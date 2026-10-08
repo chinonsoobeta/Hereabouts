@@ -32,7 +32,10 @@ struct DueView: View {
             } header: { Text("Reminder coverage").foregroundStyle(Theme.secondary) }
             if !store.deadlines.contains(where: \.active) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Remember in time", systemImage: "calendar.badge.clock").font(.headline)
+                    HStack(alignment: .top) {
+                        Image(systemName: "calendar.badge.clock").accessibilityHidden(true)
+                        Text("Remember in time").fixedSize(horizontal: false, vertical: true)
+                    }.font(.headline)
                     Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")
                         .foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
                 }

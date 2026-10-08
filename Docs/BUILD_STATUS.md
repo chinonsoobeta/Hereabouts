@@ -324,3 +324,26 @@ A fresh full typography audit on the delivered source failed with thirteen findi
 The existing contrast check was extended with `.textClipped` to isolate this category without Dynamic Type changes. Command used `-jobs 10 -parallel-testing-enabled NO`, SE destination `F57B85B9-C56D-4EC3-84CE-9A77A38C3109`, derived data `DerivedData/DueCardUI`, result `/private/tmp/Localiser-tabs-contrast-clipping-20261008.xcresult`, and the then-existing selector `LocaliserUITests/LocaliserUITests/testLaunchTabsContrastWithoutChangingTextSize`. **Failed**, one test, one clipping finding on `Remember in time`, 18.248 seconds, exit 65. Log: `/private/tmp/localiser-tabs-contrast-clipping-20261008.log`. The test was subsequently renamed `testLaunchTabsContrastAndClippingWithoutChangingTextSize` and attachment names updated to describe both categories. The exported element screenshot was inspected; this is unresolved evidence, not a claimed false positive. Earlier contrast-only passes retain their narrower scope.
 
 After the owner reported unlocking the phone, two wireless launch requests still returned CoreDevice 10002 / FBSOpenApplicationErrorDomain 7 `Locked` (exit 1). Process inventory succeeded but contained no Localiser process. The latest signed app remains installed at `F8565095-A75A-44BE-B9D6-CD89C06DF46E/Localiser.app`; its launch remains unverified. The owner was asked to keep the screen awake and open the installed app manually. No password was requested and no device security setting changed.
+
+
+## Due title clipping correction
+
+Outcome: the existing Due empty-state title must have space to wrap at larger text sizes. Non-goals: no date, reminder, storage or permission change. Production file: `Localiser/Dates/DueView.swift` only. The acceptance check is the existing all-tab contrast-and-clipping audit.
+
+Applying vertical fixed sizing to the whole native Label did not clear the finding (one failure, 18.139 seconds, exit 65; `/private/tmp/Localiser-label-vertical-clipping-20261008.xcresult`). That trial was replaced, not stacked, with a native HStack containing an accessibility-hidden decorative icon and a separate wrapping Text. The wording is unchanged. The default screenshot was inspected and retained as `Final-title-row-light.png`.
+
+Exact focused light command:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=F57B85B9-C56D-4EC3-84CE-9A77A38C3109' -derivedDataPath DerivedData/DueCardUI -resultBundlePath /private/tmp/Localiser-title-row-clipping-20261008.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testLaunchTabsContrastAndClippingWithoutChangingTextSize test
+```
+
+**Passed**, one test, zero failures/skips, 17.963 seconds, exit 0. Summary: `Final-title-row-contrast-clipping-summary.json`; log `/private/tmp/localiser-title-row-clipping-20261008.log`. The same selector passed on current iOS 27 / dark / default text using destination `795B0913-F0A1-4316-A268-4DAC0EE9189D`, derived data `DerivedData/DueCardDarkUI`, result `/private/tmp/Localiser-title-row-dark-20261008.xcresult`. Summary: `Final-title-row-dark-summary.json`; log `/private/tmp/localiser-title-row-dark-20261008.log`.
+
+Maximum text was explicitly set using `xcrun simctl ui F57B85B9-C56D-4EC3-84CE-9A77A38C3109 content_size accessibility-extra-extra-extra-large`. The first command above then selected `testSettingsExportsAndProAreReachable`, with result `/private/tmp/Localiser-title-row-max-20261008.xcresult`. **Passed**, one test, zero failures/skips, 56.585 seconds, exit 0. Summary: `Final-title-row-max-summary.json`; log `/private/tmp/localiser-title-row-max-20261008.log`. The Due screenshot was inspected: status text wraps, with the empty title below the initial viewport. This structural workflow pass does not establish full typography at maximum size.
+
+The full typography selector `testTypographyAccessibilityOnLaunchTabs` on baseline/default text still **failed**: eleven findings, 40.226 seconds, exit 65; result `/private/tmp/Localiser-title-row-typography-20261008.xcresult`, log `/private/tmp/localiser-title-row-typography-20261008.log`, summary `Final-title-row-typography-summary.json`. The clipping finding did not recur, but the title's Dynamic Type warning remains. Other Dynamic Type warnings and settings contrast findings remain. No audit suppression was added; this is not a passing full accessibility gate.
+
+The normal Release build succeeded using the recorded Personal Team/empty entitlement/cloud-container command and `-jobs 10`; log `/private/tmp/localiser-title-row-release-20261008.log`. Separate `codesign --verify --deep --strict --verbose=4 DerivedData/PersonalDeviceFinal/Build/Products/Release-iphoneos/Localiser.app` exited 0. Executable SHA-256: `6aa7ff80f49ea0b3053ce9a230283e719c81ddb6e4a0fb9d718f18723321f7bd`.
+
+Wireless install succeeded, exit 0: `622CCA3C-1576-4018-B129-338058122B1B/Localiser.app`, database sequence 2808. The normal launch request returned exit 1, CoreDevice 10002 / FBSOpenApplicationErrorDomain 7 `Locked`. Separate process inventory succeeded and contained no Localiser process. This installation supersedes the previous hash, but final physical launch remains unverified. No password was requested. `git diff --check` passed.
