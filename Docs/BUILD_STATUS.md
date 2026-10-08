@@ -89,6 +89,16 @@ xcrun devicectl device process launch --device 00008140-000659260A84801C dev.loc
 
 Xcode created the Personal Team development profile required for this installation. No paid enrollment, upload, invitation or public distribution occurred.
 
+The subsequent physical UI run was blocked before executing tests: `LocaliserUITests-Runner` could not install because the iPhone already had three apps using free development profiles (Consigliere, Localiser and Hisense Remote). `MIInstallerErrorDomain` code 13 explicitly identified this limit. No installed apps were deleted to make room. This failed run provides no physical UI-workflow evidence; it does not contradict the successful standalone installation/launch. Log: `/private/tmp/localiser-physical-ui-test.log`.
+
+The hosted non-purchase logic tests then ran inside Localiser's existing app slot:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS,id=00008140-000659260A84801C' -derivedDataPath DerivedData/PersonalDeviceLocal -jobs 10 -parallel-testing-enabled NO -allowProvisioningUpdates DEVELOPMENT_TEAM=BRLCAAM57K CODE_SIGN_STYLE=Automatic CODE_SIGN_ENTITLEMENTS=/private/tmp/localiser-personal.entitlements LOCALISER_CLOUD_CONTAINER= -only-testing:LocaliserTests -skip-testing:LocaliserTests/LocaliserTests/testLifetimePurchaseRestoreRefundAndCreationLimitsPreserveLibrary -skip-testing:LocaliserTests/LocaliserTests/testCanceledFailedAndPendingPurchasesDoNotUnlock test
+```
+
+**Succeeded: sixteen tests passed, zero failures.** Tests exercised persistence, historical migration, place safety, search, confirmed dates/DST, actual Vision OCR on a generated printed-expiry image, PDF rejection, scan retention, packing conflicts/coming home and backup recovery on the physical iPhone. Result: `DerivedData/PersonalDeviceLocal/Logs/Test/Test-Localiser-2026.10.07_20-41-06--0700.xcresult`. The two purchase tests were deliberately excluded; this run does not establish camera capture, interactive UI, notification delivery, offline network conditions, Apple Intelligence absence or private sync. Each logic test uses its own temporary/in-memory library. Localiser was relaunched afterward without test-library arguments for normal use.
+
 ## Remaining release requirements
 
 See BETA_AND_RELEASE.md for the beta workflow, listing/policy drafts and physical test matrix. No real-user beta, live iCloud operation, production StoreKit setup, developer enrollment, upload, invitation or public release has occurred. Commercial demand and launch timing remain unverified. The full launch combination has not been reduced.
