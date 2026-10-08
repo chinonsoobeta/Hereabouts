@@ -467,7 +467,14 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(result.candidates.contains { $0.day.stored == "2028-07-14" && $0.hint == .expiry })
         XCTAssertEqual(result.mime, "image/png")
         let pdf = PDFDocument()
-        for index in 0..<11 { pdf.insert(try XCTUnwrap(PDFPage(image: image)), at: index) }
+        pdf.insert(try XCTUnwrap(PDFPage(image: image)), at: 0)
+        let supportedPDF = try XCTUnwrap(pdf.dataRepresentation())
+        let imported = try await Task.detached { try ScanReader.read(data: supportedPDF, filename: "Expiry.pdf", mime: "application/pdf") }.value
+        XCTAssertEqual(imported.mime, "application/pdf")
+        XCTAssertEqual(imported.data, supportedPDF)
+        XCTAssertNotNil(imported.preview)
+        XCTAssertTrue(imported.candidates.contains { $0.day.stored == "2028-07-14" && $0.hint == .expiry })
+        for index in 1..<11 { pdf.insert(try XCTUnwrap(PDFPage(image: image)), at: index) }
         let pdfData = try XCTUnwrap(pdf.dataRepresentation())
         XCTAssertThrowsError(try ScanReader.read(data: pdfData, filename: "Too many.pdf", mime: "application/pdf"))
         XCTAssertThrowsError(try ScanReader.read(data: Data([0, 1]), filename: "Broken.pdf", mime: "application/pdf"))

@@ -18,11 +18,11 @@ struct FindView: View {
     var body: some View {
         List {
             if store.items.isEmpty {
-                Section { ContentUnavailableView("Find it next time", systemImage: "shippingbox", description: Text("Save one belonging and where you put it. A name is enough to start."))
-                    Button("Add your first item") { showAdd = true }
+                Section { LibraryEmptyState(title: "Find it next time", systemImage: "shippingbox", description: "Save one belonging and where you put it. A name is enough to start.")
+                    Button { showAdd = true } label: { Text("Add your first item").font(.body).fixedSize(horizontal: false, vertical: true) }
                 }
             } else {
-                if putAway { Text("Choose an item, then confirm where you put it.").foregroundStyle(.secondary) }
+                if putAway { Text("Choose an item, then confirm where you put it.").foregroundStyle(Theme.secondary) }
                 if results.isEmpty { ContentUnavailableView.search(text: query) }
                 ForEach(results) { item in
                     NavigationLink { ItemDetailView(item: item, putAway: putAway) } label: { ItemRow(item: item) }
@@ -31,7 +31,7 @@ struct FindView: View {
         }
         .scrollContentBackground(.hidden).background(Theme.ground)
         .navigationTitle("Localiser")
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Name, alias, or place")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
@@ -61,7 +61,7 @@ struct ItemRow: View {
             } else { Image(systemName: "shippingbox").foregroundStyle(Theme.purple).frame(width: 44).accessibilityHidden(true) }
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name).font(.headline)
-                Text((item.packedTrips.isEmpty ? "" : "Home: ") + (item.place?.path ?? "Location unspecified")).font(.subheadline).foregroundStyle(.secondary)
+                Text((item.packedTrips.isEmpty ? "" : "Home: ") + (item.place?.path ?? "Location unspecified")).font(.subheadline).foregroundStyle(Theme.secondary)
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.caption).foregroundStyle(Theme.purple) }
             }
         }.padding(.vertical, 4)
@@ -184,7 +184,7 @@ struct ItemDetailView: View {
                 Section {
                     ItemRow(item: item)
                     if !item.notes.isEmpty { Text(item.notes) }
-                    if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").foregroundStyle(.secondary) }
+                    if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").foregroundStyle(Theme.secondary) }
                 }
                 Section(putAway ? "Put away" : "Location") {
                     PlacePicker(selection: $destination)
@@ -205,7 +205,7 @@ struct ItemDetailView: View {
                     Section("Scans") {
                         ForEach(item.scans.sorted { $0.createdAt > $1.createdAt }) { scan in
                             NavigationLink { StoredScanView(scan: scan) } label: {
-                                VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(.secondary) }
+                                VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(Theme.secondary) }
                             }
                         }
                     }
@@ -215,7 +215,7 @@ struct ItemDetailView: View {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
                             VStack(alignment: .leading) {
                                 Text("\(movement.fromPath) → \(movement.toPath)")
-                                Text(movement.date, format: .dateTime.month().day().hour().minute()).font(.caption).foregroundStyle(.secondary)
+                                Text(movement.date, format: .dateTime.month().day().hour().minute()).font(.caption).foregroundStyle(Theme.secondary)
                             }
                         }
                     }

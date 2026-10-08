@@ -17,6 +17,16 @@ Start with a small consented group of household organizers, frequent shoppers an
 
 Ask whether they used Localiser again without prompting, which problem it helped with, what they would pay, and which existing tool they would replace. Record observations and exact defects; small-sample percentages do not establish commercial demand. Do not add an analytics service solely for this beta.
 
+## Frozen quality-check protocol
+
+Freeze the app commit and expected answers before evaluating the independent examples proposed in the plan: 200 capture sentences and 100 search pairs. Use consented, de-identified examples from people who did not write the implementation. Keep all examples in the reported denominator, including failures, ambiguous inputs and manual corrections. Do not replace difficult examples after seeing the result. Development fixtures and the current unit tests are not this holdout dataset.
+
+For each capture sentence, record the intended item name, existing place identifier or explicit unknown/ambiguous result, suggested values, required corrections and time to finish saving. Score an automatic suggestion as correct only when both its name and place result match the frozen answer. Report suggestion accuracy separately from successful corrected capture. The usability target is at least 90% of attempted captures completed correctly within ten seconds, including any corrections. Unknown/ambiguous locations must never be silently assigned, and dates must never be saved without explicit confirmation: the allowed count for either safety failure is zero.
+
+For each search pair, record the query and acceptable item identifiers before running it. Score a successful positive query when an acceptable item appears among the first three results; the initial target is at least 95% of positive queries. Report negative-query false positives and ambiguity separately, rather than counting them as successful retrievals. Measure the separate 5,000-record / 50 ms performance target on the slowest supported test phone. Do not infer it from search accuracy or simulator timing.
+
+These are evaluation targets, not achieved results. If the frozen evaluation misses a target, record the defects and repeat on a new independent holdout after correcting them; preserve the failed evaluation. Representative inputs, user observations and the physical timing checks remain owner/beta work.
+
 ## Physical-device verification before public launch
 
 - Test iOS 26 and the current OS, the smallest supported screen, and phones with and without Apple Intelligence where available.

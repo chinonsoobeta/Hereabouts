@@ -20,15 +20,15 @@ struct DueView: View {
         let _ = store.revision
         List {
             Section("Reminder coverage") {
-                LabeledContent("Notifications", value: reminders.permission)
+                LabeledContent("Notifications") { Text(reminders.permission).foregroundStyle(Theme.secondary) }
                 Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.subheadline)
-                if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates below or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(.secondary) }
+                if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates below or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
                 if let error = reminders.error { Text(error).foregroundStyle(.red) }
                 Button("Enable notifications") { Task { await reminders.enable() } }
                 if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Link("Open notification settings", destination: url) }
-                Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.caption).foregroundStyle(.secondary)
+                Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.caption).foregroundStyle(Theme.secondary)
             }
-            if !store.deadlines.contains(where: \.active) { ContentUnavailableView("Remember in time", systemImage: "calendar.badge.clock", description: Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")) }
+            if !store.deadlines.contains(where: \.active) { LibraryEmptyState(title: "Remember in time", systemImage: "calendar.badge.clock", description: "Add a confirmed return deadline, warranty end, or document expiry to an item.") }
             ForEach(sections, id: \.self) { heading in
                 let dates = store.deadlines.filter { $0.active && section($0) == heading }
                 if !dates.isEmpty {
@@ -43,7 +43,7 @@ struct DueView: View {
         }
         .scrollContentBackground(.hidden).background(Theme.ground).navigationTitle("Due soon")
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) { Button(showClosed ? "Hide closed" : "Show closed") { showClosed.toggle() } }
+            ToolbarItem(placement: .topBarLeading) { Button { showClosed.toggle() } label: { Image(systemName: showClosed ? "eye.slash" : "eye") }.accessibilityLabel(showClosed ? "Hide closed" : "Show closed") }
             ToolbarItem(placement: .topBarTrailing) { Button("Add date", systemImage: "plus") { addDate = true } }
         }
         .sheet(isPresented: $addDate) { NavigationStack {
@@ -60,8 +60,8 @@ struct DeadlineRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(deadline.item?.name ?? "Item unavailable").font(.headline)
-            HStack { Text(deadline.kind?.title ?? "Unknown date"); Spacer(); if let date = deadline.day?.date() { Text(date, format: .dateTime.year().month().day()) } }
-                .font(.subheadline).foregroundStyle(.secondary)
+            LabeledContent(deadline.kind?.title ?? "Unknown date") { if let date = deadline.day?.date() { Text(date, format: .dateTime.year().month().day()) } }
+                .font(.subheadline).foregroundStyle(Theme.secondary)
         }.padding(.vertical, 4)
     }
 }
@@ -116,7 +116,7 @@ struct DeadlineEditor: View {
                     if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
                     Text("A receipt date may be a purchase date. Confirm the date type and any missing terms; suggestions are not store policies.").font(.subheadline)
                     Toggle("Keep original document", isOn: $retainSource)
-                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this item and included in device backup and any configured private sync." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(.secondary)
+                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this item and included in device backup and any configured private sync." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
             Section(item.name) {
@@ -128,7 +128,7 @@ struct DeadlineEditor: View {
                         DatePicker(anchorType, selection: $anchor, displayedComponents: .date)
                         Stepper("Window: \(windowDays) days", value: $windowDays, in: 1...365)
                         Toggle("Count the starting day as day 1", isOn: $includeAnchor)
-                        Text("Use the terms for this purchase. Localiser does not look up the store's policy.").font(.caption).foregroundStyle(.secondary)
+                        Text("Use the terms for this purchase. Localiser does not look up the store's policy.").font(.caption).foregroundStyle(Theme.secondary)
                     }
                 }
                 if !useWindow || kind != .returns { DatePicker("Final date", selection: $date, displayedComponents: .date).accessibilityIdentifier("deadline.date") }
@@ -139,14 +139,14 @@ struct DeadlineEditor: View {
                 if enabled {
                     Stepper("\(leadDays) days before", value: $leadDays, in: 0...3650)
                     Picker("Local time", selection: $hour) { ForEach(0..<24) { Text(String(format: "%02d:00", $0)).tag($0) } }
-                    Text("A reminder is also scheduled on the date, if it is still in the future and queue space is available. Enable notifications in Due soon.").font(.caption).foregroundStyle(.secondary)
+                    Text("A reminder is also scheduled on the date, if it is still in the future and queue space is available. Enable notifications in Due soon.").font(.caption).foregroundStyle(Theme.secondary)
                 }
-                if kind == .expiry { Text("The lead time is your preference. It does not establish travel eligibility or insurance coverage.").font(.caption).foregroundStyle(.secondary) }
+                if kind == .expiry { Text("The lead time is your preference. It does not establish travel eligibility or insurance coverage.").font(.caption).foregroundStyle(Theme.secondary) }
             }
             Section("Review before saving") {
-                if let value = finalDay?.date() { LabeledContent("Confirmed deadline") { Text(value, format: .dateTime.year().month().day()) } }
+                if let value = finalDay?.date() { LabeledContent("Confirmed deadline") { Text(value, format: .dateTime.year().month().day()).foregroundStyle(Theme.secondary) } }
                 if closed { Toggle("Reopen return decision", isOn: $reopen) }
-                if item.archived { Text("This item is archived. Restore it in Find before reminders can be scheduled.").foregroundStyle(.secondary) }
+                if item.archived { Text("This item is archived. Restore it in Find before reminders can be scheduled.").foregroundStyle(Theme.secondary) }
                 Toggle("I have checked the date type and final date", isOn: $confirmed).accessibilityIdentifier("deadline.confirm")
             }
         }
@@ -196,7 +196,7 @@ struct DeadlineDetailView: View {
             Section { DeadlineRow(deadline: deadline); if !deadline.source.isEmpty { Text(deadline.source).font(.subheadline) } }
             Section("Scheduled reminders") {
                 let requests = reminders.scheduled.filter { $0.deadlineID == deadline.id }
-                if requests.isEmpty { Text("No future notification is currently scheduled for this date.").foregroundStyle(.secondary) }
+                if requests.isEmpty { Text("No future notification is currently scheduled for this date.").foregroundStyle(Theme.secondary) }
                 ForEach(requests, id: \.id) { request in Text(request.fireDate, format: .dateTime.year().month().day().hour().minute()) }
                 Button("Add to Calendar") { calendar = true }
             }
@@ -207,7 +207,7 @@ struct DeadlineDetailView: View {
                         Button("Keep purchase") { decide(.keeping) }
                         Button("Plan to return") { decide(.returning) }
                         Button("Mark returned") { confirmReturned = true }
-                    } else { Text("Edit this date and explicitly reopen the decision to resume return reminders.").foregroundStyle(.secondary) }
+                    } else { Text("Edit this date and explicitly reopen the decision to resume return reminders.").foregroundStyle(Theme.secondary) }
                 }
             }
             if let item = deadline.item { Section { NavigationLink("View belonging") { ItemDetailView(item: item) } } }

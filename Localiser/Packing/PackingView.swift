@@ -7,10 +7,10 @@ struct PackingView: View {
     var body: some View {
         List {
             Section("Trips") {
-                if store.trips.isEmpty { Text("Create a trip from a reusable kit or start an empty checklist.").foregroundStyle(.secondary) }
+                if store.trips.isEmpty { Text("Create a trip from a reusable kit or start an empty checklist.").foregroundStyle(Theme.secondary) }
                 ForEach(store.trips) { trip in
                     NavigationLink { TripDetailView(trip: trip) } label: {
-                        VStack(alignment: .leading) { Text(trip.name).font(.headline); Text("\(trip.startDay) to \(trip.endDay) · \(trip.stateRaw)").font(.caption).foregroundStyle(.secondary) }
+                        VStack(alignment: .leading) { Text(trip.name).font(.headline); Text("\(trip.startDay) to \(trip.endDay) · \(trip.stateRaw)").font(.caption).foregroundStyle(Theme.secondary) }
                     }
                 }
                 Button("New trip") { newTrip = true }
@@ -18,7 +18,7 @@ struct PackingView: View {
             Section("Reusable kits") {
                 ForEach(store.kits) { kit in NavigationLink { KitDetailView(kit: kit) } label: { LabeledContent(kit.name, value: "\(kit.entries.count) rows") } }
                 Button("New kit") { newKit = true }
-                Text("Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.").font(.caption).foregroundStyle(.secondary)
+                Text("Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.").font(.caption).foregroundStyle(Theme.secondary)
             }
         }
         .scrollContentBackground(.hidden).background(Theme.ground).navigationTitle("Packing")
@@ -70,8 +70,8 @@ struct KitDetailView: View {
                     Button { editingEntry = entry } label: {
                         VStack(alignment: .leading) {
                             Text(entry.title).font(.headline)
-                            Text("\(entry.unitQuantity)\(entry.perNight ? " per night" : " total") · \(entry.condition.title)").font(.caption).foregroundStyle(.secondary)
-                            if entry.item?.archived == true { Text("Archived item: excluded from new trips").font(.caption).foregroundStyle(.orange) }
+                            Text("\(entry.unitQuantity)\(entry.perNight ? " per night" : " total") · \(entry.condition.title)").font(.caption).foregroundStyle(Theme.secondary)
+                            if entry.item?.archived == true { Text("Archived item: excluded from new trips").font(.caption).foregroundStyle(Theme.warning) }
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
                 }
@@ -119,7 +119,7 @@ struct KitEntryEditor: View {
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
             Toggle("Multiply by nights", isOn: $perNight)
             Picker("Include for", selection: $condition) { ForEach(PackingCondition.allCases) { Text($0.title).tag($0) } }
-            Text("Linked rows use the item's current place. Free-text rows appear under Anywhere.").font(.caption).foregroundStyle(.secondary)
+            Text("Linked rows use the item's current place. Free-text rows appear under Anywhere.").font(.caption).foregroundStyle(Theme.secondary)
         }
         .navigationTitle(entry == nil ? "Add packing row" : "Edit packing row").navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -167,7 +167,7 @@ struct TripEditor: View {
             if let trip {
                 Section("Quantity changes") {
                     ForEach(trip.entries.filter { $0.required(for: details) != $0.requiredCount }.sorted { $0.title < $1.title }) { entry in Text("\(entry.title): \(entry.requiredCount) → \(entry.required(for: details)); \(entry.packedCount) already packed") }
-                    Text("Packed counts and manual quantity overrides will be kept. Review any excess or missing items after saving.").font(.caption).foregroundStyle(.secondary)
+                    Text("Packed counts and manual quantity overrides will be kept. Review any excess or missing items after saving.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }
@@ -207,8 +207,8 @@ struct TripDetailView: View {
                         NavigationLink { TripEntryDetailView(entry: entry) } label: {
                             VStack(alignment: .leading) {
                                 Text(entry.title).font(.headline)
-                                Text("\(entry.packedCount) packed / \(entry.requiredCount) needed").font(.subheadline).foregroundStyle(.secondary)
-                                if entry.item?.archived == true { Text("Archived / returned item: resolve or remove this row.").font(.caption).foregroundStyle(.orange) }
+                                Text("\(entry.packedCount) packed / \(entry.requiredCount) needed").font(.subheadline).foregroundStyle(Theme.secondary)
+                                if entry.item?.archived == true { Text("Archived / returned item: resolve or remove this row.").font(.caption).foregroundStyle(Theme.warning) }
                                 if trip.state == .comingHome { Text("Coming home: \(entry.resolutionRaw)").font(.caption) }
                             }
                         }
@@ -285,7 +285,7 @@ struct TripEntryDetailView: View {
         List {
             Section {
                 Text("\(entry.packedCount) packed / \(entry.requiredCount) needed")
-                Text(entry.item?.place?.path ?? "Anywhere").foregroundStyle(.secondary)
+                Text(entry.item?.place?.path ?? "Anywhere").foregroundStyle(Theme.secondary)
                 if let item = entry.item { NavigationLink("View belonging") { ItemDetailView(item: item) } }
             }
             if entry.trip?.state == .packing {
@@ -299,7 +299,7 @@ struct TripEntryDetailView: View {
                     Stepper("Needed: \(quantity)", value: $quantity, in: 0...9999)
                     Button("Use manual quantity") { attempt { try store.setTripQuantity(entry, override: quantity) } }
                     Button("Use kit rule") { attempt { try store.setTripQuantity(entry, override: nil); quantity = entry.requiredCount } }
-                    Text("Changing quantities does not erase the number already packed.").font(.caption).foregroundStyle(.secondary)
+                    Text("Changing quantities does not erase the number already packed.").font(.caption).foregroundStyle(Theme.secondary)
                 }
                 Section { Button("Remove row", role: .destructive) { deleting = true } }
             }
@@ -316,7 +316,7 @@ struct TripEntryDetailView: View {
                         }
                     }
                     Button("Leave unresolved for now") { attempt { try store.resolveHome(entry, resolution: .unresolved) } }
-                    Text("Unresolved rows stay on this checklist. Resolve them before finishing coming home.").font(.caption).foregroundStyle(.secondary)
+                    Text("Unresolved rows stay on this checklist. Resolve them before finishing coming home.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }

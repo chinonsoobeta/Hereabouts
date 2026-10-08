@@ -5,10 +5,10 @@ struct PlacesView: View {
     @State private var adding = false
     var body: some View {
         List {
-            if store.places.isEmpty { ContentUnavailableView("Where do you keep things?", systemImage: "shippingbox", description: Text("Add a room, drawer, shelf, or box. You can put one place inside another.")) }
+            if store.places.isEmpty { LibraryEmptyState(title: "Where do you keep things?", systemImage: "shippingbox", description: "Add a room, drawer, shelf, or box. You can put one place inside another.") }
             ForEach(store.places) { place in
                 NavigationLink { PlaceDetailView(place: place) } label: {
-                    VStack(alignment: .leading) { Text(place.path); Text("\(place.items.filter { !$0.archived }.count) items · \(place.children.count) places").font(.caption).foregroundStyle(.secondary) }
+                    VStack(alignment: .leading) { Text(place.path); Text("\(place.items.filter { !$0.archived }.count) items · \(place.children.count) places").font(.caption).foregroundStyle(Theme.secondary) }
                 }
             }
         }
@@ -62,7 +62,7 @@ struct PlaceDetailView: View {
     var body: some View {
         let _ = store.revision
         List {
-            Text(place.path).foregroundStyle(.secondary)
+            Text(place.path).foregroundStyle(Theme.secondary)
             Section("Places inside") {
                 ForEach(place.children.sorted { $0.name < $1.name }) { child in NavigationLink(child.name) { PlaceDetailView(place: child) } }
                 Button("Add a place inside") { adding = true }

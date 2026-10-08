@@ -16,6 +16,7 @@ struct ScanView: View {
     @State private var candidateID: String?
     @State private var itemID: UUID?
     @State private var newName = ""
+    @FocusState private var nameFocused: Bool
     @State private var review = false
     @State private var error: String?
     @State private var upgrade = false
@@ -28,7 +29,7 @@ struct ScanView: View {
                 Button("Scan with camera", systemImage: "doc.viewfinder") { camera = true }.disabled(!VNDocumentCameraViewController.isSupported || processing)
                 PhotosPicker(selection: $photo, matching: .images) { Label("Choose a photo", systemImage: "photo") }.disabled(processing)
                 Button("Import PDF or image", systemImage: "doc.badge.plus") { importing = true }.disabled(processing)
-                if !VNDocumentCameraViewController.isSupported { Text("Camera scanning is unavailable on this device. Choose a photo or import a document.").font(.caption).foregroundStyle(.secondary) }
+                if !VNDocumentCameraViewController.isSupported { Text("Camera scanning is unavailable on this device. Choose a photo or import a document.").font(.caption).foregroundStyle(Theme.secondary) }
                 if processing { ProgressView("Reading on this device…") }
             }
             if let draft {
@@ -41,29 +42,29 @@ struct ScanView: View {
                             VStack(alignment: .leading, spacing: 5) {
                                 HStack { Text(candidate.raw).bold(); Spacer(); if candidate.id == candidateID { Image(systemName: "checkmark.circle.fill") } }
                                 if let date = candidate.day.date() { Text(date, format: .dateTime.year().month().day()) }
-                                Text(candidate.line).font(.caption).foregroundStyle(.secondary)
-                                if candidate.ambiguous { Text("Ambiguous format. Choose the interpretation that matches the document.").font(.caption).foregroundStyle(.orange) }
+                                Text(candidate.line).font(.caption).foregroundStyle(Theme.secondary)
+                                if candidate.ambiguous { Text("Ambiguous format. Choose the interpretation that matches the document.").font(.caption).foregroundStyle(Theme.warning) }
                                 Text(candidate.hint.map { "Possible \($0.title.lowercased()); confirm this." } ?? "Date type is unknown; confirm it in the next step.").font(.caption)
                             }
                         }
                     }
                     Button("Enter a different date manually") { candidateID = nil }
-                    Text("Nothing is scheduled until you confirm the final date.").font(.caption).foregroundStyle(.secondary)
+                    Text("Nothing is scheduled until you confirm the final date.").font(.caption).foregroundStyle(Theme.secondary)
                 }
                 Section("3. Link one item") {
                     Picker("Existing item", selection: $itemID) {
                         Text("Choose an item").tag(nil as UUID?)
                         ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) }
                     }
-                    TextField("Or name a new item", text: $newName)
+                    TextField("Or name a new item", text: $newName).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }
                     Button("Create item") {
                         guard pro.allows(.item, count: store.items.count) else { upgrade = true; return }
                         do { itemID = try store.addItem(name: newName).id; newName = "" } catch { self.error = error.localizedDescription }
                     }.disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Button("Review and confirm date") { review = true }.disabled(itemID == nil)
+                    Button("Review and confirm date") { nameFocused = false; review = true }.disabled(itemID == nil)
                 }
             }
-            Section { Text("Reading happens on your device. Originals are kept only if you choose that in the final review. A purchase date alone does not establish a return deadline.").font(.caption).foregroundStyle(.secondary) }
+            Section { Text("Reading happens on your device. Originals are kept only if you choose that in the final review. A purchase date alone does not establish a return deadline.").font(.caption).foregroundStyle(Theme.secondary) }
         }
         .navigationTitle("Scan a document").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -148,7 +149,7 @@ struct StoredScanView: View {
                 if scan.mime == "application/pdf" { PDFPreview(data: data) }
                 else if let image = UIImage(data: data) { ScrollView { Image(uiImage: image).resizable().scaledToFit() } }
                 Button("Remove original document", role: .destructive) { removing = true }.padding()
-            } else { ContentUnavailableView("Date-only scan", systemImage: "calendar", description: Text("The original is not retained. Your saved dates remain with the item.")) }
+            } else { LibraryEmptyState(title: "Date-only scan", systemImage: "calendar", description: "The original is not retained. Your saved dates remain with the item.") }
         }
         .navigationTitle(scan.filename).navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Remove the original? Your saved dates and completed-scan count will remain.", isPresented: $removing, titleVisibility: .visible) { Button("Remove original", role: .destructive) {
