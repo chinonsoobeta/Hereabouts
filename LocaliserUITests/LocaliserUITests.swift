@@ -44,6 +44,15 @@ import XCTest
             add(screenshot)
             try app.performAccessibilityAudit(for: [.contrast, .textClipped])
         }
+        app.tabBars.buttons["Find"].tap()
+        app.buttons["Find options"].tap()
+        app.buttons["Settings and backup"].tap()
+        reveal(app.buttons["Choose Localiser backup"], in: app)
+        let backup = XCTAttachment(screenshot: app.screenshot())
+        backup.name = "Contrast and clipping audit Restore"
+        backup.lifetime = .keepAlways
+        add(backup)
+        try app.performAccessibilityAudit(for: [.contrast, .textClipped])
     }
 
     func testTypographyAccessibilityOnLaunchTabs() throws {

@@ -347,3 +347,26 @@ The full typography selector `testTypographyAccessibilityOnLaunchTabs` on baseli
 The normal Release build succeeded using the recorded Personal Team/empty entitlement/cloud-container command and `-jobs 10`; log `/private/tmp/localiser-title-row-release-20261008.log`. Separate `codesign --verify --deep --strict --verbose=4 DerivedData/PersonalDeviceFinal/Build/Products/Release-iphoneos/Localiser.app` exited 0. Executable SHA-256: `6aa7ff80f49ea0b3053ce9a230283e719c81ddb6e4a0fb9d718f18723321f7bd`.
 
 Wireless install succeeded, exit 0: `622CCA3C-1576-4018-B129-338058122B1B/Localiser.app`, database sequence 2808. The normal launch request returned exit 1, CoreDevice 10002 / FBSOpenApplicationErrorDomain 7 `Locked`. Separate process inventory succeeded and contained no Localiser process. This installation supersedes the previous hash, but final physical launch remains unverified. No password was requested. `git diff --check` passed.
+
+
+## Isolated settings contrast and recovery regression
+
+Outcome: correct an independently reproduced visible Restore-heading contrast finding. Non-goals: no backup/restore, data, permission or purchase behavior change. Production file: `Localiser/Recovery/LibrarySettingsView.swift`. The existing focused UI audit now also navigates to settings and reveals `Choose Localiser backup`, retaining its viewport screenshot before the contrast/clipping audit. No issue suppression was added.
+
+Default `large` text / baseline light run on unchanged production source failed with four contrast findings, one test, 34.708 seconds, exit 65: `/private/tmp/Localiser-restore-contrast-baseline-20261008.xcresult`, log `/private/tmp/localiser-restore-contrast-baseline-20261008.log`. The visible `Restore` heading was identified directly. After the suite finished, optional simulator diagnostic collector PID 45803 was terminated; xcodebuild then finalized the readable result and returned 65. The test failure was preserved.
+
+The Restore header now explicitly uses the existing adaptive `Theme.secondary`. The same isolated check failed with three remaining contrast findings, but the resolved Restore-heading finding no longer appeared. Exact command:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=F57B85B9-C56D-4EC3-84CE-9A77A38C3109' -derivedDataPath DerivedData/DueCardUI -resultBundlePath /private/tmp/Localiser-restore-heading-contrast-20261008.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testLaunchTabsContrastAndClippingWithoutChangingTextSize test
+```
+
+**Failed**, one test, three contrast findings, 34.097 seconds, exit 65. Summary: `Final-restore-heading-light-summary.json`; log `/private/tmp/localiser-restore-heading-contrast-20261008.log`. The remaining nodes could not be resolved individually by XCTest; the hierarchy attachment contained only the app root. That is insufficient to call them false positives. Screenshot `Final-restore-heading-light.png` was inspected: Restore is darker and readable; upper content is behind the native navigation overlay.
+
+Same selector on current iOS 27 / dark / default text, destination `795B0913-F0A1-4316-A268-4DAC0EE9189D`, derived data `DerivedData/DueCardDarkUI`, result `/private/tmp/Localiser-restore-heading-dark-20261008.xcresult`, **failed** with five contrast findings in 35.642 seconds, exit 65. Summary: `Final-restore-heading-dark-summary.json`; log `/private/tmp/localiser-restore-heading-dark-20261008.log`. Screenshot `Final-restore-heading-dark.png` and the reported erase-warning element image were inspected. The warning is below the initially captured viewport. These observations do not clear the expanded audit or establish all findings false. Earlier four-tab passes did not include settings.
+
+The actual native backup export/import round trip passed on baseline light/default text using the first command's destination/derived data with selector `testBackupExportsAndRestoresIntoFreshLibrary` and result `/private/tmp/Localiser-restore-heading-recovery-20261008.xcresult`: one test, zero failures/skips, 52.257 seconds, exit 0. Summary: `Final-restore-heading-recovery-summary.json`; log `/private/tmp/localiser-restore-heading-recovery-20261008.log`. This confirms the header-only correction preserves that tested workflow.
+
+Normal signed Release build passed using the recorded Personal Team/empty entitlement/cloud-container command, `-jobs 10`; log `/private/tmp/localiser-restore-heading-release-20261008.log`. Separate strict codesign verification exited 0. Executable SHA-256: `72d831b3ac01cb13ba332aa73fc1fe13127a749b5bb0ebc6d2b81577ebf2a5ee`.
+
+Wireless installation succeeded, exit 0; newest installed bundle `D1AB9457-36E7-4C83-9ADD-CBDC11C8EF4F/Localiser.app`, database sequence 2816. The subsequent normal launch returned exit 1 with CoreDevice 10002 / FBSOpenApplicationErrorDomain 7 `Locked`. Separate process inventory succeeded and found no Localiser process. The newest app is installed but final launch is unverified. No password was requested. Full typography/accessibility remains incomplete. `git diff --check` passed.

@@ -57,10 +57,10 @@ struct LibrarySettingsView: View {
                 }
                 if store.items.allSatisfy({ $0.photo == nil && $0.scans.allSatisfy { $0.data == nil } }) { Text("No retained files.").foregroundStyle(Theme.secondary) }
             }
-            Section("Restore") {
+            Section {
                 Button("Choose Localiser backup") { importing = true }.disabled(store.syncEnabled || store.hasUsedSync)
                 Text("Restore requires an empty local library and private sync off. Existing records are never overwritten. A restored library stays local until cloud reconnection is verified.").font(.footnote).foregroundStyle(Theme.secondary)
-            }
+            } header: { Text("Restore").foregroundStyle(Theme.secondary) }
             Section("Erase local library") {
                 Button("Erase all local records…", role: .destructive) { erasePhrase = ""; erasing = true }.disabled(store.syncEnabled || store.hasUsedSync)
                 Text("Export first. This removes local records and retained files, including trip history. This action does not erase an existing iCloud library.").font(.footnote).foregroundStyle(Theme.secondary)
