@@ -134,3 +134,21 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -d
 **Succeeded: one extended UI test passed, zero failures.** Result: `DerivedData/Logs/Test/Test-Localiser-2026.10.07_20-54-15--0700.xcresult`. The actual denial occurred in the preceding run through SpringBoard's Don't Allow button; the final run verified its persisted state. The successful screenshot was inspected and visibly shows Disabled in Settings and Open notification settings. This establishes a usable manual-date workflow with denied permission, not permission revocation, scheduling a populated queue, delivery/actions or physical-device notification behavior.
 
 See BETA_AND_RELEASE.md for the beta workflow, listing/policy drafts and physical test matrix. No real-user beta, live iCloud operation, production StoreKit setup, developer enrollment, upload, invitation or public release has occurred. Commercial demand and launch timing remain unverified. The full launch combination has not been reduced.
+
+## Continued accessibility and system reminder verification
+
+The full XCTest accessibility audit initially reported 38 findings on the iPhone SE (3rd generation), iOS 26.5. Direct screenshot inspection confirmed truncation of the Places empty-state title and low-contrast explanatory labels. The shared empty-state label now wraps, and secondary text uses an opaque colour for light/dark appearance. The search placeholder is shorter, and the tested closed-date/close/done toolbar controls use labelled icons.
+
+After the first wrapping/colour changes, the same audit reported 22 findings. A subsequent run with the toolbar changes reported seven findings, but the text-size setting was applied after initial launch: its tab screenshots do not establish maximum-text behaviour. Its Pro/settings screenshots do show large wrapping text. Result: `DerivedData/SmallScreen/Logs/Test/Test-Localiser-2026.10.07_21-24-27--0700.xcresult`. These are **failed audits**, not passing accessibility results. The remaining contrast/Dynamic Type/clipping findings require individual verification; none has been suppressed. An iOS 27 audit reported ten findings and stalled in result cleanup; its command was terminated after the test suite ended. Its unfinished bundle is not authoritative passing evidence.
+
+Apple explains that audits can produce false positives and that assistive-technology testing remains necessary: [Apple accessibility audit guidance](https://developer.apple.com/videos/play/wwdc2023/10035/). An [Apple engineer response](https://developer.apple.com/forums/thread/823968) also discusses reported Inspector Dynamic Type issues when text visibly scales. These sources do not establish that any particular Localiser finding is false.
+
+Actual system notification requests are now exercised by the existing unit/integration target on disposable simulators. The new check requests quiet permission only if it is available; physical devices are skipped, and denied simulator permission is not changed. It verifies 50 scheduled requests out of 70 candidates, the exact earliest-request identifiers, generic content without sensitive document details, local-time calendar triggers, preservation of an unrelated request, replacement after editing, deletion, return categories, keeping versus warranty reminders, and cancellation after returning an item.
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -configuration Debug -destination 'platform=iOS Simulator,id=74ED4118-BA51-47FA-9F21-17AB21E41D0D' -derivedDataPath DerivedData/CurrentOS -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserTests test
+```
+
+**Succeeded: twenty tests passed, zero failures and no skips.** Result: `DerivedData/CurrentOS/Logs/Test/Test-Localiser-2026.10.07_21-27-40--0700.xcresult`. This includes the extended actual-queue test and both local StoreKit tests. It does not prove physical notification delivery/action handling after long inactivity.
+
+The first maximum-text small-screen capture/packing run failed because the UI tests attempted to tap controls below the visible area. The existing tests now scroll to the necessary controls. Verification is still in progress. Private-sync unavailable copy was also corrected: this personal build has a signing team but lacks private-cloud configuration.

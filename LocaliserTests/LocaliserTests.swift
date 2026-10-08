@@ -4,6 +4,7 @@ import UIKit
 import PDFKit
 import StoreKit
 import StoreKitTest
+import UserNotifications
 @testable import Localiser
 
 @MainActor
@@ -348,6 +349,85 @@ final class LocaliserTests: XCTestCase {
         XCTAssertNil(CalendarDay(stored: "2026-02-30"))
         let many = (0..<70).map { _ in ReminderInput(id: UUID(), day: day, kind: .returns, leadDays: 0, hour: 9, enabled: true, archived: false, decision: .open) }
         XCTAssertEqual(ReminderPlan.candidates(many, now: now, calendar: calendar).count, 70)
+    }
+
+    func testSystemNotificationQueueCapsCoverageAndRemovesStaleRequests() async throws {
+        #if targetEnvironment(simulator)
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        if settings.authorizationStatus == .denied { throw XCTSkip("Use a dedicated simulator with notification permission available; do not change the owner's device settings.") }
+        if settings.authorizationStatus == .notDetermined {
+            _ = try await center.requestAuthorization(options: [.provisional, .alert, .sound])
+        }
+        let authorized = await center.notificationSettings().authorizationStatus
+        XCTAssertTrue([.authorized, .provisional, .ephemeral].contains(authorized))
+        let previousDelegate = center.delegate
+        let store = try LocaliserStore(inMemory: true)
+        let service = ReminderService(); service.store = store
+        let foreignID = "localiser.verification.\(UUID().uuidString)"
+        let foreignContent = UNMutableNotificationContent(); foreignContent.title = "Unrelated test request"
+        try await center.add(UNNotificationRequest(identifier: foreignID, content: foreignContent, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 86400, repeats: false)))
+        defer { center.removePendingNotificationRequests(withIdentifiers: [foreignID]); center.delegate = previousDelegate }
+        let today = CalendarDay(.now)
+        for offset in 2...71 {
+            let item = try store.addItem(name: "Private document 12345")
+            try store.setDeadline(item: item, kind: .expiry, day: XCTUnwrap(today.adding(days: offset)), source: "Sensitive terms", leadDays: 0, hour: 9, enabled: true, confirmed: true)
+        }
+        func verifyQueue() async throws -> [UNNotificationRequest] {
+            let candidates = ReminderPlan.candidates(store.deadlines.compactMap(\.reminderInput))
+            let expected = Set(candidates.prefix(50).map(\.id))
+            service.refresh(store.deadlines)
+            var requests: [UNNotificationRequest] = []
+            for _ in 0..<100 {
+                requests = await center.pendingNotificationRequests()
+                let actual = Set(requests.filter { $0.identifier.hasPrefix("localiser.deadline.") }.map(\.identifier))
+                if actual == expected && Set(service.scheduled.map(\.id)) == expected && service.candidateCount == candidates.count { break }
+                try await Task.sleep(for: .milliseconds(50))
+            }
+            XCTAssertEqual(Set(requests.filter { $0.identifier.hasPrefix("localiser.deadline.") }.map(\.identifier)), expected)
+            XCTAssertEqual(Set(service.scheduled.map(\.id)), expected)
+            XCTAssertEqual(service.candidateCount, candidates.count)
+            XCTAssertNil(service.error)
+            XCTAssertTrue(requests.contains { $0.identifier == foreignID })
+            return requests.filter { $0.identifier.hasPrefix("localiser.deadline.") }
+        }
+        let initial = try await verifyQueue()
+        XCTAssertEqual(initial.count, 50); XCTAssertEqual(service.candidateCount, 70)
+        for request in initial {
+            XCTAssertFalse(request.content.body.contains("12345")); XCTAssertFalse(request.content.body.contains("Sensitive"))
+            XCTAssertEqual(request.content.title, "Localiser reminder")
+            let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
+            XCTAssertFalse(trigger.repeats); XCTAssertEqual(trigger.dateComponents.hour, 9)
+        }
+        let first = try XCTUnwrap(store.deadlines.min { $0.dayString < $1.dayString })
+        let firstID = first.id
+        try store.setDeadline(item: XCTUnwrap(first.item), kind: .expiry, day: XCTUnwrap(today.adding(days: 200)), source: "", leadDays: 0, hour: 10, enabled: true, confirmed: true, existing: first)
+        let edited = try await verifyQueue()
+        XCTAssertFalse(edited.contains { $0.content.userInfo["deadlineID"] as? String == firstID.uuidString })
+        for deadline in store.deadlines { try store.deleteDeadline(deadline) }
+        let empty = try await verifyQueue()
+        XCTAssertTrue(empty.isEmpty)
+        let purchase = try store.addItem(name: "Private purchase 12345")
+        let returnDay = try XCTUnwrap(today.adding(days: 3))
+        let returns = try store.setDeadline(item: purchase, kind: .returns, day: returnDay, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true)
+        let warranty = try store.setDeadline(item: purchase, kind: .warranty, day: returnDay, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true)
+        let open = try await verifyQueue()
+        XCTAssertEqual(open.count, 2)
+        XCTAssertEqual(open.first { $0.content.userInfo["deadlineID"] as? String == returns.id.uuidString }?.content.categoryIdentifier, "localiser.return")
+        try store.decide(returns, .returning)
+        let returning = try await verifyQueue()
+        XCTAssertEqual(returning.count, 2)
+        try store.decide(returns, .keeping)
+        let kept = try await verifyQueue()
+        XCTAssertEqual(kept.count, 1)
+        XCTAssertEqual(kept.first?.content.userInfo["deadlineID"] as? String, warranty.id.uuidString)
+        try store.setDeadline(item: purchase, kind: .returns, day: returnDay, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true, existing: returns, reopen: true)
+        try store.decide(returns, .returned)
+        let returned = try await verifyQueue()
+        XCTAssertTrue(returned.isEmpty)
+        #else
+        throw XCTSkip("This test requests quiet notification permission only on disposable simulators. Physical notification testing requires owner interaction.")
+        #endif
     }
 
     func testScanAmbiguityInvalidDatesAndPrivacyOnConfirmation() throws {
