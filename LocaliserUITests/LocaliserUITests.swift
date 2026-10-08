@@ -32,17 +32,17 @@ import XCTest
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
     }
 
-    func testLaunchTabsContrastWithoutChangingTextSize() throws {
+    func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
         for tab in ["Find", "Places", "Due soon", "Packing"] {
             app.tabBars.buttons[tab].tap()
             let screenshot = XCTAttachment(screenshot: app.screenshot())
-            screenshot.name = "Contrast-only audit \(tab)"
+            screenshot.name = "Contrast and clipping audit \(tab)"
             screenshot.lifetime = .keepAlways
             add(screenshot)
-            try app.performAccessibilityAudit(for: [.contrast])
+            try app.performAccessibilityAudit(for: [.contrast, .textClipped])
         }
     }
 
