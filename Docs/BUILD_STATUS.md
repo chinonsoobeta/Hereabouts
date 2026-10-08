@@ -279,3 +279,20 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -d
 ```
 
 **Passed**, one test, zero failures/skips, 37.132 seconds; exit 0. Log: `/private/tmp/localiser-pdf-import-corrected-20261008.log`; summary: `Docs/Verification/Final-native-pdf-import-summary.json`. The real Files picker selected the PDF; on-device reading offered its exact expiry; save was disabled before confirmation; source retention started off and was explicitly enabled; the saved item showed `Expiry, Jul 14, 2028`; and its stored PDF preview opened. `Final-native-pdf-preview.png` was inspected: the expiry text is visible and matches the fixture, with the source-removal control available. This closes simulator native PDF-selection proof, not physical provider/camera/offline proof. Production source and the wireless delivered Release app remain unchanged. `git diff --check` passed.
+
+
+## Isolated visible Packing contrast correction
+
+A dedicated contrast-only check avoids the combined audit’s Dynamic Type changes. At default `large` text / light / iPhone SE / iOS 26.5, it failed solely for visible `Trips` and `Reusable kits` headings (“Contrast nearly passed”), two issues in 6.001 seconds. Result: `/private/tmp/Localiser-packing-contrast-20261008.xcresult`; log: `/private/tmp/localiser-packing-contrast-20261008.log`. This identified a concrete visible defect rather than assuming all findings came from overlays.
+
+Those two section headers now explicitly use the existing adaptive `Theme.secondary` colour. No new theme, layout layer, data model, or audit suppression was introduced. Exact verification:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=F57B85B9-C56D-4EC3-84CE-9A77A38C3109' -derivedDataPath DerivedData/TypographyAudit -resultBundlePath /private/tmp/Localiser-packing-contrast-fixed-20261008.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testPackingContrastWithoutChangingTextSize -only-testing:LocaliserUITests/LocaliserUITests/testKitTripPackingAndComingHome test
+```
+
+**Passed**, two tests, zero failures, 48.467 seconds: visible contrast and complete packing/departure/coming-home workflow. Summary: `Final-packing-contrast-workflow-summary.json`. The same contrast-only test passed on current iOS 27 / iPhone 17 Pro / dark / default text, one test, zero failures, 9.592 seconds, using destination `795B0913-F0A1-4316-A268-4DAC0EE9189D`, derived data `DerivedData/HeadingDarkAudit`, result `/private/tmp/Localiser-packing-dark-contrast-20261008.xcresult`. Summary: `Final-packing-dark-contrast-summary.json`. Both commands exited 0. Light/dark screenshots `Final-packing-headings-light.png` and `Final-packing-headings-dark.png` were inspected. This resolves these two headings only; full typography/Dynamic Type/clipping diagnostics on other screens remain unresolved.
+
+The normal signed Release build of this correction succeeded using the same approved Personal Team/empty cloud-container command, `-jobs 10`, and `DerivedData/PersonalDeviceFinal`. Log: `/private/tmp/localiser-final-heading-release-20261008.log`. Separate `codesign --verify --deep --strict --verbose=4 DerivedData/PersonalDeviceFinal/Build/Products/Release-iphoneos/Localiser.app` exited 0: valid on disk/satisfies Designated Requirement. Executable SHA-256: `fc7d92053d066dcc6ed136799cbece91c860d03a841604ae4761c2ac5bf7bdde`.
+
+Device details again confirmed paired/connected `localNetwork` transport. The normal `devicectl device install app` command succeeded; final installed bundle `991D3813-DBA9-42CB-9549-3778226AF9D5/Localiser.app`. Normal launch succeeded. Separate process inventory confirmed PID 33765 from that exact installed bundle. This correction supersedes the earlier delivered executable hash. No password was needed. Full public-launch readiness is still not claimed. `git diff --check` passed.

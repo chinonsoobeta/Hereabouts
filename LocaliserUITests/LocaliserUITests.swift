@@ -32,6 +32,18 @@ import XCTest
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
     }
 
+    func testPackingContrastWithoutChangingTextSize() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launch()
+        app.tabBars.buttons["Packing"].tap()
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Packing contrast before audit"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: [.contrast])
+    }
+
     func testTypographyAccessibilityOnLaunchTabs() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]

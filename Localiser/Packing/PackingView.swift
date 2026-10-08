@@ -6,7 +6,7 @@ struct PackingView: View {
     @State private var newKit = false
     var body: some View {
         List {
-            Section("Trips") {
+            Section {
                 if store.trips.isEmpty { Text("Create a trip from a reusable kit or start an empty checklist.").foregroundStyle(Theme.secondary) }
                 ForEach(store.trips) { trip in
                     NavigationLink { TripDetailView(trip: trip) } label: {
@@ -14,12 +14,12 @@ struct PackingView: View {
                     }
                 }
                 Button("New trip") { newTrip = true }
-            }
-            Section("Reusable kits") {
+            } header: { Text("Trips").foregroundStyle(Theme.secondary) }
+            Section {
                 ForEach(store.kits) { kit in NavigationLink { KitDetailView(kit: kit) } label: { LabeledContent(kit.name, value: "\(kit.entries.count) rows") } }
                 Button("New kit") { newKit = true }
                 Text("Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.").font(.caption).foregroundStyle(Theme.secondary)
-            }
+            } header: { Text("Reusable kits").foregroundStyle(Theme.secondary) }
         }
         .scrollContentBackground(.hidden).background(Theme.ground).navigationTitle("Packing")
         .sheet(isPresented: $newTrip) { NavigationStack { TripEditor() } }
