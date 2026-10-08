@@ -54,6 +54,22 @@ import XCTest
         save.tap()
         XCTAssertTrue(save.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Return deadline"].waitForExistence(timeout: 5))
+        app.staticTexts["Return deadline"].tap()
+        app.buttons["Add to Calendar"].tap()
+        XCTAssertTrue(app.textFields["Title"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertEqual(app.textFields["Title"].value as? String, "Localiser: Return deadline")
+        let calendar = XCTAttachment(screenshot: app.screenshot()); calendar.name = "Calendar event preview"; calendar.lifetime = .keepAlways; add(calendar)
+        app.buttons["Cancel"].tap()
+        let discard = app.buttons["Discard Changes"]
+        XCTAssertTrue(discard.waitForExistence(timeout: 5), app.debugDescription)
+        discard.tap()
+        XCTAssertTrue(app.navigationBars["New Event"].waitForNonExistence(timeout: 5))
+        let deleteDate = app.buttons["Delete date"].firstMatch
+        for _ in 0..<5 { if deleteDate.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(deleteDate.isHittable); deleteDate.tap()
+        app.sheets.buttons["Delete date"].tap()
+        XCTAssertTrue(app.buttons["Add date"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Return deadline"].exists)
         app.terminate(); app.launch()
         app.tabBars.buttons["Find"].tap()
         let search = app.searchFields.firstMatch

@@ -7,7 +7,7 @@ Goal: implement the entire approved plan locally. No remote repository or public
 | 0. Project/local storage | Local implementation tested; gate partial | Network-disabled runtime and physical-device/signing checks |
 | 1. Find belongings | Local implementation tested; gate partial | Real-device capture timing and broader UI review |
 | 2. Search/capture quality | Logic tests passed; gate partial | Independent quality dataset, slowest-device benchmark |
-| 3. Dates/reminders | Local implementation tested; gate partial | Permission/actions/queue and calendar UI tests, real-device long inactivity |
+| 3. Dates/reminders | Local implementation tested; calendar preview/cancel and date deletion UI passed | Permission/actions/queue, saved calendar event and real-device long inactivity |
 | 4. Scan/confirm | Local implementation tested; gate partial | Import/review UI checks, blurred real receipts, camera, no-AI physical device, cleanup review |
 | 5. Pack/depart/come home | Local implementation tested; gate partial | Physical workflow review |
 | 6. Private sync/recovery | Local recovery tested; private-sync configuration implemented | Signing/provisioning; two-device sync, account/storage errors and safe cloud reset/reconnection |
@@ -100,5 +100,13 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -d
 **Succeeded: sixteen tests passed, zero failures.** Tests exercised persistence, historical migration, place safety, search, confirmed dates/DST, actual Vision OCR on a generated printed-expiry image, PDF rejection, scan retention, packing conflicts/coming home and backup recovery on the physical iPhone. Result: `DerivedData/PersonalDeviceLocal/Logs/Test/Test-Localiser-2026.10.07_20-41-06--0700.xcresult`. The two purchase tests were deliberately excluded; this run does not establish camera capture, interactive UI, notification delivery, offline network conditions, Apple Intelligence absence or private sync. Each logic test uses its own temporary/in-memory library. Localiser was relaunched afterward without test-library arguments for normal use.
 
 ## Remaining release requirements
+
+The date workflow UI test was extended to open Apple's calendar editor, verify the generic event title, cancel with the system's Discard Changes confirmation, delete the date, relaunch/search and delete the item. The final test uses ordinary named controls; temporary coordinate taps and the unproven app dismissal change were removed. Earlier failures skipped the calendar discard confirmation and do not establish an app dismissal defect.
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=15434DA2-3643-4612-B5AB-FE973104A4DD' -derivedDataPath DerivedData -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testNameOnlyCaptureSurvivesRelaunchAndCanBeFound test
+```
+
+**Succeeded: one extended UI test passed, zero failures.** Result: `DerivedData/Logs/Test/Test-Localiser-2026.10.07_20-49-43--0700.xcresult`. The calendar-preview screenshot was inspected: generic title, all-day event and the confirmed date. No broad calendar-access request appeared. This verifies preview/cancellation and date deletion in iOS 26.5, not saving an event to a real calendar or physical-device calendar behavior. The existing application code is unchanged.
 
 See BETA_AND_RELEASE.md for the beta workflow, listing/policy drafts and physical test matrix. No real-user beta, live iCloud operation, production StoreKit setup, developer enrollment, upload, invitation or public release has occurred. Commercial demand and launch timing remain unverified. The full launch combination has not been reduced.
