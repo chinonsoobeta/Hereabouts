@@ -19,16 +19,24 @@ struct DueView: View {
     var body: some View {
         let _ = store.revision
         List {
-            Section("Reminder coverage") {
-                LabeledContent("Notifications") { Text(reminders.permission).foregroundStyle(Theme.secondary) }
-                Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.subheadline)
-                if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates below or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
-                if let error = reminders.error { Text(error).foregroundStyle(.red) }
-                Button("Enable notifications") { Task { await reminders.enable() } }
-                if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Link("Open notification settings", destination: url) }
-                Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.caption).foregroundStyle(Theme.secondary)
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Notifications: \(reminders.permission)").fixedSize(horizontal: false, vertical: true)
+                    Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.subheadline)
+                    if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates below or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
+                    if let error = reminders.error { Text(error).foregroundStyle(.red) }
+                    Button("Enable notifications") { Task { await reminders.enable() } }
+                    if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Link("Open notification settings", destination: url) }
+                    Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.caption).foregroundStyle(Theme.secondary)
+                }.buttonStyle(.borderless)
+            } header: { Text("Reminder coverage").foregroundStyle(Theme.secondary) }
+            if !store.deadlines.contains(where: \.active) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("Remember in time", systemImage: "calendar.badge.clock").font(.headline)
+                    Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")
+                        .foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
+                }
             }
-            if !store.deadlines.contains(where: \.active) { LibraryEmptyState(title: "Remember in time", systemImage: "calendar.badge.clock", description: "Add a confirmed return deadline, warranty end, or document expiry to an item.") }
             ForEach(sections, id: \.self) { heading in
                 let dates = store.deadlines.filter { $0.active && section($0) == heading }
                 if !dates.isEmpty {

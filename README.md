@@ -6,7 +6,7 @@ Approved launch scope: finding belongings, confirmed return/warranty/expiry remi
 
 Open `Localiser.xcodeproj`. The project is generated from `project.yml` using the already-installed XcodeGen; there are no third-party app dependencies. Regenerate after changing target configuration with `xcodegen generate`.
 
-The temporary bundle identifier is `dev.localiser.app`. The owner's free Personal Team has been used for the final signed Release installation and launch over Wi-Fi. A production identity and a team supporting private iCloud remain owner decisions. Unsigned simulator builds and local tests do not require membership. CloudKit provisioning, production purchases, remaining real-device checks, beta participation and release approval remain explicit gates.
+The temporary bundle identifier is `dev.localiser.app`. The owner's free Personal Team has been used for signed Release installation over Wi-Fi. Earlier builds launched successfully; the newest installed correction awaits an unlocked-phone launch check. A production identity and a team supporting private iCloud remain owner decisions. Unsigned simulator builds and local tests do not require membership. CloudKit provisioning, production purchases, remaining real-device checks, beta participation and release approval remain explicit gates.
 
 The approved plan is at `../outputs/Localiser-build-plan.md`. Track implementation and verification in `Docs/BUILD_STATUS.md`. See `Docs/COMPLETION_AUDIT.md` for the scope review and `Docs/HUMAN_BLOCKED.md` for remaining owner-dependent work.
 
