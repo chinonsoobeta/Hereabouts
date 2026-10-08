@@ -32,6 +32,17 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
+        app.tabBars.buttons["Due soon"].tap()
+        let disabled = app.buttons["Open notification settings"]
+        if !disabled.waitForExistence(timeout: 2) {
+            app.buttons["Enable notifications"].tap()
+            let deny = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Don’t Allow"]
+            XCTAssertTrue(deny.waitForExistence(timeout: 5), app.debugDescription)
+            deny.tap()
+        }
+        XCTAssertTrue(disabled.waitForExistence(timeout: 5))
+        let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
+        app.tabBars.buttons["Find"].tap()
         app.buttons["Add item"].tap()
         let name = "Verification cable \(UUID().uuidString.prefix(8))"
         let field = app.textFields["item.name"]
