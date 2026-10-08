@@ -165,6 +165,8 @@ final class LocaliserTests: XCTestCase {
         let office = try store.addPlace(name: "Office")
         try store.editPlace(drawer, name: "Drawer", parent: office)
         XCTAssertEqual(item.place?.path, "Office › Drawer")
+        XCTAssertTrue(ItemSearch.results(query: "Bedroom", entries: store.searchIndex, archived: false).isEmpty)
+        XCTAssertEqual(ItemSearch.results(query: "Office", entries: store.searchIndex, archived: false).first?.id, item.id)
         let kit = try store.addKit(name: "Travel")
         try store.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
         let trip = try store.addTrip(TripDetails(name: "Work trip", start: CalendarDay(.now), end: CalendarDay(.now)), kit: kit)
@@ -228,6 +230,47 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(ItemSearch.suggestion("Keys in Drawer", places: [(id, "Bedroom › Drawer")])?.placeID, id)
         XCTAssertNil(ItemSearch.suggestion("Keys in Drawer", places: [(id, "Bedroom › Drawer"), (UUID(), "Office › Drawer")])?.placeID)
         XCTAssertEqual(ItemSearch.score(query: "drawr", name: "Keys", aliases: "", place: "Bedroom › Drawer", notes: ""), 500)
+    }
+
+    func testSearchPerformanceAtFiveThousandItems() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Bedroom")
+        let drawer = try store.addPlace(name: "Drawer", parent: room)
+        for index in 0..<5_000 {
+            let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: store.context) as! Belonging
+            item.id = UUID(); item.name = index == 0 ? "Passport" : "Household item \(index)"
+            item.aliases = index == 0 ? "Travel ID" : "Spare object \(index)"
+            item.notes = "Saved household belonging"; item.place = drawer
+            item.archived = index % 20 == 19; item.createdAt = Date(timeIntervalSince1970: Double(index))
+        }
+        try store.context.save(); try store.refresh()
+        let passport = try XCTUnwrap(store.items.first { $0.name == "Passport" })
+        for query in ["passport", "travel id", "passprt", "drawr", "potato"] {
+            var slowest = 0.0
+            for _ in 0..<5 {
+                let start = ContinuousClock.now
+                let matches = ItemSearch.results(query: query, entries: store.searchIndex, archived: false)
+                let elapsed = start.duration(to: .now).components
+                let milliseconds = Double(elapsed.seconds) * 1_000 + Double(elapsed.attoseconds) / 1e15
+                slowest = max(slowest, milliseconds)
+                if query == "potato" { XCTAssertTrue(matches.isEmpty) }
+                else if query == "drawr" { XCTAssertEqual(matches.count, 4_750) }
+                else { XCTAssertEqual(matches.first?.id, passport.id) }
+            }
+            print("SEARCH_5000 \(query): slowest of five = \(slowest) ms")
+            #if !DEBUG
+            XCTAssertLessThan(slowest, 50, "5,000-item query '\(query)' exceeded the planned 50 ms target. Use an optimized physical build for performance acceptance.")
+            #endif
+        }
+        try store.editItem(passport, name: "Permit", place: nil, notes: "Personal paperwork", aliases: "Travel document", photo: nil)
+        XCTAssertTrue(ItemSearch.results(query: "passport", entries: store.searchIndex, archived: false).isEmpty)
+        XCTAssertEqual(ItemSearch.results(query: "travel document", entries: store.searchIndex, archived: false).first?.id, passport.id)
+        XCTAssertEqual(ItemSearch.results(query: "personal paperwork", entries: store.searchIndex, archived: false).first?.id, passport.id)
+        try store.setArchived(passport, true)
+        XCTAssertTrue(ItemSearch.results(query: "permit", entries: store.searchIndex, archived: false).isEmpty)
+        XCTAssertEqual(ItemSearch.results(query: "permit", entries: store.searchIndex, archived: true).first?.id, passport.id)
+        try store.deleteItem(passport)
+        XCTAssertTrue(ItemSearch.results(query: "permit", entries: store.searchIndex, archived: true).isEmpty)
     }
 
     func testMigrationPreservesExistingItemPhotoAndPlace() throws {

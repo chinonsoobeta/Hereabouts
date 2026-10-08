@@ -12,10 +12,7 @@ struct FindView: View {
 
     private var results: [Belonging] {
         _ = store.revision
-        return store.items.filter { $0.archived == showArchived }.compactMap { item -> (Belonging, Int)? in
-            guard let score = ItemSearch.score(query: query, name: item.name, aliases: item.aliases, place: item.place?.path ?? "", notes: item.notes) else { return nil }
-            return (item, score)
-        }.sorted { $0.1 == $1.1 ? $0.0.createdAt > $1.0.createdAt : $0.1 > $1.1 }.map(\.0)
+        return ItemSearch.results(query: query, entries: store.searchIndex, archived: showArchived)
     }
 
     var body: some View {

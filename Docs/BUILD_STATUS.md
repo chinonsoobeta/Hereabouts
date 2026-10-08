@@ -4,7 +4,7 @@ Goal: implement the entire approved plan locally. No remote repository or public
 
 | Phase | Status | Evidence still required |
 | --- | --- | --- |
-| 0. Project/local storage | Local implementation tested; gate partial | Network-disabled runtime and physical-device/signing checks |
+| 0. Project/local storage | Local implementation tested; signed iPhone installation/launch passed | Network-disabled runtime checks |
 | 1. Find belongings | Local implementation tested; gate partial | Real-device capture timing and broader UI review |
 | 2. Search/capture quality | Logic tests passed; gate partial | Independent quality dataset, slowest-device benchmark |
 | 3. Dates/reminders | Local implementation tested; notification denial, calendar preview/cancel and date deletion UI passed | Permission revocation/actions/queue, saved calendar event and real-device long inactivity |
@@ -100,6 +100,22 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -d
 **Succeeded: sixteen tests passed, zero failures.** Tests exercised persistence, historical migration, place safety, search, confirmed dates/DST, actual Vision OCR on a generated printed-expiry image, PDF rejection, scan retention, packing conflicts/coming home and backup recovery on the physical iPhone. Result: `DerivedData/PersonalDeviceLocal/Logs/Test/Test-Localiser-2026.10.07_20-41-06--0700.xcresult`. The two purchase tests were deliberately excluded; this run does not establish camera capture, interactive UI, notification delivery, offline network conditions, Apple Intelligence absence or private sync. Each logic test uses its own temporary/in-memory library. Localiser was relaunched afterward without test-library arguments for normal use.
 
 ## Remaining release requirements
+
+## Wireless installation and search performance
+
+After the user unplugged USB and confirmed both devices were on Wi-Fi, `devicectl device info details` reported **Transport Type: localNetwork**. Installing the previously verified signed app through `devicectl device install app` succeeded, followed by successful launch and a process inventory showing Localiser running. This establishes a wireless development installation/update path for this paired phone, not an App Store distribution channel. The user authorized installing the latest verified build after autonomous completion/review, while saving human-blocked work for later. That final delivery remains separate from this successful OTA connection test.
+
+The original optimized physical 5,000-item search benchmark missed the proposed 50 ms target (slowest samples approximately 63–77 ms). Removing repeated query normalization alone remained insufficient. Search now prepares normalized item text once on the existing library refresh path and reuses it across queries. Both Find and tests call the same ranking implementation. Tests verify fresh results after container moves, item/alias/note edits, archival and deletion. No persisted index or schema change was added.
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -configuration Release ENABLE_TESTABILITY=YES -destination 'platform=iOS Simulator,id=15434DA2-3643-4612-B5AB-FE973104A4DD' -derivedDataPath DerivedData/SearchSimulator -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserTests/LocaliserTests/testSearchPerformanceAtFiveThousandItems -only-testing:LocaliserTests/LocaliserTests/testSearchAndAmbiguousCaptureSuggestions -only-testing:LocaliserTests/LocaliserTests/testLocalPersistenceAndContainerMove test
+```
+
+**Succeeded: three tests passed, zero failures.** Result: `DerivedData/SearchSimulator/Logs/Test/Test-Localiser-2026.10.07_21-04-25--0700.xcresult`. Slowest of five measured queries: passport 23.07 ms; travel id 25.80 ms; passprt 22.57 ms; drawr 28.22 ms; potato 25.65 ms. The fixture contains 5,000 records, 250 archived records, nested places, aliases and notes. These measurements cover query matching/ranking, not row rendering, initial text preparation or an independent quality dataset. Release tests enforce the 50 ms target; Debug tests check correctness and report timing without enforcing an optimized-build budget.
+
+The final optimized physical run could not start because the phone locked; Xcode explicitly requested an unlock. The waiting test process was stopped, not reported as passed. Final physical timing and slower-supported-device coverage are human-blocked, documented in HUMAN_BLOCKED.md.
+
+The normal Find UI workflow also passed after this change using `xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=15434DA2-3643-4612-B5AB-FE973104A4DD' -derivedDataPath DerivedData -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testNameOnlyCaptureSurvivesRelaunchAndCanBeFound test`: one test, zero failures. Result: `DerivedData/Logs/Test/Test-Localiser-2026.10.07_21-05-41--0700.xcresult`. It exercised capture, confirmed dates with denied notifications, calendar cancellation, date deletion, relaunch/search and item deletion through the prepared search data.
 
 The date workflow UI test was extended to open Apple's calendar editor, verify the generic event title, cancel with the system's Discard Changes confirmation, delete the date, relaunch/search and delete the item. The final test uses ordinary named controls; temporary coordinate taps and the unproven app dismissal change were removed. Earlier failures skipped the calendar discard confirmation and do not establish an app dismissal defect.
 

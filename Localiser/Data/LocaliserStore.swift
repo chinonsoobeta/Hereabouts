@@ -38,6 +38,7 @@ final class LocaliserStore {
         (Bundle.main.object(forInfoDictionaryKey: "LocaliserCloudContainer") as? String ?? "").hasPrefix("iCloud.")
     }
     var items: [Belonging] = []
+    var searchIndex: [ItemSearch.Entry] = []
     var places: [Place] = []
     var deadlines: [Deadline] = []
     var completedScans = 0
@@ -85,6 +86,7 @@ final class LocaliserStore {
         let itemRequest = NSFetchRequest<Belonging>(entityName: "Belonging")
         itemRequest.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
         items = try context.fetch(itemRequest)
+        searchIndex = items.map(ItemSearch.Entry.init)
         places = try context.fetch(NSFetchRequest<Place>(entityName: "Place")).sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
         deadlines = try context.fetch(NSFetchRequest<Deadline>(entityName: "Deadline")).sorted { $0.dayString < $1.dayString }
         let scanRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ScanRecord")
