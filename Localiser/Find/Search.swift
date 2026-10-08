@@ -21,6 +21,10 @@ enum ItemSearch {
         if query.count >= 3 && tokens.allSatisfy({ token in words.contains { word in
             abs(word.count - token.count) <= 1 && distance(word, token) <= 1
         } }) { return 600 }
+        let placeWords = normalized(place).split { $0.isWhitespace || $0 == "›" }.map(String.init)
+        if query.count >= 3 && tokens.allSatisfy({ token in placeWords.contains { word in
+            abs(word.count - token.count) <= 1 && distance(word, token) <= 1
+        } }) { return 500 }
         if normalized(notes).contains(query) { return 400 }
         return nil
     }
@@ -47,10 +51,9 @@ enum ItemSearch {
             let name = String(sentence[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
             let location = String(sentence[range.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
             guard !name.isEmpty, !location.isEmpty else { return nil }
-            let matches = places.filter { normalized($0.1) == normalized(location) }
+            let matches = places.filter { normalized($0.1) == normalized(location) || normalized($0.1.components(separatedBy: " › ").last ?? "") == normalized(location) }
             return CaptureSuggestion(name: name, placeID: matches.count == 1 ? matches.first?.0 : nil, unrecognizedPlace: matches.count == 1 ? nil : location)
         }
         return nil
     }
 }
-

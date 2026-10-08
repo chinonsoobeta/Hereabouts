@@ -8,6 +8,7 @@ struct FindView: View {
     @State private var scanning = false
     @State private var showArchived = false
     @State private var putAway = false
+    @State private var settings = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -33,12 +34,13 @@ struct FindView: View {
         }
         .scrollContentBackground(.hidden).background(Theme.ground)
         .navigationTitle("Localiser")
-        .searchable(text: $query, prompt: "Name, alias, or place")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Name, alias, or place")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Toggle("Archived items", isOn: $showArchived)
                     Toggle("Put-away mode", isOn: $putAway)
+                    Button("Settings and backup") { settings = true }
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
             }
@@ -47,19 +49,23 @@ struct FindView: View {
         }
         .sheet(isPresented: $showAdd) { NavigationStack { ItemEditor() } }
         .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
+        .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
     }
 }
 
 struct ItemRow: View {
+    @Environment(LocaliserStore.self) private var store
     let item: Belonging
     var body: some View {
+        let _ = store.revision
         HStack(spacing: 12) {
             if let data = item.photo, let image = UIImage(data: data) {
                 Image(uiImage: image).resizable().scaledToFill().frame(width: 44, height: 44).clipShape(RoundedRectangle(cornerRadius: 10)).accessibilityHidden(true)
             } else { Image(systemName: "shippingbox").foregroundStyle(Theme.purple).frame(width: 44).accessibilityHidden(true) }
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.name).font(.headline)
-                Text(item.place?.path ?? "Location unspecified").font(.subheadline).foregroundStyle(.secondary)
+                Text((item.packedTrips.isEmpty ? "" : "Home: ") + (item.place?.path ?? "Location unspecified")).font(.subheadline).foregroundStyle(.secondary)
+                if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.caption).foregroundStyle(Theme.purple) }
             }
         }.padding(.vertical, 4)
     }
@@ -67,6 +73,7 @@ struct ItemRow: View {
 
 struct ItemEditor: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(ProAccess.self) private var pro
     @Environment(\.dismiss) private var dismiss
     let item: Belonging?
     @State private var name: String
@@ -77,6 +84,7 @@ struct ItemEditor: View {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var error: String?
     @State private var suggestion: ItemSearch.CaptureSuggestion?
+    @State private var upgrade = false
     @FocusState private var nameFocused: Bool
 
     init(item: Belonging? = nil) {
@@ -122,13 +130,15 @@ struct ItemEditor: View {
             ToolbarItem(placement: .confirmationAction) { Button("Save") { save() }.accessibilityIdentifier("item.save").disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
         }
         .onAppear { nameFocused = item == nil }
+        .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .onChange(of: selectedPhoto) { _, newValue in
             Task {
                 do {
                     guard let data = try await newValue?.loadTransferable(type: Data.self), let image = UIImage(data: data) else { throw CocoaError(.fileReadCorruptFile) }
                     let scale = min(1, 1600 / max(image.size.width, image.size.height))
                     let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-                    photo = UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }.jpegData(compressionQuality: 0.8)
+                    let format = UIGraphicsImageRendererFormat(); format.scale = 1
+                    photo = UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }.jpegData(compressionQuality: 0.8)
                 } catch { self.error = error.localizedDescription }
             }
         }
@@ -136,6 +146,7 @@ struct ItemEditor: View {
     }
 
     private func save() {
+        if item == nil && !pro.allows(.item, count: store.items.count) { upgrade = true; return }
         do {
             let place = store.places.first { $0.id == placeID }
             if let item { try store.editItem(item, name: name, place: place, notes: notes, aliases: aliases, photo: photo) }
@@ -159,62 +170,75 @@ struct PlacePicker: View {
 
 struct ItemDetailView: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
     let item: Belonging
     var putAway = false
     @State private var editing = false
     @State private var addingDate = false
     @State private var destination: UUID?
     @State private var error: String?
+    @State private var deleting = false
+    private var available: Bool { item.managedObjectContext != nil && !item.isDeleted }
 
     var body: some View {
         let _ = store.revision
         List {
-            Section {
-                ItemRow(item: item)
-                if !item.notes.isEmpty { Text(item.notes) }
-                if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").foregroundStyle(.secondary) }
-            }
-            Section(putAway ? "Put away" : "Location") {
-                PlacePicker(selection: $destination)
-                Button(putAway ? "Confirm put away here" : "Found here / move here") {
-                    do { try store.move(item, to: store.places.first { $0.id == destination }) } catch { self.error = error.localizedDescription }
+            if available {
+                Section {
+                    ItemRow(item: item)
+                    if !item.notes.isEmpty { Text(item.notes) }
+                    if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").foregroundStyle(.secondary) }
                 }
-            }
-            Section("Dates") {
-                ForEach(item.deadlines.sorted { $0.dayString < $1.dayString }) { deadline in
-                    NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline) }
+                Section(putAway ? "Put away" : "Location") {
+                    PlacePicker(selection: $destination)
+                    Button(putAway ? "Confirm put away here" : "Found here / move here") {
+                        do { try store.move(item, to: store.places.first { $0.id == destination }) } catch { self.error = error.localizedDescription }
+                    }
                 }
-                Button("Add date") { addingDate = true }
-            }
-            if !item.scans.isEmpty {
-                Section("Scans") {
-                    ForEach(item.scans.sorted { $0.createdAt > $1.createdAt }) { scan in
-                        NavigationLink { StoredScanView(scan: scan) } label: {
-                            VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(.secondary) }
+                if !item.packedTrips.isEmpty {
+                    Section("Packed trips") { ForEach(item.packedTrips) { trip in NavigationLink(trip.name) { TripDetailView(trip: trip) } } }
+                }
+                Section("Dates") {
+                    ForEach(item.deadlines.sorted { $0.dayString < $1.dayString }) { deadline in
+                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline) }
+                    }
+                    Button("Add date") { addingDate = true }
+                }
+                if !item.scans.isEmpty {
+                    Section("Scans") {
+                        ForEach(item.scans.sorted { $0.createdAt > $1.createdAt }) { scan in
+                            NavigationLink { StoredScanView(scan: scan) } label: {
+                                VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(.secondary) }
+                            }
                         }
                     }
                 }
-            }
-            if !item.movements.isEmpty {
-                Section("Location history") {
-                    ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
-                        VStack(alignment: .leading) {
-                            Text("\(movement.fromPath) → \(movement.toPath)")
-                            Text(movement.date, format: .dateTime.month().day().hour().minute()).font(.caption).foregroundStyle(.secondary)
+                if !item.movements.isEmpty {
+                    Section("Location history") {
+                        ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
+                            VStack(alignment: .leading) {
+                                Text("\(movement.fromPath) → \(movement.toPath)")
+                                Text(movement.date, format: .dateTime.month().day().hour().minute()).font(.caption).foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
-            }
-            Section { Button(item.archived ? "Restore item" : "Archive item") {
-                do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
-            } }
+                Section { Button(item.archived ? "Restore item" : "Archive item") {
+                    do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
+                }; Button("Delete item permanently", role: .destructive) { deleting = true } }
+            } else { ContentUnavailableView("Item deleted", systemImage: "trash") }
         }
-        .navigationTitle(item.name).navigationBarTitleDisplayMode(.inline)
-        .toolbar { Button("Edit") { editing = true } }
+        .navigationTitle(available ? item.name : "Item deleted").navigationBarTitleDisplayMode(.inline)
+        .toolbar { if available { Button("Edit") { editing = true } } }
         .sheet(isPresented: $editing) { NavigationStack { ItemEditor(item: item) } }
         .sheet(isPresented: $addingDate) { NavigationStack { DeadlineEditor(item: item) } }
-        .onAppear { destination = item.place?.id }
-        .onChange(of: store.revision) { _, _ in destination = item.place?.id }
+        .onAppear { if available { destination = item.place?.id } }
+        .onChange(of: store.revision) { _, _ in if available { destination = item.place?.id } else { dismiss() } }
+        .confirmationDialog("Delete this item, its dates, scans and location history? Existing kit and trip rows will remain as unlinked checklist rows.", isPresented: $deleting, titleVisibility: .visible) {
+            Button("Delete item permanently", role: .destructive) {
+                do { try store.deleteItem(item); dismiss() } catch { self.error = error.localizedDescription }
+            }
+        }
         .alert("Could not update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }

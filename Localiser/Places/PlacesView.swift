@@ -84,4 +84,3 @@ struct PlaceDetailView: View {
         .alert("Could not delete", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
-

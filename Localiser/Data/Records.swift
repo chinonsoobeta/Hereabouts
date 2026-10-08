@@ -13,6 +13,12 @@ final class Belonging: NSManagedObject, Identifiable {
     @NSManaged var movements: Set<Movement>
     @NSManaged var deadlines: Set<Deadline>
     @NSManaged var scans: Set<ScanRecord>
+    @NSManaged var tripEntries: Set<TripEntry>
+    @NSManaged var kitEntries: Set<KitEntry>
+    var packedTrips: [TripRecord] {
+        var seen = Set<UUID>()
+        return tripEntries.filter(\.allocatesItem).compactMap(\.trip).filter { seen.insert($0.id).inserted }.sorted { $0.startDay < $1.startDay }
+    }
 }
 
 @objc(Place)

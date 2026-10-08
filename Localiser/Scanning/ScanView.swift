@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 
 struct ScanView: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(ProAccess.self) private var pro
     @Environment(\.dismiss) private var dismiss
     @State private var photo: PhotosPickerItem?
     @State private var camera = false
@@ -17,6 +18,7 @@ struct ScanView: View {
     @State private var newName = ""
     @State private var review = false
     @State private var error: String?
+    @State private var upgrade = false
 
     private var selected: DateCandidate? { draft?.candidates.first { $0.id == candidateID } }
 
@@ -55,6 +57,7 @@ struct ScanView: View {
                     }
                     TextField("Or name a new item", text: $newName)
                     Button("Create item") {
+                        guard pro.allows(.item, count: store.items.count) else { upgrade = true; return }
                         do { itemID = try store.addItem(name: newName).id; newName = "" } catch { self.error = error.localizedDescription }
                     }.disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     Button("Review and confirm date") { review = true }.disabled(itemID == nil)
@@ -68,6 +71,7 @@ struct ScanView: View {
             camera = false
             switch result { case .success(let data): read(data, filename: "Document.pdf", mime: "application/pdf"); case .failure(let error): self.error = error.localizedDescription }
         } canceled: { camera = false } }
+        .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .sheet(isPresented: $review, onDismiss: { draft = nil; candidateID = nil; photo = nil }) {
             if let draft, let item = store.items.first(where: { $0.id == itemID }) {
                 NavigationStack { DeadlineEditor(item: item, suggestedDate: selected?.day.date(), source: "Confirmed from a scanned document", suggestedKind: selected?.hint, scan: draft, onSaved: { dismiss() }) }
@@ -79,7 +83,7 @@ struct ScanView: View {
                 let access = url.startAccessingSecurityScopedResource()
                 defer { if access { url.stopAccessingSecurityScopedResource() } }
                 if let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize, size > ScanReader.maximumBytes { throw ScanError.tooLarge }
-                let data = try Data(contentsOf: url, options: .mappedIfSafe)
+                let data = try Data(contentsOf: url)
                 read(data, filename: url.lastPathComponent, mime: url.pathExtension.lowercased() == "pdf" ? "application/pdf" : "image/jpeg")
             } catch { self.error = error.localizedDescription }
         }

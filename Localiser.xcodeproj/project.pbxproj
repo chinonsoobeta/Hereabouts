@@ -8,19 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56936067B918AEFABF8680BB /* ScanView.swift */; };
+		2A50FFFFB8829E8AE690F13F /* LibrarySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */; };
+		2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A30538423261835CD54AD5A /* ProAccess.swift */; };
+		320D35A448C990008ED39806 /* Localiser.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */; };
 		3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688EA727718F4AD230A48BBB /* LocaliserStore.swift */; };
 		3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25EBA641962B55EE0850C76 /* DueView.swift */; };
+		4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */; };
 		55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A961609BF5723FD7F58316C /* LocaliserUITests.swift */; };
 		5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4437E05350A4892C18DA9522 /* ReminderService.swift */; };
 		73184C07C0834BF531F95BBB /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A21167AF6F6CAEF79448DE /* Records.swift */; };
+		761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF170C8864C322B2EF738BC7 /* PackingRecords.swift */; };
+		7DFD233175BBDBC456DF0025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDA7CB51BE2372853A56B223 /* Assets.xcassets */; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
+		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
 		C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A479972608E485C29556D57 /* LocaliserApp.swift */; };
 		CA2AEB951D2C0E57C4B22732 /* PlacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */; };
+		CBF25115806EB6C59B30735D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */; };
 		CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE95939E5941898426B7EBDF /* DateRules.swift */; };
+		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
 		F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */; };
 		F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */; };
+		FF71503CD114EC4282272846 /* ProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCC79A8C661311C9C70A285 /* ProView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,12 +51,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06F18AE850904C71580C25A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0807D105D68201D35D8DF977 /* Localiser.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Localiser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		153312694358421F11F17E69 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		1A30538423261835CD54AD5A /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProAccess.swift; sourceTree = "<group>"; };
+		1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV4.xcdatamodel; sourceTree = "<group>"; };
+		1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		25D5B7D5AD105BA2E4455706 /* LocaliserV2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV2.xcdatamodel; sourceTree = "<group>"; };
+		2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */ = {isa = PBXFileReference; path = Localiser.storekit; sourceTree = "<group>"; };
 		4437E05350A4892C18DA9522 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
+		4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBackup.swift; sourceTree = "<group>"; };
+		4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingView.swift; sourceTree = "<group>"; };
+		501CA93C23A339C49D35AA3D /* Localiser.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Localiser.entitlements; sourceTree = "<group>"; };
 		530F7A4D14101BD22267E581 /* LocaliserV1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV1.xcdatamodel; sourceTree = "<group>"; };
 		56936067B918AEFABF8680BB /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
+		5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySettingsView.swift; sourceTree = "<group>"; };
 		60A697438CB089D0830D4DC2 /* FindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindView.swift; sourceTree = "<group>"; };
 		688EA727718F4AD230A48BBB /* LocaliserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserStore.swift; sourceTree = "<group>"; };
 		6A479972608E485C29556D57 /* LocaliserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserApp.swift; sourceTree = "<group>"; };
@@ -55,10 +74,14 @@
 		953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
 		9690100A2F7DD2AC90139B89 /* ScanReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanReader.swift; sourceTree = "<group>"; };
 		A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
+		DBCC79A8C661311C9C70A285 /* ProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProView.swift; sourceTree = "<group>"; };
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
 		EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV3.xcdatamodel; sourceTree = "<group>"; };
 		F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserTests.swift; sourceTree = "<group>"; };
+		FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingStore.swift; sourceTree = "<group>"; };
 		FD8E6A9C1D66453E2DA206F9 /* LocaliserTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -71,6 +94,15 @@
 				4437E05350A4892C18DA9522 /* ReminderService.swift */,
 			);
 			path = Dates;
+			sourceTree = "<group>";
+		};
+		27D9D3773E578B000776BAF6 /* Recovery */ = {
+			isa = PBXGroup;
+			children = (
+				4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */,
+				5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */,
+			);
+			path = Recovery;
 			sourceTree = "<group>";
 		};
 		27DE49865767075A6DC8ADED /* Places */ = {
@@ -118,14 +150,31 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		6FEE1F6077407FBEC6C00C99 /* Packing */ = {
+			isa = PBXGroup;
+			children = (
+				BF170C8864C322B2EF738BC7 /* PackingRecords.swift */,
+				FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */,
+				4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */,
+			);
+			path = Packing;
+			sourceTree = "<group>";
+		};
 		9530E7D7FDE5FF75EB3FC201 /* Localiser */ = {
 			isa = PBXGroup;
 			children = (
+				BDA7CB51BE2372853A56B223 /* Assets.xcassets */,
+				06F18AE850904C71580C25A8 /* Info.plist */,
+				501CA93C23A339C49D35AA3D /* Localiser.entitlements */,
 				6A479972608E485C29556D57 /* LocaliserApp.swift */,
+				1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */,
 				5A8F3D16C8483AABAAE3D3E9 /* Data */,
 				1A9DAE5CD64E5097D70CE152 /* Dates */,
 				4C8AD373F3465F188D2EFD8F /* Find */,
+				6FEE1F6077407FBEC6C00C99 /* Packing */,
 				27DE49865767075A6DC8ADED /* Places */,
+				D7CBECA7CA9D22B67B8CB206 /* Purchases */,
+				27D9D3773E578B000776BAF6 /* Recovery */,
 				E6D8F6FB14A17F86314E10CB /* Scanning */,
 			);
 			path = Localiser;
@@ -134,6 +183,7 @@
 		BFBADADEA1980E22D2A5D605 /* LocaliserTests */ = {
 			isa = PBXGroup;
 			children = (
+				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
 			);
 			path = LocaliserTests;
@@ -147,6 +197,15 @@
 				4D338B76994D0905C61DAEBB /* LocaliserUITests */,
 				675B25DED9A59CCD220E0A20 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		D7CBECA7CA9D22B67B8CB206 /* Purchases */ = {
+			isa = PBXGroup;
+			children = (
+				1A30538423261835CD54AD5A /* ProAccess.swift */,
+				DBCC79A8C661311C9C70A285 /* ProView.swift */,
+			);
+			path = Purchases;
 			sourceTree = "<group>";
 		};
 		E6D8F6FB14A17F86314E10CB /* Scanning */ = {
@@ -166,6 +225,7 @@
 			buildConfigurationList = 794214AA05BF9504E1A90CBD /* Build configuration list for PBXNativeTarget "Localiser" */;
 			buildPhases = (
 				F2733260586BE79B4235AA8D /* Sources */,
+				64D6D6B14CBAFECE73C93D61 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -183,6 +243,7 @@
 			buildConfigurationList = 1C3CAB57C8C222837F2614ED /* Build configuration list for PBXNativeTarget "LocaliserTests" */;
 			buildPhases = (
 				00F0072E9C9CE81ECFB668CE /* Sources */,
+				2B5FFE6D7E6D0ECC38E92B8F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -256,6 +317,26 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		2B5FFE6D7E6D0ECC38E92B8F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				320D35A448C990008ED39806 /* Localiser.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		64D6D6B14CBAFECE73C93D61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7DFD233175BBDBC456DF0025 /* Assets.xcassets in Resources */,
+				CBF25115806EB6C59B30735D /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		00F0072E9C9CE81ECFB668CE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -280,10 +361,17 @@
 				CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */,
 				3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */,
 				93A170C63D8339AC3420650A /* FindView.swift in Sources */,
+				B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */,
+				2A50FFFFB8829E8AE690F13F /* LibrarySettingsView.swift in Sources */,
 				F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */,
 				C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */,
 				3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */,
+				761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */,
+				DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */,
+				4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */,
 				CA2AEB951D2C0E57C4B22732 /* PlacesView.swift in Sources */,
+				2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */,
+				FF71503CD114EC4282272846 /* ProView.swift in Sources */,
 				73184C07C0834BF531F95BBB /* Records.swift in Sources */,
 				5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */,
 				AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */,
@@ -355,6 +443,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALISER_APS_ENVIRONMENT = production;
+				LOCALISER_CLOUD_CONTAINER = iCloud.dev.localiser.app;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -370,13 +460,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Localiser/Localiser.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Localiser;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan a receipt or document when you request it.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose an optional photo or document to save with a belonging.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -384,7 +477,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -475,6 +568,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALISER_APS_ENVIRONMENT = development;
+				LOCALISER_CLOUD_CONTAINER = iCloud.dev.localiser.app;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -525,13 +620,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Localiser/Localiser.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Localiser;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan a receipt or document when you request it.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose an optional photo or document to save with a belonging.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -539,7 +637,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -591,8 +689,9 @@
 				530F7A4D14101BD22267E581 /* LocaliserV1.xcdatamodel */,
 				25D5B7D5AD105BA2E4455706 /* LocaliserV2.xcdatamodel */,
 				EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */,
+				1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */,
 			);
-			currentVersion = EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */;
+			currentVersion = 1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */;
 			path = Localiser.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

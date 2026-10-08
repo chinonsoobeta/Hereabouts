@@ -1,0 +1,20 @@
+{
+  "identifier" : "EB651F24",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "49.99",
+      "familyShareable" : false,
+      "internalID" : "6422170010",
+      "localizations" : [
+        { "description" : "More belongings, kits and scans. Local test product.", "displayName" : "Localiser Pro Lifetime", "locale" : "en_US" }
+      ],
+      "productID" : "dev.localiser.pro.lifetime",
+      "referenceName" : "Localiser Pro Lifetime (local testing)",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : { "_failTransactionsEnabled" : false, "_locale" : "en_US", "_storefront" : "USA" },
+  "subscriptionGroups" : [],
+  "version" : { "major" : 3, "minor" : 0 }
+}

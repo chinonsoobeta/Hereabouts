@@ -3,6 +3,8 @@ import Observation
 
 enum LocaliserError: LocalizedError, Equatable {
     case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder, closedReturn
+    case invalidPackingEntry, invalidTripDates, packingConflict(String), incompleteDeparture, unresolvedHome
+    case invalidBackup(String), libraryNotEmpty
     var errorDescription: String? {
         switch self {
         case .nameRequired: "Enter a name."
@@ -12,23 +14,43 @@ enum LocaliserError: LocalizedError, Equatable {
         case .dateNotConfirmed: "Review and confirm the final date before saving it."
         case .invalidReminder: "Choose a valid reminder time and lead time."
         case .closedReturn: "Choose to reopen this return decision before editing it."
+        case .invalidPackingEntry: "Check the item, quantity, and trip status before updating this checklist."
+        case .invalidTripDates: "The return date must be on or after the departure date."
+        case .packingConflict(let trip): "This physical item is already packed for \(trip). Unpack it there or resolve that trip first."
+        case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
+        case .unresolvedHome: "Confirm where the remaining items were put before finishing coming home."
+        case .invalidBackup(let reason): reason
+        case .libraryNotEmpty: "Restore requires an empty local library. Export your current library before choosing to erase it. Import never overwrites existing records."
         }
     }
 }
 
 @MainActor @Observable
 final class LocaliserStore {
-    let container: NSPersistentContainer
+    let container: NSPersistentCloudKitContainer
+    let syncEnabled: Bool
+    let isUserLibrary: Bool
+    var syncStatus = "Private sync is off."
+    var syncRequested: Bool { UserDefaults.standard.bool(forKey: "privateSyncRequested") }
+    var hasUsedSync: Bool { isUserLibrary && UserDefaults.standard.bool(forKey: "privateSyncHasRun") }
+    var syncAvailable: Bool {
+        !(Bundle.main.object(forInfoDictionaryKey: "LocaliserSigningTeam") as? String ?? "").isEmpty &&
+        (Bundle.main.object(forInfoDictionaryKey: "LocaliserCloudContainer") as? String ?? "").hasPrefix("iCloud.")
+    }
     var items: [Belonging] = []
     var places: [Place] = []
     var deadlines: [Deadline] = []
     var completedScans = 0
+    var kits: [Kit] = []
+    var trips: [TripRecord] = []
+    var tripEntries: [TripEntry] = []
     var revision = 0
     var context: NSManagedObjectContext { container.viewContext }
 
     init(url: URL? = nil, inMemory: Bool = false) throws {
+        isUserLibrary = url == nil && !inMemory
         guard let model = LocaliserModel.shared else { throw LocaliserError.schemaUnavailable }
-        container = NSPersistentContainer(name: "Localiser", managedObjectModel: model)
+        container = NSPersistentCloudKitContainer(name: "Localiser", managedObjectModel: model)
         let description = NSPersistentStoreDescription()
         if inMemory { description.type = NSInMemoryStoreType }
         else {
@@ -39,10 +61,21 @@ final class LocaliserStore {
         description.shouldAddStoreAsynchronously = false
         description.shouldMigrateStoreAutomatically = true
         description.shouldInferMappingModelAutomatically = true
+        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+        let team = Bundle.main.object(forInfoDictionaryKey: "LocaliserSigningTeam") as? String ?? ""
+        let cloudID = Bundle.main.object(forInfoDictionaryKey: "LocaliserCloudContainer") as? String ?? ""
+        syncEnabled = !inMemory && url == nil && !team.isEmpty && cloudID.hasPrefix("iCloud.") &&
+            UserDefaults.standard.bool(forKey: "privateSyncRequested") && !UserDefaults.standard.bool(forKey: "restoredLocalLibrary")
+        if syncEnabled {
+            description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: cloudID)
+            syncStatus = "Waiting for a private iCloud operation. Local changes remain available offline."
+        }
         container.persistentStoreDescriptions = [description]
         var loadError: Error?
         container.loadPersistentStores { _, error in loadError = error }
         if let loadError { throw loadError }
+        if syncEnabled { UserDefaults.standard.set(true, forKey: "privateSyncHasRun") }
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
         try refresh()
@@ -57,12 +90,33 @@ final class LocaliserStore {
         let scanRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ScanRecord")
         scanRequest.predicate = NSPredicate(format: "counted == YES")
         completedScans = try context.count(for: scanRequest)
+        kits = try context.fetch(NSFetchRequest<Kit>(entityName: "Kit")).sorted { $0.name < $1.name }
+        trips = try context.fetch(NSFetchRequest<TripRecord>(entityName: "TripRecord")).sorted { $0.startDay > $1.startDay }
+        tripEntries = try context.fetch(NSFetchRequest<TripEntry>(entityName: "TripEntry"))
         revision += 1
     }
 
     func save() throws {
         do { try context.save(); try refresh() }
         catch { context.rollback(); try? refresh(); throw error }
+    }
+
+    func requestSync(_ enabled: Bool) throws {
+        if enabled {
+            guard syncAvailable else { throw LocaliserError.invalidBackup("Private sync needs a signed app with an iCloud container. This local build is not configured yet.") }
+            guard !UserDefaults.standard.bool(forKey: "restoredLocalLibrary") else { throw LocaliserError.invalidBackup("This library was restored from a file. Reconnecting it to an existing cloud library has not been verified; sync is disabled to avoid duplicate records.") }
+        }
+        UserDefaults.standard.set(enabled, forKey: "privateSyncRequested")
+        syncStatus = "Restart Localiser to apply this sync setting."
+    }
+
+    func receiveCloudEvent(_ notification: Notification) {
+        guard syncEnabled, let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else { return }
+        let operation = switch event.type { case .setup: "Setup"; case .import: "Download"; case .export: "Upload"; @unknown default: "iCloud operation" }
+        if let error = event.error { syncStatus = "\(operation) failed: \(error.localizedDescription). Your local library remains available." }
+        else if event.endDate == nil { syncStatus = "\(operation) in progress." }
+        else { syncStatus = "\(operation) completed. This status does not confirm another device has received every change." }
+        do { try refresh() } catch { syncStatus = error.localizedDescription }
     }
 
     @discardableResult
@@ -87,7 +141,7 @@ final class LocaliserStore {
         try save()
     }
 
-    private func recordMove(_ item: Belonging, to place: Place?) {
+    func recordMove(_ item: Belonging, to place: Place?) {
         guard item.place?.id != place?.id else { return }
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
         movement.id = UUID(); movement.date = .now; movement.item = item
@@ -121,6 +175,16 @@ final class LocaliserStore {
     }
 
     func setArchived(_ item: Belonging, _ archived: Bool) throws { item.archived = archived; try save() }
+
+    func deleteItem(_ item: Belonging) throws {
+        for entry in item.kitEntries { entry.name = item.name }
+        for entry in item.tripEntries { entry.name = item.name }
+        for movement in item.movements { context.delete(movement) }
+        for deadline in item.deadlines { context.delete(deadline) }
+        for scan in item.scans { context.delete(scan) }
+        context.delete(item)
+        try save()
+    }
 
     @discardableResult
     func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil, reopen: Bool = false, scan: ScanDraft? = nil, retainSource: Bool = false) throws -> Deadline {
@@ -158,7 +222,7 @@ final class LocaliserStore {
         try save()
     }
 
-    private func requiredName(_ name: String) throws -> String {
+    func requiredName(_ name: String) throws -> String {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { throw LocaliserError.nameRequired }
         return clean

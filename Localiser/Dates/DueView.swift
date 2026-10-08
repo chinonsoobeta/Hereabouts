@@ -68,6 +68,7 @@ struct DeadlineRow: View {
 
 struct DeadlineEditor: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(ProAccess.self) private var pro
     @Environment(\.dismiss) private var dismiss
     let item: Belonging
     let existing: Deadline?
@@ -89,6 +90,7 @@ struct DeadlineEditor: View {
     @State private var error: String?
     @State private var retainSource = false
     @State private var saving = false
+    @State private var upgrade = false
 
     init(item: Belonging, existing: Deadline? = nil, suggestedDate: Date? = nil, source: String = "", suggestedKind: DeadlineKind? = nil, scan: ScanDraft? = nil, onSaved: (() -> Void)? = nil) {
         self.item = item; self.existing = existing; self.scan = scan; self.onSaved = onSaved
@@ -160,11 +162,13 @@ struct DeadlineEditor: View {
         .onChange(of: includeAnchor) { _, _ in confirmed = false }
         .onChange(of: useWindow) { _, _ in confirmed = false }
         .onChange(of: anchorType) { _, _ in confirmed = false }
+        .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .alert("Could not save date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private func save() {
         guard let day = finalDay, !saving else { return }
+        if let scan, !scan.candidates.isEmpty, !pro.allows(.scan, count: store.completedScans) { upgrade = true; return }
         saving = true
         do {
             var evidence = source
