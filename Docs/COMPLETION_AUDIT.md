@@ -53,3 +53,5 @@ Exact commands, bundle paths, failures/corrections and delivery records are in B
 Passing structural audits and screenshots do not prove the outstanding contrast/Dynamic Type/clipping findings false. No suppression or issue handler is present. HUMAN_BLOCKED.md and BETA_AND_RELEASE.md preserve the remaining physical/account/release work; tests do not establish public-launch readiness, commercial demand or legal clearance. Final phone delivery must be assessed from the signed-build verification and actual wireless install/launch record, separately from the earlier OTA test.
 
 The final normal Release app was restored after the physical benchmark and launched wirelessly. Process readback confirmed PID 33471 from installed bundle `1EBABC45-299C-4225-B8B8-8C5FB9F634D3/Localiser.app`. No password was required.
+
+A fresh four-tab maximum-text typography audit on October 8 failed with four contrast findings. Its summary/screenshots are retained, and the new focused UI test reproduces that gate. Earlier functional passes do not imply the expanded default UI suite now passes. See BUILD_STATUS.md for the individual review and exact command.
