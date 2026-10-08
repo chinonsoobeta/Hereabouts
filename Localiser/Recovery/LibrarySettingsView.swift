@@ -62,7 +62,8 @@ struct LibrarySettingsView: View {
                 Text("Restore requires an empty local library and private sync off. Existing records are never overwritten. A restored library stays local until cloud reconnection is verified.").font(.footnote).foregroundStyle(Theme.secondary)
             } header: { Text("Restore").foregroundStyle(Theme.secondary) }
             Section("Erase local library") {
-                Button("Erase all local records…", role: .destructive) { erasePhrase = ""; erasing = true }.disabled(store.syncEnabled || store.hasUsedSync)
+                Button("Erase all local records…", role: .destructive) { erasePhrase = ""; erasing = true }
+                    .foregroundStyle(Theme.warning).disabled(store.syncEnabled || store.hasUsedSync)
                 Text("Export first. This removes local records and retained files, including trip history. This action does not erase an existing iCloud library.").font(.footnote).foregroundStyle(Theme.secondary)
                 if store.hasUsedSync { Text("Restore and erase are unavailable for stores that have used sync until cloud reconnection has been verified. Export remains available.").font(.footnote) }
             }

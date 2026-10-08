@@ -53,6 +53,10 @@ import XCTest
         backup.lifetime = .keepAlways
         add(backup)
         try app.performAccessibilityAudit(for: [.contrast, .textClipped])
+        reveal(app.buttons["Erase all local records…"], in: app)
+        let erase = XCTAttachment(screenshot: app.screenshot())
+        erase.name = "Rendered erase warning"
+        erase.lifetime = .keepAlways; add(erase)
     }
 
     func testTypographyAccessibilityOnLaunchTabs() throws {
@@ -61,6 +65,14 @@ import XCTest
         app.launch()
         for tab in ["Find", "Places", "Due soon", "Packing"] {
             app.tabBars.buttons[tab].tap()
+            let labels: [String]
+            switch tab {
+            case "Find": labels = ["Add your first item"]
+            case "Due soon": labels = ["Remember in time", "Add a confirmed return deadline, warranty end, or document expiry to an item."]
+            case "Packing": labels = ["Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips."]
+            default: labels = []
+            }
+            recordTypography(app, labels: labels, name: tab)
             let screenshot = XCTAttachment(screenshot: app.screenshot())
             screenshot.name = "Typography audit \(tab)"
             screenshot.lifetime = .keepAlways
@@ -72,15 +84,35 @@ import XCTest
         app.buttons["Settings and backup"].tap()
         let pro = app.buttons["Purchase or restore lifetime Pro"]
         reveal(pro, in: app); pro.tap()
+        recordTypography(app, labels: ["Free: 50 saved items, 1 kit and 3 successful scans. Trips, manual dates, existing records and export stay available."], name: "Pro")
         reveal(app.buttons["Restore purchases"], in: app)
         let paywall = XCTAttachment(screenshot: app.screenshot())
         paywall.name = "Typography audit Pro"; paywall.lifetime = .keepAlways; add(paywall)
         try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped])
         app.buttons["Close"].tap()
+        recordTypography(app, labels: ["Restore", "The exported file is readable by anyone who can access it. Save it somewhere private."], name: "Backup")
         reveal(app.buttons["Export restorable backup"], in: app)
         let settings = XCTAttachment(screenshot: app.screenshot())
         settings.name = "Typography audit Backup"; settings.lifetime = .keepAlways; add(settings)
         try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped])
+    }
+
+    private func recordTypography(_ app: XCUIApplication, labels: [String], name: String) {
+        var measurements = [[String: Any]]()
+        for label in labels {
+            let element = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", label)).firstMatch
+            reveal(element, in: app)
+            XCTAssertTrue(element.exists && element.isHittable, "Typography text must remain reachable: \(label)")
+            let frame = element.frame
+            measurements.append(["label": label, "x": frame.minX, "y": frame.minY, "width": frame.width, "height": frame.height])
+            let screenshot = XCTAttachment(screenshot: app.screenshot())
+            screenshot.name = "Rendered typography \(name) \(measurements.count)"
+            screenshot.lifetime = .keepAlways; add(screenshot)
+        }
+        let data = try! JSONSerialization.data(withJSONObject: measurements, options: [.prettyPrinted, .sortedKeys])
+        let attachment = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+        attachment.name = "Typography measurements \(name)"
+        attachment.lifetime = .keepAlways; add(attachment)
     }
 
     func testNameOnlyCaptureSurvivesRelaunchAndCanBeFound() {

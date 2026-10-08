@@ -1,0 +1,43 @@
+{
+  "method": "Relative luminance of flat foreground/background RGB values from inspected rendered screenshots; antialiased edge pixels excluded. This is not a full accessibility audit.",
+  "beforeDark": {
+    "foreground": [
+      255,
+      66,
+      69
+    ],
+    "background": [
+      44,
+      44,
+      46
+    ],
+    "ratio": 4.059692092337208
+  },
+  "afterDark": {
+    "foreground": [
+      253,
+      186,
+      107
+    ],
+    "background": [
+      44,
+      44,
+      46
+    ],
+    "ratio": 8.237486475730156
+  },
+  "afterLight": {
+    "foreground": [
+      140,
+      71,
+      5
+    ],
+    "background": [
+      255,
+      255,
+      255
+    ],
+    "ratio": 6.956921459585586
+  },
+  "reference": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html"
+}

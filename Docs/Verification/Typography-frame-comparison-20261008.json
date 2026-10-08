@@ -1,0 +1,134 @@
+{
+  "device": "iPhone SE (3rd generation), iOS 26.5, light",
+  "defaultCategory": "large",
+  "maximumCategory": "accessibility-extra-extra-extra-large",
+  "scope": "Accessibility element frame heights, including any native row padding; not font point sizes or a passing full accessibility audit. Native audit failures are retained separately.",
+  "measurements": [
+    {
+      "label": "Restore",
+      "default": {
+        "height": 40.5,
+        "label": "Restore",
+        "width": 343,
+        "x": 16,
+        "y": 568
+      },
+      "maximum": {
+        "height": 83.5,
+        "label": "Restore",
+        "width": 343,
+        "x": 16,
+        "y": 103.5
+      },
+      "heightRatio": 2.0617283950617282
+    },
+    {
+      "label": "The exported file is readable by anyone who can access it. Save it somewhere private.",
+      "default": {
+        "height": 64,
+        "label": "The exported file is readable by anyone who can access it. Save it somewhere private.",
+        "width": 343,
+        "x": 16,
+        "y": 376.5
+      },
+      "maximum": {
+        "height": 395,
+        "label": "The exported file is readable by anyone who can access it. Save it somewhere private.",
+        "width": 343,
+        "x": 16,
+        "y": 6.5
+      },
+      "heightRatio": 6.171875
+    },
+    {
+      "label": "Free: 50 saved items, 1 kit and 3 successful scans. Trips, manual dates, existing records and export stay available.",
+      "default": {
+        "height": 82,
+        "label": "Free: 50 saved items, 1 kit and 3 successful scans. Trips, manual dates, existing records and export stay available.",
+        "width": 343,
+        "x": 16,
+        "y": 286
+      },
+      "maximum": {
+        "height": 447,
+        "label": "Free: 50 saved items, 1 kit and 3 successful scans. Trips, manual dates, existing records and export stay available.",
+        "width": 343,
+        "x": 16,
+        "y": 143
+      },
+      "heightRatio": 5.451219512195122
+    },
+    {
+      "label": "Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.",
+      "default": {
+        "height": 60.5,
+        "label": "Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.",
+        "width": 343,
+        "x": 16,
+        "y": 401
+      },
+      "maximum": {
+        "height": 387.5,
+        "label": "Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.",
+        "width": 343,
+        "x": 16,
+        "y": 311
+      },
+      "heightRatio": 6.404958677685951
+    },
+    {
+      "label": "Remember in time",
+      "default": {
+        "height": 20.5,
+        "label": "Remember in time",
+        "width": 144.5,
+        "x": 61.5,
+        "y": 440.5
+      },
+      "maximum": {
+        "height": 187.5,
+        "label": "Remember in time",
+        "width": 204.5,
+        "x": 107,
+        "y": 324.5
+      },
+      "heightRatio": 9.146341463414634
+    },
+    {
+      "label": "Add a confirmed return deadline, warranty end, or document expiry to an item.",
+      "default": {
+        "height": 64.5,
+        "label": "Add a confirmed return deadline, warranty end, or document expiry to an item.",
+        "width": 303,
+        "x": 32,
+        "y": 468
+      },
+      "maximum": {
+        "height": 497.5,
+        "label": "Add a confirmed return deadline, warranty end, or document expiry to an item.",
+        "width": 311,
+        "x": 32,
+        "y": 188
+      },
+      "heightRatio": 7.713178294573644
+    },
+    {
+      "label": "Add your first item",
+      "default": {
+        "height": 52,
+        "label": "Add your first item",
+        "width": 343,
+        "x": 16,
+        "y": 409.5
+      },
+      "maximum": {
+        "height": 155.5,
+        "label": "Add your first item",
+        "width": 343,
+        "x": 16,
+        "y": 408.5
+      },
+      "heightRatio": 2.9903846153846154
+    }
+  ]
+}
