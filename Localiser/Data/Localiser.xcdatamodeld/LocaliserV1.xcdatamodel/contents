@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="25000" systemVersion="24A" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES">
+  <entity name="Belonging" representedClassName="Belonging" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" allowsExternalBinaryDataStorage="YES" />
+    <attribute name="notes" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="aliases" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="archived" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" />
+    <attribute name="photo" optional="YES" attributeType="Binary" />
+    <relationship name="place" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Place" inverseName="items" inverseEntity="Place" />
+    <relationship name="movements" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Movement" inverseName="item" inverseEntity="Movement" />
+  </entity>
+  <entity name="Place" representedClassName="Place" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Belonging" inverseName="place" inverseEntity="Belonging" />
+    <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Place" inverseName="children" inverseEntity="Place" />
+    <relationship name="children" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Place" inverseName="parent" inverseEntity="Place" />
+  </entity>
+  <entity name="Movement" representedClassName="Movement" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" />
+    <attribute name="fromPath" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="toPath" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="movements" inverseEntity="Belonging" />
+  </entity>
+</model>
