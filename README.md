@@ -22,6 +22,8 @@ xcrun simctl addmedia <simulator-UUID> Docs/Verification/Printed-expiry.png
 
 The test selects the newest photo through Apple's picker and checks OCR, required confirmation and date-only storage. Use a simulator with test media only; do not seed or modify the owner's physical photo library. This fixture is outside the application target and is not bundled in the app.
 
+For `testPDFImportNeedsConfirmationAndRetainsOriginal`, place the synthetic `Docs/Verification/Localiser-test-expiry.pdf` in **On My iPhone** in the dedicated test simulator’s Files provider before running. The test navigates Browse > On My iPhone and selects that exact filename. Do not seed the owner’s physical Files library. The fixture is outside the application target. BUILD_STATUS.md records the exact simulator provider directory used in the verified run.
+
 Private sync is off by default. Set the permanent bundle ID, `DEVELOPMENT_TEAM` and matching `LOCALISER_CLOUD_CONTAINER` before signed-device verification. Local export and restore do not require an account or purchase. Restore requires an empty store. Restored stores stay local, and full erase/restore is restricted for stores that previously used sync until reset/reconnection has been verified on two devices.
 
 See `Docs/BETA_AND_RELEASE.md` for the local beta script, listing/policy drafts and missing owner inputs. Nothing has been uploaded, published or sent to testers.

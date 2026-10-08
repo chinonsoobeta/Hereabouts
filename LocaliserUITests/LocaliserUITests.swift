@@ -44,6 +44,20 @@ import XCTest
             add(screenshot)
             try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped])
         }
+        app.tabBars.buttons["Find"].tap()
+        app.buttons["Find options"].tap()
+        app.buttons["Settings and backup"].tap()
+        let pro = app.buttons["Purchase or restore lifetime Pro"]
+        reveal(pro, in: app); pro.tap()
+        reveal(app.buttons["Restore purchases"], in: app)
+        let paywall = XCTAttachment(screenshot: app.screenshot())
+        paywall.name = "Typography audit Pro"; paywall.lifetime = .keepAlways; add(paywall)
+        try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped])
+        app.buttons["Close"].tap()
+        reveal(app.buttons["Export restorable backup"], in: app)
+        let settings = XCTAttachment(screenshot: app.screenshot())
+        settings.name = "Typography audit Backup"; settings.lifetime = .keepAlways; add(settings)
+        try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped])
     }
 
     func testNameOnlyCaptureSurvivesRelaunchAndCanBeFound() {
@@ -224,6 +238,50 @@ import XCTest
         screenshot.name = "Confirmed date-only photo scan"; screenshot.lifetime = .keepAlways; add(screenshot)
         #else
         throw XCTSkip("This automated photo workflow uses the documented synthetic simulator fixture. Physical camera/photo verification requires owner interaction.")
+        #endif
+    }
+
+    func testPDFImportNeedsConfirmationAndRetainsOriginal() throws {
+        #if targetEnvironment(simulator)
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launch()
+        app.buttons["Scan"].tap()
+        app.buttons["Import PDF or image"].tap()
+        let browse = app.buttons["Browse"].firstMatch
+        if browse.waitForExistence(timeout: 5) { browse.tap() }
+        let local = app.staticTexts["On My iPhone"].firstMatch
+        if local.waitForExistence(timeout: 5) { local.tap() }
+        let document = app.cells["Localiser-test-expiry, pdf"].firstMatch
+        XCTAssertTrue(document.waitForExistence(timeout: 10), app.debugDescription)
+        document.tap()
+        let candidate = app.buttons.containing(.staticText, identifier: "2028-07-14").firstMatch
+        reveal(candidate, in: app); candidate.tap()
+        let name = "PDF expiry \(UUID().uuidString.prefix(6))"
+        let field = app.textFields["Or name a new item"]
+        reveal(field, in: app); field.tap(); field.typeText(name + "\n")
+        reveal(app.buttons["Create item"], in: app); app.buttons["Create item"].tap()
+        reveal(app.buttons["Review and confirm date"], in: app); app.buttons["Review and confirm date"].tap()
+        let save = app.buttons["deadline.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
+        let retain = app.switches["Keep original document"]
+        reveal(retain, in: app); XCTAssertEqual(retain.value as? String, "0")
+        retain.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertEqual(retain.value as? String, "1")
+        let confirm = app.switches["deadline.confirm"]
+        reveal(confirm, in: app); confirm.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertEqual(confirm.value as? String, "1"); XCTAssertTrue(save.isEnabled); save.tap()
+        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 10)); app.staticTexts[name].tap()
+        reveal(app.staticTexts["Expiry, Jul 14, 2028"], in: app)
+        XCTAssertTrue(app.staticTexts["Expiry, Jul 14, 2028"].exists)
+        let retained = app.staticTexts["Localiser-test-expiry.pdf"]
+        reveal(retained, in: app); retained.tap()
+        XCTAssertTrue(app.buttons["Remove original document"].waitForExistence(timeout: 5))
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Retained imported PDF"; screenshot.lifetime = .keepAlways; add(screenshot)
+        #else
+        throw XCTSkip("This import check uses the documented synthetic simulator PDF. Physical Files-provider verification requires owner interaction.")
         #endif
     }
 
