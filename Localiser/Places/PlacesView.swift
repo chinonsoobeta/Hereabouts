@@ -4,15 +4,18 @@ struct PlacesView: View {
     @Environment(LocaliserStore.self) private var store
     @State private var adding = false
     var body: some View {
-        List {
-            if store.places.isEmpty { LibraryEmptyState(title: "Where do you keep things?", systemImage: "shippingbox", description: "Add a room, drawer, shelf, or box. You can put one place inside another.") }
-            ForEach(store.places) { place in
-                NavigationLink { PlaceDetailView(place: place) } label: {
-                    VStack(alignment: .leading) { Text(place.path); Text("\(place.items.filter { !$0.archived }.count) items · \(place.children.count) places").font(.caption).foregroundStyle(Theme.secondary) }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if store.places.isEmpty { LibraryEmptyState(title: "Where do you keep things?", systemImage: "shippingbox", description: "Add a room, drawer, shelf, or box. You can put one place inside another.") }
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                    ForEach(store.places.filter { $0.parent == nil }) { place in
+                        NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
+                    }
                 }
             }
+            .padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .scrollContentBackground(.hidden).background(Theme.ground).navigationTitle("Places")
+        .background(Theme.ground).navigationTitle("Places")
         .toolbar { Button("Add place", systemImage: "plus") { adding = true } }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor() } }
     }
@@ -35,6 +38,7 @@ struct PlaceEditor: View {
             TextField("Place name", text: $name).accessibilityIdentifier("place.name")
             PlacePicker(selection: $parentID, excluded: place)
         }
+        .groundBackground()
         .navigationTitle(place == nil ? "Add place" : "Edit place").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
@@ -62,9 +66,18 @@ struct PlaceDetailView: View {
     var body: some View {
         let _ = store.revision
         List {
-            Text(place.path).foregroundStyle(Theme.secondary)
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(place.name).font(.wbDisplay).foregroundStyle(Theme.ink)
+                    PlaceBreadcrumb(path: place.path)
+                }.plainRow()
+            }
             Section("Places inside") {
-                ForEach(place.children.sorted { $0.name < $1.name }) { child in NavigationLink(child.name) { PlaceDetailView(place: child) } }
+                ForEach(place.children.sorted { $0.name < $1.name }) { child in
+                    NavigationLink { PlaceDetailView(place: child) } label: {
+                        Label { Text(child.name) } icon: { Image(systemName: PlaceTile.symbol(for: child.name)).foregroundStyle(Theme.purple) }
+                    }
+                }
                 Button("Add a place inside") { adding = true }
             }
             Section("Belongings") {
@@ -72,6 +85,7 @@ struct PlaceDetailView: View {
             }
             Section { Button("Delete place", role: .destructive) { deleting = true } }
         }
+        .groundBackground()
         .navigationTitle(place.name).navigationBarTitleDisplayMode(.inline)
         .toolbar { Button("Edit") { editing = true } }
         .sheet(isPresented: $editing) { NavigationStack { PlaceEditor(place: place) } }

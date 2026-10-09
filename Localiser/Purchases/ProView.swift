@@ -22,7 +22,7 @@ struct ProView: View {
             }
             Section { Text("If a purchase is refunded or becomes unavailable, your saved records remain visible and editable. You can always export them. Limits apply to new records and successful scans.").font(.footnote) }
         }
-        .navigationTitle("Localiser Pro").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle("Localiser Pro").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close", systemImage: "xmark") { dismiss() }.labelStyle(.iconOnly) } }
         .task { await pro.loadProduct(); await pro.refresh() }
     }

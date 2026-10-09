@@ -66,7 +66,7 @@ struct ScanView: View {
             }
             Section { Text("Reading happens on your device. Originals are kept only if you choose that in the final review. A purchase date alone does not establish a return deadline.").font(.caption).foregroundStyle(Theme.secondary) }
         }
-        .navigationTitle("Scan a document").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle("Scan a document").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         .sheet(isPresented: $camera) { DocumentCamera { result in
             camera = false

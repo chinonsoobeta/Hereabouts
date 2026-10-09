@@ -31,7 +31,8 @@ enum ItemSearch {
     static func results(query: String, entries: [Entry], archived: Bool) -> [Belonging] {
         let query = normalized(query)
         let tokens = query.split(separator: " ").map(String.init)
-        return entries.filter { $0.archived == archived }.compactMap { entry -> (Entry, Int)? in
+        // The index can briefly hold an item deleted this pass; skip it so views never read a faulted id.
+        return entries.filter { $0.archived == archived && !$0.item.isDeleted && $0.item.managedObjectContext != nil }.compactMap { entry -> (Entry, Int)? in
             guard let score = score(normalizedQuery: query, tokens: tokens, text: entry.text) else { return nil }
             return (entry, score)
         }.sorted { $0.1 == $1.1 ? $0.0.createdAt > $1.0.createdAt : $0.1 > $1.1 }.map { $0.0.item }

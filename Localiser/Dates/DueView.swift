@@ -7,6 +7,7 @@ struct DueView: View {
     @Environment(ReminderService.self) private var reminders
     @State private var addDate = false
     @State private var showClosed = false
+    @State private var error: String?
     private let sections = ["Decide soon", "Returning", "Warranties ending", "Expiring", "Missed"]
 
     private func section(_ deadline: Deadline) -> String {
@@ -18,41 +19,62 @@ struct DueView: View {
 
     var body: some View {
         let _ = store.revision
-        List {
-            Section {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 12) {
+                if !store.deadlines.contains(where: \.active) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(alignment: .top) {
+                            Image(systemName: "calendar.badge.clock").foregroundStyle(Theme.purple).accessibilityHidden(true)
+                            Text("Remember in time").fixedSize(horizontal: false, vertical: true)
+                        }.font(.wbTitle)
+                        Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")
+                            .foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
+                    }.card(padding: 16)
+                }
+                ForEach(sections, id: \.self) { heading in
+                    let dates = store.deadlines.filter { $0.active && section($0) == heading }.sorted { $0.dayString < $1.dayString }
+                    if !dates.isEmpty {
+                        SectionHeading(title: heading).padding(.top, 8)
+                        ForEach(dates) { deadline in
+                            if heading == "Decide soon" {
+                                VStack(spacing: 14) {
+                                    NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
+                                    HStack(spacing: 10) {
+                                        Button("Returning") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
+                                        Button("Keep it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
+                                    }
+                                }.card()
+                            } else {
+                                NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
+                if showClosed {
+                    SectionHeading(title: "Closed / archived").padding(.top, 8)
+                    ForEach(store.deadlines.filter { !$0.active }) { deadline in
+                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
+                    }
+                }
                 VStack(alignment: .leading, spacing: 12) {
+                    Label { Text("Reminder coverage").font(.wbItem) } icon: { Image(systemName: "bell").foregroundStyle(Theme.purpleInk) }
+                        .accessibilityAddTraits(.isHeader)
                     Text("Notifications: \(reminders.permission)").fixedSize(horizontal: false, vertical: true)
-                    Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.subheadline)
-                    if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates below or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
-                    if let error = reminders.error { Text(error).foregroundStyle(.red) }
-                    Button("Enable notifications") { Task { await reminders.enable() } }
-                    if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Link("Open notification settings", destination: url) }
-                    Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.caption).foregroundStyle(Theme.secondary)
-                }.buttonStyle(.borderless)
-            } header: { Text("Reminder coverage").foregroundStyle(Theme.secondary) }
-            if !store.deadlines.contains(where: \.active) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(alignment: .top) {
-                        Image(systemName: "calendar.badge.clock").accessibilityHidden(true)
-                        Text("Remember in time").fixedSize(horizontal: false, vertical: true)
-                    }.font(.headline)
-                    Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")
-                        .foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
+                    Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.wbCaption)
+                    if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates above or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
+                    if let error = reminders.error { Text(error).foregroundStyle(Theme.warning) }
+                    Button("Enable notifications") { Task { await reminders.enable() } }.buttonStyle(SoftButtonStyle(compact: true))
+                    if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Button("Open notification settings") { UIApplication.shared.open(url) }.buttonStyle(SoftButtonStyle(compact: true)) }
+                    Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.wbCaption).foregroundStyle(Theme.secondary)
                 }
+                .foregroundStyle(Theme.ink)
+                .padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.mist, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .padding(.top, 8)
             }
-            ForEach(sections, id: \.self) { heading in
-                let dates = store.deadlines.filter { $0.active && section($0) == heading }
-                if !dates.isEmpty {
-                    Section(heading) { ForEach(dates) { deadline in NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline) } } }
-                }
-            }
-            if showClosed {
-                Section("Closed / archived") {
-                    ForEach(store.deadlines.filter { !$0.active }) { deadline in NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline) } }
-                }
-            }
+            .padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .scrollContentBackground(.hidden).background(Theme.ground).navigationTitle("Due soon")
+        .background(Theme.ground).navigationTitle("Due soon")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { Button { showClosed.toggle() } label: { Image(systemName: showClosed ? "eye.slash" : "eye") }.accessibilityLabel(showClosed ? "Hide closed" : "Show closed") }
             ToolbarItem(placement: .topBarTrailing) { Button("Add date", systemImage: "plus") { addDate = true } }
@@ -61,8 +83,13 @@ struct DueView: View {
             List {
                 if store.items.filter({ !$0.archived }).isEmpty { Text("Add a belonging in Find first.") }
                 ForEach(store.items.filter { !$0.archived }) { item in NavigationLink { DeadlineEditor(item: item) } label: { ItemRow(item: item) } }
-            }.navigationTitle("Choose an item").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { addDate = false } } }
+            }.groundBackground().navigationTitle("Choose an item").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { addDate = false } } }
         } }
+        .alert("Could not update date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    private func decide(_ deadline: Deadline, _ decision: ReturnDecision) {
+        do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription }
     }
 }
 
@@ -161,7 +188,7 @@ struct DeadlineEditor: View {
                 Toggle("I have checked the date type and final date", isOn: $confirmed).accessibilityIdentifier("deadline.confirm")
             }
         }
-        .navigationTitle(existing == nil ? "Add date" : "Edit date").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle(existing == nil ? "Add date" : "Edit date").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") { save() }.disabled(saving || !confirmed || finalDay == nil || (closed && !reopen)).accessibilityIdentifier("deadline.save") }
@@ -224,7 +251,7 @@ struct DeadlineDetailView: View {
             if let item = deadline.item { Section { NavigationLink("View belonging") { ItemDetailView(item: item) } } }
             Section { Button("Delete date", role: .destructive) { deleting = true } }
         }
-        .navigationTitle(deadline.kind?.title ?? "Date").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle(deadline.kind?.title ?? "Date").navigationBarTitleDisplayMode(.inline)
         .toolbar { if deadline.item != nil { Button("Edit") { editing = true } } }
         .sheet(isPresented: $editing) { if let item = deadline.item { NavigationStack { DeadlineEditor(item: item, existing: deadline) } } }
         .sheet(isPresented: $calendar) { CalendarEventEditor(deadline: deadline) }
