@@ -34,7 +34,7 @@ enum DemoLibrary {
         let kit = try store.addKit(name: "Ski trip")
         _ = try store.setKitEntry(kit: kit, name: "", item: goggles, unit: 1, perNight: false, condition: .always)
         _ = try store.setKitEntry(kit: kit, name: "", item: layers, unit: 1, perNight: false, condition: .always)
-        _ = try store.setKitEntry(kit: kit, name: "Wool socks", item: nil, unit: 1, perNight: true, condition: .always)
+        _ = try store.setKitEntry(kit: kit, name: "Wool socks", item: nil, unit: 1, perNight: false, perDay: true, condition: .always)
         _ = try store.setKitEntry(kit: kit, name: "Sunscreen", item: nil, unit: 1, perNight: false, condition: .always)
         let trip = try store.addTrip(TripDetails(name: "Ski trip", start: day(10), end: day(14)), kit: kit)
         if let entry = trip.entries.first(where: { $0.item?.id == goggles.id }) { try store.pack(entry, count: entry.requiredCount) }

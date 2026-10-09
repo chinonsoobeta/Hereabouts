@@ -58,6 +58,8 @@ struct ReminderInput: Sendable {
     var enabled: Bool
     var archived: Bool
     var decision: ReturnDecision
+    var itemName: String = ""
+    var itemID: UUID?
 }
 
 struct PlannedReminder: Equatable, Sendable {
@@ -65,6 +67,23 @@ struct PlannedReminder: Equatable, Sendable {
     var deadlineID: UUID
     var fireDate: Date
     var kind: DeadlineKind
+    var daysBefore: Int = 0
+    var itemName: String = ""
+    var itemID: UUID?
+    var day: CalendarDay?
+
+    /// Notification wording. Item names appear unless the person turned them off in Settings.
+    func content(showingNames: Bool) -> (title: String, body: String) {
+        let subject = showingNames && !itemName.isEmpty ? itemName : "A saved item"
+        let when = daysBefore == 0 ? "today" : (daysBefore == 1 ? "tomorrow" : "in \(daysBefore) days")
+        let body: String = switch kind {
+        case .returns: "\(subject): last day to return is \(when)."
+        case .warranty: "\(subject): warranty ends \(when)."
+        case .expiry: "\(subject): expires \(when)."
+        }
+        let title: String = switch kind { case .returns: "Return window closing"; case .warranty: "Warranty ending"; case .expiry: "Expiry coming up" }
+        return (title, body)
+    }
 }
 
 enum ReminderPlan {
@@ -76,7 +95,7 @@ enum ReminderPlan {
             return offsets.compactMap { offset in
                 guard let day = input.day.adding(days: -offset, calendar: calendar),
                       let fireDate = day.date(calendar: calendar, hour: input.hour), fireDate > now else { return nil }
-                return PlannedReminder(id: "localiser.deadline.\(input.id.uuidString).\(offset)", deadlineID: input.id, fireDate: fireDate, kind: input.kind)
+                return PlannedReminder(id: "localiser.deadline.\(input.id.uuidString).\(offset)", deadlineID: input.id, fireDate: fireDate, kind: input.kind, daysBefore: offset, itemName: input.itemName, itemID: input.itemID, day: input.day)
             }
         }.sorted { $0.fireDate == $1.fireDate ? $0.id < $1.id : $0.fireDate < $1.fireDate }
     }

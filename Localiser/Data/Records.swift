@@ -2,7 +2,8 @@ import CoreData
 
 @objc(Belonging)
 final class Belonging: NSManagedObject, Identifiable {
-    @NSManaged var id: UUID
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var name: String
     @NSManaged var notes: String
     @NSManaged var aliases: String
@@ -23,7 +24,8 @@ final class Belonging: NSManagedObject, Identifiable {
 
 @objc(Place)
 final class Place: NSManagedObject, Identifiable {
-    @NSManaged var id: UUID
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var name: String
     @NSManaged var parent: Place?
     @NSManaged var children: Set<Place>
@@ -53,7 +55,8 @@ final class Place: NSManagedObject, Identifiable {
 
 @objc(Movement)
 final class Movement: NSManagedObject, Identifiable {
-    @NSManaged var id: UUID
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var date: Date
     @NSManaged var fromPath: String
     @NSManaged var toPath: String
@@ -62,7 +65,8 @@ final class Movement: NSManagedObject, Identifiable {
 
 @objc(Deadline)
 final class Deadline: NSManagedObject, Identifiable {
-    @NSManaged var id: UUID
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var dayString: String
     @NSManaged var kindRaw: String
     @NSManaged var decisionRaw: String
@@ -78,17 +82,19 @@ final class Deadline: NSManagedObject, Identifiable {
     var active: Bool { item != nil && item?.archived == false && (kind != .returns || [.open, .returning].contains(decision)) }
     var reminderInput: ReminderInput? {
         guard let day, let kind, let decision else { return nil }
-        return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision)
+        return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision, itemName: item?.name ?? "", itemID: item?.id)
     }
 }
 
-@MainActor enum LocaliserModel {
-    static let shared = Bundle.main.url(forResource: "Localiser", withExtension: "momd").flatMap(NSManagedObjectModel.init(contentsOf:))
+enum LocaliserModel {
+    nonisolated static let missingID = UUID(uuid: (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+    @MainActor static let shared = Bundle.main.url(forResource: "Localiser", withExtension: "momd").flatMap(NSManagedObjectModel.init(contentsOf:))
 }
 
 @objc(ScanRecord)
 final class ScanRecord: NSManagedObject, Identifiable {
-    @NSManaged var id: UUID
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var createdAt: Date
     @NSManaged var counted: Bool
     @NSManaged var filename: String

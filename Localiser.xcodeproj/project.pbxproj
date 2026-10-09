@@ -14,15 +14,19 @@
 		3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688EA727718F4AD230A48BBB /* LocaliserStore.swift */; };
 		3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25EBA641962B55EE0850C76 /* DueView.swift */; };
 		4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */; };
+		4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9129D1892BAA558D32EE09BC /* OnboardingView.swift */; };
 		55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A961609BF5723FD7F58316C /* LocaliserUITests.swift */; };
 		5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4437E05350A4892C18DA9522 /* ReminderService.swift */; };
 		723298C2EE434DF675B9562B /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495FD0CD72900A5932FC8DE9 /* DesignSystem.swift */; };
 		73184C07C0834BF531F95BBB /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A21167AF6F6CAEF79448DE /* Records.swift */; };
 		761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF170C8864C322B2EF738BC7 /* PackingRecords.swift */; };
 		7DFD233175BBDBC456DF0025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDA7CB51BE2372853A56B223 /* Assets.xcassets */; };
+		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
+		AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73C34594A1DA3A80DA79A05 /* Spotlight.swift */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
+		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
 		C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A479972608E485C29556D57 /* LocaliserApp.swift */; };
 		CA2AEB951D2C0E57C4B22732 /* PlacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */; };
@@ -55,12 +59,14 @@
 /* Begin PBXFileReference section */
 		06F18AE850904C71580C25A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0807D105D68201D35D8DF977 /* Localiser.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Localiser.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV5.xcdatamodel; sourceTree = "<group>"; };
 		153312694358421F11F17E69 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		1A30538423261835CD54AD5A /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProAccess.swift; sourceTree = "<group>"; };
 		1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV4.xcdatamodel; sourceTree = "<group>"; };
 		1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		25D5B7D5AD105BA2E4455706 /* LocaliserV2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV2.xcdatamodel; sourceTree = "<group>"; };
 		2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */ = {isa = PBXFileReference; path = Localiser.storekit; sourceTree = "<group>"; };
+		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		4437E05350A4892C18DA9522 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
 		495FD0CD72900A5932FC8DE9 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBackup.swift; sourceTree = "<group>"; };
@@ -75,11 +81,14 @@
 		6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoLibrary.swift; sourceTree = "<group>"; };
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		8A961609BF5723FD7F58316C /* LocaliserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserUITests.swift; sourceTree = "<group>"; };
+		9129D1892BAA558D32EE09BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
 		9690100A2F7DD2AC90139B89 /* ScanReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanReader.swift; sourceTree = "<group>"; };
 		A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A73C34594A1DA3A80DA79A05 /* Spotlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotlight.swift; sourceTree = "<group>"; };
 		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
+		CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoDeletionToast.swift; sourceTree = "<group>"; };
 		DBCC79A8C661311C9C70A285 /* ProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProView.swift; sourceTree = "<group>"; };
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
@@ -90,6 +99,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		01730CDC7B8CC5DFF40E454D /* System */ = {
+			isa = PBXGroup;
+			children = (
+				A73C34594A1DA3A80DA79A05 /* Spotlight.swift */,
+			);
+			path = System;
+			sourceTree = "<group>";
+		};
 		0B0E3590A1B0783544C17021 /* Design */ = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +126,14 @@
 			path = Dates;
 			sourceTree = "<group>";
 		};
+		21A74C7AD769A50343918F59 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				427E0752B779DA0F309E3F55 /* Support.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		27D9D3773E578B000776BAF6 /* Recovery */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,11 +151,20 @@
 			path = Places;
 			sourceTree = "<group>";
 		};
+		30232BB5C5AA76813A967346 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				9129D1892BAA558D32EE09BC /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		4C8AD373F3465F188D2EFD8F /* Find */ = {
 			isa = PBXGroup;
 			children = (
 				60A697438CB089D0830D4DC2 /* FindView.swift */,
 				153312694358421F11F17E69 /* Search.swift */,
+				CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */,
 			);
 			path = Find;
 			sourceTree = "<group>";
@@ -185,11 +219,14 @@
 				1A9DAE5CD64E5097D70CE152 /* Dates */,
 				0B0E3590A1B0783544C17021 /* Design */,
 				4C8AD373F3465F188D2EFD8F /* Find */,
+				30232BB5C5AA76813A967346 /* Onboarding */,
 				6FEE1F6077407FBEC6C00C99 /* Packing */,
 				27DE49865767075A6DC8ADED /* Places */,
 				D7CBECA7CA9D22B67B8CB206 /* Purchases */,
 				27D9D3773E578B000776BAF6 /* Recovery */,
 				E6D8F6FB14A17F86314E10CB /* Scanning */,
+				21A74C7AD769A50343918F59 /* Support */,
+				01730CDC7B8CC5DFF40E454D /* System */,
 			);
 			path = Localiser;
 			sourceTree = "<group>";
@@ -382,6 +419,7 @@
 				F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */,
 				C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */,
 				3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */,
+				4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */,
 				761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */,
 				DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */,
 				4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */,
@@ -393,6 +431,9 @@
 				AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */,
 				10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */,
 				BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */,
+				AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */,
+				8E221F011A35DF4EF41035F1 /* Support.swift in Sources */,
+				B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,9 +499,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEREABOUTS_SITE_URL = "https://hereabouts.app";
+				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALISER_APS_ENVIRONMENT = production;
-				LOCALISER_CLOUD_CONTAINER = iCloud.dev.localiser.app;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -481,9 +522,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Localiser/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Localiser;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan a receipt or document when you request it.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose an optional photo or document to save with a belonging.";
+				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Hereabouts adds return deadlines and warranty dates to the calendar you choose. It never reads your existing events.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of an item or scan a receipt. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what an item looks like or to read a date from a receipt. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -583,9 +626,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEREABOUTS_SITE_URL = "https://hereabouts.app";
+				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LOCALISER_APS_ENVIRONMENT = development;
-				LOCALISER_CLOUD_CONTAINER = iCloud.dev.localiser.app;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -641,9 +684,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Localiser/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Localiser;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan a receipt or document when you request it.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose an optional photo or document to save with a belonging.";
+				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Hereabouts adds return deadlines and warranty dates to the calendar you choose. It never reads your existing events.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of an item or scan a receipt. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what an item looks like or to read a date from a receipt. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -706,8 +751,9 @@
 				25D5B7D5AD105BA2E4455706 /* LocaliserV2.xcdatamodel */,
 				EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */,
 				1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */,
+				0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */,
 			);
-			currentVersion = 1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */;
+			currentVersion = 0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */;
 			path = Localiser.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

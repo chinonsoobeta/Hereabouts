@@ -296,7 +296,7 @@ struct ItemEditor: View {
     }
 
     private func save() {
-        if item == nil && !pro.allows(.item, count: store.items.count) { upgrade = true; return }
+        if item == nil && !pro.allows(.item, count: store.activeItemCount) { upgrade = true; return }
         do {
             let place = store.places.first { $0.id == placeID }
             if let item { try store.editItem(item, name: name, place: place, notes: notes, aliases: aliases, photo: photo) }

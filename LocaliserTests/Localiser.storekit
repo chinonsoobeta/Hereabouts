@@ -3,14 +3,14 @@
   "nonRenewingSubscriptions" : [],
   "products" : [
     {
-      "displayPrice" : "49.99",
-      "familyShareable" : false,
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
       "internalID" : "6422170010",
       "localizations" : [
-        { "description" : "More belongings, kits and scans. Local test product.", "displayName" : "Localiser Pro Lifetime", "locale" : "en_US" }
+        { "description" : "Unlimited items, kits and scans. Pay once.", "displayName" : "Hereabouts Pro", "locale" : "en_US" }
       ],
       "productID" : "dev.localiser.pro.lifetime",
-      "referenceName" : "Localiser Pro Lifetime (local testing)",
+      "referenceName" : "Hereabouts Pro Lifetime (local testing)",
       "type" : "NonConsumable"
     }
   ],

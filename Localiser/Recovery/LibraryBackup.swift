@@ -29,7 +29,7 @@ struct LibraryBackup: Codable, Sendable {
         return data
     }
     static func decoded(_ data: Data) throws -> Self {
-        guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup("Choose a Localiser backup under 200 MB.") }
+        guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup("Choose a Hereabouts backup under 200 MB.") }
         return try JSONDecoder().decode(Self.self, from: data)
     }
 }
@@ -74,13 +74,20 @@ struct LibraryBackup: Codable, Sendable {
         return file
     }
 
-    func restore(_ file: LibraryBackup) throws {
+    /// Restores a backup. With `replacingExisting`, the current library is erased in the same save,
+    /// so a failure leaves it exactly as it was.
+    func restore(_ file: LibraryBackup, replacingExisting: Bool = false) throws {
         try validateBackup(file)
-        for entity in container.managedObjectModel.entities {
-            if let name = entity.name, try context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: name)) > 0 { throw LocaliserError.libraryNotEmpty }
+        forgetUndo()
+        if replacingExisting {
+            for entity in container.managedObjectModel.entities {
+                if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
+            }
+        } else {
+            for entity in container.managedObjectModel.entities {
+                if let name = entity.name, try context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: name)) > 0 { throw LocaliserError.libraryNotEmpty }
+            }
         }
-        guard !syncEnabled else { throw LocaliserError.invalidBackup("Turn off private sync and restart before restoring a local backup. Verify the cloud library before reconnecting it.") }
-        guard !hasUsedSync else { throw LocaliserError.invalidBackup("This store has previously used private sync. Restoring into it requires a verified cloud reconnection procedure; use a fresh local installation for file recovery.") }
         let staging = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         staging.parent = context
         do {
@@ -101,12 +108,10 @@ struct LibraryBackup: Codable, Sendable {
                 try object.validateForInsert()
             }
             try staging.save(); try save()
-            if isUserLibrary {
-                UserDefaults.standard.set(true, forKey: "restoredLocalLibrary")
-                UserDefaults.standard.set(false, forKey: "privateSyncRequested")
-            }
         } catch { staging.rollback(); context.rollback(); try? refresh(); throw error }
     }
+
+    static var laterFields: Set<String> { ["perDay", "unlinked"] }
 
     func validateBackup(_ file: LibraryBackup) throws {
         guard file.version == 1, file.records.count <= 100_000 else { throw LocaliserError.invalidBackup("This backup version or record count is unsupported.") }
@@ -115,7 +120,8 @@ struct LibraryBackup: Codable, Sendable {
         for record in file.records {
             guard records[record.id] == nil, let entity = schema[record.entity] else { throw LocaliserError.invalidBackup("Duplicate identifiers or unknown record types were found.") }
             let fields = entity.attributesByName.filter { $0.key != "id" }
-            let required = Set(fields.filter { $0.value.attributeType != .binaryDataAttributeType }.keys)
+            // Fields added after the first backup format; older backups omit them and get the model default.
+            let required = Set(fields.filter { $0.value.attributeType != .binaryDataAttributeType && !Self.laterFields.contains($0.key) }.keys)
             guard required.isSubset(of: Set(record.attributes.keys)), Set(record.attributes.keys).isSubset(of: Set(fields.keys)), Set(record.relationships.keys) == Set(entity.relationshipsByName.keys) else { throw LocaliserError.invalidBackup("A record has missing or unknown fields.") }
             for (key, value) in record.attributes {
                 switch (fields[key]!.attributeType, value) {
@@ -181,12 +187,10 @@ struct LibraryBackup: Codable, Sendable {
     }
 
     func resetLibrary() throws {
-        guard !syncEnabled else { throw LocaliserError.invalidBackup("Turn off private sync and restart before erasing the local library. Cloud deletion and reconnection require separate verification.") }
-        guard !hasUsedSync else { throw LocaliserError.invalidBackup("This store has previously used private sync. Erasing and reconnecting could affect the cloud library, so this operation is unavailable until that procedure is verified.") }
+        forgetUndo()
         for entity in container.managedObjectModel.entities {
             if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
         }
         try save()
-        if isUserLibrary { UserDefaults.standard.removeObject(forKey: "restoredLocalLibrary") }
     }
 }

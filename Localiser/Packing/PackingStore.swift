@@ -16,12 +16,12 @@ import CoreData
     func editKit(_ kit: Kit, name: String) throws { kit.name = try requiredName(name); try save() }
 
     @discardableResult
-    func setKitEntry(kit: Kit, existing: KitEntry? = nil, name: String, item: Belonging?, unit: Int, perNight: Bool, condition: PackingCondition) throws -> KitEntry {
+    func setKitEntry(kit: Kit, existing: KitEntry? = nil, name: String, item: Belonging?, unit: Int, perNight: Bool, perDay: Bool = false, condition: PackingCondition) throws -> KitEntry {
         let clean = try requiredName(item?.name ?? name)
         guard (1...99).contains(unit), item?.archived != true else { throw LocaliserError.invalidPackingEntry }
         let entry = existing ?? (NSEntityDescription.insertNewObject(forEntityName: "KitEntry", into: context) as! KitEntry)
         if existing == nil { entry.id = UUID() }
-        entry.kit = kit; entry.name = clean; entry.item = item; entry.unitQuantity = Int64(unit); entry.perNight = perNight; entry.conditionRaw = condition.rawValue
+        entry.kit = kit; entry.name = clean; entry.item = item; entry.unitQuantity = Int64(unit); entry.perNight = perNight && !perDay; entry.perDay = perDay; entry.unlinked = false; entry.conditionRaw = condition.rawValue
         try save(); return entry
     }
 
@@ -47,7 +47,7 @@ import CoreData
         for template in kit?.entries ?? [] where template.item?.archived != true {
             let entry = NSEntityDescription.insertNewObject(forEntityName: "TripEntry", into: context) as! TripEntry
             entry.id = UUID(); entry.trip = trip; entry.item = template.item; entry.name = template.name
-            entry.unitQuantity = template.unitQuantity; entry.perNight = template.perNight; entry.conditionRaw = template.conditionRaw
+            entry.unitQuantity = template.unitQuantity; entry.perNight = template.perNight; entry.perDay = template.perDay; entry.unlinked = template.unlinked; entry.conditionRaw = template.conditionRaw
             entry.manualQuantity = -1; entry.packedCount = 0; entry.resolutionRaw = HomeResolution.pending.rawValue
         }
         let tasks = kit.map { $0.tasks.map(\.title) } ?? ["Check appliances", "Lock doors", "Take keys"]
@@ -80,7 +80,7 @@ import CoreData
         guard trip.state == .packing, item?.archived != true else { throw LocaliserError.invalidPackingEntry }
         let entry = NSEntityDescription.insertNewObject(forEntityName: "TripEntry", into: context) as! TripEntry
         entry.id = UUID(); entry.trip = trip; entry.item = item; entry.name = clean; entry.unitQuantity = 1
-        entry.perNight = false; entry.conditionRaw = PackingCondition.always.rawValue
+        entry.perNight = false; entry.perDay = false; entry.unlinked = false; entry.conditionRaw = PackingCondition.always.rawValue
         entry.manualQuantity = -1; entry.packedCount = 0; entry.resolutionRaw = HomeResolution.pending.rawValue
         try save()
     }

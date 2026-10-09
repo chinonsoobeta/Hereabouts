@@ -14,7 +14,11 @@ struct LibraryExportDocument: FileDocument {
 
 struct LibrarySettingsView: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(ProAccess.self) private var pro
+    @Environment(ReminderService.self) private var reminders
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
+    @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @State private var selectedFiles = Set<UUID>()
     @State private var document: LibraryExportDocument?
     @State private var exportType = UTType.json
@@ -27,52 +31,64 @@ struct LibrarySettingsView: View {
     @State private var error: String?
     @State private var notice: String?
 
+    private var libraryIsEmpty: Bool { store.items.isEmpty && store.places.isEmpty && store.deadlines.isEmpty && store.kits.isEmpty && store.trips.isEmpty }
+    private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count + store.items.flatMap(\.scans).filter { $0.data != nil }.count }
+
     var body: some View {
         Form {
-            Section { NavigationLink("Purchase or restore lifetime Pro") { ProView() } }
-                header: { Text("Localiser Pro").foregroundStyle(Theme.secondary) }
             Section {
-                Text("Document reading happens on your device. Source text is discarded after review; originals are retained only when you choose to keep them. Retained files may participate in device backup and configured private sync.").font(.footnote)
-                Text("Localiser has no advertising or analytics SDK. Reminders use generic lock-screen text. Exported files are not encrypted by Localiser.").font(.footnote).foregroundStyle(Theme.secondary)
+                NavigationLink { ProView(showsClose: false) } label: {
+                    HStack(spacing: 12) {
+                        IconTile(systemImage: "sparkles", size: 40)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Hereabouts Pro").font(.wbItem).foregroundStyle(Theme.ink)
+                            Text(pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) items").font(.wbCaption).foregroundStyle(Theme.secondary)
+                        }
+                    }
+                }
+                .accessibilityLabel("Purchase or restore lifetime Pro")
+            }
+            Section {
+                Toggle("Show item names in reminders", isOn: $showItemNames)
+                    .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines) }
+            } header: { Text("Reminders").foregroundStyle(Theme.secondary) }
+              footer: { Text(showItemNames ? "Reminders say which item is due, for example \u{201C}Headphones: last day to return is tomorrow.\u{201D} Anyone who sees your lock screen can read them." : "Reminders say \u{201C}A saved item\u{201D} instead of the name.").foregroundStyle(Theme.secondary) }
+            Section {
+                Button("Export restorable backup", systemImage: "arrow.down.doc") { prepareBackup() }
+                Button("Export inventory CSV", systemImage: "tablecells") { prepareCSV() }
+                NavigationLink {
+                    BackupFilesView(selectedFiles: $selectedFiles)
+                } label: {
+                    LabeledContent { Text(selectedFiles.isEmpty ? "None" : "\(selectedFiles.count) of \(retainedFileCount)") } label: { Label("Photos and documents to include", systemImage: "photo.on.rectangle") }
+                }
+                Button("Restore from a backup", systemImage: "arrow.counterclockwise") { importing = true }
+            } header: { Text("Backup").foregroundStyle(Theme.secondary) }
+              footer: { Text("A backup holds your places, items, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.").foregroundStyle(Theme.secondary) }
+            Section {
+                Label("Your library stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
+                Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
             } header: { Text("Privacy").foregroundStyle(Theme.secondary) }
+            .font(.wbBody)
             Section {
-                Toggle("Use my private iCloud", isOn: Binding(get: { store.syncRequested }, set: { value in
-                    do { try store.requestSync(value) } catch { self.error = error.localizedDescription }
-                })).disabled(!store.syncAvailable)
-                Text(store.syncStatus).font(.footnote).foregroundStyle(Theme.secondary)
-                if !store.syncAvailable { Text("This build is not configured for private iCloud. Sync stays off until the app is signed with its own iCloud container.").font(.footnote) }
-                Text("Changes work offline. Apply sync settings by restarting Localiser. Household sharing is not included.").font(.footnote).foregroundStyle(Theme.secondary)
-            } header: { Text("Private sync").foregroundStyle(Theme.secondary) }
+                Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
+                Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
+                Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
+                Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
+                Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
+            } header: { Text("Help").foregroundStyle(Theme.secondary) }
             Section {
-                Button("Export inventory CSV") { prepareCSV() }
-                Button("Export restorable backup") { prepareBackup() }
-                Text("A backup includes places, belongings, history, confirmed dates, kits, trips and packing progress. Choose photos and retained documents below to include their files. Exports are available without a purchase.").font(.footnote).foregroundStyle(Theme.secondary)
-                Text("The exported file is readable by anyone who can access it. Save it somewhere private.").font(.footnote)
-            } header: { Text("Export").foregroundStyle(Theme.secondary) }
-            Section {
-                ForEach(store.items.filter { $0.photo != nil }) { item in
-                    fileToggle(item.id, title: "Photo: \(item.name)")
-                }
-                ForEach(store.items.flatMap { Array($0.scans) }.filter { $0.data != nil }.sorted { $0.createdAt < $1.createdAt }) { scan in
-                    fileToggle(scan.id, title: "\(scan.item?.name ?? "Document"): \(scan.filename)")
-                }
-                if store.items.allSatisfy({ $0.photo == nil && $0.scans.allSatisfy { $0.data == nil } }) { Text("No retained files.").foregroundStyle(Theme.secondary) }
-            } header: { Text("Files to include in backup").foregroundStyle(Theme.secondary) }
-            Section {
-                Button("Choose Localiser backup") { importing = true }.disabled(store.syncEnabled || store.hasUsedSync)
-                Text("Restore requires an empty local library and private sync off. Existing records are never overwritten. A restored library stays local until cloud reconnection is verified.").font(.footnote).foregroundStyle(Theme.secondary)
-            } header: { Text("Restore").foregroundStyle(Theme.secondary) }
-            Section {
-                Button("Erase all local records…", role: .destructive) { erasePhrase = ""; erasing = true }
-                    .foregroundStyle(Theme.warning).disabled(store.syncEnabled || store.hasUsedSync)
-                Text("Export first. This removes local records and retained files, including trip history. This action does not erase an existing iCloud library.").font(.footnote).foregroundStyle(Theme.secondary)
-                if store.hasUsedSync { Text("Restore and erase are unavailable for stores that have used sync until cloud reconnection has been verified. Export remains available.").font(.footnote) }
-            } header: { Text("Erase local library").foregroundStyle(Theme.secondary) }
-            if let notice { Section { Text(notice) } }
+                Button("Erase all local records…", systemImage: "trash", role: .destructive) { erasePhrase = ""; erasing = true }
+                    .foregroundStyle(Theme.warning)
+            } footer: { Text("Export a backup first. Erasing removes every item, place, date, kit and trip from this iPhone.").foregroundStyle(Theme.secondary) }
+            if let notice { Section { Label(notice, systemImage: "checkmark.circle").foregroundStyle(Theme.sageInk) } }
+            Section {} footer: {
+                Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.secondary).frame(maxWidth: .infinity)
+            }
         }
-        .groundBackground().navigationTitle("Settings and backup").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", systemImage: "checkmark") { dismiss() }.labelStyle(.iconOnly) } }
-        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Localiser-backup" : "Localiser-inventory") { result in
+        .tint(Theme.purple)
+        .groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
+        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts inventory") { result in
             switch result { case .success: notice = "Export saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
         }
@@ -90,26 +106,30 @@ struct LibrarySettingsView: View {
         }
         .alert("Restore backup?", isPresented: $confirmingRestore) {
             Button("Cancel", role: .cancel) { pendingRestore = nil }
-            Button("Restore") {
-                defer { pendingRestore = nil }
-                do { if let pendingRestore { try store.restore(pendingRestore); notice = "Backup restored. Check your library and enable reminders if needed." } }
-                catch { self.error = error.localizedDescription }
+            if libraryIsEmpty {
+                Button("Restore") { restore(replacing: false) }
+            } else {
+                Button("Erase and restore", role: .destructive) { restore(replacing: true) }
             }
         } message: {
-            Text("\(pendingRestore?.records.count ?? 0) records from \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "unknown date"). Only the files included in this backup can be restored.")
+            let summary = "\(pendingRestore?.records.count ?? 0) records saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
+            Text(libraryIsEmpty ? summary : summary + " Your current library will be replaced. If anything goes wrong, it is kept exactly as it is.")
         }
         .alert("Erase all local records?", isPresented: $erasing) {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
             Button("Erase", role: .destructive) {
-                do { try store.resetLibrary(); selectedFiles = []; notice = "Local library erased." } catch { self.error = error.localizedDescription }
+                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = "Library erased." } catch { self.error = error.localizedDescription }
             }.disabled(erasePhrase != "ERASE")
-        } message: { Text("This cannot be undone without a backup. Type ERASE to confirm.") }
-        .alert("Could not complete", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        } message: { Text("This can't be undone without a backup. Type ERASE to confirm.") }
+        .alert("Couldn't finish that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    private func fileToggle(_ id: UUID, title: String) -> some View {
-        Toggle(title, isOn: Binding(get: { selectedFiles.contains(id) }, set: { if $0 { selectedFiles.insert(id) } else { selectedFiles.remove(id) } }))
+    private func restore(replacing: Bool) {
+        defer { pendingRestore = nil }
+        do {
+            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored. Check reminders are on in Due soon." }
+        } catch { self.error = error.localizedDescription }
     }
     private func prepareCSV() {
         exportType = .commaSeparatedText; document = LibraryExportDocument(data: Data(store.inventoryCSV().utf8)); exporting = true
@@ -117,5 +137,37 @@ struct LibrarySettingsView: View {
     private func prepareBackup() {
         do { exportType = .json; document = LibraryExportDocument(data: try store.backup(attachmentIDs: selectedFiles).encoded()); exporting = true }
         catch { self.error = error.localizedDescription }
+    }
+}
+
+/// Chooses which photos and kept documents go into the next backup.
+struct BackupFilesView: View {
+    @Environment(LocaliserStore.self) private var store
+    @Binding var selectedFiles: Set<UUID>
+    private var photos: [Belonging] { store.items.filter { $0.photo != nil } }
+    private var documents: [ScanRecord] { store.items.flatMap { Array($0.scans) }.filter { $0.data != nil }.sorted { $0.createdAt < $1.createdAt } }
+    var body: some View {
+        Form {
+            if photos.isEmpty && documents.isEmpty {
+                Text("No photos or kept documents yet.").foregroundStyle(Theme.secondary)
+            } else {
+                Section {
+                    Button(selectedFiles.isEmpty ? "Include all" : "Include none") {
+                        selectedFiles = selectedFiles.isEmpty ? Set(photos.map(\.id) + documents.map(\.id)) : []
+                    }
+                } footer: { Text("Files make a backup larger. A backup can be up to 200 MB.").foregroundStyle(Theme.secondary) }
+                if !photos.isEmpty {
+                    Section { ForEach(photos) { toggle($0.id, title: $0.name) } } header: { Text("Item photos").foregroundStyle(Theme.secondary) }
+                }
+                if !documents.isEmpty {
+                    Section { ForEach(documents) { toggle($0.id, title: "\($0.item?.name ?? "Document") · \($0.filename)") } } header: { Text("Kept documents").foregroundStyle(Theme.secondary) }
+                }
+            }
+        }
+        .tint(Theme.purple)
+        .groundBackground().navigationTitle("Files to include").navigationBarTitleDisplayMode(.inline)
+    }
+    private func toggle(_ id: UUID, title: String) -> some View {
+        Toggle(title, isOn: Binding(get: { selectedFiles.contains(id) }, set: { if $0 { selectedFiles.insert(id) } else { selectedFiles.remove(id) } }))
     }
 }

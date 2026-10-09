@@ -1,7 +1,11 @@
 import StoreKit
 import Observation
 
-enum CreationKind { case item, kit, scan }
+enum CreationKind {
+    case item, kit, scan
+    /// Free-tier allowance. Pro removes every limit; nothing else is gated.
+    var freeLimit: Int { switch self { case .item: 200; case .kit: 2; case .scan: 5 } }
+}
 
 @MainActor @Observable final class ProAccess {
     static let productID = "dev.localiser.pro.lifetime"
@@ -11,8 +15,7 @@ enum CreationKind { case item, kit, scan }
     var message: String?
 
     func allows(_ kind: CreationKind, count: Int) -> Bool {
-        let limit = switch kind { case .item: 50; case .kit: 1; case .scan: 3 }
-        return unlocked || count < limit
+        unlocked || count < kind.freeLimit
     }
 
     func refresh() async {
@@ -51,7 +54,7 @@ enum CreationKind { case item, kit, scan }
             case .success(let result):
                 guard case .verified(let transaction) = result else { message = "The purchase could not be verified. Restore purchases or try again."; return }
                 await refresh(); await transaction.finish()
-                message = unlocked ? "Localiser Pro is unlocked." : "The purchase is not currently entitled. Try restoring purchases."
+                message = unlocked ? "Hereabouts Pro is unlocked." : "The purchase is not currently entitled. Try restoring purchases."
             case .userCancelled: message = "Purchase canceled. Your library is unchanged."
             case .pending: message = "Purchase awaiting approval. Free features remain available."
             @unknown default: message = "Purchase status is unavailable. Try restoring purchases."
@@ -63,7 +66,7 @@ enum CreationKind { case item, kit, scan }
         guard !busy else { return }
         busy = true; message = nil
         defer { busy = false }
-        do { try await AppStore.sync(); await refresh(); message = unlocked ? "Localiser Pro restored." : "No current lifetime purchase was found for this Apple account." }
+        do { try await AppStore.sync(); await refresh(); message = unlocked ? "Hereabouts Pro restored." : "No current lifetime purchase was found for this Apple account." }
         catch { message = error.localizedDescription }
     }
 }

@@ -4,10 +4,11 @@ import Observation
 enum LocaliserError: LocalizedError, Equatable {
     case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder, closedReturn
     case invalidPackingEntry, invalidTripDates, packingConflict(String), incompleteDeparture, unresolvedHome
-    case invalidBackup(String), libraryNotEmpty
+    case invalidBackup(String), libraryNotEmpty, tooLong(String, Int)
     var errorDescription: String? {
         switch self {
         case .nameRequired: "Enter a name."
+        case .tooLong(let field, let limit): "\(field) can be up to \(limit.formatted()) characters."
         case .placeCycle: "A place cannot be moved into itself or one of its contents."
         case .occupiedPlace: "Move the contents first, or explicitly clear their locations before deleting this place."
         case .schemaUnavailable: "The data model is missing. Your library has not been deleted."
@@ -20,66 +21,71 @@ enum LocaliserError: LocalizedError, Equatable {
         case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
         case .unresolvedHome: "Confirm where the remaining items were put before finishing coming home."
         case .invalidBackup(let reason): reason
-        case .libraryNotEmpty: "Restore requires an empty local library. Export your current library before choosing to erase it. Import never overwrites existing records."
+        case .libraryNotEmpty: "Your library already has records. Choose Erase and restore to replace them with this backup, or export them first."
         }
     }
 }
 
+/// Maximum lengths for free text, so a pasted document cannot swamp every list row.
+enum TextLimit {
+    static let name = 120
+    static let aliases = 1_000
+    static let notes = 5_000
+}
+
 @MainActor @Observable
 final class LocaliserStore {
-    let container: NSPersistentCloudKitContainer
-    let syncEnabled: Bool
+    let container: NSPersistentContainer
     let isUserLibrary: Bool
-    var syncStatus = "Private sync is off."
-    var syncRequested: Bool { UserDefaults.standard.bool(forKey: "privateSyncRequested") }
-    var hasUsedSync: Bool { isUserLibrary && UserDefaults.standard.bool(forKey: "privateSyncHasRun") }
-    var syncAvailable: Bool {
-        !(Bundle.main.object(forInfoDictionaryKey: "LocaliserSigningTeam") as? String ?? "").isEmpty &&
-        (Bundle.main.object(forInfoDictionaryKey: "LocaliserCloudContainer") as? String ?? "").hasPrefix("iCloud.")
-    }
     var items: [Belonging] = []
     var searchIndex: [ItemSearch.Entry] = []
     var places: [Place] = []
     var deadlines: [Deadline] = []
+    /// Successful scans in the current calendar month. The free tier resets on the 1st.
     var completedScans = 0
     var kits: [Kit] = []
     var trips: [TripRecord] = []
     var tripEntries: [TripEntry] = []
     var revision = 0
+    /// Name of the most recent permanent deletion that can still be undone.
+    var undoableDeletion: String?
+    /// Item to show on the Find tab, set by Spotlight, Siri or a widget.
+    var openedItem: UUID?
     var context: NSManagedObjectContext { container.viewContext }
+    /// Items that count toward the free tier. Archived items never do.
+    var activeItemCount: Int { items.lazy.filter { !$0.archived }.count }
 
     init(url: URL? = nil, inMemory: Bool = false) throws {
         isUserLibrary = url == nil && !inMemory
         guard let model = LocaliserModel.shared else { throw LocaliserError.schemaUnavailable }
-        container = NSPersistentCloudKitContainer(name: "Localiser", managedObjectModel: model)
+        container = NSPersistentContainer(name: "Localiser", managedObjectModel: model)
         let description = NSPersistentStoreDescription()
         if inMemory { description.type = NSInMemoryStoreType }
         else {
-            let directory = try url?.deletingLastPathComponent() ?? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            description.url = url ?? directory.appendingPathComponent("Localiser.sqlite")
+            let file = try url ?? Self.defaultStoreURL()
+            try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            description.url = file
         }
         description.shouldAddStoreAsynchronously = false
         description.shouldMigrateStoreAutomatically = true
         description.shouldInferMappingModelAutomatically = true
+        // Earlier builds enabled history tracking. Turning it off would make those stores read-only.
         description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
         description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
-        let team = Bundle.main.object(forInfoDictionaryKey: "LocaliserSigningTeam") as? String ?? ""
-        let cloudID = Bundle.main.object(forInfoDictionaryKey: "LocaliserCloudContainer") as? String ?? ""
-        syncEnabled = !inMemory && url == nil && !team.isEmpty && cloudID.hasPrefix("iCloud.") &&
-            UserDefaults.standard.bool(forKey: "privateSyncRequested") && !UserDefaults.standard.bool(forKey: "restoredLocalLibrary")
-        if syncEnabled {
-            description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: cloudID)
-            syncStatus = "Waiting for a private iCloud operation. Local changes remain available offline."
-        }
         container.persistentStoreDescriptions = [description]
         var loadError: Error?
         container.loadPersistentStores { _, error in loadError = error }
         if let loadError { throw loadError }
-        if syncEnabled { UserDefaults.standard.set(true, forKey: "privateSyncHasRun") }
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
         try refresh()
+    }
+
+    /// The on-device library file. The name predates the Hereabouts rename and must not change.
+    static func defaultStoreURL() throws -> URL {
+        let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory.appendingPathComponent("Localiser.sqlite")
     }
 
     func refresh() throws {
@@ -90,7 +96,8 @@ final class LocaliserStore {
         places = try context.fetch(NSFetchRequest<Place>(entityName: "Place")).sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
         deadlines = try context.fetch(NSFetchRequest<Deadline>(entityName: "Deadline")).sorted { $0.dayString < $1.dayString }
         let scanRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ScanRecord")
-        scanRequest.predicate = NSPredicate(format: "counted == YES")
+        let monthStart = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .distantPast
+        scanRequest.predicate = NSPredicate(format: "counted == YES AND createdAt >= %@", monthStart as NSDate)
         completedScans = try context.count(for: scanRequest)
         kits = try context.fetch(NSFetchRequest<Kit>(entityName: "Kit")).sorted { $0.name < $1.name }
         trips = try context.fetch(NSFetchRequest<TripRecord>(entityName: "TripRecord")).sorted { $0.startDay > $1.startDay }
@@ -98,34 +105,20 @@ final class LocaliserStore {
         revision += 1
     }
 
-    func save() throws {
+    func save(keepingUndo: Bool = false) throws {
+        // Any other change closes the undo window, so Undo can only ever reverse the deletion.
+        if !keepingUndo { forgetUndo() }
         do { try context.save(); try refresh() }
         catch { context.rollback(); try? refresh(); throw error }
     }
 
-    func requestSync(_ enabled: Bool) throws {
-        if enabled {
-            guard syncAvailable else { throw LocaliserError.invalidBackup("Private sync needs a signed app with an iCloud container. This local build is not configured yet.") }
-            guard !UserDefaults.standard.bool(forKey: "restoredLocalLibrary") else { throw LocaliserError.invalidBackup("This library was restored from a file. Reconnecting it to an existing cloud library has not been verified; sync is disabled to avoid duplicate records.") }
-        }
-        UserDefaults.standard.set(enabled, forKey: "privateSyncRequested")
-        syncStatus = "Restart Localiser to apply this sync setting."
-    }
-
-    func receiveCloudEvent(_ notification: Notification) {
-        guard syncEnabled, let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else { return }
-        let operation = switch event.type { case .setup: "Setup"; case .import: "Download"; case .export: "Upload"; @unknown default: "iCloud operation" }
-        if let error = event.error { syncStatus = "\(operation) failed: \(error.localizedDescription). Your local library remains available." }
-        else if event.endDate == nil { syncStatus = "\(operation) in progress." }
-        else { syncStatus = "\(operation) completed. This status does not confirm another device has received every change." }
-        do { try refresh() } catch { syncStatus = error.localizedDescription }
-    }
-
     @discardableResult
     func addItem(name: String, place: Place? = nil, notes: String = "", aliases: String = "", photo: Data? = nil) throws -> Belonging {
+        // Validate everything before inserting, so a rejected item never lingers half-made in the context.
         let clean = try requiredName(name)
+        let cleanNotes = try limited(notes, TextLimit.notes), cleanAliases = try limited(aliases, TextLimit.aliases)
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
-        item.id = UUID(); item.name = clean; item.notes = notes; item.aliases = aliases
+        item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
         item.createdAt = .now; item.archived = false; item.place = place; item.photo = photo
         try save()
         return item
@@ -133,8 +126,9 @@ final class LocaliserStore {
 
     func editItem(_ item: Belonging, name: String, place: Place?, notes: String, aliases: String, photo: Data?) throws {
         let clean = try requiredName(name)
+        let cleanNotes = try limited(notes, TextLimit.notes), cleanAliases = try limited(aliases, TextLimit.aliases)
         recordMove(item, to: place)
-        item.name = clean; item.notes = notes; item.aliases = aliases; item.photo = photo
+        item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases; item.photo = photo
         try save()
     }
 
@@ -178,14 +172,39 @@ final class LocaliserStore {
 
     func setArchived(_ item: Belonging, _ archived: Bool) throws { item.archived = archived; try save() }
 
+    /// Permanently deletes an item. Call `undoLastDeletion()` shortly afterwards to bring it back.
     func deleteItem(_ item: Belonging) throws {
-        for entry in item.kitEntries { entry.name = item.name }
-        for entry in item.tripEntries { entry.name = item.name }
+        let undo = UndoManager()
+        forgetUndo()
+        context.processPendingChanges()
+        context.undoManager = undo
+        undo.beginUndoGrouping()
+        let name = item.name
+        for entry in item.kitEntries { entry.name = item.name; entry.unlinked = true }
+        for entry in item.tripEntries { entry.name = item.name; entry.unlinked = true }
         for movement in item.movements { context.delete(movement) }
         for deadline in item.deadlines { context.delete(deadline) }
         for scan in item.scans { context.delete(scan) }
         context.delete(item)
-        try save()
+        context.processPendingChanges()
+        undo.endUndoGrouping()
+        do { try save(keepingUndo: true) } catch { context.undoManager = nil; undoableDeletion = nil; throw error }
+        undoableDeletion = name
+    }
+
+    /// Restores the item removed by the last `deleteItem`, with its dates, scans and history.
+    func undoLastDeletion() throws {
+        guard let undo = context.undoManager, undo.canUndo else { undoableDeletion = nil; return }
+        undo.undo()
+        context.undoManager = nil
+        undoableDeletion = nil
+        try save(keepingUndo: true)
+    }
+
+    /// Ends the undo window, so later edits are not tracked.
+    func forgetUndo() {
+        context.undoManager = nil
+        undoableDeletion = nil
     }
 
     @discardableResult
@@ -227,6 +246,19 @@ final class LocaliserStore {
     func requiredName(_ name: String) throws -> String {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { throw LocaliserError.nameRequired }
+        guard clean.count <= TextLimit.name else { throw LocaliserError.tooLong("Names", TextLimit.name) }
         return clean
+    }
+
+    func limited(_ text: String, _ limit: Int) throws -> String {
+        let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard clean.count <= limit else { throw LocaliserError.tooLong(limit == TextLimit.notes ? "Notes" : "Other names", limit) }
+        return clean
+    }
+
+    /// Another place with the same name at the same level, if one exists. Used to warn, not to block.
+    func duplicatePlace(named name: String, parent: Place?, excluding: Place? = nil) -> Place? {
+        let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return places.first { $0 != excluding && $0.parent == parent && $0.name.localizedCaseInsensitiveCompare(clean) == .orderedSame }
     }
 }

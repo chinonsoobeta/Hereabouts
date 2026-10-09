@@ -58,7 +58,7 @@ struct ScanView: View {
                     }
                     TextField("Or name a new item", text: $newName).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }
                     Button("Create item") {
-                        guard pro.allows(.item, count: store.items.count) else { upgrade = true; return }
+                        guard pro.allows(.item, count: store.activeItemCount) else { upgrade = true; return }
                         do { itemID = try store.addItem(name: newName).id; newName = "" } catch { self.error = error.localizedDescription }
                     }.disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     Button("Review and confirm date") { nameFocused = false; review = true }.disabled(itemID == nil)

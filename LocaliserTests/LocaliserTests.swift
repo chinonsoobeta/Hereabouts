@@ -21,9 +21,9 @@ final class LocaliserTests: XCTestCase {
         await pro.refresh(); await pro.loadProduct()
         _ = try XCTUnwrap(pro.product, "StoreKit did not load the local test product; do not enter an Apple account.")
         XCTAssertFalse(pro.unlocked)
-        XCTAssertTrue(pro.allows(.item, count: 49)); XCTAssertFalse(pro.allows(.item, count: 50))
-        XCTAssertTrue(pro.allows(.kit, count: 0)); XCTAssertFalse(pro.allows(.kit, count: 1))
-        XCTAssertTrue(pro.allows(.scan, count: 2)); XCTAssertFalse(pro.allows(.scan, count: 3))
+        XCTAssertTrue(pro.allows(.item, count: 199)); XCTAssertFalse(pro.allows(.item, count: 200))
+        XCTAssertTrue(pro.allows(.kit, count: 1)); XCTAssertFalse(pro.allows(.kit, count: 2))
+        XCTAssertTrue(pro.allows(.scan, count: 4)); XCTAssertFalse(pro.allows(.scan, count: 5))
         let store = try LocaliserStore(inMemory: true)
         let item = try store.addItem(name: "Keep after refund")
         await pro.purchase()
@@ -96,8 +96,7 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(restored.trips.first?.entries.first?.packedCount, 1)
         XCTAssertEqual(restored.trips.first?.tasks.filter(\.checked).count, 1)
         XCTAssertEqual(restored.items.first?.packedTrips.first?.id, trip.id)
-        XCTAssertFalse(restored.syncEnabled)
-        XCTAssertNil(restored.container.persistentStoreDescriptions.first?.cloudKitContainerOptions)
+        XCTAssertFalse(restored.container is NSPersistentCloudKitContainer)
         let dateOnly = try source.backup()
         XCTAssertFalse(dateOnly.records.contains { $0.attributes.values.contains { if case .data = $0 { true } else { false } } })
         try restored.resetLibrary()
@@ -139,6 +138,106 @@ final class LocaliserTests: XCTestCase {
         let existing = try target.addItem(name: "Keep me")
         XCTAssertThrowsError(try target.restore(good)) { XCTAssertEqual($0 as? LocaliserError, .libraryNotEmpty) }
         XCTAssertEqual(target.items.map(\.id), [existing.id])
+        // Erase and restore is all or nothing: a bad file leaves the current library untouched.
+        XCTAssertThrowsError(try target.restore(bad, replacingExisting: true))
+        XCTAssertEqual(target.items.map(\.id), [existing.id])
+        try target.restore(good, replacingExisting: true)
+        XCTAssertEqual(target.items.map(\.name), ["Keys"])
+        XCTAssertEqual(target.items.first?.place?.path, "Room › Drawer")
+    }
+
+    func testBackupsFromBeforeV5StillRestore() throws {
+        let source = try LocaliserStore(inMemory: true)
+        let kit = try source.addKit(name: "Weekend")
+        try source.setKitEntry(kit: kit, name: "Socks", item: nil, unit: 1, perNight: true, condition: .always)
+        var file = try source.backup()
+        for index in file.records.indices { for key in LocaliserStore.laterFields { file.records[index].attributes[key] = nil } }
+        let target = try LocaliserStore(inMemory: true)
+        try target.restore(file)
+        let entry = try XCTUnwrap(target.kits.first?.entries.first)
+        XCTAssertTrue(entry.perNight); XCTAssertFalse(entry.perDay); XCTAssertFalse(entry.unlinked)
+    }
+
+    func testFreeTierCountsActiveItemsAndThisMonthsScans() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let kept = try store.addItem(name: "Drill")
+        let old = try store.addItem(name: "Old phone")
+        try store.setArchived(old, true)
+        XCTAssertEqual(store.activeItemCount, 1)
+        let candidates = ScanDates.candidates("Expiry 2028-07-14")
+        let scan = ScanDraft(data: Data([1]), filename: "r.png", mime: "image/png", preview: nil, text: "Expiry 2028-07-14", candidates: candidates)
+        try store.setDeadline(item: kept, kind: .expiry, day: candidates[0].day, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true, scan: scan)
+        XCTAssertEqual(store.completedScans, 1)
+        let lastMonth = try XCTUnwrap(Calendar.current.date(byAdding: .month, value: -1, to: .now))
+        kept.scans.first?.createdAt = lastMonth
+        try store.save()
+        XCTAssertEqual(store.completedScans, 0)
+    }
+
+    func testTextLimitsAndDuplicatePlaceWarning() throws {
+        let store = try LocaliserStore(inMemory: true)
+        XCTAssertThrowsError(try store.addItem(name: String(repeating: "a", count: 121)))
+        XCTAssertNoThrow(try store.addItem(name: String(repeating: "a", count: 120)))
+        XCTAssertThrowsError(try store.addItem(name: "Notes", notes: String(repeating: "n", count: 5_001)))
+        XCTAssertThrowsError(try store.addItem(name: "Aliases", aliases: String(repeating: "x", count: 1_001)))
+        XCTAssertEqual(store.items.count, 1)
+        let garage = try store.addPlace(name: "Garage")
+        XCTAssertEqual(store.duplicatePlace(named: " garage ", parent: nil), garage)
+        XCTAssertNil(store.duplicatePlace(named: "Garage", parent: garage))
+        XCTAssertNil(store.duplicatePlace(named: "Garage", parent: nil, excluding: garage))
+    }
+
+    func testDeletingAnItemCanBeUndone() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drawer = try store.addPlace(name: "Drawer")
+        let item = try store.addItem(name: "Passport", place: drawer)
+        let id = item.id
+        try store.move(item, to: nil)
+        try store.setDeadline(item: item, kind: .expiry, day: XCTUnwrap(CalendarDay(stored: "2030-01-01")), source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true)
+        let kit = try store.addKit(name: "Travel")
+        try store.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
+        try store.deleteItem(item)
+        XCTAssertEqual(store.undoableDeletion, "Passport")
+        XCTAssertTrue(store.items.isEmpty)
+        XCTAssertEqual(kit.entries.first?.unlinked, true)
+        try store.undoLastDeletion()
+        XCTAssertNil(store.undoableDeletion)
+        let back = try XCTUnwrap(store.items.first)
+        XCTAssertEqual(back.id, id)
+        XCTAssertEqual(back.deadlines.count, 1); XCTAssertEqual(back.movements.count, 1)
+        XCTAssertEqual(kit.entries.first?.item, back); XCTAssertEqual(kit.entries.first?.unlinked, false)
+        // Any other change closes the undo window.
+        try store.deleteItem(back)
+        try store.addPlace(name: "Shelf")
+        XCTAssertNil(store.undoableDeletion)
+        try store.undoLastDeletion()
+        XCTAssertTrue(store.items.isEmpty)
+        // A fresh store reading the same data agrees.
+        XCTAssertEqual(try store.context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: "Belonging")), 0)
+    }
+
+    func testNotificationActionBeforeLibraryOpensIsReplayed() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Headphones")
+        let deadline = try store.setDeadline(item: item, kind: .returns, day: XCTUnwrap(CalendarDay(.now).adding(days: 5)), source: "", leadDays: 1, hour: 9, enabled: true, confirmed: true)
+        let previous = UNUserNotificationCenter.current().delegate
+        defer { UNUserNotificationCenter.current().delegate = previous }
+        let service = ReminderService()
+        service.handle(id: deadline.id, action: "keep")
+        XCTAssertEqual(service.pendingActions.count, 1)
+        XCTAssertEqual(deadline.decision, .open)
+        service.store = store
+        XCTAssertTrue(service.pendingActions.isEmpty)
+        XCTAssertEqual(deadline.decision, .keeping)
+    }
+
+    func testReminderWordingNamesTheItemOnlyWhenAllowed() throws {
+        let reminder = PlannedReminder(id: "x", deadlineID: UUID(), fireDate: .now, kind: .returns, daysBefore: 1, itemName: "Headphones")
+        XCTAssertEqual(reminder.content(showingNames: true).body, "Headphones: last day to return is tomorrow.")
+        XCTAssertEqual(reminder.content(showingNames: false).body, "A saved item: last day to return is tomorrow.")
+        XCTAssertEqual(reminder.content(showingNames: true).title, "Return window closing")
+        let today = PlannedReminder(id: "y", deadlineID: UUID(), fireDate: .now, kind: .warranty, daysBefore: 0, itemName: "Drill")
+        XCTAssertEqual(today.content(showingNames: true).body, "Drill: warranty ends today.")
     }
 
     func testCSVQuotesMultilineTextAndNeutralizesFormulaPrefixes() throws {
@@ -147,7 +246,7 @@ final class LocaliserTests: XCTestCase {
         let csv = store.inventoryCSV()
         XCTAssertTrue(csv.contains("\"'=SUM(1,2)\""))
         XCTAssertTrue(csv.contains("\"A \"\"quote\"\"\nand comma,\""))
-        XCTAssertTrue(csv.contains("\"' @command\""))
+        XCTAssertTrue(csv.contains("\"'@command\""))
     }
 
     func testLocalPersistenceAndContainerMove() throws {
@@ -362,6 +461,9 @@ final class LocaliserTests: XCTestCase {
         let authorized = await center.notificationSettings().authorizationStatus
         XCTAssertTrue([.authorized, .provisional, .ephemeral].contains(authorized))
         let previousDelegate = center.delegate
+        let previousNames = UserDefaults.standard.object(forKey: ReminderService.showNamesKey)
+        UserDefaults.standard.set(false, forKey: ReminderService.showNamesKey)
+        defer { UserDefaults.standard.set(previousNames, forKey: ReminderService.showNamesKey) }
         let store = try LocaliserStore(inMemory: true)
         let service = ReminderService(); service.store = store
         let foreignID = "localiser.verification.\(UUID().uuidString)"
@@ -395,7 +497,8 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(initial.count, 50); XCTAssertEqual(service.candidateCount, 70)
         for request in initial {
             XCTAssertFalse(request.content.body.contains("12345")); XCTAssertFalse(request.content.body.contains("Sensitive"))
-            XCTAssertEqual(request.content.title, "Localiser reminder")
+            XCTAssertEqual(request.content.title, "Expiry coming up")
+            XCTAssertTrue(request.content.body.hasPrefix("A saved item"))
             let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
             XCTAssertFalse(trigger.repeats); XCTAssertEqual(trigger.dateComponents.hour, 9)
         }
@@ -510,6 +613,21 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(trip.details?.nights, 0); XCTAssertEqual(tripSocks.requiredCount, 5); XCTAssertEqual(tripSocks.packedCount, 2)
     }
 
+    func testPerDayRowsCoverDayTrips() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let kit = try store.addKit(name: "Away")
+        try store.setKitEntry(kit: kit, name: "Snacks", item: nil, unit: 2, perNight: false, perDay: true, condition: .always)
+        try store.setKitEntry(kit: kit, name: "Pyjamas", item: nil, unit: 1, perNight: true, condition: .always)
+        let day = try XCTUnwrap(CalendarDay(stored: "2026-05-01"))
+        let dayTrip = try store.addTrip(TripDetails(name: "Beach", start: day, end: day), kit: kit)
+        XCTAssertEqual(dayTrip.entries.first { $0.name == "Snacks" }?.requiredCount, 2)
+        XCTAssertEqual(dayTrip.entries.first { $0.name == "Pyjamas" }?.requiredCount, 0)
+        let weekend = try store.addTrip(TripDetails(name: "Weekend", start: day, end: XCTUnwrap(CalendarDay(stored: "2026-05-03"))), kit: kit)
+        XCTAssertEqual(weekend.entries.first { $0.name == "Snacks" }?.requiredCount, 6)
+        XCTAssertEqual(weekend.entries.first { $0.name == "Pyjamas" }?.requiredCount, 2)
+        XCTAssertEqual(weekend.entries.first { $0.name == "Snacks" }?.perDay, true)
+    }
+
     func testPackingConflictsCancellationAndDateEdits() throws {
         let store = try LocaliserStore(inMemory: true)
         let home = try store.addPlace(name: "Drawer")
@@ -581,7 +699,7 @@ final class LocaliserTests: XCTestCase {
         try store.editItem(item, name: "Renamed camera", place: nil, notes: "", aliases: "", photo: nil)
         try store.deleteItem(item)
         XCTAssertTrue(store.items.isEmpty); XCTAssertTrue(store.deadlines.isEmpty)
-        XCTAssertNil(entry.item); XCTAssertEqual(entry.name, "Renamed camera")
+        XCTAssertNil(entry.item); XCTAssertEqual(entry.name, "Renamed camera"); XCTAssertTrue(entry.unlinked)
         XCTAssertEqual(kit.entries.first?.name, "Renamed camera")
         XCTAssertNil(kit.entries.first?.item)
         XCTAssertFalse(try store.backup().records.contains { ["Belonging", "Deadline", "Movement", "ScanRecord"].contains($0.entity) })

@@ -8,7 +8,18 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     var candidateCount = 0
     var error: String?
     @ObservationIgnored private var updateTask: Task<Void, Never>?
-    @ObservationIgnored weak var store: LocaliserStore?
+    @ObservationIgnored weak var store: LocaliserStore? {
+        didSet { replayPendingActions() }
+    }
+    /// Actions tapped on a notification before the library finished opening (cold launch).
+    @ObservationIgnored private(set) var pendingActions: [(id: UUID, action: String)] = []
+    /// Deadline the person opened from a notification, for the Due soon tab to show.
+    var openedDeadline: UUID?
+    /// True when some upcoming reminders cannot be delivered (permission off or over the system limit).
+    var coverageGap: Bool { candidateCount > scheduled.count }
+    static let showNamesKey = "reminderShowsItemNames"
+    /// Item names appear in reminders unless turned off in Settings.
+    static var showsItemNames: Bool { UserDefaults.standard.object(forKey: showNamesKey) as? Bool ?? true }
     private let center = UNUserNotificationCenter.current()
 
     override init() {
@@ -58,9 +69,12 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         for reminder in candidates.prefix(50) {
             guard !Task.isCancelled else { return }
             let content = UNMutableNotificationContent()
-            content.title = "Localiser reminder"
-            content.body = "A saved \(reminder.kind.title.lowercased()) needs your attention. Open Localiser to review it."
+            let text = reminder.content(showingNames: Self.showsItemNames)
+            content.title = text.title
+            content.body = text.body
             content.sound = .default
+            content.interruptionLevel = .active
+            if let itemID = reminder.itemID { content.threadIdentifier = itemID.uuidString }
             content.userInfo = ["deadlineID": reminder.deadlineID.uuidString]
             if reminder.kind == .returns { content.categoryIdentifier = "localiser.return" }
             let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.fireDate)
@@ -81,12 +95,21 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         await handle(id: id, action: action)
     }
 
-    private func handle(id: UUID, action: String) {
-        guard let store, let deadline = store.deadlines.first(where: { $0.id == id }), deadline.kind == .returns, deadline.active else { return }
+    func handle(id: UUID, action: String) {
+        guard let store else { pendingActions.append((id, action)); return }
+        if action == UNNotificationDefaultActionIdentifier { openedDeadline = id; return }
+        guard let deadline = store.deadlines.first(where: { $0.id == id }), deadline.kind == .returns, deadline.active else { return }
         do {
             if action == "keep" { try store.decide(deadline, .keeping) }
             else if action == "returning" { try store.decide(deadline, .returning) }
             refresh(store.deadlines)
         } catch { self.error = error.localizedDescription }
+    }
+
+    private func replayPendingActions() {
+        guard store != nil, !pendingActions.isEmpty else { return }
+        let queued = pendingActions
+        pendingActions = []
+        for entry in queued { handle(id: entry.id, action: entry.action) }
     }
 }
