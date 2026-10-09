@@ -7,6 +7,9 @@ struct DueView: View {
     @Environment(ReminderService.self) private var reminders
     @State private var addDate = false
     @State private var showClosed = false
+    @State private var calendarFor: Deadline?
+    @State private var addingAll = false
+    @State private var notice: String?
     @State private var error: String?
     private let sections = ["Decide soon", "Returning", "Warranties ending", "Expiring", "Missed"]
 
@@ -27,8 +30,8 @@ struct DueView: View {
                             Image(systemName: "calendar.badge.clock").foregroundStyle(Theme.purple).accessibilityHidden(true)
                             Text("Remember in time").fixedSize(horizontal: false, vertical: true)
                         }.font(.wbTitle)
-                        Text("Add a confirmed return deadline, warranty end, or document expiry to an item.")
-                            .foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
+                        Text("Add a return deadline, warranty end or expiry date to an item. Hereabouts reminds you before it passes.")
+                            .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }.card(padding: 16)
                 }
                 ForEach(sections, id: \.self) { heading in
@@ -39,6 +42,7 @@ struct DueView: View {
                             if heading == "Decide soon" {
                                 VStack(spacing: 14) {
                                     NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
+                                        .contextMenu { calendarMenu(deadline) }
                                     HStack(spacing: 10) {
                                         Button("Returning") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
                                         Button("Keep it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
@@ -46,6 +50,7 @@ struct DueView: View {
                                 }.card()
                             } else {
                                 NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
+                                    .contextMenu { calendarMenu(deadline) }
                             }
                         }
                     }
@@ -56,20 +61,22 @@ struct DueView: View {
                         NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
                     }
                 }
-                VStack(alignment: .leading, spacing: 12) {
-                    Label { Text("Reminder coverage").font(.wbItem) } icon: { Image(systemName: "bell").foregroundStyle(Theme.purpleInk) }
+                VStack(alignment: .leading, spacing: 10) {
+                    Label { Text("Reminders").font(.wbItem) } icon: { Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk) }
                         .accessibilityAddTraits(.isHeader)
-                    Text("Notifications: \(reminders.permission)").fixedSize(horizontal: false, vertical: true)
-                    Text("\(reminders.scheduled.count) of \(reminders.candidateCount) upcoming reminder requests scheduled.").font(.wbCaption)
-                    if reminders.candidateCount > reminders.scheduled.count { Text("Some reminders are not scheduled. Review the dates above or add them to Calendar. Open Localiser regularly to refresh the queue.").foregroundStyle(Theme.secondary) }
-                    if let error = reminders.error { Text(error).foregroundStyle(Theme.warning) }
-                    Button("Enable notifications") { Task { await reminders.enable() } }.buttonStyle(SoftButtonStyle(compact: true))
-                    if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) { Button("Open notification settings") { UIApplication.shared.open(url) }.buttonStyle(SoftButtonStyle(compact: true)) }
-                    Text("Scheduling depends on permission and device settings. Document names and numbers are hidden in notification text.").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    Text(coverageSummary).fixedSize(horizontal: false, vertical: true)
+                    if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
+                        if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue, or add the dates to Calendar.").font(.wbCaption).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true) }
+                    } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
+                        Button("Open notification settings") { UIApplication.shared.open(url) }.buttonStyle(SoftButtonStyle(compact: true))
+                    } else {
+                        Button("Turn on reminders") { Task { await reminders.enable() } }.buttonStyle(PrimaryButtonStyle())
+                    }
+                    if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
+                    Text(ReminderService.showsItemNames ? "Reminders show item names. You can hide them in Settings." : "Item names are hidden in reminders. You can show them in Settings.").font(.wbCaption).foregroundStyle(Theme.secondary)
                 }
                 .foregroundStyle(Theme.ink)
-                .padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                .background(Theme.mist, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .card(padding: 16)
                 .padding(.top, 8)
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
@@ -77,8 +84,15 @@ struct DueView: View {
         .background(Theme.ground).navigationTitle("Due soon")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { Button { showClosed.toggle() } label: { Image(systemName: showClosed ? "eye.slash" : "eye") }.accessibilityLabel(showClosed ? "Hide closed" : "Show closed") }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu("More", systemImage: "ellipsis.circle") {
+                    Button("Add all to Calendar", systemImage: "calendar.badge.plus") { Task { await addAllToCalendar() } }.disabled(upcoming.isEmpty || addingAll)
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) { Button("Add date", systemImage: "plus") { addDate = true } }
         }
+        .sheet(item: $calendarFor) { CalendarEventEditor(deadline: $0) }
+        .alert("Added to Calendar", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) { Button("OK") { notice = nil } } message: { Text(notice ?? "") }
         .sheet(isPresented: $addDate) { NavigationStack {
             List {
                 if store.items.filter({ !$0.archived }).isEmpty { Text("Add a belonging in Find first.") }
@@ -90,6 +104,33 @@ struct DueView: View {
 
     private func decide(_ deadline: Deadline, _ decision: ReturnDecision) {
         do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription }
+    }
+
+    private var upcoming: [Deadline] {
+        let today = CalendarDay(.now)
+        return store.deadlines.filter { $0.active && ($0.day.map { $0 >= today } ?? false) }
+    }
+
+    private var coverageSummary: String {
+        switch reminders.permission {
+        case "Enabled", "Quiet delivery":
+            let count = reminders.scheduled.count
+            return count == 1 ? "1 reminder is queued on this iPhone." : "\(count) reminders are queued on this iPhone."
+        case "Disabled in Settings": return "Notifications are off for Hereabouts, so reminders can't reach you."
+        default: return "Turn on reminders so Hereabouts can tell you before a date passes."
+        }
+    }
+
+    @ViewBuilder private func calendarMenu(_ deadline: Deadline) -> some View {
+        Button("Add to Calendar", systemImage: "calendar.badge.plus") { calendarFor = deadline }
+    }
+
+    private func addAllToCalendar() async {
+        addingAll = true; defer { addingAll = false }
+        do {
+            let added = try await CalendarExport.addAll(upcoming)
+            notice = added == 1 ? "1 date was added to your default calendar." : "\(added) dates were added to your default calendar."
+        } catch { self.error = error.localizedDescription }
     }
 }
 
@@ -154,7 +195,7 @@ struct DeadlineEditor: View {
                     if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
                     Text("A receipt date may be a purchase date. Confirm the date type and any missing terms; suggestions are not store policies.").font(.subheadline)
                     Toggle("Keep original document", isOn: $retainSource)
-                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this item and included in device backup and any configured private sync." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this item and included in your device backup and in Hereabouts backups." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
             Section(item.name) {
@@ -166,7 +207,7 @@ struct DeadlineEditor: View {
                         DatePicker(anchorType, selection: $anchor, displayedComponents: .date)
                         Stepper("Window: \(windowDays) days", value: $windowDays, in: 1...365)
                         Toggle("Count the starting day as day 1", isOn: $includeAnchor)
-                        Text("Use the terms for this purchase. Localiser does not look up the store's policy.").font(.caption).foregroundStyle(Theme.secondary)
+                        Text("Use the terms for this purchase. Hereabouts doesn't look up the store's policy.").font(.caption).foregroundStyle(Theme.secondary)
                     }
                 }
                 if !useWindow || kind != .returns { DatePicker("Final date", selection: $date, displayedComponents: .date).accessibilityIdentifier("deadline.date") }
@@ -271,11 +312,9 @@ struct CalendarEventEditor: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> EKEventEditViewController {
         let controller = EKEventEditViewController()
         let eventStore = EKEventStore()
-        let event = EKEvent(eventStore: eventStore)
-        event.title = "Localiser: \(deadline.kind?.title ?? "Saved date")"
-        event.isAllDay = true
-        event.startDate = deadline.day?.date(hour: 0) ?? .now
-        event.endDate = Calendar.current.date(byAdding: .day, value: 1, to: event.startDate)
+        let event: EKEvent
+        if let plan = CalendarExport.plan(for: deadline) { event = CalendarExport.makeEvent(plan, in: eventStore) }
+        else { event = EKEvent(eventStore: eventStore); event.title = (deadline.kind ?? .returns).calendarTitle(itemName: deadline.item?.name) }
         controller.eventStore = eventStore; controller.event = event; controller.editViewDelegate = context.coordinator
         return controller
     }

@@ -59,11 +59,16 @@ struct LibrarySettingsView: View {
                 NavigationLink {
                     BackupFilesView(selectedFiles: $selectedFiles)
                 } label: {
-                    LabeledContent { Text(selectedFiles.isEmpty ? "None" : "\(selectedFiles.count) of \(retainedFileCount)") } label: { Label("Photos and documents to include", systemImage: "photo.on.rectangle") }
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Photos and documents to include")
+                            Text(selectedFiles.isEmpty ? "None selected" : "\(selectedFiles.count) of \(retainedFileCount) selected").font(.wbCaption).foregroundStyle(Theme.ink)
+                        }
+                    } icon: { Image(systemName: "photo.on.rectangle") }
                 }
                 Button("Restore from a backup", systemImage: "arrow.counterclockwise") { importing = true }
             } header: { Text("Backup").foregroundStyle(Theme.secondary) }
-              footer: { Text("A backup holds your places, items, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.").foregroundStyle(Theme.secondary) }
+              footer: { Text("A backup holds your places, items, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.").font(.wbCaption).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true) }
             Section {
                 Label("Your library stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
                 Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
@@ -85,7 +90,7 @@ struct LibrarySettingsView: View {
                 Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.secondary).frame(maxWidth: .infinity)
             }
         }
-        .tint(Theme.purple)
+        .tint(Theme.purpleInk)
         .groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts inventory") { result in
@@ -112,7 +117,8 @@ struct LibrarySettingsView: View {
                 Button("Erase and restore", role: .destructive) { restore(replacing: true) }
             }
         } message: {
-            let summary = "\(pendingRestore?.records.count ?? 0) records saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
+            let count = pendingRestore?.records.count ?? 0
+            let summary = "\(count == 1 ? "1 record" : "\(count) records") saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
             Text(libraryIsEmpty ? summary : summary + " Your current library will be replaced. If anything goes wrong, it is kept exactly as it is.")
         }
         .alert("Erase all local records?", isPresented: $erasing) {

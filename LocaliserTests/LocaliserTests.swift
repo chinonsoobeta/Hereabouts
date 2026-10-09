@@ -240,6 +240,18 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(today.content(showingNames: true).body, "Drill: warranty ends today.")
     }
 
+    @MainActor func testCalendarEventsNameTheItemAndAlertTheDayBefore() throws {
+        XCTAssertEqual(DeadlineKind.returns.calendarTitle(itemName: "Headphones"), "Return: Headphones")
+        XCTAssertEqual(DeadlineKind.warranty.calendarTitle(itemName: " "), "Warranty ends")
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Drill")
+        try store.setDeadline(item: item, kind: .expiry, day: XCTUnwrap(CalendarDay(stored: "2030-01-01")), source: "Receipt", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        let plan = try XCTUnwrap(CalendarExport.plan(for: XCTUnwrap(store.deadlines.first)))
+        XCTAssertEqual(plan.title, "Expires: Drill")
+        XCTAssertEqual(plan.alarmOffset, 9 * 3600 - 86_400)
+        XCTAssertTrue(plan.notes.hasPrefix("Receipt"))
+    }
+
     func testCSVQuotesMultilineTextAndNeutralizesFormulaPrefixes() throws {
         let store = try LocaliserStore(inMemory: true)
         try store.addItem(name: "=SUM(1,2)", notes: "A \"quote\"\nand comma,", aliases: " @command")
@@ -556,6 +568,16 @@ final class LocaliserTests: XCTestCase {
         let blank = ScanDraft(data: Data([0]), filename: "Blank.jpg", mime: "image/jpeg", preview: nil, text: "", candidates: [])
         try store.setDeadline(item: item, kind: .expiry, day: day, source: "", leadDays: 180, hour: 9, enabled: true, confirmed: true, scan: blank)
         XCTAssertEqual(store.completedScans, 2)
+    }
+
+    func testTwoDigitYearsAndLocalMonthNamesNeedReview() {
+        let short = ScanDates.candidates("Bought 12/05/98")
+        XCTAssertTrue(short.allSatisfy { $0.shortYear && $0.ambiguous })
+        let unique = ScanDates.candidates("Expiry 25/12/30")
+        XCTAssertEqual(unique.count, 1); XCTAssertTrue(unique[0].ambiguous)
+        XCTAssertFalse(ScanDates.candidates("Expiry 25/12/2030")[0].ambiguous)
+        XCTAssertEqual(ScanDates.interpretations("14 January 2028").first?.stored, "2028-01-14")
+        XCTAssertEqual(ScanDates.interpretations("Jan. 14, 2028").first?.stored, "2028-01-14")
     }
 
     func testOnDeviceOCRReadsPrintedExpiryAndPDFLimits() async throws {

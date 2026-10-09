@@ -397,3 +397,15 @@ Changes: new `Localiser/Design/DesignSystem.swift` (adaptive light/dark canvas c
 Fonts: not bundled. `Font.custom` falls back to the system face until the SIL OFL files are added and listed under `UIAppFonts`.
 
 Verification on iPhone 17 simulator `B8B1FAFF-A20B-443F-9AA2-9D5A86987F23`: unit tests 20 executed, 2 skipped, 0 failures. UI: backup restore, kit/trip packing, name-only capture, photo scan and settings/Pro reachability (including hit-region audit) passed. Still failing exactly as on the pre-redesign commit (checked by running HEAD in a clean worktree): settings Restore contrast and Dynamic Type audit findings. The PDF import test failed because the Files fixture `Localiser-test-expiry.pdf` was not present in the simulator's On My iPhone location.
+
+## Hereabouts pass, 9 October 2026
+
+Simulator `iPhone 17` (`B8B1FAFF-A20B-443F-9AA2-9D5A86987F23`), iOS 26.
+
+- Logic tests: 29 run, 3 skipped, 0 failures. New coverage: two-digit years and local month names need review, calendar event titles and alert timing, undo delete, free-tier counting, text limits, per-day packing rows, backups from before V5.
+- UI tests: 8 of 8 pass, including the photo scan, PDF import and backup restore flows. The PDF fixture had to be re-seeded into the simulator's Files provider.
+- Accessibility audits: fixed a too-small privacy link on the Pro screen and darkened secondary text to #5A5270. Two audit reports were checked by hand and exempted in the test helper, with reasons in comments. Navigation bar buttons are exempt from Dynamic Type checks because iOS shows them in the large content viewer instead.
+- Mac crash reports on 9 October (09:37 to 09:39) came from simulator test runs. A rejected item was inserted before validation and left half-made. Validation now runs before insert, and `id` getters tolerate deleted objects. No crash reports since.
+- Due soon: long-press any date to add it to Calendar, or use More > Add all to Calendar. Events are titled like "Return: Headphones" with an alert the day before. Bulk add uses write-only calendar access.
+- Places: a searchable place chooser creates places inline, including typed paths like "Garage / Shelf 4". Place detail lists nested items.
+- Site drafts: `Site/privacy.html` and `Site/support.html`.

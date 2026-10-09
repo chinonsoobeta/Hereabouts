@@ -24,6 +24,8 @@ struct DateCandidate: Identifiable, Sendable {
     let day: CalendarDay
     let hint: DeadlineKind?
     let ambiguous: Bool
+    /// The year was written with two digits, so the century is a guess.
+    var shortYear = false
 }
 
 struct ScanDraft: Sendable {
@@ -37,7 +39,7 @@ struct ScanDraft: Sendable {
 
 enum ScanDates {
     static func candidates(_ text: String) -> [DateCandidate] {
-        let pattern = #"\b(?:\d{4}-\d{1,2}-\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})\b"#
+        let pattern = #"\b(?:\d{4}-\d{1,2}-\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}\.?\s+\p{L}{3,10}\.?\s+\d{4}|\p{L}{3,10}\.?\s+\d{1,2},?\s+\d{4})\b"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         return text.components(separatedBy: .newlines).enumerated().flatMap { index, line -> [DateCandidate] in
             let lower = line.lowercased()
@@ -46,9 +48,24 @@ enum ScanDates {
                 guard let range = Range(match.range, in: line) else { return [] }
                 let raw = String(line[range])
                 let days = interpretations(raw)
-                return days.map { day in DateCandidate(id: "\(index).\(match.range.location).\(day.stored)", raw: raw, line: line, day: day, hint: hint, ambiguous: days.count > 1) }
+                let shortYear = hasShortYear(raw)
+                return days.map { day in DateCandidate(id: "\(index).\(match.range.location).\(day.stored)", raw: raw, line: line, day: day, hint: hint, ambiguous: days.count > 1 || shortYear, shortYear: shortYear) }
             }
         }
+    }
+
+    static func hasShortYear(_ raw: String) -> Bool {
+        let parts = raw.split(whereSeparator: { $0 == "/" || $0 == "-" })
+        return parts.count == 3 && parts[0].count <= 2 && parts[2].count == 2
+    }
+
+    /// Month names are tried in the person's own language first, then English.
+    static var monthLocales: [Locale] {
+        var locales = [Locale.current]
+        for identifier in Locale.preferredLanguages.prefix(3) { locales.append(Locale(identifier: identifier)) }
+        locales.append(Locale(identifier: "en_US_POSIX"))
+        var seen = Set<String>()
+        return locales.filter { seen.insert($0.identifier).inserted }
     }
 
     static func interpretations(_ raw: String) -> [CalendarDay] {
@@ -59,11 +76,14 @@ enum ScanDates {
             let year = parts[2].count == 2 ? 2000 + yearRaw : yearRaw
             return [(a, b), (b, a)].compactMap { month, day in CalendarDay(stored: String(format: "%04d-%02d-%02d", year, month, day)) }.reduce(into: []) { result, day in if !result.contains(day) { result.append(day) } }
         }
-        return ["d MMM yyyy", "d MMMM yyyy", "MMM d yyyy", "MMMM d yyyy", "MMM d, yyyy", "MMMM d, yyyy"].compactMap { format -> CalendarDay? in
+        let cleaned = raw.replacingOccurrences(of: ".", with: "")
+        let formats = ["d MMM yyyy", "d MMMM yyyy", "MMM d yyyy", "MMMM d yyyy", "MMM d, yyyy", "MMMM d, yyyy"]
+        return monthLocales.flatMap { locale in formats.map { (locale, $0) } }.compactMap { locale, format -> CalendarDay? in
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.dateFormat = format; formatter.isLenient = false
-            guard let date = formatter.date(from: raw) else { return nil }
-            return CalendarDay(date)
+            formatter.locale = locale; formatter.dateFormat = format; formatter.isLenient = false
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            guard let date = formatter.date(from: cleaned) ?? formatter.date(from: raw) else { return nil }
+            return CalendarDay(date, calendar: { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(secondsFromGMT: 0)!; return c }())
         }.reduce(into: []) { result, day in if !result.contains(day) { result.append(day) } }
     }
 }
@@ -113,7 +133,14 @@ enum ScanReader {
     private static func recognize(_ image: CGImage) throws -> String {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate; request.usesLanguageCorrection = true
-        request.recognitionLanguages = ["en-US"]
+        // Read in the person's own languages first, so local month names and labels are recognised.
+        let supported = (try? request.supportedRecognitionLanguages()) ?? ["en-US"]
+        let preferred = Locale.preferredLanguages.compactMap { language in
+            supported.first { $0 == language } ?? supported.first { $0.hasPrefix(String(language.prefix(2))) }
+        }
+        var languages: [String] = []
+        for language in preferred + ["en-US"] where !languages.contains(language) { languages.append(language) }
+        request.recognitionLanguages = languages
         try VNImageRequestHandler(cgImage: image).perform([request])
         return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }

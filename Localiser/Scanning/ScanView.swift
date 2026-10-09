@@ -43,7 +43,8 @@ struct ScanView: View {
                                 HStack { Text(candidate.raw).bold(); Spacer(); if candidate.id == candidateID { Image(systemName: "checkmark.circle.fill") } }
                                 if let date = candidate.day.date() { Text(date, format: .dateTime.year().month().day()) }
                                 Text(candidate.line).font(.caption).foregroundStyle(Theme.secondary)
-                                if candidate.ambiguous { Text("Ambiguous format. Choose the interpretation that matches the document.").font(.caption).foregroundStyle(Theme.warning) }
+                                if candidate.shortYear { Text("The year has two digits, so check the century before you confirm.").font(.caption).foregroundStyle(Theme.warning) }
+                                else if candidate.ambiguous { Text("This could be day/month or month/day. Pick the one that matches the receipt.").font(.caption).foregroundStyle(Theme.warning) }
                                 Text(candidate.hint.map { "Possible \($0.title.lowercased()); confirm this." } ?? "Date type is unknown; confirm it in the next step.").font(.caption)
                             }
                         }

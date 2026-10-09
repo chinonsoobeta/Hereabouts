@@ -50,11 +50,11 @@ struct ProView: View {
                     if let message = pro.message { Text(message).font(.wbCaption).foregroundStyle(Theme.ink).multilineTextAlignment(.center) }
                 }
                 Text("Limits only apply to adding new things. If a purchase is refunded, everything you've saved stays visible, editable and exportable.").font(.wbCaption).foregroundStyle(Theme.secondary)
-                HStack(spacing: 16) {
-                    Link("Privacy policy", destination: Support.privacy)
-                    Link("Terms of use", destination: Support.terms)
+                HStack(spacing: 8) {
+                    Link("Privacy policy", destination: Support.privacy).frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
+                    Link("Terms of use", destination: Support.terms).frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
                 }
-                .font(.wbCaption)
+                .font(.wbBody)
             }
             .padding(20)
         }

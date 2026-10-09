@@ -124,7 +124,8 @@ struct KitDetailView: View {
                     Button { editingEntry = entry } label: {
                         VStack(alignment: .leading) {
                             Text(entry.title).font(.headline)
-                            Text("\(entry.unitQuantity)\(entry.perNight ? " per night" : " total") · \(entry.condition.title)").font(.caption).foregroundStyle(Theme.secondary)
+                            Text("\(entry.unitQuantity)\(entry.perDay ? " per day" : entry.perNight ? " per night" : " in total") · \(entry.condition.title)").font(.caption).foregroundStyle(Theme.secondary)
+                            if entry.unlinked && entry.item == nil { Text("Deleted item. Kept as a text row.").font(.caption).foregroundStyle(Theme.secondary) }
                             if entry.item?.archived == true { Text("Archived item: excluded from new trips").font(.caption).foregroundStyle(Theme.warning) }
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
@@ -157,29 +158,37 @@ struct KitEntryEditor: View {
     @State private var name: String
     @State private var itemID: UUID?
     @State private var quantity: Int
-    @State private var perNight: Bool
+    @State private var scale: PackingScale
     @State private var condition: PackingCondition
     @State private var error: String?
     init(kit: Kit, entry: KitEntry? = nil) {
         self.kit = kit; self.entry = entry
         _name = State(initialValue: entry?.name ?? ""); _itemID = State(initialValue: entry?.item?.id)
         _quantity = State(initialValue: entry.map { Int($0.unitQuantity) } ?? 1)
-        _perNight = State(initialValue: entry?.perNight ?? false); _condition = State(initialValue: entry?.condition ?? .always)
+        _scale = State(initialValue: entry?.scale ?? .once); _condition = State(initialValue: entry?.condition ?? .always)
+    }
+    private var scaleHint: String {
+        switch scale {
+        case .once: "Pack \(quantity) whatever the trip length."
+        case .perDay: "\(quantity) for each day away, counting travel days. A day trip needs \(quantity); a weekend away needs \(quantity * 3)."
+        case .perNight: "\(quantity) for each night away. A day trip needs none; a weekend away needs \(quantity * 2)."
+        }
     }
     var body: some View {
         Form {
             Picker("Link a belonging", selection: $itemID) { Text("Free-text row").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Row name", text: $name).accessibilityIdentifier("kit.entry.name") }
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
-            Toggle("Multiply by nights", isOn: $perNight)
+            Picker("Amount", selection: $scale) { ForEach(PackingScale.allCases) { Text($0.title).tag($0) } }
+            Text(scaleHint).font(.caption).foregroundStyle(Theme.secondary)
             Picker("Include for", selection: $condition) { ForEach(PackingCondition.allCases) { Text($0.title).tag($0) } }
-            Text("Linked rows use the item's current place. Free-text rows appear under Anywhere.").font(.caption).foregroundStyle(Theme.secondary)
+            Text("Rows linked to an item are grouped by where it lives. Text rows appear under Anywhere.").font(.caption).foregroundStyle(Theme.secondary)
         }
         .groundBackground().navigationTitle(entry == nil ? "Add packing row" : "Edit packing row").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
-                do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: perNight, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
+                do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.entry.save") }
         }
         .alert("Could not save row", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -247,6 +256,16 @@ struct TripDetailView: View {
     @State private var taskTitle = ""
     @State private var error: String?
     private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? "Anywhere" }).sorted() }
+    /// Says exactly what is left before the trip can be marked away.
+    private var departureBlocker: String? {
+        let unpacked = trip.entries.filter { $0.requiredCount > 0 && ($0.item?.archived == true || Int($0.packedCount) < $0.requiredCount) }.map(\.title).sorted()
+        let tasks = trip.tasks.filter { !$0.checked }.map(\.title).sorted()
+        guard !unpacked.isEmpty || !tasks.isEmpty else { return nil }
+        var parts: [String] = []
+        if !unpacked.isEmpty { parts.append("Still to pack: \(unpacked.prefix(5).joined(separator: ", "))\(unpacked.count > 5 ? " and \(unpacked.count - 5) more" : "").") }
+        if !tasks.isEmpty { parts.append("Still to do: \(tasks.joined(separator: ", ")).") }
+        return parts.joined(separator: "\n") + "\nOr choose Start coming home to skip packing checks."
+    }
     var body: some View {
         let _ = store.revision
         List {
@@ -276,7 +295,8 @@ struct TripDetailView: View {
                                 VStack(alignment: .leading) {
                                     Text(entry.title).font(.wbItem)
                                     Text("\(entry.packedCount) packed / \(entry.requiredCount) needed").font(.subheadline).foregroundStyle(Theme.secondary)
-                                    if entry.item?.archived == true { Text("Archived / returned item: resolve or remove this row.").font(.caption).foregroundStyle(Theme.warning) }
+                                    if entry.item?.archived == true { Text("Archived or returned. Resolve or remove this row.").font(.caption).foregroundStyle(Theme.warning) }
+                                    if entry.unlinked && entry.item == nil { Text("Deleted item. Kept as a text row.").font(.caption).foregroundStyle(Theme.secondary) }
                                     if trip.state == .comingHome { Text("Coming home: \(entry.resolutionRaw)").font(.caption) }
                                 }
                             }
@@ -292,7 +312,9 @@ struct TripDetailView: View {
                     }
                     TextField("New departure task", text: $taskTitle)
                     Button("Add departure task") { attempt { try store.addTripTask(trip, title: taskTitle); taskTitle = "" } }.disabled(taskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Button("Mark away") { attempt { try store.changeTripState(trip, to: .away) } }
+                    Button("Mark away") {
+                        if let blocker = departureBlocker { error = blocker } else { attempt { try store.changeTripState(trip, to: .away) } }
+                    }
                 }
             }
             if trip.state == .away || trip.state == .packing { Section { Button("Start coming home") { attempt { try store.changeTripState(trip, to: .comingHome) } } } }
@@ -311,7 +333,7 @@ struct TripDetailView: View {
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Cancel this trip? Its packing allocation will be cleared. Saved home locations will remain unchanged.", isPresented: $canceling, titleVisibility: .visible) { Button("Cancel trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } }
         .confirmationDialog("Delete this trip and its checklists? Belongings and home locations will be kept.", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } }
-        .alert("Could not update trip", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Not quite ready", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
     private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
 }

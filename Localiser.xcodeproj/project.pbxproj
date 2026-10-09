@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56936067B918AEFABF8680BB /* ScanView.swift */; };
+		2244EB33A68408212C306A4D /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B25CD28C05FAF34B95F157 /* CameraPicker.swift */; };
 		2A50FFFFB8829E8AE690F13F /* LibrarySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */; };
 		2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A30538423261835CD54AD5A /* ProAccess.swift */; };
 		320D35A448C990008ED39806 /* Localiser.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */; };
@@ -25,6 +26,7 @@
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
 		AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73C34594A1DA3A80DA79A05 /* Spotlight.swift */; };
+		B00FDD89F85E125E5F236A48 /* CalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
 		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
@@ -35,6 +37,7 @@
 		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
 		F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */; };
+		F51008C9D776CF6895283174 /* PlaceChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */; };
 		F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */; };
 		FF71503CD114EC4282272846 /* ProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCC79A8C661311C9C70A285 /* ProView.swift */; };
 /* End PBXBuildFile section */
@@ -57,10 +60,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExport.swift; sourceTree = "<group>"; };
 		06F18AE850904C71580C25A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0807D105D68201D35D8DF977 /* Localiser.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Localiser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV5.xcdatamodel; sourceTree = "<group>"; };
 		153312694358421F11F17E69 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		18B25CD28C05FAF34B95F157 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		1A30538423261835CD54AD5A /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProAccess.swift; sourceTree = "<group>"; };
 		1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV4.xcdatamodel; sourceTree = "<group>"; };
 		1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -93,6 +98,7 @@
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
 		EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV3.xcdatamodel; sourceTree = "<group>"; };
+		F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceChooser.swift; sourceTree = "<group>"; };
 		F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserTests.swift; sourceTree = "<group>"; };
 		FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingStore.swift; sourceTree = "<group>"; };
 		FD8E6A9C1D66453E2DA206F9 /* LocaliserTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +125,7 @@
 		1A9DAE5CD64E5097D70CE152 /* Dates */ = {
 			isa = PBXGroup;
 			children = (
+				00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */,
 				DE95939E5941898426B7EBDF /* DateRules.swift */,
 				E25EBA641962B55EE0850C76 /* DueView.swift */,
 				4437E05350A4892C18DA9522 /* ReminderService.swift */,
@@ -146,6 +153,7 @@
 		27DE49865767075A6DC8ADED /* Places */ = {
 			isa = PBXGroup;
 			children = (
+				F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */,
 				953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */,
 			);
 			path = Places;
@@ -162,6 +170,7 @@
 		4C8AD373F3465F188D2EFD8F /* Find */ = {
 			isa = PBXGroup;
 			children = (
+				18B25CD28C05FAF34B95F157 /* CameraPicker.swift */,
 				60A697438CB089D0830D4DC2 /* FindView.swift */,
 				153312694358421F11F17E69 /* Search.swift */,
 				CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */,
@@ -409,6 +418,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B00FDD89F85E125E5F236A48 /* CalendarExport.swift in Sources */,
+				2244EB33A68408212C306A4D /* CameraPicker.swift in Sources */,
 				CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */,
 				DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */,
 				723298C2EE434DF675B9562B /* DesignSystem.swift in Sources */,
@@ -423,6 +434,7 @@
 				761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */,
 				DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */,
 				4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */,
+				F51008C9D776CF6895283174 /* PlaceChooser.swift in Sources */,
 				CA2AEB951D2C0E57C4B22732 /* PlacesView.swift in Sources */,
 				2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */,
 				FF71503CD114EC4282272846 /* ProView.swift in Sources */,

@@ -1,18 +1,15 @@
-# Localiser: owner handoff
+# Hereabouts: owner handoff
 
-The user authorized completing all autonomous implementation/review work and saving human-blocked items for later. These exceptions do not establish public-release readiness. See BUILD_STATUS.md for commands and actual evidence.
+Everything that can be built and checked on this Mac is done or tracked in BUILD_STATUS.md. These items need the owner.
 
-| Item | Why human participation is required | Next action |
+| Item | Why it needs you | What to do |
 | --- | --- | --- |
-| Latest installed build launch | The latest settings correction installed over Wi-Fi and passed strict signature verification, but iOS denied the launch request because the phone locked again. Process readback found no Localiser process. | Unlock the phone and open the already installed Localiser app, or permit the normal launch/readback check while unlocked. No password is needed in chat. Earlier build launches do not prove this final hash launched. |
-| Private iCloud and cloud reset/reconnection | Xcode explicitly rejects iCloud/push provisioning for the existing free Personal Team. Two-device evidence also requires a second device on the owner's Apple ID. | Provide a team with supported capabilities and a second test device. Verify offline conflicts, account changes, attachments, deletion and reconnection before enabling the restricted reset/recovery paths. No enrollment or purchase was performed. |
-| Physical UI automation | The free-team three-app limit is occupied by Consigliere, Hisense Remote and Localiser. The extra UI test runner cannot install. | Choose whether to free an app slot after preserving its data, or use a suitable enrolled team. No apps were deleted. Manual workflows are an alternative. |
-| Search timing on slower hardware | The October 8 optimized benchmark passed on the owner’s unlocked iPhone 16 Pro Max: all five queries stayed below 50 ms at 5,000 records, with a worst measured sample of 25.483459 ms. A slower supported phone is unavailable. | Test the slowest supported test phone before extending this result across supported hardware. |
-| Real camera, reminders and device accessibility | Actual camera documents, notification interaction, long inactivity and VoiceOver/manual workflow observations require physical inputs and user interaction. The automated physical UI runner is also blocked by the free-team app limit. | Follow the physical matrix in BETA_AND_RELEASE.md. Use synthetic documents initially; do not supply passwords or remove normal lock protections. |
-| StoreKit service configuration | The local StoreKit fixture is not an App Store Connect product. Product identifier, actual price/storefronts and sandbox accounts require owner configuration. | Confirm the offer and provide a provisioned product/test account. Preserve the existing local entitlement tests. No real purchase was made. |
-| Beta and independent quality assessment | Consented users and representative real queries/receipts cannot be fabricated from development fixtures. | Recruit a small consented beta and review the frozen quality criteria before evaluating holdout examples. No invitation was sent. |
-| Publisher and release decisions | Permanent identifiers, legal publisher/support contact, policy URL, name/listing clearance and applicable obligations need owner decisions. Upload/publication remains separately gated. | Complete the owner inputs in BETA_AND_RELEASE.md. No legal clearance, commercial-demand finding or distribution approval is inferred. |
+| Website and support email | The app links to `https://hereabouts.app` and `support@hereabouts.app`. These are placeholders, not registered. | Register a domain and mailbox, or pick existing ones. Set `HEREABOUTS_SITE_URL` and `HEREABOUTS_SUPPORT_EMAIL` in `project.yml`, then run `xcodegen generate`. |
+| Privacy and support pages | App Store review requires a reachable privacy policy and support page. Drafts are in `Site/`. | Host `Site/privacy.html` and `Site/support.html` at `/privacy` and `/support` on the chosen site. Terms link to Apple's standard licence. Update the email address in both pages if it changes. |
+| Apple Developer Program | The free Personal Team can't use TestFlight, App Store distribution or App Groups for the widget. | Enrol (US$99 a year), then set `DEVELOPMENT_TEAM` in `project.yml`. |
+| App Store Connect product | The lifetime unlock only exists in the local StoreKit file. | Create a non-consumable `dev.localiser.pro.lifetime`, price tier US$4.99, Family Sharing on. Raise it to US$9.99 after the 8-week Founder's window and set `HereaboutsFoundersPricing` to false. |
+| Name clearance | "Hereabouts" needs a trademark and App Store name check. | Search the App Store and trademark registers before submitting. |
+| TestFlight beta | Real people and real receipts can't be simulated. | After enrolment, upload a build and invite testers using `Docs/BETA_AND_RELEASE.md`. |
+| Physical-device checks | Camera capture, real notifications over days, VoiceOver and older phones need hands on a device. | Follow the physical matrix in `Docs/BETA_AND_RELEASE.md` with synthetic documents first. |
 
-This list records actual constraints and required owner inputs. It does not excuse implementation or simulator checks that remain possible locally.
-
-Final signing and wireless Release installation succeeded October 8. Earlier builds launched successfully. The latest settings correction is installed but requires unlocking for its final launch check; see BUILD_STATUS.md for exact evidence. No password was requested or stored in chat.
+Nothing has been uploaded, published, purchased or sent to anyone.

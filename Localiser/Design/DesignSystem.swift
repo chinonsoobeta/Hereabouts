@@ -18,7 +18,7 @@ enum Theme {
     static let ground = adaptive(0xF7F4FB, 0x17121F)
     static let card = adaptive(0xFFFFFF, 0x221B2E)
     static let ink = adaptive(0x2A2140, 0xF1ECF9)
-    static let secondary = adaptive(0x6A6280, 0xBDB5CC)
+    static let secondary = adaptive(0x5A5270, 0xBDB5CC)
     static let apricot = adaptive(0xFCE9DC, 0x3D2A1E)
     static let apricotInk = adaptive(0x9A4A17, 0xF6B98A)
     static let sage = adaptive(0xDCEFE4, 0x1E3328)

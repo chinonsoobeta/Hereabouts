@@ -10,6 +10,7 @@ struct FindView: View {
     @State private var putAway = false
     @State private var settings = false
     @State private var addingPlace = false
+    @State private var openedItem: Belonging?
 
     private var results: [Belonging] {
         _ = store.revision
@@ -28,7 +29,7 @@ struct FindView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if store.items.isEmpty {
-                    LibraryEmptyState(title: "Find it next time", systemImage: "shippingbox", description: "Save one belonging and where you put it. A name is enough to start.")
+                    LibraryEmptyState(title: "Find it next time", systemImage: "shippingbox", description: "Save something and where you put it. A name is enough to start, like \u{201C}Spare keys\u{201D} in \u{201C}Kitchen › Top drawer\u{201D}.")
                     Button { showAdd = true } label: { Text("Add your first item").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
@@ -48,14 +49,21 @@ struct FindView: View {
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
         .background(Theme.ground)
-        .navigationTitle("Localiser")
+        .navigationTitle("Hereabouts")
+        .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
+        .onChange(of: store.openedItem, initial: true) { _, id in
+            guard let id else { return }
+            openedItem = store.items.first { $0.id == id }
+            store.openedItem = nil
+        }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Toggle("Archived items", isOn: $showArchived)
-                    Toggle("Put-away mode", isOn: $putAway)
-                    Button("Settings and backup") { settings = true }
+                    Toggle("Show archived items", systemImage: "archivebox", isOn: $showArchived)
+                    Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $putAway)
+                    Divider()
+                    Button("Settings", systemImage: "gear") { settings = true }
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
             }
@@ -71,29 +79,25 @@ struct FindView: View {
 
     @ViewBuilder private var dashboard: some View {
         if !dueSoon.isEmpty {
-            SectionHeading(title: "Due soon").padding(.top, 4)
+            HStack {
+                SectionHeading(title: "Due soon")
+                Spacer()
+                NavigationLink("See all") { DueView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk)
+            }.padding(.top, 4)
             ForEach(dueSoon.prefix(2)) { deadline in
                 NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
             }
         }
-        SectionHeading(title: "Places").padding(.top, 8)
+        HStack {
+            SectionHeading(title: "Places")
+            Spacer()
+            if store.places.contains(where: { $0.parent == nil }) { NavigationLink("See all") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
+        }.padding(.top, 8)
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
             ForEach(store.places.filter { $0.parent == nil }.prefix(5)) { place in
                 NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
             }
-            Button { addingPlace = true } label: {
-                VStack(alignment: .leading, spacing: 14) {
-                    Image(systemName: "plus").font(.title3.weight(.semibold)).accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("New place").font(.wbItem)
-                        Text("Room, shelf or box").font(.wbCaption).foregroundStyle(Theme.secondary)
-                    }
-                }
-                .foregroundStyle(Theme.purpleInk)
-                .padding(16).frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-                .background(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.purple.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])))
-                .contentShape(Rectangle())
-            }.buttonStyle(.plain)
+            NewPlaceTile { addingPlace = true }
         }
         SectionHeading(title: "Recently added").padding(.top, 8)
         ForEach(results) { item in itemCard(item) }
@@ -208,44 +212,53 @@ struct ItemEditor: View {
     @State private var placeID: UUID?
     @State private var photo: Data?
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var choosingPhoto = false
+    @State private var takingPhoto = false
     @State private var error: String?
     @State private var suggestion: ItemSearch.CaptureSuggestion?
     @State private var upgrade = false
     @FocusState private var nameFocused: Bool
 
-    init(item: Belonging? = nil) {
+    init(item: Belonging? = nil, place: Place? = nil) {
         self.item = item
         _name = State(initialValue: item?.name ?? ""); _notes = State(initialValue: item?.notes ?? "")
-        _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id)
+        _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id ?? place?.id)
         _photo = State(initialValue: item?.photo)
     }
 
     var body: some View {
-        let photoTitle = photo == nil ? "Add photo" : "Replace photo"
         Form {
             Section {
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                Menu {
+                    if CameraPicker.isAvailable { Button("Take photo", systemImage: "camera") { takingPhoto = true } }
+                    Button("Choose from library", systemImage: "photo.on.rectangle") { choosingPhoto = true }
+                    if photo != nil { Button("Remove photo", systemImage: "trash", role: .destructive) { photo = nil } }
+                } label: {
                     if let photo, let image = UIImage(data: photo) {
                         Image(uiImage: image).resizable().scaledToFill().frame(maxWidth: .infinity).frame(height: 168).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                            .accessibilityLabel(photoTitle)
+                            .overlay(alignment: .bottomTrailing) {
+                                Label("Change", systemImage: "camera").font(.wbLabel).foregroundStyle(Theme.purpleInk)
+                                    .padding(.horizontal, 12).padding(.vertical, 8).background(Theme.card, in: Capsule()).padding(10)
+                            }
                     } else {
                         VStack(spacing: 6) {
                             Image(systemName: "camera").font(.title2).accessibilityHidden(true)
-                            Text("Snap a photo").font(.wbItem)
+                            Text("Add a photo").font(.wbItem)
                             Text("Optional, but it helps you spot it").font(.wbCaption)
                         }
                         .foregroundStyle(Theme.purpleInk).frame(maxWidth: .infinity, minHeight: 148)
                         .background(Theme.mist, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(Theme.purple.opacity(0.5), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])))
-                        .accessibilityElement(children: .combine).accessibilityLabel(photoTitle)
                     }
-                }.buttonStyle(.plain)
-                if photo != nil { Button("Remove photo", role: .destructive) { self.photo = nil }.listRowBackground(Color.clear) }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(photo == nil ? "Add photo" : "Change photo")
             }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
             Section {
                 TextField("Name", text: $name).focused($nameFocused).accessibilityIdentifier("item.name")
+                if name.count > TextLimit.name - 20 { counter(name, TextLimit.name) }
                 if item == nil {
-                    Button("Suggest name and place from sentence") {
+                    Button("Fill in from a sentence") {
                         suggestion = ItemSearch.suggestion(name, places: store.places.map { ($0.id, $0.path) })
                         if suggestion == nil { error = "Try a sentence such as ‘Passport is in Bedroom › Drawer’. Review the suggestion before saving." }
                     }.font(.subheadline)
@@ -262,9 +275,12 @@ struct ItemEditor: View {
                 PlacePicker(selection: $placeID)
             } header: { Text("Where does it live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
-                TextField("Notes", text: $notes, axis: .vertical)
-                TextField("Aliases (one per line)", text: $aliases, axis: .vertical)
+                TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
+                if notes.count > TextLimit.notes - 500 { counter(notes, TextLimit.notes) }
+                TextField("Other names, one per line", text: $aliases, axis: .vertical).lineLimit(1...6)
+                if aliases.count > TextLimit.aliases - 200 { counter(aliases, TextLimit.aliases) }
             } header: { Text("Optional details").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
+              footer: { Text("Other names help search. Add what you might type later, like \u{201C}ID\u{201D} for a passport.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
@@ -281,18 +297,24 @@ struct ItemEditor: View {
         }
         .onAppear { nameFocused = item == nil }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
+        .photosPicker(isPresented: $choosingPhoto, selection: $selectedPhoto, matching: .images)
+        .fullScreenCover(isPresented: $takingPhoto) { CameraPicker { photo = PhotoResize.jpeg($0) }.ignoresSafeArea() }
         .onChange(of: selectedPhoto) { _, newValue in
+            guard let newValue else { return }
             Task {
                 do {
-                    guard let data = try await newValue?.loadTransferable(type: Data.self), let image = UIImage(data: data) else { throw CocoaError(.fileReadCorruptFile) }
-                    let scale = min(1, 1600 / max(image.size.width, image.size.height))
-                    let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-                    let format = UIGraphicsImageRendererFormat(); format.scale = 1
-                    photo = UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }.jpegData(compressionQuality: 0.8)
-                } catch { self.error = error.localizedDescription }
+                    guard let data = try await newValue.loadTransferable(type: Data.self), let image = UIImage(data: data) else { throw CocoaError(.fileReadCorruptFile) }
+                    photo = PhotoResize.jpeg(image)
+                } catch { self.error = "That photo couldn't be opened. Try another one." }
+                selectedPhoto = nil
             }
         }
         .alert("Could not save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    private func counter(_ text: String, _ limit: Int) -> some View {
+        Text("\(text.count.formatted()) of \(limit.formatted()) characters").font(.wbCaption)
+            .foregroundStyle(text.count > limit ? Theme.warning : Theme.secondary)
     }
 
     private func save() {
@@ -306,18 +328,6 @@ struct ItemEditor: View {
     }
 }
 
-struct PlacePicker: View {
-    @Environment(LocaliserStore.self) private var store
-    @Binding var selection: UUID?
-    var excluded: Place? = nil
-    var body: some View {
-        Picker("Place", selection: $selection) {
-            Text("Unspecified").tag(nil as UUID?)
-            ForEach(store.places.filter { place in excluded.map { !place.isWithin($0) } ?? true }) { place in Text(place.path).tag(Optional(place.id)) }
-        }
-    }
-}
-
 struct ItemDetailView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -325,9 +335,12 @@ struct ItemDetailView: View {
     var putAway = false
     @State private var editing = false
     @State private var addingDate = false
-    @State private var destination: UUID?
+    @State private var moving = false
+    @State private var confirmedPutAway = false
+    @State private var upgrade = false
     @State private var error: String?
     @State private var deleting = false
+    @Environment(ProAccess.self) private var pro
     private var available: Bool { item.managedObjectContext != nil && !item.isDeleted }
 
     var body: some View {
@@ -344,25 +357,36 @@ struct ItemDetailView: View {
                             if item.archived { Pill(text: "Archived") }
                             else if !item.packedTrips.isEmpty { Pill(text: "Packed", tone: .due) }
                             else { Pill(text: "At home", tone: .done) }
-                            if let moved = item.movements.map(\.date).max() { Text("Moved \(moved.formatted(.dateTime.month(.abbreviated).day()))").font(.wbCaption).foregroundStyle(Theme.secondary) }
                         }
                         Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                        HStack(spacing: 10) {
-                            Image(systemName: "mappin.and.ellipse").foregroundStyle(Theme.purple).accessibilityHidden(true)
-                            PlaceBreadcrumb(path: item.place?.path)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: "mappin.and.ellipse").foregroundStyle(Theme.purple).accessibilityHidden(true)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    PlaceBreadcrumb(path: item.place?.path)
+                                    if let moved = item.movements.map(\.date).max() {
+                                        Text(Date.now.timeIntervalSince(moved) < 60 ? "Moved just now" : "Moved \(moved.formatted(.relative(presentation: .named)))").font(.wbCaption).foregroundStyle(Theme.secondary)
+                                    }
+                                }
+                            }
+                            .accessibilityElement(children: .combine)
+                            HStack(spacing: 10) {
+                                Button(item.place == nil ? "Set place…" : "Move…") { moving = true }
+                                    .buttonStyle(SoftButtonStyle(compact: true))
+                                    .accessibilityIdentifier("item.move")
+                                if putAway {
+                                    Button("Confirm put away here") {
+                                        do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.localizedDescription }
+                                    }.buttonStyle(SoftButtonStyle(compact: true))
+                                }
+                            }
+                            if confirmedPutAway { Label("Put away. Nice.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                         }
-                        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Theme.mist, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .card()
                         if !item.notes.isEmpty { Text(item.notes) }
                         if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     }.plainRow()
                 }
-                Section {
-                    PlacePicker(selection: $destination)
-                    Button(putAway ? "Confirm put away here" : "Found here / move here") {
-                        do { try store.move(item, to: store.places.first { $0.id == destination }) } catch { self.error = error.localizedDescription }
-                    }.buttonStyle(PrimaryButtonStyle()).listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
-                } header: { Text(putAway ? "Put away" : "Location").foregroundStyle(Theme.secondary) }
                 if !item.packedTrips.isEmpty {
                     Section("Packed trips") { ForEach(item.packedTrips) { trip in NavigationLink(trip.name) { TripDetailView(trip: trip) } } }
                 }
@@ -391,23 +415,58 @@ struct ItemDetailView: View {
                         }
                     }
                 }
-                Section { Button(item.archived ? "Restore item" : "Archive item") {
-                    do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
-                }; Button("Delete item permanently", role: .destructive) { deleting = true } }
+                Section {
+                    Button(item.archived ? "Restore item" : "Archive item", systemImage: item.archived ? "tray.and.arrow.up" : "archivebox") { toggleArchive() }
+                        .buttonStyle(SoftButtonStyle())
+                } footer: {
+                    Text(item.archived ? "Restored items show up in search again." : "Archive things you've given away or no longer own. They leave search and don't count toward the free plan, but their history is kept.")
+                        .foregroundStyle(Theme.secondary)
+                }
+                .listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             } else { ContentUnavailableView("Item deleted", systemImage: "trash") }
         }
         .groundBackground()
         .navigationTitle(available ? item.name : "Item deleted").navigationBarTitleDisplayMode(.inline)
-        .toolbar { if available { Button("Edit") { editing = true } } }
+        .toolbar {
+            if available {
+                ToolbarItem(placement: .topBarTrailing) { Button("Edit") { editing = true } }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("Move…", systemImage: "arrow.right.circle") { moving = true }
+                        Button("Add date", systemImage: "calendar.badge.plus") { addingDate = true }
+                        Button(item.archived ? "Restore item" : "Archive item", systemImage: "archivebox") { toggleArchive() }
+                        Divider()
+                        Button("Delete item permanently", systemImage: "trash", role: .destructive) { deleting = true }
+                    } label: { Image(systemName: "ellipsis") }
+                    .accessibilityLabel("Item options")
+                }
+            }
+        }
+        .sheet(isPresented: $moving) {
+            NavigationStack {
+                PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
+                    do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
+                }))
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
+            }
+        }
+        .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .sheet(isPresented: $editing) { NavigationStack { ItemEditor(item: item) } }
         .sheet(isPresented: $addingDate) { NavigationStack { DeadlineEditor(item: item) } }
-        .onAppear { if available { destination = item.place?.id } }
-        .onChange(of: store.revision) { _, _ in if available { destination = item.place?.id } else { dismiss() } }
-        .confirmationDialog("Delete this item, its dates, scans and location history? Existing kit and trip rows will remain as unlinked checklist rows.", isPresented: $deleting, titleVisibility: .visible) {
+        .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
+        .confirmationDialog("Delete \u{201C}\(available ? item.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete item permanently", role: .destructive) {
                 do { try store.deleteItem(item); dismiss() } catch { self.error = error.localizedDescription }
             }
+            if !item.archived { Button("Archive instead") { toggleArchive() } }
+        } message: {
+            Text("Its dates, scans and location history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
         }
-        .alert("Could not update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    private func toggleArchive() {
+        if item.archived && !pro.allows(.item, count: store.activeItemCount) { upgrade = true; return }
+        do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
     }
 }
