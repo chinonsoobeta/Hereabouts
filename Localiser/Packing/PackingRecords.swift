@@ -16,8 +16,22 @@ enum PackingScale: String, CaseIterable, Identifiable, Sendable {
     var perDay: Bool { self == .perDay }
 }
 
-enum TripState: String { case packing, away, comingHome, finished, canceled }
-enum HomeResolution: String { case pending, putBack, newPlace, unresolved, noLongerHere }
+enum TripState: String {
+    case packing, away, comingHome, finished, canceled
+    static let titles: [TripState: String] = [.packing: "Packing", .away: "Away", .comingHome: "Coming home", .finished: "Finished", .canceled: "Called off"]
+}
+enum HomeResolution: String {
+    case pending, putBack, newPlace, unresolved, noLongerHere
+    var title: String {
+        switch self {
+        case .pending: "Not put away yet"
+        case .putBack: "Put back"
+        case .newPlace: "Moved to a new place"
+        case .unresolved: "Left for later"
+        case .noLongerHere: "No longer here"
+        }
+    }
+}
 
 struct TripDetails: Sendable {
     var name: String

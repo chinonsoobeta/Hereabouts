@@ -1,0 +1,181 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-09T18:10:00Z"
+  },
+  "title": "Hereabouts Design Direction",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1240,
+      "h": 860,
+      "title": "Foundations"
+    },
+    "Voice.dc.html": {
+      "x": 1320,
+      "y": 0,
+      "w": 900,
+      "h": 860,
+      "title": "Voice and words"
+    },
+    "Onboard1.dc.html": {
+      "x": 0,
+      "y": 1240,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding 1 \u00b7 Your notebook"
+    },
+    "Onboard2.dc.html": {
+      "x": 470,
+      "y": 1240,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding 2 \u00b7 First thing"
+    },
+    "Onboard3.dc.html": {
+      "x": 940,
+      "y": 1240,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding 3 \u00b7 Nudges"
+    },
+    "Find.dc.html": {
+      "x": 0,
+      "y": 2440,
+      "w": 390,
+      "h": 844,
+      "title": "Find"
+    },
+    "Item.dc.html": {
+      "x": 470,
+      "y": 2440,
+      "w": 390,
+      "h": 844,
+      "title": "Thing"
+    },
+    "Due.dc.html": {
+      "x": 940,
+      "y": 2440,
+      "w": 390,
+      "h": 844,
+      "title": "Due"
+    },
+    "Trips.dc.html": {
+      "x": 1410,
+      "y": 2440,
+      "w": 390,
+      "h": 844,
+      "title": "Trips"
+    },
+    "FindDark.dc.html": {
+      "x": 1880,
+      "y": 2440,
+      "w": 390,
+      "h": 844,
+      "title": "Find \u00b7 night"
+    },
+    "Recap.dc.html": {
+      "x": 0,
+      "y": 3640,
+      "w": 390,
+      "h": 844,
+      "title": "Sunday recap"
+    },
+    "Stocktake.dc.html": {
+      "x": 470,
+      "y": 3640,
+      "w": 390,
+      "h": 844,
+      "title": "Monthly stocktake"
+    },
+    "Pro.dc.html": {
+      "x": 0,
+      "y": 4840,
+      "w": 390,
+      "h": 844,
+      "title": "Pro"
+    },
+    "Leaving.dc.html": {
+      "x": 470,
+      "y": 4840,
+      "w": 390,
+      "h": 844,
+      "title": "Leaving"
+    },
+    "NavOptions.dc.html": {
+      "x": 0,
+      "y": 6040,
+      "w": 1720,
+      "h": 560,
+      "title": "Bottom navigation options"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Voice.dc.html",
+    "Onboard1.dc.html",
+    "Onboard2.dc.html",
+    "Onboard3.dc.html",
+    "Find.dc.html",
+    "Item.dc.html",
+    "Due.dc.html",
+    "Trips.dc.html",
+    "FindDark.dc.html",
+    "Recap.dc.html",
+    "Stocktake.dc.html",
+    "Pro.dc.html",
+    "Leaving.dc.html",
+    "NavOptions.dc.html"
+  ],
+  "notes": {
+    "t-found": {
+      "x": 0,
+      "y": -260,
+      "text": "Foundations: a well-kept notebook",
+      "kind": "title1",
+      "maxW": 2220
+    },
+    "t-onboard": {
+      "x": 0,
+      "y": 980,
+      "text": "Onboarding: three pages, no account",
+      "kind": "title1",
+      "maxW": 1330
+    },
+    "t-core": {
+      "x": 0,
+      "y": 2180,
+      "text": "The four tabs",
+      "kind": "title1",
+      "maxW": 2270
+    },
+    "t-retain": {
+      "x": 0,
+      "y": 3380,
+      "text": "Coming back: recap and stocktake",
+      "kind": "title1",
+      "maxW": 860
+    },
+    "t-money": {
+      "x": 0,
+      "y": 4580,
+      "text": "Paying once, and leaving well",
+      "kind": "title1",
+      "maxW": 860
+    },
+    "t-nav": {
+      "x": 0,
+      "y": 5780,
+      "text": "Getting between the tabs: four options",
+      "kind": "title1",
+      "maxW": 1720
+    }
+  },
+  "designSystems": []
+}

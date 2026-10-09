@@ -22,6 +22,7 @@
 		73184C07C0834BF531F95BBB /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A21167AF6F6CAEF79448DE /* Records.swift */; };
 		761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF170C8864C322B2EF738BC7 /* PackingRecords.swift */; };
 		7DFD233175BBDBC456DF0025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDA7CB51BE2372853A56B223 /* Assets.xcassets */; };
+		883F90525273EB06CDF36579 /* Tips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C11FBF78BD6877C6EF37AD /* Tips.swift */; };
 		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
@@ -61,6 +62,7 @@
 
 /* Begin PBXFileReference section */
 		00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExport.swift; sourceTree = "<group>"; };
+		02C11FBF78BD6877C6EF37AD /* Tips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tips.swift; sourceTree = "<group>"; };
 		06F18AE850904C71580C25A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0807D105D68201D35D8DF977 /* Localiser.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Localiser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV5.xcdatamodel; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				A73C34594A1DA3A80DA79A05 /* Spotlight.swift */,
+				02C11FBF78BD6877C6EF37AD /* Tips.swift */,
 			);
 			path = System;
 			sourceTree = "<group>";
@@ -445,6 +448,7 @@
 				BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */,
 				AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */,
 				8E221F011A35DF4EF41035F1 /* Support.swift in Sources */,
+				883F90525273EB06CDF36579 /* Tips.swift in Sources */,
 				B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

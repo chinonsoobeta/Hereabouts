@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import TipKit
 
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
@@ -29,7 +30,7 @@ struct FindView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if store.items.isEmpty {
-                    LibraryEmptyState(title: "Find it next time", systemImage: "shippingbox", description: "Save something and where you put it. A name is enough to start, like \u{201C}Spare keys\u{201D} in \u{201C}Kitchen › Top drawer\u{201D}.")
+                    LibraryEmptyState(title: "Find it next time", systemImage: "magnifyingglass", description: "Save something and where you put it. A name is enough to start, like \u{201C}Spare keys\u{201D} in \u{201C}Kitchen › Top drawer\u{201D}.")
                     Button { showAdd = true } label: { Text("Add your first item").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
@@ -66,11 +67,13 @@ struct FindView: View {
                     Button("Settings", systemImage: "gear") { settings = true }
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
+                .popoverTip(PutAwayTip())
             }
-            ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true } }
+            ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true }.popoverTip(ScanTip()) }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) { Button("Add item", systemImage: "plus") { showAdd = true }.buttonStyle(.borderedProminent).tint(Theme.purpleFill) }
         }
+        .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
         .sheet(isPresented: $showAdd) { NavigationStack { ItemEditor() } }
         .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
@@ -255,13 +258,15 @@ struct ItemEditor: View {
                 .accessibilityLabel(photo == nil ? "Add photo" : "Change photo")
             }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
             Section {
-                TextField("Name", text: $name).focused($nameFocused).accessibilityIdentifier("item.name")
+                TextField("Name", text: $name).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }.accessibilityIdentifier("item.name")
                 if name.count > TextLimit.name - 20 { counter(name, TextLimit.name) }
-                if item == nil {
-                    Button("Fill in from a sentence") {
+                if item == nil && name.split(separator: " ").count >= 3 && suggestion == nil {
+                    Button("Split into name and place", systemImage: "wand.and.stars") {
                         suggestion = ItemSearch.suggestion(name, places: store.places.map { ($0.id, $0.path) })
-                        if suggestion == nil { error = "Try a sentence such as ‘Passport is in Bedroom › Drawer’. Review the suggestion before saving." }
+                        if suggestion == nil { error = "Try a sentence such as \u{201C}passport in the bedroom drawer\u{201D}. You'll see the suggestion before anything changes." }
                     }.font(.subheadline)
+                }
+                if item == nil {
                     if let suggestion {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Suggested name: \(suggestion.name)")
@@ -294,6 +299,7 @@ struct ItemEditor: View {
         .navigationTitle(item == nil ? "New item" : "Edit item").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { nameFocused = false; UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) } }
         }
         .onAppear { nameFocused = item == nil }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
@@ -374,6 +380,7 @@ struct ItemDetailView: View {
                                 Button(item.place == nil ? "Set place…" : "Move…") { moving = true }
                                     .buttonStyle(SoftButtonStyle(compact: true))
                                     .accessibilityIdentifier("item.move")
+                                    .popoverTip(MoveTip())
                                 if putAway {
                                     Button("Confirm put away here") {
                                         do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.localizedDescription }
@@ -392,7 +399,7 @@ struct ItemDetailView: View {
                 }
                 Section("Dates") {
                     ForEach(item.deadlines.sorted { $0.dayString < $1.dayString }) { deadline in
-                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline) }
+                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline, showsItem: false) }
                     }
                     Button("Add date") { addingDate = true }
                 }

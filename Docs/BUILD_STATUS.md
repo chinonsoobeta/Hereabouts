@@ -409,3 +409,21 @@ Simulator `iPhone 17` (`B8B1FAFF-A20B-443F-9AA2-9D5A86987F23`), iOS 26.
 - Due soon: long-press any date to add it to Calendar, or use More > Add all to Calendar. Events are titled like "Return: Headphones" with an alert the day before. Bulk add uses write-only calendar access.
 - Places: a searchable place chooser creates places inline, including typed paths like "Garage / Shelf 4". Place detail lists nested items.
 - Site drafts: `Site/privacy.html` and `Site/support.html`.
+
+## Codex handoff verification — 9 October 2026
+
+Verified the inherited Due soon/Packing UI, Settings on every tab, TipKit and release-document chunk before changing production code. Plan rows: 9.1 empty states; 9.2 capture keyboard and scan copy; 9.3 date row; 9.4 Due; 9.5 Packing; 9.6 Settings access; 9.7 copy; phase 2 tips/release preparation.
+
+Commands (repo root; 10 logical CPUs; one UI simulator):
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=B8B1FAFF-A20B-443F-9AA2-9D5A86987F23' -derivedDataPath DerivedData/Audit -resultBundlePath /private/tmp/Hereabouts-handoff-contrast-20261009.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserUITests/LocaliserUITests/testLaunchTabsContrastAndClippingWithoutChangingTextSize -only-testing:LocaliserUITests/LocaliserUITests/testTypographyAccessibilityOnLaunchTabs test > /private/tmp/Hereabouts-handoff-contrast-20261009.log 2>&1
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=B8B1FAFF-A20B-443F-9AA2-9D5A86987F23' -derivedDataPath DerivedData/Audit -resultBundlePath /private/tmp/Hereabouts-handoff-full-20261009.xcresult -jobs 10 -parallel-testing-enabled NO test > /private/tmp/Hereabouts-handoff-full-20261009.log 2>&1
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=74ED4118-BA51-47FA-9F21-17AB21E41D0D' -derivedDataPath DerivedData/Audit27 -resultBundlePath /private/tmp/Hereabouts-handoff-units27-20261009.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserTests test > /private/tmp/Hereabouts-handoff-units27-20261009.log 2>&1
+```
+
+Results: focused audits **2/2 passed**, no skips, exit 0. Full iPhone 17/iOS 26.5 run **8/8 UI passed**, units **26 passed / 3 existing skips / 0 failures** (29 total), exit 0. Separate iOS 27 units **29/29 passed**, no skips, exit 0, including StoreKit and notification-queue tests. No test was removed or newly skipped. The full result reports two runtime warnings, “Invalid frame dimension (negative or non-finite)”; passing tests do not clear those warnings.
+
+Exported focused-run screenshots to `/private/tmp/Hereabouts-handoff-contrast-attachments`. Inspected Due/Packing empty states: both exempted sentences are readable dark ink on white; retained the inherited exemptions without adding any. Inspected the Settings footer screenshot; this default-size run alone does not establish maximum-size scaling. The inherited Dynamic Type footer/navigation exemptions remain. Accessibility XXXL, dark mode and physical VoiceOver remain checks for section 10.8.6 and the owner matrix.
+
+Both synthetic OCR/PDF fixtures were present on the test simulator. `git diff --check` passed. No physical device installation or external publishing was performed.

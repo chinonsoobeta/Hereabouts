@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hereabouts foundations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5B3DB8;text-decoration:none}a:hover{color:#3B2A7A}
+.sf{font-family:Fraunces,Georgia,serif}
+.ss{font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+.stamp{display:inline-block;padding:5px 9px 4px;border:1.5px solid currentColor;outline:1px solid currentColor;outline-offset:2px;border-radius:3px;font:700 11px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.lead{flex:1;border-bottom:2px dotted #B4A9C7;margin:0 8px 6px;min-width:16px}
+.hl{background:linear-gradient(transparent 30%,#E6DBF7 30%,#E6DBF7 92%,transparent 92%);padding:0 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.tick{width:22px;height:22px;border:1.5px solid #241B3D;border-radius:4px;display:flex;align-items:center;justify-content:center;flex:none;background:#F6F1E9}
+.btn{display:flex;align-items:center;justify-content:center;height:52px;border-radius:10px;font:700 17px/1 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer;border:0;padding:0 18px;box-sizing:border-box}
+.btn-p{background:#5B3DB8;color:#F6F1E9}
+.btn-s{background:transparent;color:#241B3D;border:1.5px solid #241B3D}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1.5px solid #241B3D;border-bottom:0;border-radius:10px 10px 0 0;font:700 12px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.02em;color:#241B3D;text-decoration:none}
+.sw{display:flex;flex-direction:column;gap:6px}
+.chip{width:100%;height:56px;border-radius:6px;border:1.5px solid #241B3D;box-sizing:border-box}
+.lab{font:700 12px/1.3 'Atkinson Hyperlegible',system-ui,sans-serif;color:#241B3D}
+.sub{font:400 11px/1.3 'Atkinson Hyperlegible',system-ui,sans-serif;color:#655C7A}
+.h{font:700 11px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#655C7A;margin:0 0 14px}
+</style>
+</helmet>
+<div class="ss" style="width: 1240px; height: 860px; box-sizing: border-box; padding: 40px 44px; background: #F6F1E9; color: #241B3D; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 40px; overflow: hidden">
+
+  <div style="grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1.5px solid #241B3D; padding-bottom: 14px">
+    <div>
+      <div class="sf" style="font-size: 44px; line-height: 1; font-weight: 600; letter-spacing: -0.01em">Hereabouts</div>
+      <div style="font-size: 15px; color: #655C7A; margin-top: 8px">A well-kept notebook for your house. Paper, ink, stamps and tabs. Purple is the ink.</div>
+    </div>
+    <div style="display: flex; gap: 22px; align-items: center">
+      <span class="stamp" style="color: #5B3DB8; transform: rotate(-4deg)">Direction v1</span>
+      <span class="stamp" style="color: #9A4A14; transform: rotate(2deg)">Not yet built</span>
+    </div>
+  </div>
+
+  <div>
+    <p class="h">Colour · paper and ink</p>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+      <div class="sw"><div class="chip" style="background: #F6F1E9"></div><div class="lab">Paper</div><div class="sub">#F6F1E9 · ground</div></div>
+      <div class="sw"><div class="chip" style="background: #ECE5F3"></div><div class="lab">Lilac paper</div><div class="sub">#ECE5F3 · tabs, sticky notes</div></div>
+      <div class="sw"><div class="chip" style="background: #E6DBF7"></div><div class="lab">Highlighter</div><div class="sub">#E6DBF7 · selection, marks</div></div>
+      <div class="sw"><div class="chip" style="background: #241B3D"></div><div class="lab">Ink</div><div class="sub">#241B3D · all reading text</div></div>
+      <div class="sw"><div class="chip" style="background: #5B3DB8"></div><div class="lab">Purple ink</div><div class="sub">#5B3DB8 · actions, stamps</div></div>
+      <div class="sw"><div class="chip" style="background: #3B2A7A"></div><div class="lab">Deep ink</div><div class="sub">#3B2A7A · pressed, headings</div></div>
+      <div class="sw"><div class="chip" style="background: #655C7A"></div><div class="lab">Pencil</div><div class="sub">#655C7A · notes, dates</div></div>
+      <div class="sw"><div class="chip" style="background: #9A4A14"></div><div class="lab">Amber ink</div><div class="sub">#9A4A14 · due, missed</div></div>
+      <div class="sw"><div class="chip" style="background: #2E6B3F"></div><div class="lab">Green ink</div><div class="sub">#2E6B3F · done, returned</div></div>
+    </div>
+    <div style="margin-top: 14px; font-size: 12px; color: #655C7A; line-height: 1.45">Rules: no gradients as surfaces, no drop shadows, no glass. Depth comes from paper on paper, 1.5px ink lines and a stamp's double ring. Night mode swaps paper for #17131F and ink for #F1EBF7; purple lightens to #B59CF5.</div>
+  </div>
+
+  <div>
+    <p class="h">Type · a serif that talks, a sans that works</p>
+    <div class="sf" style="font-size: 40px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em">Where is the passport?</div>
+    <div class="sub" style="margin: 6px 0 16px">Fraunces 500, 40/42 · screen titles and the things themselves</div>
+    <div class="sf" style="font-size: 24px; line-height: 1.15; font-style: italic; font-weight: 400">Running shoes</div>
+    <div class="sub" style="margin: 6px 0 16px">Fraunces italic 24 · names of things, numbers in recaps</div>
+    <div style="font-size: 17px; line-height: 1.45">Save something and where you put it. A name is enough to start.</div>
+    <div class="sub" style="margin: 6px 0 16px">Atkinson Hyperlegible 17/25 · body, buttons, fields</div>
+    <div style="font-size: 14px; line-height: 1.4; color: #655C7A">Garage › Shelf 4 · last seen Tuesday</div>
+    <div class="sub" style="margin: 6px 0 16px">Atkinson 14 pencil · paths, dates, asides</div>
+    <div class="stamp" style="color: #241B3D">Return by 11 Oct</div>
+    <div class="sub" style="margin: 10px 0 0">Atkinson 700 11, tracked +14% · stamps and tab labels</div>
+    <div style="margin-top: 14px; font-size: 12px; color: #655C7A; line-height: 1.45">Both faces are open licence and ship inside the app. Fraunces carries the warmth; Atkinson keeps every digit and letter unmistakable at small sizes, which matters for dates.</div>
+  </div>
+
+  <div>
+    <p class="h">Motifs · what makes it feel like paper</p>
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: baseline; font-size: 16px"><span class="sf" style="font-size: 18px">Spare keys</span><span class="lead"></span><span style="color: #655C7A; font-size: 14px">Kitchen › Top drawer</span></div>
+      <div class="sub" style="margin-top: -8px">Dotted leaders join a thing to its place, like a contents page.</div>
+
+      <div style="display: flex; gap: 14px; align-items: center">
+        <span class="stamp" style="color: #9A4A14; transform: rotate(-3deg)">2 days</span>
+        <span class="stamp" style="color: #2E6B3F; transform: rotate(3deg)">Returned</span>
+        <span class="stamp" style="color: #5B3DB8; transform: rotate(-2deg)">Founder's price</span>
+      </div>
+      <div class="sub" style="margin-top: -8px">Rubber stamps for states. Slightly askew, double ring, never a pill.</div>
+
+      <div style="display: flex; align-items: flex-end; height: 50px; border-bottom: 1.5px solid #241B3D; gap: 4px; padding: 0 2px">
+        <a class="tab" href="#tabs" style="height: 50px; background: #F6F1E9">Find</a>
+        <a class="tab" href="#tabs" style="height: 42px; background: #ECE5F3">Places</a>
+        <a class="tab" href="#tabs" style="height: 42px; background: #ECE5F3">Due</a>
+        <a class="tab" href="#tabs" style="height: 42px; background: #ECE5F3">Trips</a>
+      </div>
+      <div class="sub" style="margin-top: -8px">Index tabs instead of a floating tab bar. The open tab stands taller and shares the page's paper.</div>
+
+      <div style="font-size: 16px; line-height: 1.5">Left it <span class="hl">in the hall closet</span> after the trip.</div>
+      <div class="sub" style="margin-top: -8px">A highlighter mark is the selection state. Nothing glows.</div>
+
+      <div style="display: flex; gap: 12px; align-items: center">
+        <div style="display: flex; align-items: center; gap: 10px"><span class="tick"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B3DB8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l5 5L20 6"></path></svg></span><span style="font-size: 15px">Wool socks</span></div>
+        <div style="display: flex; align-items: center; gap: 10px"><span class="tick"></span><span style="font-size: 15px">Charger</span></div>
+      </div>
+      <div class="sub" style="margin-top: -8px">A pen tick, drawn in, not a filled circle.</div>
+
+      <div style="display: flex; gap: 12px">
+        <button class="btn btn-p" type="button" style="flex: 1; height: 46px; font-size: 15px">Write it down</button>
+        <button class="btn btn-s" type="button" style="flex: 1; height: 46px; font-size: 15px">Not now</button>
+      </div>
+      <div class="sub" style="margin-top: -8px">Primary is solid purple ink. Secondary is an inked outline. Both 10px corners, no shadow.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

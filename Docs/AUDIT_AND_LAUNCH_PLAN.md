@@ -20,6 +20,8 @@ The engine is sound. The data rules, date confirmation, packing lifecycle, backu
 | iCloud sync | **Out of 1.0** (Option A in 3.2). Ship local-only with file backup; sync in 1.1. | A Personal Team cannot deploy a production CloudKit schema, the toggle needs a restart, and `hasUsedSync` permanently disables Restore/Erase. A disabled placeholder is a 2.1/2.3 rejection risk; a local app with export is not. |
 | Pricing | **Aggressive, lifetime only**: free up to 200 items / 2 kits / 5 scans a month; Pro $9.99 one-off, $4.99 Founder's price for 8 weeks, step to $14.99 later (section 6). No yearly anchor in 1.0. | Zero server cost makes a land-grab affordable; the category's complaints (subscriptions, tiny free limits, $30–60 unlocks) become the pitch. Prices can only comfortably move up later, so aggressive-first is the reversible order. A subscription would add states `ProAccess.swift` does not model and a second paywall surface for review. |
 | Item names in reminders | **On by default**, with a Settings switch "Show item names in reminders". Never include document numbers, amounts, notes or retailer in notification text. | "Running shoes: return by Sunday" is actionable from the lock screen; "A saved return deadline needs your attention" is not. The sensitive data is the document content, not the item name, and iOS already hides previews on the lock screen for users who want that. |
+| More than one home | **Yes, in 1.x, gated by count**: free 2 homes, Pro no limit. Not in 1.0. | There is no home entity today and nobody has asked. When it lands, a count limit keeps the "Pro gates volume only, every feature free" promise; the second home (a parent's house, a storage unit) is the one most people want, so free still covers the useful case. Decided 9 Oct, later. |
+| Visual direction | **"A well-kept notebook"** (section 10): paper and ink, Fraunces + Atkinson Hyperlegible, the stock iOS tab bar kept (not the index tabs on the canvas), retention rituals (Sunday recap, keeping-up count, monthly stocktake). Implemented after 1.0's store-readiness work, before beta. | The owner wants the app to look unlike generic app UI; purple stays dominant. Nav alternatives were drawn and reviewed; testers preferred the app's existing stock tab bar, so it stays. Decided 9 Oct, later. |
 
 ---
 
@@ -235,8 +237,10 @@ Rename scope when you decide: display name and `CFBundleDisplayName`, app icon w
 | **1 · Make it not feel broken** | Place picker with inline create and typed paths; place detail shows nested items; camera on "Snap a photo"; archived items off the free count; notification action replay; day-trip quantities; name/notes limits; delete → archive with undo; restore "erase and restore" path; plain-English copy pass; hide sync (Option A); all P1 rows from the UI pass (section 9). | 2 sessions |
 | **2 · Store readiness** | Privacy policy + support page hosted; Info.plist keys; permission strings; strip unused entitlements; Settings and Pro restyled with policy/terms links; onboarding (3 screens) and TipKit tips; Due soon "Add to Calendar" actions; iPad run-through; accessibility audits green; screenshots from the demo library; review notes; remaining P2 rows from the UI pass (section 9). | 2 sessions |
 | **3 · Differentiators** | Spotlight indexing; App Intents ("Where is my…"); Due soon widget; photo-first capture. | 2 sessions |
+| **3.5 · Notebook restyle** | Section 10 in full: bundle fonts, retoken `DesignSystem.swift`, restyle every screen to the canvas, onboarding and leaving screens, copy pass, Sunday recap, keeping-up count, monthly stocktake, per-thing "confirmed on" date. UI tests and audits stay green throughout. | 3 sessions |
 | **4 · Beta** | TestFlight external group per `BETA_AND_RELEASE.md`; sandbox purchase/restore/refund on two devices; notification delivery after several days; camera with real receipts; Files providers; time-zone change. Fix what surfaces. | 2–3 weeks elapsed |
 | **5 · Submit 1.0** | Final localisation of copy (en-GB primary with en-US), App Privacy label, age rating, keywords, Founder's price and its 8-week end date scheduled, submit. | 1 session + review time |
+| **1.x** | More than one home: `Home` above `Place`, switcher on Find and Places, search and export across homes, free 2 / Pro no limit, Pro page gets a fourth dotted-leader row. | later |
 | **1.1** | iCloud sync done properly (two-device verified, no restart), calendar keep-in-sync, encrypted backups, String Catalog, native iPad, container operations and QR labels. | later |
 
 All four open questions were decided on 9 October; see the Decisions table at the top.
@@ -326,3 +330,76 @@ Method: walked every screen in the simulator twice, once with the demo library a
 - Phase 1 absorbs all P1 rows (they are the "feels broken" list) and the New item / Place detail P2 rows, since they share code with the place-picker fix.
 - Phase 2 absorbs the remaining P2 rows alongside the onboarding and Settings/Pro restyle, so the copy pass happens once.
 - P3 rows are optional and can ride with 1.1.
+
+---
+
+## 10. Design direction: a well-kept notebook (decided 9 October, later)
+
+The canvas is at https://claude.ai/artifact/LoqZd8A3TCpKVEDLvDkeDH (private, owner's account). The artboard sources are checked in under `Docs/Design/canvas/` (`*.dc.html`, plain HTML; open in a browser, the `support.js` reference can be ignored) with `canvas.json` listing the boards. This section is the source of truth when the two disagree.
+
+### 10.1 Feel and rules
+
+One nameable look: a notebook someone keeps well. Paper, ink, a pencil, a highlighter, a rubber stamp. Flat colour, 1.5px ink rules, no shadows, no gradients, no blur, no orbs, no rounded-rectangle cards floating on grey. Purple is the ink, not a wash: the dominant colour comes from ink on paper, not from large purple fills.
+
+### 10.2 Tokens (replace `Theme` in `Localiser/Design/DesignSystem.swift`)
+
+| Token | Light | Dark ("night") | Use |
+| --- | --- | --- | --- |
+| paper | `#F6F1E9` | `#17131F` | Page background |
+| lilacPaper | `#ECE5F3` | `#2A2340` | Second surface: sticky notes, inactive tabs, sheets |
+| highlighter | `#E6DBF7` | `#3A3150` | Selected row, search match, active state behind text |
+| ink | `#241B3D` | `#F1EBF7` | Text, rules, borders, the ink bar |
+| purpleInk | `#5B3DB8` | `#B59CF5` | Primary buttons, links, pen strokes, ticks |
+| deepInk | `#3B2A7A` | `#B59CF5` | Pressed/hover of purpleInk |
+| pencil | `#655C7A` | `#B5ABC9` | Secondary text, captions, leaders |
+| rule | `#D9D0E6` | `#3A3150` | Hairlines between rows |
+| leader | `#B4A9C7` | `#5A4F78` | Dotted leaders |
+| amber | `#9A4A14` | `#E8A772` | Due, overdue, erase, "Founder's price" stamp |
+| green | `#2E6B3F` | `#8BD1A0` | Done, confirmed, "still there" |
+
+Every text/background pair above passes 4.5:1 in the role it is used for; keep the XCUI contrast audits on.
+
+### 10.3 Type
+
+- Display and item names: **Fraunces** (variable, optical size on, weight 500 for headlines, italic for quotes and sticky notes). Headlines 34–38pt at Large, `-0.01em` tracking, line height 1.05.
+- Body and UI: **Atkinson Hyperlegible** 400/700. Body 16–17pt, captions 13pt, uppercase labels 11pt with `.16em` tracking.
+- Both are SIL OFL. Bundle the TTF/OTF files in the app, register them in `Info.plist` (`UIAppFonts`) via `project.yml`, wrap in `Font.custom(_:size:relativeTo:)` so Dynamic Type still scales. Fall back to Georgia / system if a font fails to load.
+
+### 10.4 Motifs and components
+
+| Motif | Where | Spec |
+| --- | --- | --- |
+| Dotted leader | Every list row: name on the left, place/count on the right, 2px dotted `leader` between, baseline aligned | `Find`, `Places`, `Trips`, `Pro` rows |
+| Rubber stamp | States: "Due Sun", "Overdue", "Packed", "Founder's price", "4 months ago" | Uppercase 11–12pt 700, `.14em`, 1.5px border + 1px outline offset 2px, 3px radius, rotated −3° to −6°, colour = state (amber/green/ink) |
+| Bottom nav | Find · Places · Due · Trips | **Stock iOS `TabView` tab bar, as the app has today.** Not the index tabs drawn on the Find/Due/Trips boards and not the four alternatives on the "Bottom navigation options" board; all were reviewed and rejected. Tint it `purpleInk`, use the same four line icons as the boards for the tab symbols, and leave the system bar background alone. |
+| Highlighter | Selected row, search-term match, active filter | `highlighter` fill behind the text only, 2px radius, no border |
+| Pen tick | Checklist and "still there" | Hand-drawn path, `purpleInk`, 2.2px stroke, animates on in 180ms |
+| Sticky note | Tips, Pro explainer, leaving note | `lilacPaper`, 6px radius, rotated ±0.8°, a paper "tape" strip at top centre; replaces TipKit's default popover styling where TipKit allows, otherwise a custom view |
+| Ticket stub | A trip on the Trips tab | Perforated edge, destination in Fraunces, dates stamped |
+| Sentence search | Find | The field reads "Where is…" and the user completes the sentence; results appear as "lives in Kitchen › Top drawer" |
+
+### 10.5 Words
+
+Plain and warm. "Things" not items; "lives in" not located at; "put back" not restock; "Due" and "Trips" are the tab names (Due soon → Due, Packing → Trips, Kits stay kits inside Trips). "Keeping up: 6 weeks" and never "streak broken". Settings → "Leaving" page is "Take your notebook with you." Full copy is on the Voice board and in each screen board; apply it verbatim unless it breaks a test, then adjust the test.
+
+### 10.6 Screens on the canvas
+
+Onboarding 1–3 (your notebook / first thing / nudges, no account), Find, Thing, Due, Trips, Find at night, Sunday recap, Monthly stocktake, Pro, Leaving. Every screen ships; the night boards define dark mode.
+
+### 10.7 Retention features (new behaviour)
+
+| Feature | Behaviour | Data |
+| --- | --- | --- |
+| Keeping up | "Keeping up: N weeks" = consecutive weeks (Sunday to Saturday, local) in which the user wrote something down or confirmed something. Shown on the recap and the Find header. Never shown as broken; when it resets it just shows the new count. | Derived from `createdAt`/`confirmedAt`; no new store |
+| Sunday recap | A sheet offered once a week (Sunday 6pm local, or next launch after): what was added, what is due this week, what has drifted. Opt-out in Settings. | Local notification + in-app sheet |
+| Monthly stocktake | Up to five "Still there?" cards a month for things not confirmed in 3+ months. Answers: Still there (sets `confirmedAt`), Moved (opens place picker), Don't have it any more (archive with undo). Opt-out in Settings. | Needs `confirmedAt: Date?` on Item (Core Data V6, lightweight migration; default to `createdAt`) |
+| Drifting | On the recap: things whose `confirmedAt` is oldest | Derived |
+
+### 10.8 Order of work (Phase 3.5)
+
+1. Fonts bundled and `DesignSystem.swift` retokened; the app builds and all tests pass with nothing else changed.
+2. Lists and rows (leader, stamp, highlighter) across Find, Places, Thing, Due, Trips.
+3. Tab bar tint and symbols (stock bar stays); Settings, Pro, Leaving.
+4. Onboarding three pages; sticky-note tips.
+5. Core Data V6 `confirmedAt`; stocktake; recap; keeping up; notifications and Settings switches for both.
+6. Dark mode pass against the night board; accessibility audits; store screenshots retaken from the demo library.

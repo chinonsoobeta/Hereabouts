@@ -185,9 +185,9 @@ enum DueLabel {
         switch days {
         case ..<0: return ("Missed", .due)
         case 0: return ("Today", .due)
-        case 1: return ("1 day", .due)
-        case 2...3: return ("\(days) days", .due)
-        default: return ("\(days) days", .neutral)
+        case 1: return ("Tomorrow", .due)
+        case 2...3: return ("In \(days) days", .due)
+        default: return ("In \(days) days", .neutral)
         }
     }
 

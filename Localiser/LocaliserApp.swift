@@ -29,6 +29,7 @@ struct LocaliserApp: App {
         }
         catch { loadError = error.localizedDescription }
         Appearance.apply()
+        HereaboutsTips.configure()
     }
 
     var body: some Scene {
@@ -55,10 +56,10 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $tab) {
             Tab("Find", systemImage: "magnifyingglass", value: AppTab.find) { NavigationStack { FindView() } }
-            Tab("Places", systemImage: "shippingbox", value: AppTab.places) { NavigationStack { PlacesView() } }
-            Tab("Due soon", systemImage: "calendar.badge.clock", value: AppTab.due) { NavigationStack { DueView() } }
+            Tab("Places", systemImage: "shippingbox", value: AppTab.places) { NavigationStack { PlacesView().settingsButton() } }
+            Tab("Due soon", systemImage: "calendar.badge.clock", value: AppTab.due) { NavigationStack { DueView().settingsButton() } }
                 .badge(reminders.coverageGap ? Text("!") : nil)
-            Tab("Packing", systemImage: "suitcase", value: AppTab.packing) { NavigationStack { PackingView() } }
+            Tab("Packing", systemImage: "suitcase", value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } }
         }
         .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
@@ -126,7 +127,7 @@ struct LibraryEmptyState: View {
             Label {
                 Text(title).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.center)
             } icon: {
-                Image(systemName: systemImage).accessibilityHidden(true)
+                Image(systemName: systemImage).foregroundStyle(Theme.purpleInk).accessibilityHidden(true)
             }
         } description: {
             Text(description).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)

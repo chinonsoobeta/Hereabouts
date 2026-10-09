@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hereabouts voice and words</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5B3DB8;text-decoration:none}a:hover{color:#3B2A7A}
+.sf{font-family:Fraunces,Georgia,serif}
+.ss{font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+.h{font:700 11px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#655C7A;margin:0 0 12px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:9px 0;border-top:1px solid #D9D0E6;font-size:14px;line-height:1.4}
+.no{color:#9A4A14;text-decoration:line-through;text-decoration-thickness:1.5px}
+.yes{color:#241B3D}
+.q{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:16px;line-height:1.35;color:#241B3D}
+.who{font-size:12px;color:#655C7A;margin-top:3px}
+</style>
+</helmet>
+<div class="ss" style="width: 900px; height: 860px; box-sizing: border-box; padding: 40px 44px; background: #F6F1E9; color: #241B3D; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px 40px; overflow: hidden">
+
+  <div style="grid-column: 1 / -1; border-bottom: 1.5px solid #241B3D; padding-bottom: 14px">
+    <div class="sf" style="font-size: 36px; line-height: 1.05; font-weight: 500">How Hereabouts talks</div>
+    <div style="font-size: 15px; color: #655C7A; margin-top: 8px">Plain and warm. Like a housemate who remembers where everything is and never makes you feel bad for asking.</div>
+  </div>
+
+  <div>
+    <p class="h">Words we use · words we don't</p>
+    <div class="row" style="border-top: 1.5px solid #241B3D"><span class="no">Items, assets, inventory</span><span class="yes">Things. "12 things in the garage."</span></div>
+    <div class="row"><span class="no">Location, container</span><span class="yes">Place. "It lives in the hall closet."</span></div>
+    <div class="row"><span class="no">Deadline, expiration</span><span class="yes">"Return by", "Warranty ends", "Goes off".</span></div>
+    <div class="row"><span class="no">Resolve, archive, complete</span><span class="yes">"Put back", "Returned", "Done".</span></div>
+    <div class="row"><span class="no">Streak, broken streak, lost</span><span class="yes">"Keeping up: 5 weeks." Never a loss, only a pick-up.</span></div>
+    <div class="row"><span class="no">Upgrade, unlock, premium</span><span class="yes">"Pay once." "Hereabouts Pro."</span></div>
+    <div class="row"><span class="no">Error, invalid, failed</span><span class="yes">"That didn't save. Try once more."</span></div>
+    <div class="row"><span class="no">Enable, configure, settings</span><span class="yes">"Turn on", "Change", "Settings" stays a noun.</span></div>
+    <div class="row"><span class="no">Sync, cloud, account</span><span class="yes">"Stays on your phone." "Backup."</span></div>
+
+    <p class="h" style="margin-top: 24px">Four rules</p>
+    <ol style="margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px">
+      <li>Finish the user's sentence. The search field reads "Where is…" and they type the rest.</li>
+      <li>Say the thing by name. "Rain jacket is due Wednesday", never "1 item is due".</li>
+      <li>One sentence per screen state. If it needs two, the screen is wrong.</li>
+      <li>Never praise, never scold. Report, then offer the next step.</li>
+    </ol>
+  </div>
+
+  <div>
+    <p class="h">Sample lines</p>
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div><div class="q">"Where is…"</div><div class="who">Find, the search field</div></div>
+      <div><div class="q">"Still in the hall closet, as of Tuesday."</div><div class="who">Thing detail, last seen</div></div>
+      <div><div class="q">"Running shoes go back by Sunday. Two days left."</div><div class="who">Reminder, the day before</div></div>
+      <div><div class="q">"That's 6 things found this week. One return made in time."</div><div class="who">Sunday recap</div></div>
+      <div><div class="q">"Still there?"</div><div class="who">Monthly stocktake, each card</div></div>
+      <div><div class="q">"You picked it back up. Keeping up: 1 week."</div><div class="who">After a quiet month</div></div>
+      <div><div class="q">"Nothing here yet. The first thing is the hardest to lose."</div><div class="who">Empty Find</div></div>
+      <div><div class="q">"Pay once. Keep it forever. No subscription, ever."</div><div class="who">Pro</div></div>
+      <div><div class="q">"Take your notebook with you."</div><div class="who">Leaving</div></div>
+      <div><div class="q">"Nothing has been deleted. Restarting your phone often fixes this."</div><div class="who">When the library won't open</div></div>
+    </div>
+
+    <p class="h" style="margin-top: 22px">Tabs</p>
+    <div style="font-size: 14px; line-height: 1.5">Find · Places · Due · Trips. One word each, all nouns except Find, which is the verb people arrive with.</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

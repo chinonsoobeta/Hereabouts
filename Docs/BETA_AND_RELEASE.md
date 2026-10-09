@@ -1,83 +1,123 @@
-# Localiser: beta and release preparation
+# Hereabouts: beta and release preparation
 
-Local draft, October 7, 2026. No invitations, account changes, product creation or submission have been performed. Use BUILD_STATUS.md for actual verification results.
+Updated 9 October 2026. Nothing has been invited, uploaded, created in App Store Connect or submitted. `BUILD_STATUS.md` holds verification results and `HUMAN_BLOCKED.md` lists what needs the owner.
 
 ## Beta workflow
 
-Start with a small consented group of household organizers, frequent shoppers and travellers. Expand toward fifteen to twenty households only after obvious defects are resolved. Ask participants to use their own ordinary belongings; synthetic documents are sufficient for initial expiry tests.
+Start with a small consented group of household organisers, frequent shoppers and travellers. Grow to fifteen to twenty households once obvious defects are fixed. Ask people to use their own belongings. Use synthetic receipts for the first expiry tests.
 
 | Task | Success to observe | Record |
 | --- | --- | --- |
-| Save one real item | Save by name, choose an optional place, then retrieve after restarting | Time, search phrase, whether help was needed |
-| Find after moving | Move a container or belonging and retrieve its new location | Incorrect/ambiguous suggestions and corrections |
-| Confirm a date | Review a scan, choose its meaning, confirm the final date | Wrong suggestions, manual corrections, trust |
-| Complete a return decision | Keep, plan a return or mark returned without suppressing unrelated dates | Reminder changes and accidental archival |
-| Complete a packing cycle | Reuse a kit, pack, check departure tasks, resolve coming home | Missing rows, quantities, conflicts and unresolved items |
-| Recover a library | Export selected files and restore into a fresh local installation | Record counts, attachment recovery and trip progress |
+| Save one real item | Save by name, optionally choose a place, find it again after a restart | Time, search phrase, whether help was needed |
+| Find after moving | Move an item or a box and find its new place | Wrong or ambiguous suggestions, corrections |
+| Confirm a date | Scan a receipt, check the date, save it | Wrong suggestions, manual corrections, trust |
+| Decide a return | "I'm returning it", "I'm keeping it" or "It's been returned" without touching other dates | Reminder changes, accidental archiving |
+| Add to Calendar | Add one date and "Add all to Calendar" from Due soon | Calendar title, alert time, duplicates |
+| Complete a packing cycle | Plan a trip from a kit, pack, tick tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
+| Recover a library | Back up with selected files, restore into a fresh install | Record counts, attachments, trip progress |
 
-Ask whether they used Localiser again without prompting, which problem it helped with, what they would pay, and which existing tool they would replace. Record observations and exact defects; small-sample percentages do not establish commercial demand. Do not add an analytics service solely for this beta.
+Ask whether they opened Hereabouts again without prompting, which problem it solved, whether $9.99 once feels fair, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
 
-## Frozen quality-check protocol
+## Frozen quality check
 
-Freeze the app commit and expected answers before evaluating the independent examples proposed in the plan: 200 capture sentences and 100 search pairs. Use consented, de-identified examples from people who did not write the implementation. Keep all examples in the reported denominator, including failures, ambiguous inputs and manual corrections. Do not replace difficult examples after seeing the result. Development fixtures and the current unit tests are not this holdout dataset.
+Freeze the app commit and expected answers before scoring 200 capture sentences and 100 search pairs. Use consented, de-identified examples from people who did not write the code. Keep every example in the denominator, including failures and corrections. Do not swap out hard examples after seeing results. Unit-test fixtures are not this holdout.
 
-For each capture sentence, record the intended item name, existing place identifier or explicit unknown/ambiguous result, suggested values, required corrections and time to finish saving. Score an automatic suggestion as correct only when both its name and place result match the frozen answer. Report suggestion accuracy separately from successful corrected capture. The usability target is at least 90% of attempted captures completed correctly within ten seconds, including any corrections. Unknown/ambiguous locations must never be silently assigned, and dates must never be saved without explicit confirmation: the allowed count for either safety failure is zero.
+- **Capture.** Record the intended name, the existing place or an explicit "unknown", the suggestion, corrections and time to save. A suggestion is correct only when both name and place match. Target: 90% of captures finished correctly within ten seconds, corrections included.
+- **Safety.** An unknown place must never be silently assigned, and a date must never be saved without confirmation. The allowed count for either is zero.
+- **Search.** Record the query and acceptable items first. A positive query passes when an acceptable item is in the top three. Target: 95%. Report false positives on negative queries separately.
+- **Speed.** Measure search over 5,000 records on the slowest supported phone. Target: 50 ms. Simulator timings do not count.
 
-For each search pair, record the query and acceptable item identifiers before running it. Score a successful positive query when an acceptable item appears among the first three results; the initial target is at least 95% of positive queries. Report negative-query false positives and ambiguity separately, rather than counting them as successful retrievals. Measure the separate 5,000-record / 50 ms performance target on the slowest supported test phone. Do not infer it from search accuracy or simulator timing.
+These are targets, not results. If one is missed, keep the failed run, fix the defects and re-test on a new holdout.
 
-These are evaluation targets, not achieved results. If the frozen evaluation misses a target, record the defects and repeat on a new independent holdout after correcting them; preserve the failed evaluation. Representative inputs, user observations and the physical timing checks remain owner/beta work.
+## Physical-device checks before launch
 
-## Physical-device verification before public launch
+- Test iOS 26 on the smallest supported phone and on a phone with and without Apple Intelligence.
+- Use airplane mode with no iCloud account: create, edit, move, search, scan and relaunch without loss.
+- Time name-only capture and search with 5,000 records.
+- Review every tab, scan confirmation, backup, Settings and Pro in light and dark mode, at the largest text size and with VoiceOver. Check focus order, error announcements and labels.
+- Check that tips appear once and in order: Scan after the first item, put-away after five items, Move, Add to Calendar, "I'm leaving".
+- Notifications: deny, revoke, act on a reminder, edit and delete dates, force-quit, leave the phone idle for days, change time zone, exceed 64 pending reminders. Compare the coverage card with the real pending queue. Check the item-name switch in Settings.
+- Calendar: add one date and all dates with write-only access, then with access denied.
+- Scanning: blurred receipt, several dates, no date, an expired document, camera, photo and PDF. A cancelled or failed scan must not use one of the 5 free monthly scans.
+- Purchases: StoreKit sandbox buy, restore on a second device, cancel, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
+- iPad: install on an iPad and walk all four tabs. The app is iPhone-only and runs in compatibility mode.
 
-- Test iOS 26 and the current OS, the smallest supported screen, and phones with and without Apple Intelligence where available.
-- Test airplane mode/no iCloud account: create, edit, move, search, scan and relaunch without loss.
-- Measure name-only capture and search with 5,000 records. The ten-second capture and 50 ms search figures are targets until measured on the slowest test device.
-- Review Find, Places, Due soon, Packing, scan confirmation, backup and purchase screens in light/dark mode, maximum Dynamic Type and VoiceOver. Check focus order, error announcements and control labels.
-- Test notification permission denial/revocation, actions, date edits/deletions, termination, long inactivity, time-zone changes and more than sixty-four candidate reminders. Check the visible queue against actual pending requests. Test the calendar editor without broad calendar access.
-- Scan blurred receipts, multiple/ambiguous/missing dates, an expired document, a camera scan, a photo and a PDF. Verify canceled/failed scans consume no successful-scan allowance. Inspect retention and cancellation cleanup.
-- Two devices on the same Apple ID: initial sync, offline edits, reconnection, conflict handling, unavailable/full iCloud, sign-out, relaunch and later account availability. Verify photos and source documents. Do not claim household sharing.
-- Verify deletion with an offline second device. Implement and verify a safe reset/reconnect procedure before removing the current safety restrictions on previously synced or file-restored stores.
-- Complete StoreKit sandbox purchase, restore, cancellation, failure, pending approval and refund checks. Verify existing data/edit/export access after loss of the entitlement. Local StoreKit evidence does not establish production setup.
+No public launch with an open data-loss defect, a silently accepted wrong date or missing proof that real reminders fire.
 
-No public launch while there are unresolved data-loss defects, silently accepted wrong dates, unverified cloud reconnection, or missing physical reminder proof.
+## App Store listing
 
-## Draft listing
+| Field | Value | Limit |
+| --- | --- | --- |
+| Name | Hereabouts | 30 |
+| Subtitle | Find things, track returns | 30 |
+| Primary category | Productivity | |
+| Secondary category | Utilities | |
+| Age rating | 4+ | |
+| Price | Free with a US$4.99 in-app Founder's price, then US$9.99 | |
+| Keywords | `where,find,belongings,inventory,home,organizer,receipt,return,warranty,packing,list,storage,lost` | 100 |
 
-Name: **Localiser**
+The keywords leave out "Hereabouts", plurals and category names because the App Store already indexes those.
 
-Subtitle candidate: **Find, remember, pack**
+**Promotional text** (170 characters, editable without review):
 
-Description candidate, subject to final verified behavior:
+> Founder's price: unlock everything for US$4.99, once. No subscription, no account. Free for up to 200 things.
 
-> Remember where you put things and what you need to do next. Save a belonging with just a name, add a place when useful, and find it by name, alias or location. Scan a receipt or document on your iPhone, review possible dates, and confirm return, warranty or expiry reminders. Prepare trips with reusable packing kits, departure tasks and explicit coming-home checklists.
+**Description:**
+
+> Where did you put it? Hereabouts remembers.
 >
-> Start gradually. Free use includes fifty saved belongings, one reusable kit and three successful scans. A lifetime Pro purchase removes those creation limits. Existing records, manual dates, trips and export remain accessible if a purchase becomes unavailable.
+> Save a thing with just its name. Add where it lives, like "Garage › Shelf 4", and find it again in seconds by name, nickname or place.
 >
-> Local use works without an app account. Optional private iCloud sync connects your own devices when configured and available. Notification scheduling has a finite queue; Localiser shows its coverage and offers calendar export. Review every scanned date against the original document.
+> NEVER MISS A RETURN
+> Scan a receipt or label. Hereabouts reads the dates on your iPhone and asks you to confirm them. It reminds you before the return window closes, a warranty ends or something expires. Add any date to your calendar with one tap.
+>
+> PACK ONCE
+> Make a kit for trips you take often. Plan a trip, tick things off by where they live, and get a checklist for putting everything back when you're home.
+>
+> YOURS, ON YOUR PHONE
+> No account. No ads. No tracking. Everything stays on your iPhone and in your device backup. Export a backup or a spreadsheet whenever you like.
+>
+> FAIR PRICE
+> Free for up to 200 things, 2 kits and 5 scans a month. Hereabouts Pro removes the limits for a single payment, shared with your family. No subscription, ever. Every feature is in the free version.
 
-Do not publish this description until the referenced behavior passes its gates. No delivery date, instant-sync claim or guaranteed reminder claim is approved.
+Before publishing, check each sentence against the shipped build. Do not claim sync, sharing between people or guaranteed reminders.
 
-Screenshot sequence: Find with a real example; item/place/history detail; scan source and confirmed date; Due soon with queue coverage; place-grouped packing and coming home. Use synthetic documents and remove identifiers. Simulator QA screenshots are not yet store-ready screenshots.
+## Screenshots
 
-## Privacy policy draft content
+Use the demo library with the Debug-only launch argument `--demo-library` on a 6.9-inch and a 6.5-inch iPhone simulator. Light mode, default text size, status bar at 9:41.
 
-Owner must supply the legal publisher name, effective date, support contact and hosted policy URL before publishing.
+1. **Find** showing "Running shoes" and its place path. Caption: "Find anything by where it lives".
+2. **Scan review** with a confirmed "Return by" date. Caption: "Scan a receipt. Never miss a return".
+3. **Due soon** with return and warranty sections. Caption: "Every deadline in one place".
+4. **Trip detail** with packing progress. Caption: "Pack once, reuse forever".
+5. **Pro screen** or a plain caption card. Caption: "No account. No subscription. Export anytime".
 
-- Localiser stores user-entered belongings, places, notes, aliases, dates, location history, kits, trips and checklist progress in the app's local library.
-- Text recognition happens on the device. Recognized source text is not retained automatically. A scan original is stored only when the user chooses to keep it; user-entered notes and retained originals may include sensitive information.
-- Retained data may participate in device backup. If private sync is enabled in a properly configured build, local library data and retained files may be mirrored to the user's private iCloud database. Availability and storage limits depend on Apple services and the user's account.
-- Localiser has no developer-operated document server, advertising SDK or analytics SDK in this implementation. The final privacy declaration must be checked against the shipped binary and Apple service behavior, including StoreKit and any optional user-submitted support material.
-- Local notifications use generic text. The user controls reminders and can export a calendar event through Apple's editor. A saved date is user-confirmed information, not a verified retail policy, warranty coverage determination or travel-validity decision.
-- CSV is an inventory export. A JSON backup includes all library records and only the selected files. Exported files are readable to anyone with access to the destination; Localiser does not encrypt the export itself.
-- Deleting an item removes its local dates, scans and movement records. Historical kit/trip rows remain as unlinked checklist rows. Sync deletion is eventual and must be tested across offline devices; do not promise instant deletion of every copy.
-- Full local erase is available only for a local store that has not used private sync. Previously synced stores and cloud reconnection after file recovery remain restricted pending verification.
+Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remove any real names or numbers from documents shown on screen.
 
-This content is an implementation-based draft, not a completed legal review or App Store privacy declaration. The privacy manifest currently declares app-private UserDefaults use (`CA92.1`); inspect the final archive and dependencies before submission. See [Apple's required-reason API list](https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype) and [private CloudKit database documentation](https://developer.apple.com/documentation/cloudkit/ckcontainer/privateclouddatabase).
+## App Review notes
 
-## Owner configuration and submission inputs
+Paste into App Store Connect, App Review Information:
 
-1. Developer membership, signing team, permanent bundle identifier and matching private iCloud container. Do not use the temporary development identifiers for a public release.
-2. Lifetime non-consumable identifier, actual price and storefronts. US$49.99 in the local StoreKit file is test metadata only. Do not configure Family Sharing automatically.
-3. Publisher/support details, privacy/support URLs and listing/name clearance. Confirm applicable business/employment obligations separately.
-4. A signed device/archive build, validated privacy report, provisioned production CloudKit schema, production StoreKit product and completed physical/beta evidence.
-5. Explicit owner approval to invite testers, upload a build, publish materials or submit the app. Local preparation does not authorize any of those actions.
+> Hereabouts has no account or login. Everything is stored on the device.
+>
+> The free version allows 200 saved things, 2 packing kits and 5 successful receipt scans per calendar month. Pro is a single non-consumable in-app purchase, "Hereabouts Pro" (dev.localiser.pro.lifetime), with Family Sharing on. It removes those limits and nothing else. To see the paywall quickly, open Packing and create a third kit, or open Settings › Hereabouts Pro. The purchase can be tested in the sandbox. "Restore purchases" is on the same screen.
+>
+> Receipt scanning uses the camera, a photo or a PDF. Text is read on the device with Apple's Vision framework. Dates are never saved without the user confirming them.
+>
+> Reminders are local notifications. "Add to Calendar" uses write-only calendar access and adds events to the default calendar.
+>
+> The app is designed for iPhone. On iPad it runs in iPhone compatibility mode.
+>
+> Privacy policy: https://hereabouts.app/privacy. Support: https://hereabouts.app/support.
+
+Replace both links if the domain changes.
+
+## App Privacy label
+
+- **Data collection:** "Data Not Collected". Hereabouts has no server, analytics, advertising or tracking SDK.
+- **Privacy manifest:** `Localiser/PrivacyInfo.xcprivacy` declares app-private UserDefaults use, reason `CA92.1`. Check the final archive's privacy report before submitting.
+- **Policy text:** `Site/privacy.html`. It covers on-device storage, device backups, user-made export files, on-device text recognition, notifications, write-only calendar access and StoreKit.
+
+## Owner inputs
+
+These live in `HUMAN_BLOCKED.md`: enrolment, domain and email, the App Store Connect product and price schedule, name clearance, TestFlight and the physical checks above. Uploading, inviting testers and submitting each need the owner's explicit go-ahead.

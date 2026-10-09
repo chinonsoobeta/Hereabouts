@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Onboarding, the first thing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#5B3DB8;text-decoration:none}a:hover{color:#3B2A7A}
+.sf{font-family:Fraunces,Georgia,serif}
+.ss{font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+.btn{display:flex;align-items:center;justify-content:center;height:52px;border-radius:10px;font:700 17px/1 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer;border:0;padding:0 18px;box-sizing:border-box}
+.btn-p{background:#5B3DB8;color:#F6F1E9}
+.chip{height:40px;padding:0 14px;border:1.5px solid #241B3D;border-radius:20px;background:transparent;color:#241B3D;font:400 15px/1 'Atkinson Hyperlegible',system-ui,sans-serif;cursor:pointer}
+.chip.on{background:#E6DBF7}
+.field{width:100%;box-sizing:border-box;border:0;border-bottom:1.5px solid #241B3D;background:transparent;font:400 22px/1.3 Fraunces,Georgia,serif;color:#241B3D;padding:6px 0;outline:none}
+.ruled{background:repeating-linear-gradient(to bottom,transparent 0 35px,#D9D0E6 35px 36px)}
+</style>
+</helmet>
+<div class="ss" style="width: 390px; height: 844px; box-sizing: border-box; padding: 64px 24px 40px; background: #F6F1E9; color: #241B3D; display: flex; flex-direction: column">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #655C7A">
+    <a href="Onboard1.dc.html" style="color: #655C7A">Back</a>
+    <span>Page 2 of 3</span>
+  </div>
+
+  <h1 class="sf" style="font-size: 38px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; margin: 48px 0 12px">What do you always lose?</h1>
+  <p style="font-size: 17px; line-height: 1.45; margin: 0">Pick one, or write your own. We'll put it on the first page.</p>
+
+  <div style="display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap">
+    <button class="chip on" type="button">Spare keys</button>
+    <button class="chip" type="button">Passport</button>
+    <button class="chip" type="button">Charger</button>
+    <button class="chip" type="button">Sunglasses</button>
+    <button class="chip" type="button">The drill</button>
+    <button class="chip" type="button">Nan's ring</button>
+    <button class="chip" type="button">Tape measure</button>
+  </div>
+
+  <div class="ruled" style="margin-top: 32px; padding-top: 10px">
+    <div style="display: flex; align-items: baseline; gap: 10px; height: 36px">
+      <span class="sf" style="font-size: 20px; color: #655C7A; font-style: italic">Spare keys</span>
+      <span class="sf" style="font-size: 20px; color: #655C7A">live in</span>
+    </div>
+    <label for="first-place" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Where do they live?</label>
+    <input id="first-place" class="field" type="text" value="" placeholder="the kitchen drawer" style="border-bottom: 0; height: 36px; padding: 0; font-size: 22px; font-style: italic; color: #241B3D">
+    <div style="height: 36px; display: flex; align-items: center; font-size: 13px; color: #655C7A">A room is enough. Shelves and drawers can come later.</div>
+  </div>
+
+  <div style="margin-top: 22px; display: flex; gap: 12px; align-items: center; padding: 12px 14px; background: #ECE5F3; border-radius: 6px; transform: rotate(-1deg)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B3DB8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+    <div style="font-size: 14px; line-height: 1.4">Or snap a photo. Hereabouts can read the name off a box or a label.</div>
+  </div>
+
+  <div style="flex: 1"></div>
+
+  <a class="btn btn-p" href="Onboard3.dc.html" style="text-decoration: none">Write it down</a>
+  <a href="Onboard3.dc.html" style="font-size: 15px; color: #655C7A; text-align: center; margin-top: 14px; display: block; min-height: 44px; line-height: 44px">I'll do this later</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

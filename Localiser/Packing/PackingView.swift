@@ -1,51 +1,107 @@
 import SwiftUI
+import TipKit
 
 struct PackingView: View {
     @Environment(LocaliserStore.self) private var store
     @State private var newTrip = false
     @State private var newKit = false
-    private var current: TripRecord? { store.trips.filter { $0.state == .packing || $0.state == .away || $0.state == .comingHome }.min { $0.startDay < $1.startDay } }
+    @State private var showPast = false
+    private var active: [TripRecord] { store.trips.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay } }
+    private var past: [TripRecord] { store.trips.filter { $0.state == .finished || $0.state == .canceled }.sorted { $0.startDay > $1.startDay } }
     var body: some View {
+        let _ = store.revision
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                if let current {
-                    NavigationLink { TripDetailView(trip: current) } label: { TripProgressCard(trip: current) }.buttonStyle(.plain)
+                if store.trips.isEmpty && store.kits.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(alignment: .top) {
+                            Image(systemName: "suitcase.rolling").foregroundStyle(Theme.purple).accessibilityHidden(true)
+                            Text("Pack once, never forget the charger").fixedSize(horizontal: false, vertical: true)
+                        }.font(.wbTitle)
+                        Text("Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home.")
+                            .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+                        Button("Plan a trip") { newTrip = true }.buttonStyle(PrimaryButtonStyle())
+                        HStack(spacing: 12) {
+                            Text("Going away often? Save what you always take as a kit.").font(.wbCaption).foregroundStyle(Theme.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 0)
+                            Button { newKit = true } label: { Label("New kit", systemImage: "plus").font(.wbItem) }
+                                .buttonStyle(SoftButtonStyle(compact: true))
+                        }
+                    }.card(padding: 16)
+                } else {
+                    SectionHeading(title: "Trips")
+                    ForEach(Array(active.enumerated()), id: \.element.id) { index, trip in
+                        NavigationLink { TripDetailView(trip: trip) } label: {
+                            if index == 0 { TripProgressCard(trip: trip) } else { TripRow(trip: trip) }
+                        }.buttonStyle(.plain)
+                    }
+                    Button("Plan a trip", systemImage: "plus") { newTrip = true }.buttonStyle(SoftButtonStyle())
+                    if !past.isEmpty {
+                        DisclosureGroup(isExpanded: $showPast) {
+                            VStack(spacing: 12) {
+                                ForEach(past) { trip in NavigationLink { TripDetailView(trip: trip) } label: { TripRow(trip: trip) }.buttonStyle(.plain) }
+                            }.padding(.top, 8)
+                        } label: { Text("Past trips (\(past.count))").font(.wbItem).foregroundStyle(Theme.ink) }
+                        .tint(Theme.purpleInk)
+                    }
+                    SectionHeading(title: "Kits").padding(.top, 8)
+                    if store.kits.isEmpty {
+                        Text("A kit is a list you reuse, like \u{201C}Weekend away\u{201D}. New trips can start from it.").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    }
+                    ForEach(store.kits) { kit in
+                        NavigationLink { KitDetailView(kit: kit) } label: {
+                            HStack(spacing: 14) {
+                                IconTile(systemImage: "checklist", size: 44)
+                                Text(kit.name).font(.wbItem).foregroundStyle(Theme.ink)
+                                Spacer(minLength: 8)
+                                Text(kit.entries.count == 1 ? "1 thing" : "\(kit.entries.count) things").font(.wbCaption).foregroundStyle(Theme.secondary)
+                            }.card()
+                        }.buttonStyle(.plain)
+                    }
+                    Button("New kit", systemImage: "plus") { newKit = true }.buttonStyle(SoftButtonStyle())
                 }
-                SectionHeading(title: "Trips").padding(.top, 8)
-                if store.trips.isEmpty { Text("Create a trip from a reusable kit or start an empty checklist.").foregroundStyle(Theme.secondary) }
-                ForEach(store.trips.filter { $0.id != current?.id }) { trip in
-                    NavigationLink { TripDetailView(trip: trip) } label: {
-                        HStack(spacing: 14) {
-                            IconTile(systemImage: "suitcase", size: 44, tone: trip.state == .finished ? .done : .neutral)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(trip.name).font(.wbItem).foregroundStyle(Theme.ink)
-                                Text(trip.dateRange).font(.wbCaption).foregroundStyle(Theme.secondary)
-                            }
-                            Spacer(minLength: 8)
-                            Pill(text: trip.stateTitle.capitalized, tone: trip.state == .finished ? .done : .neutral)
-                        }.card()
-                    }.buttonStyle(.plain)
-                }
-                Button("New trip") { newTrip = true }.buttonStyle(SoftButtonStyle())
-                SectionHeading(title: "Reusable kits").padding(.top, 8)
-                ForEach(store.kits) { kit in
-                    NavigationLink { KitDetailView(kit: kit) } label: {
-                        HStack(spacing: 14) {
-                            IconTile(systemImage: "checklist", size: 44)
-                            Text(kit.name).font(.wbItem).foregroundStyle(Theme.ink)
-                            Spacer(minLength: 8)
-                            Text(kit.entries.count == 1 ? "1 row" : "\(kit.entries.count) rows").font(.wbCaption).foregroundStyle(Theme.secondary)
-                        }.card()
-                    }.buttonStyle(.plain)
-                }
-                Button("New kit") { newKit = true }.buttonStyle(SoftButtonStyle())
-                Text("Each trip gets its own packing and departure checklist. Changes to a kit apply to future trips.").font(.wbCaption).foregroundStyle(Theme.secondary)
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
         .background(Theme.ground).navigationTitle("Packing")
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Plan a trip", systemImage: "plus") { newTrip = true } } }
         .sheet(isPresented: $newTrip) { NavigationStack { TripEditor() } }
         .sheet(isPresented: $newKit) { NavigationStack { KitEditor() } }
+    }
+}
+
+struct TripRow: View {
+    let trip: TripRecord
+    var body: some View {
+        HStack(spacing: 14) {
+            IconTile(systemImage: "suitcase", size: 44, tone: trip.state == .finished ? .done : .neutral)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(trip.name).font(.wbItem).foregroundStyle(Theme.ink)
+                Text(trip.dateRange).font(.wbCaption).foregroundStyle(Theme.secondary)
+            }
+            Spacer(minLength: 8)
+            Pill(text: trip.stateTitle, tone: trip.state == .finished ? .done : .neutral)
+        }.card()
+    }
+}
+
+/// Packing → Away → Coming home → Done, with the current stage highlighted.
+struct TripStageStrip: View {
+    let state: TripState
+    private static let stages: [(TripState, String)] = [(.packing, "Packing"), (.away, "Away"), (.comingHome, "Home"), (.finished, "Done")]
+    var body: some View {
+        let current = Self.stages.firstIndex { $0.0 == state } ?? -1
+        HStack(spacing: 6) {
+            ForEach(Array(Self.stages.enumerated()), id: \.offset) { index, stage in
+                VStack(spacing: 4) {
+                    Capsule().fill(index <= current ? Theme.purpleFill : Theme.lilac).frame(height: 6)
+                    Text(stage.1).font(.wbCaption).foregroundStyle(index == current ? Theme.purpleInk : Theme.secondary)
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Status: \(state == .canceled ? "called off" : (TripState.titles[state] ?? "").lowercased())")
     }
 }
 
@@ -78,7 +134,7 @@ extension TripRecord {
         let format = Date.FormatStyle.dateTime.month(.abbreviated).day()
         return startDay == endDay ? start.formatted(format) : "\(start.formatted(format)) – \(end.formatted(format))"
     }
-    var stateTitle: String { state == .comingHome ? "coming home" : stateRaw }
+    var stateTitle: String { state.flatMap { TripState.titles[$0] } ?? stateRaw }
 }
 
 struct KitEditor: View {
@@ -119,35 +175,65 @@ struct KitDetailView: View {
     var body: some View {
         let _ = store.revision
         List {
-            Section("Packing rows") {
+            Section {
+                Button("Plan a trip with this kit", systemImage: "suitcase") { trip = true }.buttonStyle(PrimaryButtonStyle()).plainRow()
+            }
+            Section {
                 ForEach(kit.entries.sorted { $0.title < $1.title }) { entry in
                     Button { editingEntry = entry } label: {
-                        VStack(alignment: .leading) {
-                            Text(entry.title).font(.headline)
-                            Text("\(entry.unitQuantity)\(entry.perDay ? " per day" : entry.perNight ? " per night" : " in total") · \(entry.condition.title)").font(.caption).foregroundStyle(Theme.secondary)
-                            if entry.unlinked && entry.item == nil { Text("Deleted item. Kept as a text row.").font(.caption).foregroundStyle(Theme.secondary) }
-                            if entry.item?.archived == true { Text("Archived item: excluded from new trips").font(.caption).foregroundStyle(Theme.warning) }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(entry.title).font(.wbItem).foregroundStyle(Theme.ink)
+                            Text(entry.ruleSummary).font(.wbCaption).foregroundStyle(Theme.secondary)
+                            if entry.unlinked && entry.item == nil { Text("Its item was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                            if entry.item?.archived == true { Text("Archived, so new trips leave it out.").font(.wbCaption).foregroundStyle(Theme.warning) }
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
                 }
-                Button("Add packing row") { addEntry = true }
-            }
-            Section("Reusable departure routine") {
+                Button("Add something to pack", systemImage: "plus") { addEntry = true }
+            } header: { Text("What to pack").foregroundStyle(Theme.secondary) }
+            Section {
                 ForEach(kit.tasks.sorted { $0.title < $1.title }) { task in Text(task.title).swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitTask(task) } } } }
-                TextField("New departure task", text: $taskTitle)
-                Button("Add departure task") { attempt { try store.addKitTask(kit, title: taskTitle); taskTitle = "" } }.disabled(taskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            }
-            Section { Button("Create trip from this kit") { trip = true }; Button("Delete kit", role: .destructive) { deleting = true } }
+                AddTaskField(title: $taskTitle) { attempt { try store.addKitTask(kit, title: taskTitle); taskTitle = "" } }
+            } header: { Text("Before you leave").foregroundStyle(Theme.secondary) }
+              footer: { Text("Trips copy this kit when you plan them. Changing the kit later doesn't change trips you've already planned.").foregroundStyle(Theme.secondary) }
         }
-        .groundBackground().navigationTitle(kit.name).navigationBarTitleDisplayMode(.inline).toolbar { Button("Edit") { edit = true } }
+        .groundBackground().navigationTitle(kit.name).navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) { Button("Edit") { edit = true } }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu { Button("Delete kit", systemImage: "trash", role: .destructive) { deleting = true } } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Kit options")
+            }
+        }
         .sheet(isPresented: $edit) { NavigationStack { KitEditor(kit: kit) } }
         .sheet(isPresented: $addEntry) { NavigationStack { KitEntryEditor(kit: kit) } }
         .sheet(item: $editingEntry) { entry in NavigationStack { KitEntryEditor(kit: kit, entry: entry) } }
         .sheet(isPresented: $trip) { NavigationStack { TripEditor(kit: kit) } }
-        .confirmationDialog("Delete this kit? Existing trips will keep their own checklists.", isPresented: $deleting, titleVisibility: .visible) { Button("Delete kit", role: .destructive) { attempt { try store.deleteKit(kit); dismiss() } } }
-        .alert("Could not update kit", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .confirmationDialog("Delete \u{201C}\(kit.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete kit", role: .destructive) { attempt { try store.deleteKit(kit); dismiss() } } } message: { Text("Trips you've already planned keep their own lists.") }
+        .alert("Couldn't update the kit", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
     private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
+}
+
+/// A single row that adds a task when you press Return.
+struct AddTaskField: View {
+    @Binding var title: String
+    var add: () -> Void
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "plus.circle").foregroundStyle(Theme.purpleInk).accessibilityHidden(true)
+            TextField("Add a task", text: $title).submitLabel(.done)
+                .onSubmit { if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { add() } }
+                .accessibilityIdentifier("task.add")
+        }
+    }
+}
+
+extension KitEntry {
+    /// "1 · every trip", "2 per night · flying".
+    var ruleSummary: String {
+        let amount = perDay ? "\(unitQuantity) per day" : perNight ? "\(unitQuantity) per night" : "\(unitQuantity)"
+        return "\(amount) · \(condition == .always ? "every trip" : condition.title.lowercased() + " trips")"
+    }
 }
 
 struct KitEntryEditor: View {
@@ -176,22 +262,22 @@ struct KitEntryEditor: View {
     }
     var body: some View {
         Form {
-            Picker("Link a belonging", selection: $itemID) { Text("Free-text row").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
-            if itemID == nil { TextField("Row name", text: $name).accessibilityIdentifier("kit.entry.name") }
+            Picker("Item", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            if itemID == nil { TextField("Name, like Phone charger", text: $name).accessibilityIdentifier("kit.entry.name") }
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
             Picker("Amount", selection: $scale) { ForEach(PackingScale.allCases) { Text($0.title).tag($0) } }
             Text(scaleHint).font(.caption).foregroundStyle(Theme.secondary)
             Picker("Include for", selection: $condition) { ForEach(PackingCondition.allCases) { Text($0.title).tag($0) } }
-            Text("Rows linked to an item are grouped by where it lives. Text rows appear under Anywhere.").font(.caption).foregroundStyle(Theme.secondary)
+            Text("Linking an item groups it by where it lives, so you can pack room by room.").font(.caption).foregroundStyle(Theme.secondary)
         }
-        .groundBackground().navigationTitle(entry == nil ? "Add packing row" : "Edit packing row").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle(entry == nil ? "Add to kit" : "Edit").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
                 do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.entry.save") }
         }
-        .alert("Could not save row", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -254,6 +340,7 @@ struct TripDetailView: View {
     @State private var deleting = false
     @State private var canceling = false
     @State private var taskTitle = ""
+    @State private var notReady: String?
     @State private var error: String?
     private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? "Anywhere" }).sorted() }
     /// Says exactly what is left before the trip can be marked away.
@@ -264,76 +351,112 @@ struct TripDetailView: View {
         var parts: [String] = []
         if !unpacked.isEmpty { parts.append("Still to pack: \(unpacked.prefix(5).joined(separator: ", "))\(unpacked.count > 5 ? " and \(unpacked.count - 5) more" : "").") }
         if !tasks.isEmpty { parts.append("Still to do: \(tasks.joined(separator: ", ")).") }
-        return parts.joined(separator: "\n") + "\nOr choose Start coming home to skip packing checks."
+        return parts.joined(separator: "\n")
     }
     var body: some View {
         let _ = store.revision
         List {
             Section {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     TripProgressCard(trip: trip)
-                    Text("Status: \(trip.stateTitle)").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    TripStageStrip(state: trip.state ?? .packing)
+                    if trip.state == .canceled { Text("You called off this trip.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 }.plainRow()
-                if trip.state == .packing { Button("Add item or free-text row") { adding = true } }
+                if trip.state == .packing { TipView(LeavingTip()).plainRow() }
+                stageButton
+                if trip.state == .packing { Button("Add something to pack", systemImage: "plus") { adding = true } }
             }
             ForEach(groups, id: \.self) { group in
                 Section(group) {
-                    ForEach(trip.entries.filter { ($0.item?.place?.path ?? "Anywhere") == group }.sorted { $0.title < $1.title }) { entry in
-                        HStack(spacing: 12) {
-                            if trip.state == .packing {
-                                let done = entry.requiredCount > 0 && Int(entry.packedCount) >= entry.requiredCount
-                                Button {
-                                    attempt { try store.pack(entry, count: done ? 0 : entry.requiredCount) }
-                                } label: {
-                                    Image(systemName: done ? "checkmark.circle.fill" : "circle").font(.title2).foregroundStyle(done ? Theme.purple : Theme.secondary)
-                                        .frame(width: 44, height: 44).contentShape(Rectangle())
-                                }
-                                .buttonStyle(.borderless)
-                                .accessibilityLabel(done ? "Unpack \(entry.title)" : "Pack \(entry.title)")
-                            }
-                            NavigationLink { TripEntryDetailView(entry: entry) } label: {
-                                VStack(alignment: .leading) {
-                                    Text(entry.title).font(.wbItem)
-                                    Text("\(entry.packedCount) packed / \(entry.requiredCount) needed").font(.subheadline).foregroundStyle(Theme.secondary)
-                                    if entry.item?.archived == true { Text("Archived or returned. Resolve or remove this row.").font(.caption).foregroundStyle(Theme.warning) }
-                                    if entry.unlinked && entry.item == nil { Text("Deleted item. Kept as a text row.").font(.caption).foregroundStyle(Theme.secondary) }
-                                    if trip.state == .comingHome { Text("Coming home: \(entry.resolutionRaw)").font(.caption) }
-                                }
-                            }
-                        }
-                    }
+                    ForEach(trip.entries.filter { ($0.item?.place?.path ?? "Anywhere") == group }.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
                 }
             }
             if trip.state == .packing {
-                Section("Before departure") {
+                Section {
                     ForEach(trip.tasks.sorted { $0.title < $1.title }) { task in
-                        Toggle(task.title, isOn: Binding(get: { task.checked }, set: { value in attempt { try store.checkTask(task, checked: value) } }))
-                            .swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteTripTask(task) } } }
+                        Button { attempt { try store.checkTask(task, checked: !task.checked) } } label: {
+                            Label { Text(task.title).foregroundStyle(Theme.ink).strikethrough(task.checked, color: Theme.secondary) } icon: {
+                                Image(systemName: task.checked ? "checkmark.circle.fill" : "circle").foregroundStyle(task.checked ? Theme.purple : Theme.secondary).font(.title3)
+                            }
+                        }
+                        .accessibilityLabel(task.title).accessibilityAddTraits(task.checked ? .isSelected : [])
+                        .accessibilityIdentifier("task.\(task.title)")
+                        .swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteTripTask(task) } } }
                     }
-                    TextField("New departure task", text: $taskTitle)
-                    Button("Add departure task") { attempt { try store.addTripTask(trip, title: taskTitle); taskTitle = "" } }.disabled(taskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    Button("Mark away") {
-                        if let blocker = departureBlocker { error = blocker } else { attempt { try store.changeTripState(trip, to: .away) } }
-                    }
-                }
+                    AddTaskField(title: $taskTitle) { attempt { try store.addTripTask(trip, title: taskTitle); taskTitle = "" } }
+                } header: { Text("Before you leave").foregroundStyle(Theme.secondary) }
             }
-            if trip.state == .away || trip.state == .packing { Section { Button("Start coming home") { attempt { try store.changeTripState(trip, to: .comingHome) } } } }
-            if trip.state == .comingHome { Section("Coming home") {
-                Text("\(trip.unresolvedEntries.count) packed rows still need a confirmed resolution. An end date never puts items away automatically.")
-                Button("Finish coming home") { attempt { try store.changeTripState(trip, to: .finished) } }.disabled(!trip.unresolvedEntries.isEmpty)
-            } }
-            Section {
-                if trip.state != .canceled && trip.state != .finished { Button("Cancel trip", role: .destructive) { canceling = true } }
-                Button("Delete trip", role: .destructive) { deleting = true }
+            if trip.state == .comingHome {
+                Section {
+                    let left = trip.unresolvedEntries.count
+                    Text(left == 0 ? "Everything's sorted. You can finish the trip." : left == 1 ? "1 thing still needs putting away. Tap it to say where it went." : "\(left) things still need putting away. Tap each one to say where it went.")
+                        .foregroundStyle(Theme.secondary)
+                } header: { Text("Unpacking").foregroundStyle(Theme.secondary) }
             }
         }
         .groundBackground().navigationTitle(trip.name).navigationBarTitleDisplayMode(.inline)
-        .toolbar { if trip.state == .packing || trip.state == .away { Button("Edit") { edit = true } } }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    if trip.state == .packing || trip.state == .away { Button("Edit trip", systemImage: "pencil") { edit = true } }
+                    if trip.state == .packing { Button("Skip to coming home", systemImage: "house") { attempt { try store.changeTripState(trip, to: .comingHome) } } }
+                    if trip.state != .canceled && trip.state != .finished { Button("Call off trip", systemImage: "xmark.circle") { canceling = true } }
+                    Divider()
+                    Button("Delete trip", systemImage: "trash", role: .destructive) { deleting = true }
+                } label: { Image(systemName: "ellipsis") }
+                .accessibilityLabel("Trip options")
+            }
+        }
         .sheet(isPresented: $edit) { NavigationStack { TripEditor(trip: trip) } }
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
-        .confirmationDialog("Cancel this trip? Its packing allocation will be cleared. Saved home locations will remain unchanged.", isPresented: $canceling, titleVisibility: .visible) { Button("Cancel trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } }
-        .confirmationDialog("Delete this trip and its checklists? Belongings and home locations will be kept.", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } }
-        .alert("Not quite ready", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("Its packing list is kept for reference. Where your things live doesn't change.") }
+        .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("The trip and its lists go. Your items and where they live are kept.") }
+        .alert("Not quite ready", isPresented: Binding(get: { notReady != nil }, set: { if !$0 { notReady = nil } })) {
+            Button("Keep packing", role: .cancel) { notReady = nil }
+            Button("Leave anyway") { notReady = nil; attempt { try store.changeTripState(trip, to: .comingHome) } }
+        } message: { Text((notReady ?? "") + "\n\nLeave anyway skips the packing checks and goes straight to unpacking when you're back.") }
+        .alert("Couldn't update the trip", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    @ViewBuilder private var stageButton: some View {
+        switch trip.state {
+        case .packing:
+            Button("I'm leaving") {
+                if let blocker = departureBlocker { notReady = blocker } else { attempt { try store.changeTripState(trip, to: .away) } }
+            }.buttonStyle(PrimaryButtonStyle()).plainRow()
+        case .away:
+            Button("I'm coming home") { attempt { try store.changeTripState(trip, to: .comingHome) } }.buttonStyle(PrimaryButtonStyle()).plainRow()
+        case .comingHome:
+            Button("Finish trip") { attempt { try store.changeTripState(trip, to: .finished) } }
+                .buttonStyle(PrimaryButtonStyle()).disabled(!trip.unresolvedEntries.isEmpty).plainRow()
+        case .finished, .canceled, .none:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder private func entryRow(_ entry: TripEntry) -> some View {
+        HStack(spacing: 12) {
+            if trip.state == .packing {
+                let done = entry.requiredCount > 0 && Int(entry.packedCount) >= entry.requiredCount
+                Button {
+                    attempt { try store.pack(entry, count: done ? 0 : entry.requiredCount) }
+                } label: {
+                    Image(systemName: done ? "checkmark.circle.fill" : "circle").font(.title2).foregroundStyle(done ? Theme.purple : Theme.secondary)
+                        .frame(width: 44, height: 44).contentShape(Rectangle())
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(done ? "Unpack \(entry.title)" : "Pack \(entry.title)")
+            }
+            NavigationLink { TripEntryDetailView(entry: entry) } label: {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.title).font(.wbItem)
+                    Text(entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
+                    if entry.unlinked && entry.item == nil { Text("Its item was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                    if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
+                }
+            }
+        }
     }
     private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
 }
@@ -347,17 +470,17 @@ struct TripEntryAdder: View {
     @State private var error: String?
     var body: some View {
         Form {
-            Picker("Belonging", selection: $itemID) { Text("Free-text row").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
-            if itemID == nil { TextField("Row name", text: $name) }
+            Picker("Item", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            if itemID == nil { TextField("Name, like Sunglasses", text: $name) }
         }
-        .groundBackground().navigationTitle("Add trip row").navigationBarTitleDisplayMode(.inline)
+        .groundBackground().navigationTitle("Add something to pack").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
                 do { try store.addTripEntry(trip, name: name, item: store.items.first { $0.id == itemID }); dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
         }
-        .alert("Could not add row", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't add it", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -375,9 +498,9 @@ struct TripEntryDetailView: View {
         let _ = store.revision
         List {
             Section {
-                Text("\(entry.packedCount) packed / \(entry.requiredCount) needed")
+                Text("\(entry.packedCount) of \(entry.requiredCount) packed")
                 Text(entry.item?.place?.path ?? "Anywhere").foregroundStyle(Theme.secondary)
-                if let item = entry.item { NavigationLink("View belonging") { ItemDetailView(item: item) } }
+                if let item = entry.item { NavigationLink("Open \(item.name)") { ItemDetailView(item: item) } }
             }
             if entry.trip?.state == .packing {
                 Section("Packing") {
@@ -392,11 +515,11 @@ struct TripEntryDetailView: View {
                     Button("Use kit rule") { attempt { try store.setTripQuantity(entry, override: nil); quantity = entry.requiredCount } }
                     Text("Changing quantities does not erase the number already packed.").font(.caption).foregroundStyle(Theme.secondary)
                 }
-                Section { Button("Remove row", role: .destructive) { deleting = true } }
+                Section { Button("Remove from this trip", role: .destructive) { deleting = true } }
             }
             if entry.trip?.state == .comingHome && entry.packedCount > 0 {
                 Section("Coming home") {
-                    Text("Resolution: \(entry.resolutionRaw)")
+                    Text(entry.resolution?.title ?? "")
                     if entry.item?.archived == true {
                         Button("Confirm already returned / archived") { attempt { try store.resolveHome(entry, resolution: .noLongerHere) } }
                     } else {
@@ -407,13 +530,13 @@ struct TripEntryDetailView: View {
                         }
                     }
                     Button("Leave unresolved for now") { attempt { try store.resolveHome(entry, resolution: .unresolved) } }
-                    Text("Unresolved rows stay on this checklist. Resolve them before finishing coming home.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("Anything left for later stays on this list. Sort it before you finish the trip.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }
         .groundBackground().navigationTitle(entry.title).navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Remove this row and its packing allocation? The belonging's home location will not change.", isPresented: $deleting, titleVisibility: .visible) { Button("Remove row", role: .destructive) { attempt { try store.deleteTripEntry(entry); dismiss() } } }
-        .alert("Could not update row", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .confirmationDialog("Remove it from this trip? Where it lives doesn't change.", isPresented: $deleting, titleVisibility: .visible) { Button("Remove", role: .destructive) { attempt { try store.deleteTripEntry(entry); dismiss() } } }
+        .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
     private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
 }

@@ -9,7 +9,7 @@ struct PlacesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if store.places.isEmpty {
-                    LibraryEmptyState(title: "Where do you keep things?", systemImage: "shippingbox", description: "Add a room, then the drawers, shelves and boxes inside it.")
+                    LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
                     Text("Quick start").font(.wbLabel).foregroundStyle(Theme.secondary).textCase(.uppercase)
                     FlowLayout(spacing: 8) {
                         ForEach(starters, id: \.self) { name in

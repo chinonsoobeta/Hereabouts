@@ -177,3 +177,17 @@ struct BackupFilesView: View {
         Toggle(title, isOn: Binding(get: { selectedFiles.contains(id) }, set: { if $0 { selectedFiles.insert(id) } else { selectedFiles.remove(id) } }))
     }
 }
+
+/// Gear button that opens Settings from any tab.
+private struct SettingsButton: ViewModifier {
+    @State private var open = false
+    func body(content: Content) -> some View {
+        content
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { open = true } } }
+            .sheet(isPresented: $open) { NavigationStack { LibrarySettingsView() } }
+    }
+}
+
+extension View {
+    func settingsButton() -> some View { modifier(SettingsButton()) }
+}

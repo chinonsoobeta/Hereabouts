@@ -25,7 +25,7 @@ struct ScanView: View {
 
     var body: some View {
         Form {
-            Section("1. Read a document") {
+            Section("Read a receipt or label") {
                 Button("Scan with camera", systemImage: "doc.viewfinder") { camera = true }.disabled(!VNDocumentCameraViewController.isSupported || processing)
                 PhotosPicker(selection: $photo, matching: .images) { Label("Choose a photo", systemImage: "photo") }.disabled(processing)
                 Button("Import PDF or image", systemImage: "doc.badge.plus") { importing = true }.disabled(processing)
@@ -33,7 +33,7 @@ struct ScanView: View {
                 if processing { ProgressView("Reading on this device…") }
             }
             if let draft {
-                Section("2. Review the source") {
+                Section("Check the dates") {
                     if let preview = draft.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 220) }
                     DisclosureGroup("Recognized text (not saved)") { Text(draft.text.isEmpty ? "No text was recognized." : draft.text).font(.caption).textSelection(.enabled) }
                     if draft.candidates.isEmpty { Text("No complete date was found. Enter the date manually in the next step.") }
@@ -50,9 +50,9 @@ struct ScanView: View {
                         }
                     }
                     Button("Enter a different date manually") { candidateID = nil }
-                    Text("Nothing is scheduled until you confirm the final date.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("A purchase date isn't a return deadline. You'll confirm the date type next, and nothing is scheduled until you do.").font(.caption).foregroundStyle(Theme.secondary)
                 }
-                Section("3. Link one item") {
+                Section("Which item is it for?") {
                     Picker("Existing item", selection: $itemID) {
                         Text("Choose an item").tag(nil as UUID?)
                         ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) }
@@ -65,7 +65,7 @@ struct ScanView: View {
                     Button("Review and confirm date") { nameFocused = false; review = true }.disabled(itemID == nil)
                 }
             }
-            Section { Text("Reading happens on your device. Originals are kept only if you choose that in the final review. A purchase date alone does not establish a return deadline.").font(.caption).foregroundStyle(Theme.secondary) }
+            Section { Text("Everything is read on your iPhone. You'll confirm the dates before anything is saved.").font(.caption).foregroundStyle(Theme.secondary) }
         }
         .groundBackground().navigationTitle("Scan a document").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
