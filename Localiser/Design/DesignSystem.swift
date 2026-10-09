@@ -1,29 +1,37 @@
 import SwiftUI
 import UIKit
 
-// Tokens and building blocks from the Wherebox design canvas ("Wherebox · look and feel").
-// Every colour has a dark-mode partner chosen to keep text pairs at 4.5:1 or better.
+// Paper and ink tokens from the binding notebook direction (plan section 10.2).
 enum Theme {
     private static func adaptive(_ light: UInt32, _ dark: UInt32) -> Color {
         Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: dark) : UIColor(hex: light) })
     }
-    /// Wherebox purple. Tint for links, icons and active tab.
-    static let purple = adaptive(0x6B4FBB, 0xC2A6FA)
-    /// Solid fill behind white text: buttons, progress card, add button.
-    static let purpleFill = adaptive(0x6B4FBB, 0x7C5CC9)
-    /// Purple ink: text on lavender tints.
-    static let purpleInk = adaptive(0x5B3FA6, 0xD3C4F7)
-    static let lilac = adaptive(0xD9CEF0, 0x3A3050)
-    static let mist = adaptive(0xEDE7F6, 0x2C2340)
-    static let ground = adaptive(0xF7F4FB, 0x17121F)
-    static let card = adaptive(0xFFFFFF, 0x221B2E)
-    static let ink = adaptive(0x2A2140, 0xF1ECF9)
-    static let secondary = adaptive(0x5A5270, 0xBDB5CC)
-    static let apricot = adaptive(0xFCE9DC, 0x3D2A1E)
-    static let apricotInk = adaptive(0x9A4A17, 0xF6B98A)
-    static let sage = adaptive(0xDCEFE4, 0x1E3328)
-    static let sageInk = adaptive(0x2F6B4A, 0x8FD1A8)
-    static let warning = adaptive(0x8C4705, 0xFCBA6B)
+    static let paper = adaptive(0xF6F1E9, 0x17131F)
+    static let lilacPaper = adaptive(0xECE5F3, 0x2A2340)
+    static let highlighter = adaptive(0xE6DBF7, 0x3A3150)
+    static let ink = adaptive(0x241B3D, 0xF1EBF7)
+    static let purpleInk = adaptive(0x5B3DB8, 0xB59CF5)
+    static let deepInk = adaptive(0x3B2A7A, 0xB59CF5)
+    static let pencil = adaptive(0x655C7A, 0xB5ABC9)
+    static let rule = adaptive(0xD9D0E6, 0x3A3150)
+    static let leader = adaptive(0xB4A9C7, 0x5A4F78)
+    static let amber = adaptive(0x9A4A14, 0xE8A772)
+    static let green = adaptive(0x2E6B3F, 0x8BD1A0)
+
+    // Existing component roles use the new palette during the sequential screen restyle.
+    static let purple = purpleInk
+    // Existing solid buttons and progress cards have white text in both appearances.
+    static let purpleFill = Color(uiColor: UIColor(hex: 0x5B3DB8))
+    static let lilac = lilacPaper
+    static let mist = highlighter
+    static let ground = paper
+    static let card = paper
+    static let secondary = pencil
+    static let apricot = lilacPaper
+    static let apricotInk = amber
+    static let sage = lilacPaper
+    static let sageInk = green
+    static let warning = amber
 }
 
 extension UIColor {
@@ -32,27 +40,31 @@ extension UIColor {
     }
 }
 
-// Display type is Bricolage Grotesque and body type is Figtree. Both scale with Dynamic Type.
-// If the font files are not bundled, Font.custom falls back to the system face at the same size and weight.
+// Bundled faces, scaled against semantic text styles for Dynamic Type.
 extension Font {
-    static let wbDisplay = Font.custom("Bricolage Grotesque", size: 34, relativeTo: .largeTitle).weight(.bold)
-    static let wbTitle = Font.custom("Bricolage Grotesque", size: 20, relativeTo: .title3).weight(.medium)
-    static let wbBody = Font.custom("Figtree", size: 16, relativeTo: .body)
-    static let wbItem = Font.custom("Figtree", size: 16, relativeTo: .body).weight(.semibold)
-    static let wbCaption = Font.custom("Figtree", size: 13, relativeTo: .footnote).weight(.medium)
-    static let wbLabel = Font.custom("Figtree", size: 13, relativeTo: .footnote).weight(.semibold)
+    private static func notebook(_ name: String, size: CGFloat, relativeTo style: Font.TextStyle, serif: Bool = false) -> Font {
+        let face = UIFont(name: name, size: size) != nil ? name : (serif ? "Georgia" : UIFont.systemFont(ofSize: size).fontName)
+        return .custom(face, size: size, relativeTo: style)
+    }
+    static let wbDisplay = notebook("Fraunces-Regular", size: 36, relativeTo: .largeTitle, serif: true).weight(.medium)
+    static let wbTitle = notebook("Fraunces-Regular", size: 24, relativeTo: .title2, serif: true).weight(.medium)
+    static let wbBody = notebook("AtkinsonHyperlegible-Regular", size: 17, relativeTo: .body)
+    static let wbItem = notebook("Fraunces-Regular", size: 19, relativeTo: .body, serif: true).weight(.medium)
+    static let wbCaption = notebook("AtkinsonHyperlegible-Regular", size: 13, relativeTo: .footnote).weight(.medium)
+    static let wbLabel = notebook("AtkinsonHyperlegible-Bold", size: 11, relativeTo: .footnote)
 
     static func appearanceFont(_ name: String, size: CGFloat, weight: UIFont.Weight, style: UIFont.TextStyle) -> UIFont {
-        let base = UIFont(name: name, size: size) ?? .systemFont(ofSize: size, weight: weight)
-        return UIFontMetrics(forTextStyle: style).scaledFont(for: base)
+        let base = UIFont(name: name, size: size) ?? UIFont(name: "Georgia", size: size) ?? .systemFont(ofSize: size, weight: weight)
+        let descriptor = base.fontDescriptor.addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: weight]])
+        return UIFontMetrics(forTextStyle: style).scaledFont(for: UIFont(descriptor: descriptor, size: size))
     }
 }
 
 enum Appearance {
     @MainActor static func apply() {
         let bar = UINavigationBar.appearance()
-        bar.largeTitleTextAttributes = [.font: Font.appearanceFont("BricolageGrotesque-Bold", size: 34, weight: .bold, style: .largeTitle), .foregroundColor: UIColor(Theme.ink)]
-        bar.titleTextAttributes = [.font: Font.appearanceFont("BricolageGrotesque-Medium", size: 17, weight: .semibold, style: .headline), .foregroundColor: UIColor(Theme.ink)]
+        bar.largeTitleTextAttributes = [.font: Font.appearanceFont("Fraunces-Regular", size: 36, weight: .medium, style: .largeTitle), .foregroundColor: UIColor(Theme.ink)]
+        bar.titleTextAttributes = [.font: Font.appearanceFont("Fraunces-Regular", size: 20, weight: .medium, style: .headline), .foregroundColor: UIColor(Theme.ink)]
     }
 }
 

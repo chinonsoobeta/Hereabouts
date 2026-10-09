@@ -41,5 +41,14 @@
 	<array>
 		<string>com.apple.corespotlightitem</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AtkinsonHyperlegible-Bold.ttf</string>
+		<string>AtkinsonHyperlegible-BoldItalic.ttf</string>
+		<string>AtkinsonHyperlegible-Italic.ttf</string>
+		<string>AtkinsonHyperlegible-Regular.ttf</string>
+		<string>Fraunces-Italic[SOFT,WONK,opsz,wght].ttf</string>
+		<string>Fraunces[SOFT,WONK,opsz,wght].ttf</string>
+	</array>
 </dict>
 </plist>

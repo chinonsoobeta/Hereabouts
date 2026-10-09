@@ -427,3 +427,24 @@ Results: focused audits **2/2 passed**, no skips, exit 0. Full iPhone 17/iOS 26.
 Exported focused-run screenshots to `/private/tmp/Hereabouts-handoff-contrast-attachments`. Inspected Due/Packing empty states: both exempted sentences are readable dark ink on white; retained the inherited exemptions without adding any. Inspected the Settings footer screenshot; this default-size run alone does not establish maximum-size scaling. The inherited Dynamic Type footer/navigation exemptions remain. Accessibility XXXL, dark mode and physical VoiceOver remain checks for section 10.8.6 and the owner matrix.
 
 Both synthetic OCR/PDF fixtures were present on the test simulator. `git diff --check` passed. No physical device installation or external publishing was performed.
+
+## Phase 3.5 — 10.8.1 fonts and tokens (9 October 2026)
+
+Bundled the Google Fonts Fraunces variable roman/italic and Atkinson Hyperlegible family, including both unmodified SIL OFL 1.1 licences, in `Localiser/Design/Fonts`. Source: `https://github.com/google/fonts/tree/main/ofl/fraunces` and `https://github.com/google/fonts/tree/main/ofl/atkinsonhyperlegible`. Registered six TTF files through `UIAppFonts` in `project.yml`; ran `xcodegen generate` and included the generated project and Info.plist. Built-app font bytes match the downloaded sources. CoreText verified the PostScript names and automatic Fraunces optical sizes 19/24/36.
+
+`DesignSystem.swift` now defines all section 10.2 light/night tokens and the Fraunces / Atkinson type scale with `relativeTo:`. Georgia/system fallbacks remain. Existing component role names reference the new tokens so this step does not change navigation, layouts, copy, data or features. The existing white-text solid buttons retain dark purple fill in both appearances until component restyling; this avoids white on the night palette's pale purple.
+
+Initial full run `/private/tmp/Hereabouts-fonts-full-20261009.xcresult` **failed**, exit 65: typography flagged the 11-point QUICK START label and three Pro captions. Inspected screenshots, then corrected shared label scaling (Footnote reference) and restored the previous caption weight. No audit exemption or skip was added. Focused typography rerun `/private/tmp/Hereabouts-fonts-typography-fix1-20261009.xcresult` **passed**, one test, exit 0.
+
+Final commands:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=B8B1FAFF-A20B-443F-9AA2-9D5A86987F23' -derivedDataPath DerivedData/Audit -resultBundlePath /private/tmp/Hereabouts-fonts-full-final-20261009.xcresult -jobs 10 -parallel-testing-enabled NO test > /private/tmp/Hereabouts-fonts-full-final-20261009.log 2>&1
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=74ED4118-BA51-47FA-9F21-17AB21E41D0D' -derivedDataPath DerivedData/Audit27 -resultBundlePath /private/tmp/Hereabouts-fonts-units27-final-20261009.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserTests test > /private/tmp/Hereabouts-fonts-units27-final-20261009.log 2>&1
+```
+
+Final results: **8/8 UI passed** on iPhone 17 / iOS 26.5; units **26 passed, 3 existing skips, 0 failures** (29 total). Full run exit 0. Separate iOS 27 units **29/29 passed**, no skips, exit 0. The full result retains two “Invalid frame dimension (negative or non-finite)” warnings. The iOS 27 result also reports a StoreKit transaction-listener warning from the unit-test source. These are not test failures and remain unresolved; they do not establish a production defect or a clean runtime.
+
+Exported final typography screenshots to `/private/tmp/Hereabouts-fonts-final-attachments` and inspected Pro. The font/paper change is visible; the floating cards remain intentionally for the next component step. Existing audit exemptions are unchanged. `git diff --check` passed. Maximum text, night-mode completion, iPad and store screenshots are still pending. Local artboard browser inspection is unverified: the browser tool rejected the `file://` protocol. HTML copy and CSS were read directly.
+
+Next plan row: **10.8.2 — lists and rows across Find, Places, Thing, Due and Trips**. Steps 10.8.2–6 and remaining phase 3 work are not complete.
