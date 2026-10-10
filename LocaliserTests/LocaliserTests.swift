@@ -250,6 +250,29 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(plan.title, "Expires: Drill")
         XCTAssertEqual(plan.alarmOffset, 9 * 3600 - 86_400)
         XCTAssertTrue(plan.notes.hasPrefix("Receipt"))
+        XCTAssertEqual(plan.end, plan.start, "An all-day event that ends at the next midnight covers two days.")
+        XCTAssertEqual(CalendarExport.summary(added: 1, skipped: 0), "Added 1 date to your calendar.")
+        XCTAssertEqual(CalendarExport.summary(added: 3, skipped: 2), "Added 3 dates to your calendar. 2 were added before.")
+        XCTAssertTrue(CalendarExport.summary(added: 0, skipped: 4).hasPrefix("These dates were added before."))
+    }
+
+    @MainActor func testAddingAllToCalendarSkipsDatesAddedBefore() async throws {
+        let suite = "calendar-export-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Kettle")
+        let ahead = try XCTUnwrap(CalendarDay(.now).adding(days: 5))
+        let soon = try store.setDeadline(item: item, kind: .returns, day: ahead, source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
+        try store.setDeadline(item: item, kind: .warranty, day: XCTUnwrap(CalendarDay(.now).adding(days: -5)), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        let upcoming = CalendarExport.upcoming(store.deadlines)
+        XCTAssertEqual(upcoming.map(\.id), [soon.id], "Passed dates stay out of the calendar.")
+        CalendarExport.remember([CalendarExport.exportKey(soon)], defaults: defaults)
+        // Every date was added before, so nothing is written and no calendar access is asked for.
+        let result = try await CalendarExport.addAll(upcoming, defaults: defaults)
+        XCTAssertEqual(result.added, 0); XCTAssertEqual(result.skipped, 1)
+        try store.setDeadline(item: item, kind: .returns, day: XCTUnwrap(ahead.adding(days: 1)), source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true, existing: soon)
+        XCTAssertFalse((defaults.stringArray(forKey: CalendarExport.exportedKey) ?? []).contains(CalendarExport.exportKey(soon)), "A moved date can be added again.")
     }
 
     func testCSVQuotesMultilineTextAndNeutralizesFormulaPrefixes() throws {

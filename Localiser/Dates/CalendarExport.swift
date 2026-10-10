@@ -22,7 +22,8 @@ enum CalendarExport {
 
     static func plan(for deadline: Deadline) -> EventPlan? {
         guard let day = deadline.day, let start = day.date(hour: 0) else { return nil }
-        let end = Calendar.current.date(byAdding: .day, value: 1, to: start) ?? start
+        // An all-day event ends on its own day. Ending at the next midnight makes it a two-day event.
+        let end = start
         let kind = deadline.kind ?? .returns
         // Alert at the person's chosen hour on the day before (or on the day when there is no lead time).
         let leadDays = min(Int(deadline.leadDays), 1)
@@ -43,21 +44,49 @@ enum CalendarExport {
         return event
     }
 
-    /// Saves events for every deadline straight to the default calendar. Returns how many were added.
-    static func addAll(_ deadlines: [Deadline]) async throws -> Int {
+    /// Dates still ahead that are worth putting in a calendar.
+    static func upcoming(_ deadlines: [Deadline], today: CalendarDay = CalendarDay(.now)) -> [Deadline] {
+        deadlines.filter { $0.active && ($0.day.map { $0 >= today } ?? false) }
+    }
+
+    /// Write-only access can't see what is already in the calendar, so Hereabouts remembers each
+    /// date it added, by id and day. Moving a date to another day lets it be added again.
+    nonisolated static let exportedKey = "calendarExportedDates"
+    static func exportKey(_ deadline: Deadline) -> String { "\(deadline.id.uuidString)|\(deadline.dayString)" }
+    nonisolated static func remember(_ keys: [String], defaults: UserDefaults = .standard) {
+        let known = Set(defaults.stringArray(forKey: exportedKey) ?? [])
+        defaults.set(Array(known.union(keys)).sorted(), forKey: exportedKey)
+    }
+
+    /// Saves events straight to the default calendar, skipping dates added before.
+    static func addAll(_ deadlines: [Deadline], defaults: UserDefaults = .standard) async throws -> (added: Int, skipped: Int) {
+        let known = Set(defaults.stringArray(forKey: exportedKey) ?? [])
+        let fresh = deadlines.filter { !known.contains(exportKey($0)) && plan(for: $0) != nil }
+        let skipped = deadlines.count - fresh.count
+        guard !fresh.isEmpty else { return (0, skipped) }
         let store = EKEventStore()
         guard try await store.requestWriteOnlyAccessToEvents() else { throw CalendarError.denied }
         guard let calendar = store.defaultCalendarForNewEvents else { throw CalendarError.noCalendar }
-        var added = 0
-        for deadline in deadlines {
+        var keys = [String]()
+        for deadline in fresh {
             guard let plan = plan(for: deadline) else { continue }
             let event = makeEvent(plan, in: store)
             event.calendar = calendar
             try store.save(event, span: .thisEvent, commit: false)
-            added += 1
+            keys.append(exportKey(deadline))
         }
         try store.commit()
-        return added
+        remember(keys, defaults: defaults)
+        return (keys.count, skipped)
+    }
+
+    static func summary(added: Int, skipped: Int) -> String {
+        if added == 0 {
+            return skipped == 0 ? "There are no dates ahead to add." : "These dates were added before. To add one again, open it and choose Add to Calendar."
+        }
+        let first = added == 1 ? "Added 1 date to your calendar." : "Added \(added) dates to your calendar."
+        if skipped == 0 { return first }
+        return first + (skipped == 1 ? " 1 was added before." : " \(skipped) were added before.")
     }
 
     enum CalendarError: LocalizedError {

@@ -79,6 +79,7 @@ struct LeavingView: View {
     @State private var erasePhrase = ""
     @State private var error: String?
     @State private var notice: String?
+    @State private var addingDates = false
 
     private var libraryIsEmpty: Bool { store.items.isEmpty && store.places.isEmpty && store.deadlines.isEmpty && store.kits.isEmpty && store.trips.isEmpty }
     private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count + store.items.flatMap(\.scans).filter { $0.data != nil }.count }
@@ -103,13 +104,17 @@ struct LeavingView: View {
                         optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
                     Button {
+                        addingDates = true
                         Task {
-                            do { let count = try await CalendarExport.addAll(store.deadlines.filter(\.active)); notice = "\(count) dates added to Calendar." }
-                            catch { self.error = error.localizedDescription }
+                            defer { addingDates = false }
+                            do {
+                                let result = try await CalendarExport.addAll(CalendarExport.upcoming(store.deadlines))
+                                notice = CalendarExport.summary(added: result.added, skipped: result.skipped)
+                            } catch { self.error = error.localizedDescription }
                         }
                     } label: {
                         optionLabel("Put dates in your calendar", "Returns, warranties and expiry dates keep reminding you after the app is gone.", "calendar")
-                    }.accessibilityLabel("Put dates in your calendar")
+                    }.accessibilityLabel("Put dates in your calendar").disabled(addingDates)
                 }.buttonStyle(.plain)
                 Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)

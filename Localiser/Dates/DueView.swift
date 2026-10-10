@@ -73,7 +73,7 @@ struct DueView: View {
             reminders.openedDeadline = nil
         }
         .sheet(item: $calendarFor) { CalendarEventEditor(deadline: $0) }
-        .alert("Added to Calendar", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) { Button("OK") { notice = nil } } message: { Text(notice ?? "") }
+        .alert("Calendar", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) { Button("OK") { notice = nil } } message: { Text(notice ?? "") }
         .sheet(isPresented: $addDate) { NavigationStack {
             List {
                 if store.items.filter({ !$0.archived }).isEmpty {
@@ -133,10 +133,7 @@ struct DueView: View {
         do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription }
     }
 
-    private var upcoming: [Deadline] {
-        let today = CalendarDay(.now)
-        return store.deadlines.filter { $0.active && ($0.day.map { $0 >= today } ?? false) }
-    }
+    private var upcoming: [Deadline] { CalendarExport.upcoming(store.deadlines) }
 
     private var coverageSummary: String {
         switch reminders.permission {
@@ -155,8 +152,8 @@ struct DueView: View {
     private func addAllToCalendar() async {
         addingAll = true; defer { addingAll = false }
         do {
-            let added = try await CalendarExport.addAll(upcoming)
-            notice = added == 1 ? "1 date was added to your default calendar." : "\(added) dates were added to your default calendar."
+            let result = try await CalendarExport.addAll(upcoming)
+            notice = CalendarExport.summary(added: result.added, skipped: result.skipped)
         } catch { self.error = error.localizedDescription }
     }
 }
@@ -349,7 +346,7 @@ struct DeadlineDetailView: View {
 struct CalendarEventEditor: UIViewControllerRepresentable {
     @Environment(\.dismiss) private var dismiss
     let deadline: Deadline
-    func makeCoordinator() -> Coordinator { Coordinator(dismiss: { dismiss() }) }
+    func makeCoordinator() -> Coordinator { Coordinator(key: CalendarExport.exportKey(deadline), dismiss: { dismiss() }) }
     func makeUIViewController(context: Context) -> EKEventEditViewController {
         let controller = EKEventEditViewController()
         let eventStore = EKEventStore()
@@ -361,8 +358,13 @@ struct CalendarEventEditor: UIViewControllerRepresentable {
     }
     func updateUIViewController(_ uiViewController: EKEventEditViewController, context: Context) {}
     final class Coordinator: NSObject, EKEventEditViewDelegate {
+        let key: String
         let dismiss: () -> Void
-        init(dismiss: @escaping () -> Void) { self.dismiss = dismiss }
-        func eventEditViewController(_ controller: EKEventEditViewController, didCompleteWith action: EKEventEditViewAction) { dismiss() }
+        init(key: String, dismiss: @escaping () -> Void) { self.key = key; self.dismiss = dismiss }
+        func eventEditViewController(_ controller: EKEventEditViewController, didCompleteWith action: EKEventEditViewAction) {
+            // Remembered so "Add all to Calendar" doesn't add this date a second time.
+            if action == .saved { CalendarExport.remember([key]) }
+            dismiss()
+        }
     }
 }
