@@ -3,7 +3,10 @@ import XCTest
 
 @MainActor
 final class IntentsTests: XCTestCase {
-    override func tearDown() { IntentLibrary.store = nil; super.tearDown() }
+    nonisolated override func tearDown() async throws {
+        await MainActor.run { IntentLibrary.store = nil }
+        try await super.tearDown()
+    }
 
     func testWhereIsAnswersFromTheNotebook() throws {
         let store = try LocaliserStore(inMemory: true)
@@ -15,7 +18,22 @@ final class IntentsTests: XCTestCase {
         XCTAssertEqual(FindThingIntent.answer(for: passport), "Passport is in Hall closet › Top shelf.")
         XCTAssertEqual(FindThingIntent.answer(for: loose), "Torch is written down, but without a place yet.")
         try store.setArchived(passport, true)
-        XCTAssertTrue(FindThingIntent.answer(for: passport).hasPrefix("Passport is archived."))
+        XCTAssertEqual(FindThingIntent.answer(for: passport), "Passport is archived. It was last in Hall closet › Top shelf.")
+        try store.setArchived(loose, true)
+        XCTAssertEqual(FindThingIntent.answer(for: loose), "Torch is archived.")
+    }
+
+    func testWhatsDueReadsDatesAloud() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let today = CalendarDay(.now)
+        XCTAssertEqual(WhatsDueIntent.answer(for: [], today: today), "Nothing is due in the next month.")
+        let kettle = try store.addItem(name: "Kettle")
+        try store.setDeadline(item: kettle, kind: .warranty, day: XCTUnwrap(today.adding(days: 1)), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        let shoes = try store.addItem(name: "Running shoes")
+        try store.setDeadline(item: shoes, kind: .returns, day: today, source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
+        XCTAssertEqual(WhatsDueIntent.answer(for: store.deadlines, today: today), "Running shoes: last day to return is today. Kettle: warranty ends tomorrow.")
+        let later = try XCTUnwrap(today.adding(days: 9))
+        XCTAssertFalse(later.spoken(today: today).contains(later.formatted), "Spoken dates use whole words, not \"Sun 11 Oct\".")
     }
 
     func testThingQueryMatchesNamesAndAliasesButNotArchived() async throws {
@@ -34,7 +52,7 @@ final class IntentsTests: XCTestCase {
         let store = try LocaliserStore(inMemory: true)
         IntentLibrary.store = store
         let garage = try store.addPlace(name: "Garage")
-        var intent = AddThingIntent()
+        let intent = AddThingIntent()
         intent.name = "Drill"
         intent.place = PlaceEntity(id: garage.id, path: garage.path)
         _ = try await intent.perform()
@@ -46,7 +64,7 @@ final class IntentsTests: XCTestCase {
         let store = try LocaliserStore(inMemory: true)
         IntentLibrary.store = store
         for index in 0..<CreationKind.item.freeLimit { _ = try store.addItem(name: "Thing \(index)") }
-        var intent = AddThingIntent()
+        let intent = AddThingIntent()
         intent.name = "One too many"
         do {
             _ = try await intent.perform()

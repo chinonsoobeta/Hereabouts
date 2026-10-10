@@ -275,7 +275,9 @@ struct PlaceBreadcrumb: View {
     var body: some View {
         if let path, !path.isEmpty {
             let parts = path.components(separatedBy: " › ")
-            (Text(parts.dropLast().map { $0 + " › " }.joined()).foregroundStyle(Theme.secondary) + Text(parts.last ?? "").foregroundStyle(Theme.ink).fontWeight(.semibold))
+            let containers = Text(parts.dropLast().map { $0 + " › " }.joined()).foregroundStyle(Theme.secondary)
+            let last = Text(parts.last ?? "").foregroundStyle(Theme.ink).fontWeight(.semibold)
+            Text("\(containers)\(last)")
                 .font(.wbCaption)
                 .accessibilityLabel(path)
         } else {

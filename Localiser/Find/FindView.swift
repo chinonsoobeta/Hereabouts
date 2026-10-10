@@ -435,17 +435,18 @@ struct ItemDetailView: View {
                                     .accessibilityIdentifier("item.move")
                                     .popoverTip(MoveTip())
                                 if putAway {
-                                    Button("Confirm put away here") {
+                                    Button("Put away here") {
                                         do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.localizedDescription }
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
                             if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
-                            if confirmedPutAway { Label("Put away. Nice.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
+                            if confirmedPutAway { Label("Put away.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                         }
                         .card()
                         if !item.notes.isEmpty { Text(item.notes) }
-                        if !item.aliases.isEmpty { Text("Also called: \(item.aliases.replacingOccurrences(of: "\n", with: ", "))").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                        let otherNames = item.aliases.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                        if !otherNames.isEmpty { Text("Also called: \(otherNames.joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     }.plainRow()
                 }
                 if !item.packedTrips.isEmpty {

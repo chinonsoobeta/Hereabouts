@@ -86,7 +86,7 @@ enum Rituals {
     /// The recap that is currently on offer: this week's from Sunday 18:00, otherwise last week's.
     static func recapWeekKey(now: Date = .now, calendar: Calendar = .current) -> String {
         let start = weekStart(of: now, calendar: calendar)
-        let ready = calendar.date(byAdding: .hour, value: 18, to: start) ?? start
+        let ready = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: start) ?? start
         let week = now >= ready ? start : weekStart(of: calendar.date(byAdding: .day, value: -4, to: start) ?? start, calendar: calendar)
         let parts = calendar.dateComponents([.year, .month, .day], from: week)
         return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)

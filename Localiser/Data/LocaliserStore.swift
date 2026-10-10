@@ -16,7 +16,7 @@ enum LocaliserError: LocalizedError, Equatable {
         case .invalidReminder: "Choose a valid reminder time and lead time."
         case .closedReturn: "Choose to reopen this return decision before editing it."
         case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
-        case .invalidTripDates: "The return date must be on or after the departure date."
+        case .invalidTripDates: "Come home on or after the day you leave."
         case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
         case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
         case .unresolvedHome: "Say where the rest of the things went before finishing coming home."

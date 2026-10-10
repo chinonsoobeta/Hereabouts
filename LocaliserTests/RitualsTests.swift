@@ -168,6 +168,10 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 11, 17), calendar: calendar), "2026-10-04")
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 11, 18), calendar: calendar), "2026-10-11")
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 17, 23), calendar: calendar), "2026-10-11")
+        // Sunday 25 October 2026, when the clocks go back: still last week's at 17:30, this week's from 18:00.
+        let clocksBack = calendar.date(from: DateComponents(year: 2026, month: 10, day: 25, hour: 17, minute: 30))!
+        XCTAssertEqual(Rituals.recapWeekKey(now: clocksBack, calendar: calendar), "2026-10-18")
+        XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 25, 18), calendar: calendar), "2026-10-25")
     }
 
     func testHomeNameReadsNaturallyMidSentence() {

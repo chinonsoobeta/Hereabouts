@@ -10,21 +10,17 @@ struct PlacesView: View {
             VStack(alignment: .leading, spacing: 16) {
                 if store.places.isEmpty {
                     LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
-                    Text("Quick start").font(.wbLabel).foregroundStyle(Theme.secondary).textCase(.uppercase)
-                    FlowLayout(spacing: 8) {
-                        ForEach(starters, id: \.self) { name in
-                            Button { addStarter(name) } label: { Label(name, systemImage: "plus").font(.wbItem) }
-                                .buttonStyle(SoftButtonStyle(compact: true))
-                        }
-                    }
+                    quickStart(starters)
                     Button("Add a place") { adding = true }.buttonStyle(PrimaryButtonStyle())
                 } else {
                     VStack(spacing: 0) {
-                        ForEach(store.places.filter { $0.parent == nil }) { place in
+                        ForEach(rooms) { place in
                             NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
                         }
                         NewPlaceTile { adding = true }
                     }
+                    // Quick start stays for the first few rooms, so more than one can be picked.
+                    if rooms.count < 3, !unusedStarters.isEmpty { quickStart(unusedStarters) }
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
@@ -33,6 +29,19 @@ struct PlacesView: View {
         .toolbar { Button("Add place", systemImage: "plus") { adding = true } }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor() } }
         .alert("Couldn't add that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    private var rooms: [Place] { store.places.filter { $0.parent == nil } }
+    private var unusedStarters: [String] { starters.filter { name in !rooms.contains { $0.name.localizedCaseInsensitiveCompare(name) == .orderedSame } } }
+
+    @ViewBuilder private func quickStart(_ names: [String]) -> some View {
+        Text("Quick start").font(.wbLabel).foregroundStyle(Theme.secondary).textCase(.uppercase)
+        FlowLayout(spacing: 8) {
+            ForEach(names, id: \.self) { name in
+                Button { addStarter(name) } label: { Label(name, systemImage: "plus").font(.wbItem) }
+                    .buttonStyle(SoftButtonStyle(compact: true))
+            }
+        }
     }
 
     private func addStarter(_ name: String) {
