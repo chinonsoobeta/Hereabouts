@@ -12,21 +12,17 @@ struct DueView: View {
     @State private var addingAll = false
     @State private var notice: String?
     @State private var error: String?
-    /// Grouped as on the Due board: what needs attention this week, what's further off, and what's settled.
-    private let sections = ["Missed", "This week", "Later"]
+    @State private var opened: Deadline?
+    /// True on the Due tab, which opens the date behind a tapped reminder.
+    var opensReminders = false
+    /// Grouped as on the Due board: this week, later and done. Missed appears only when a
+    /// return's last day passed without a decision.
+    private let sections: [DueGroup] = [.missed, .thisWeek, .later]
 
-    private func section(_ deadline: Deadline) -> String {
-        guard let day = deadline.day else { return "Later" }
-        let today = CalendarDay(.now)
-        if day < today { return "Missed" }
-        if let weekOut = today.adding(days: 7), day <= weekOut { return "This week" }
-        return "Later"
-    }
-
-    /// Recently settled dates: decided returns and anything whose day passed in the last month.
+    /// Recently settled dates: decided returns, and warranties and expiries that passed in the last month.
     private var recentlyDone: [Deadline] {
         let monthAgo = CalendarDay(.now).adding(days: -30) ?? CalendarDay(.now)
-        return store.deadlines.filter { !$0.active && $0.item != nil && ($0.day.map { $0 >= monthAgo } ?? false) }
+        return store.deadlines.filter { $0.group == .done && $0.item != nil && ($0.day.map { $0 >= monthAgo } ?? false) }
             .sorted { $0.dayString > $1.dayString }
     }
 
@@ -34,7 +30,7 @@ struct DueView: View {
         let _ = store.revision
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                if !store.deadlines.contains(where: \.active) {
+                if !store.deadlines.contains(where: \.needsAttention) {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack(alignment: .top) {
                             Image(systemName: "calendar.badge.clock").foregroundStyle(Theme.purple).accessibilityHidden(true)
@@ -43,15 +39,14 @@ struct DueView: View {
                         Text("Add a return deadline, warranty end or expiry date to an item. Hereabouts reminds you before it passes.")
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }.card(padding: 16)
-                }
-                if store.deadlines.contains(where: \.active) {
+                } else {
                     coverageCard
                     TipView(CalendarTip()).tipBackground(Theme.card)
                 }
-                ForEach(sections, id: \.self) { heading in dateSection(heading) }
-                let done = showClosed ? store.deadlines.filter { !$0.active }.sorted { $0.dayString > $1.dayString } : Array(recentlyDone.prefix(5))
+                ForEach(sections, id: \.self) { group in dateSection(group) }
+                let done = showClosed ? store.deadlines.filter { $0.group == .done }.sorted { $0.dayString > $1.dayString } : Array(recentlyDone.prefix(5))
                 if !done.isEmpty {
-                    SectionHeading(title: "Done").padding(.top, 8)
+                    SectionHeading(title: DueGroup.done.title).padding(.top, 8)
                     ForEach(done) { deadline in
                         NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
                     }
@@ -64,12 +59,18 @@ struct DueView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu("More", systemImage: "ellipsis.circle") {
                     Button("Add all to Calendar", systemImage: "calendar.badge.plus") { Task { await addAllToCalendar() } }.disabled(upcoming.isEmpty || addingAll)
-                    if store.deadlines.contains(where: { !$0.active }) {
+                    if store.deadlines.contains(where: { $0.group == .done }) {
                         Toggle("Show everything done", systemImage: "checkmark.circle", isOn: $showClosed)
                     }
                 }
             }
             ToolbarItem(placement: .topBarTrailing) { Button("Add date", systemImage: "plus") { addDate = true } }
+        }
+        .navigationDestination(item: $opened) { DeadlineDetailView(deadline: $0) }
+        .onChange(of: reminders.openedDeadline, initial: true) { _, id in
+            guard opensReminders, let id else { return }
+            opened = store.deadlines.first { $0.id == id }
+            reminders.openedDeadline = nil
         }
         .sheet(item: $calendarFor) { CalendarEventEditor(deadline: $0) }
         .alert("Added to Calendar", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) { Button("OK") { notice = nil } } message: { Text(notice ?? "") }
@@ -87,45 +88,45 @@ struct DueView: View {
         .alert("Could not update date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    @ViewBuilder private func dateSection(_ heading: String) -> some View {
-                    let dates = store.deadlines.filter { $0.active && section($0) == heading }.sorted { $0.dayString < $1.dayString }
-                    if !dates.isEmpty {
-                        SectionHeading(title: heading).padding(.top, 8)
-                        ForEach(dates) { deadline in
-                            if deadline.kind == .returns && deadline.decision == .open {
-                                VStack(spacing: 14) {
-                                    NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
-                                        .contextMenu { calendarMenu(deadline) }
-                                    HStack(spacing: 10) {
-                                        Button("Returning it") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
-                                        Button("Keeping it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
-                                    }
-                                }.card()
-                            } else {
-                                NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
-                                    .contextMenu { calendarMenu(deadline) }
-                            }
+    @ViewBuilder private func dateSection(_ group: DueGroup) -> some View {
+        let dates = store.deadlines.filter { $0.group == group }.sorted { $0.dayString < $1.dayString }
+        if !dates.isEmpty {
+            SectionHeading(title: group.title).padding(.top, 8)
+            ForEach(dates) { deadline in
+                if deadline.kind == .returns && deadline.decision == .open {
+                    VStack(spacing: 14) {
+                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
+                            .contextMenu { calendarMenu(deadline) }
+                        HStack(spacing: 10) {
+                            Button("Returning it") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
+                            Button("Keeping it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
                         }
-                    }
-                    }
+                    }.card()
+                } else {
+                    NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
+                        .contextMenu { calendarMenu(deadline) }
+                }
+            }
+        }
+    }
 
     private var coverageCard: some View {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label { Text("Reminders").font(.wbItem) } icon: { Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk) }
-                        .accessibilityAddTraits(.isHeader)
-                    Text(coverageSummary).fixedSize(horizontal: false, vertical: true)
-                    if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
-                        if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue, or add the dates to Calendar.").font(.wbCaption).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true) }
-                    } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
-                        Button("Open notification settings") { UIApplication.shared.open(url) }.buttonStyle(SoftButtonStyle(compact: true))
-                    } else {
-                        Button("Turn on reminders") { Task { await reminders.enable() } }.buttonStyle(PrimaryButtonStyle())
-                    }
-                    if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
-                    Text(ReminderService.showsItemNames ? "Reminders show item names. You can hide them in Settings." : "Item names are hidden in reminders. You can show them in Settings.").font(.wbCaption).foregroundStyle(Theme.secondary)
-                }
-                .foregroundStyle(Theme.ink)
-                .card(padding: 16)
+        VStack(alignment: .leading, spacing: 10) {
+            Label { Text("Reminders").font(.wbItem) } icon: { Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk) }
+                .accessibilityAddTraits(.isHeader)
+            Text(coverageSummary).fixedSize(horizontal: false, vertical: true)
+            if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
+                if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue, or add the dates to Calendar.").font(.wbCaption).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true) }
+            } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
+                Button("Open notification settings") { UIApplication.shared.open(url) }.buttonStyle(SoftButtonStyle(compact: true))
+            } else {
+                Button("Turn on reminders") { Task { await reminders.enable() } }.buttonStyle(PrimaryButtonStyle())
+            }
+            if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
+            Text(ReminderService.showsItemNames ? "Reminders show item names. You can hide them in Settings." : "Item names are hidden in reminders. You can show them in Settings.").font(.wbCaption).foregroundStyle(Theme.secondary)
+        }
+        .foregroundStyle(Theme.ink)
+        .card(padding: 16)
     }
 
     private func decide(_ deadline: Deadline, _ decision: ReturnDecision) {

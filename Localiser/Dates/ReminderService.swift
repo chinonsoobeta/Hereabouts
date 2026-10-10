@@ -13,7 +13,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     }
     /// Actions tapped on a notification before the library finished opening (cold launch).
     @ObservationIgnored private(set) var pendingActions: [(id: UUID, action: String)] = []
-    /// Deadline the person opened from a notification, for the Due soon tab to show.
+    /// Deadline the person opened from a notification. The Due tab opens it, then clears this.
     var openedDeadline: UUID?
     /// Ritual opened from a notification: "recap", "stocktake" or "trip".
     var openedRitual: String?

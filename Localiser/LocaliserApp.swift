@@ -65,7 +65,7 @@ struct RootView: View {
         TabView(selection: $tab) {
             Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.places) { NavigationStack { PlacesView().settingsButton() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.due) { NavigationStack { DueView().settingsButton() } } label: { Label("Due", systemImage: "calendar").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.due) { NavigationStack { DueView(opensReminders: true).settingsButton() } } label: { Label("Due", systemImage: "calendar").environment(\.symbolVariants, .none) }
                 .badge(reminders.coverageGap ? Text("!") : nil)
             Tab(value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
         }
@@ -101,7 +101,8 @@ struct RootView: View {
             if value == .active { do { try store.refresh() } catch { reminders.error = error.localizedDescription }; Task { await pro.refresh() } }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
-            reminders.refresh(store.deadlines)
+            // Midnight or a time-zone change: regroup the dates and requeue reminders (the revision change does both).
+            do { try store.refresh() } catch { reminders.error = error.localizedDescription }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange).receive(on: RunLoop.main)) { _ in
             do { try store.refresh() } catch { reminders.error = error.localizedDescription }

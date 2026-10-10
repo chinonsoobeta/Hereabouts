@@ -27,7 +27,7 @@ struct FindView: View {
 
     private var dueSoon: [Deadline] {
         guard let horizon = CalendarDay(.now).adding(days: 30) else { return [] }
-        return store.deadlines.filter { $0.active && ($0.day.map { $0 <= horizon } ?? false) }.sorted { $0.dayString < $1.dayString }
+        return store.deadlines.filter { $0.needsAttention && ($0.day.map { $0 <= horizon } ?? false) }.sorted { $0.dayString < $1.dayString }
     }
 
 
@@ -176,7 +176,7 @@ struct DueCard: View {
     let deadline: Deadline
     var embedded = false
     var body: some View {
-        let pill = deadline.active ? DueLabel.pill(for: deadline.day) : settledStamp
+        let pill = deadline.group == .done ? settledStamp : DueLabel.pill(for: deadline.day)
         HStack(spacing: 14) {
             IconTile(systemImage: DueLabel.symbol(for: deadline.kind), photo: deadline.item?.photo, size: 48, tone: pill?.1 ?? .neutral)
             VStack(alignment: .leading, spacing: 2) {
@@ -411,7 +411,7 @@ struct ItemDetailView: View {
                             else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
                             else { Stamp(text: "At home", tone: .done) }
                             // The canvas leads with the next date when one is close.
-                            if let next = item.deadlines.filter({ $0.active }).sorted(by: { $0.dayString < $1.dayString }).first,
+                            if let next = item.deadlines.filter(\.needsAttention).sorted(by: { $0.dayString < $1.dayString }).first,
                                let days = DueLabel.days(until: next.day), days <= 30, let pill = DueLabel.pill(for: next.day) {
                                 Stamp(text: "\(next.kind == .returns ? "Return" : next.kind == .warranty ? "Warranty" : "Expires") · \(pill.0)", tone: pill.1)
                             }

@@ -462,6 +462,34 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(ReminderPlan.candidates(many, now: now, calendar: calendar).count, 70)
     }
 
+    func testDueGroupsKeepUndecidedReturnsAndSettlePassedDates() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try XCTUnwrap(TimeZone(identifier: "Europe/London"))
+        let today = try XCTUnwrap(CalendarDay(stored: "2026-10-10"))
+        func group(_ kind: DeadlineKind, _ stored: String, active: Bool = true) -> DueGroup {
+            DueGroup.of(kind: kind, active: active, day: CalendarDay(stored: stored), today: today, calendar: calendar)
+        }
+        XCTAssertEqual(group(.returns, "2026-10-09"), .missed)
+        XCTAssertEqual(group(.warranty, "2026-10-09"), .done)
+        XCTAssertEqual(group(.expiry, "2026-01-01"), .done)
+        XCTAssertEqual(group(.returns, "2026-10-10"), .thisWeek)
+        XCTAssertEqual(group(.warranty, "2026-10-17"), .thisWeek)
+        XCTAssertEqual(group(.expiry, "2026-10-18"), .later)
+        XCTAssertEqual(group(.returns, "2026-10-12", active: false), .done)
+        XCTAssertEqual(group(.warranty, "not a day"), .later)
+
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Drill")
+        let past = try XCTUnwrap(CalendarDay(.now).adding(days: -2))
+        let warranty = try store.setDeadline(item: item, kind: .warranty, day: past, source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        let returns = try store.setDeadline(item: item, kind: .returns, day: past, source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
+        XCTAssertTrue(warranty.active)
+        XCTAssertFalse(warranty.needsAttention, "A passed warranty needs nothing more.")
+        XCTAssertEqual(returns.group, .missed)
+        try store.decide(returns, .keeping)
+        XCTAssertEqual(returns.group, .done)
+    }
+
     func testSystemNotificationQueueCapsCoverageAndRemovesStaleRequests() async throws {
         #if targetEnvironment(simulator)
         let center = UNUserNotificationCenter.current()

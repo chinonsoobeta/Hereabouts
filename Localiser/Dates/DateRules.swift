@@ -49,6 +49,22 @@ enum DeadlineKind: String, CaseIterable, Identifiable, Sendable {
 
 enum ReturnDecision: String, Sendable { case open, keeping, returning, returned }
 
+/// Where a date sits on the Due board.
+enum DueGroup: String, CaseIterable, Sendable {
+    case missed, thisWeek, later, done
+    var title: String { switch self { case .missed: "Missed"; case .thisWeek: "This week"; case .later: "Later"; case .done: "Done" } }
+
+    /// A return stays open after its day until someone says what happened. A warranty or expiry
+    /// that has passed needs nothing more, so it joins Done rather than piling up as missed.
+    static func of(kind: DeadlineKind?, active: Bool, day: CalendarDay?, today: CalendarDay, calendar: Calendar = .current) -> DueGroup {
+        guard active else { return .done }
+        guard let day else { return .later }
+        if day < today { return kind == .returns ? .missed : .done }
+        if let weekOut = today.adding(days: 7, calendar: calendar), day <= weekOut { return .thisWeek }
+        return .later
+    }
+}
+
 struct ReminderInput: Sendable {
     var id: UUID
     var day: CalendarDay

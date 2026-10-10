@@ -83,6 +83,9 @@ final class Deadline: NSManagedObject, Identifiable {
     var decision: ReturnDecision? { ReturnDecision(rawValue: decisionRaw) }
     var day: CalendarDay? { CalendarDay(stored: dayString) }
     var active: Bool { item != nil && item?.archived == false && (kind != .returns || [.open, .returning].contains(decision)) }
+    var group: DueGroup { DueGroup.of(kind: kind, active: active, day: day, today: CalendarDay(.now)) }
+    /// Still asks for something: a date still to come, or a return whose day passed without a decision.
+    var needsAttention: Bool { group != .done }
     var reminderInput: ReminderInput? {
         guard let day, let kind, let decision else { return nil }
         return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision, itemName: item?.name ?? "", itemID: item?.id)
