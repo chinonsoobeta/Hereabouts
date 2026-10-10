@@ -391,10 +391,15 @@ struct ItemDetailView: View {
                             Image(uiImage: image).resizable().scaledToFill().frame(maxWidth: .infinity).frame(height: 220)
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)).accessibilityHidden(true)
                         }
-                        HStack(spacing: 8) {
+                        FlowLayout(spacing: 8) {
                             if item.archived { Stamp(text: "Archived") }
                             else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
                             else { Stamp(text: "At home", tone: .done) }
+                            // The canvas leads with the next date when one is close.
+                            if let next = item.deadlines.filter({ $0.active }).sorted(by: { $0.dayString < $1.dayString }).first,
+                               let days = DueLabel.days(until: next.day), days <= 30, let pill = DueLabel.pill(for: next.day) {
+                                Stamp(text: "\(next.kind == .returns ? "Return" : next.kind == .warranty ? "Warranty" : "Expires") · \(pill.0)", tone: pill.1)
+                            }
                         }
                         Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         VStack(alignment: .leading, spacing: 12) {

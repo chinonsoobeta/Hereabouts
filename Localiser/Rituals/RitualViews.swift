@@ -24,7 +24,7 @@ struct RecapView: View {
                     Text("This week at \(homeName.isEmpty ? "home" : homeName.lowercasedFirstArticle)").font(.wbDisplay).foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    if recap.keepingUp > 0 { Stamp(text: recap.keepingUp == 1 ? "1 week" : "\(recap.keepingUp) weeks", tone: .done) }
+                    if recap.keepingUp > 0 { Stamp(text: recap.keepingUp == 1 ? "1 week" : "\(recap.keepingUp) weeks", tone: .purple) }
                 }
                 Text(keepingUpSentence(recap.keepingUp)).font(.wbBody).foregroundStyle(Theme.ink)
                 VStack(spacing: 0) {
@@ -247,13 +247,17 @@ struct RitualBanners: View {
         }
     }
 
+    @Environment(\.dynamicTypeSize) private var textSize
+
     private func banner(stamp: String?, text: String, action: String, perform: @escaping () -> Void) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        let layout = textSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8)) : AnyLayout(HStackLayout(alignment: .center, spacing: 12))
+        return layout {
             if let stamp { Stamp(text: stamp, tone: .purple) }
             Text(text).font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
+            if !textSize.isAccessibilitySize { Spacer(minLength: 0) }
             Button(action, action: perform).font(.wbBody.weight(.bold)).foregroundStyle(Theme.purpleInk).frame(minWidth: 44, minHeight: 44)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12).padding(.vertical, 4)
         .background(Theme.noteBox, in: RoundedRectangle(cornerRadius: 6))
         .overlay { RoundedRectangle(cornerRadius: 6).stroke(Theme.ink, lineWidth: 1.5) }

@@ -531,3 +531,15 @@ Full run `/private/tmp/hb-full6.log`: units 41 pass / 3 existing skips; UI 9/10.
 ## Phase 3.5 — 10.8.6 store screenshots and night board (Claude, 10 October)
 
 New opt-in UI test `testStoreScreenshots` writes PNGs straight to a folder named by `TEST_RUNNER_STORE_SHOTS`. Writing directly avoids the result-bundle hang; the test skips itself in ordinary runs. Six light screenshots at 6.9-inch are in `Docs/Store/iPhone-6.9` with captions in `Docs/Store/README.md`. Pro is left out because the test scheme has no StoreKit configuration. Eight dark screenshots are in `Docs/Store/night-review`. Checked against the night board: paper #17131F, ink #F1EBF7, purple #B59CF5, the boxed Find note, amber stamps and leaders all match after this step's token changes. No dark-mode defects found on Find, search, a thing, Due, Trips, recap, stocktake or Pro.
+
+## Largest text, iPad and the thing page (Claude, 10 October)
+
+At Accessibility XXXL on iPhone 17, the Find note broke words mid-word ("Keepi-ng", "Rea-d it"). At accessibility sizes it now stacks stamp, sentence and action. Re-checked by screenshot: Find, recap and stocktake all scale and wrap at whole words. The recap's keeping-up stamp is now purple, matching Find.
+
+iPad: installed on iPad Pro 13-inch (M5), iOS 26.5. The app runs in iPhone compatibility mode; Find, the notes and the stocktake sheet render and present correctly. Tapping through every tab on iPad remains on the physical matrix.
+
+Thing page: per the Item board, a thing with a date in the next 30 days now shows it as a stamp beside "At home" ("Return · In 2 days"). Stamps sit in a flow layout so they wrap at large sizes.
+
+Full run `/private/tmp/hb-full8.log` (before the thing-page stamp): units 45 pass / 3 existing skips; UI 10/10, store-screenshot test skipped as designed.
+
+Final full run `/private/tmp/hb-full9.log` (everything above included): units **45 passed**, 3 existing skips, 0 failures; UI **10/10**, store-screenshot test skipped as designed. The only audit line printed was the Pro subtitle inside the scroll-edge band, which the existing rule exempts. iOS 27 units `/private/tmp/hb-u27.log`: **45/45**, no skips. Overnight summary for the owner: `Docs/STATUS_REPORT.md`.
