@@ -57,7 +57,7 @@ struct FindView: View {
             openedItem = store.items.first { $0.id == id }
             store.openedItem = nil
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Where is…")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
@@ -96,20 +96,20 @@ struct FindView: View {
             Spacer()
             if store.places.contains(where: { $0.parent == nil }) { NavigationLink("See all") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            ForEach(store.places.filter { $0.parent == nil }.prefix(5)) { place in
+        VStack(spacing: 0) {
+            ForEach(store.places.filter { $0.parent == nil }.prefix(3)) { place in
                 NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
             }
             NewPlaceTile { addingPlace = true }
         }
-        SectionHeading(title: "Recently added").padding(.top, 8)
-        ForEach(results) { item in itemCard(item) }
+        SectionHeading(title: "Put away lately").padding(.top, 8)
+        ForEach(results.prefix(3)) { item in itemCard(item) }
     }
 
     private func itemCard(_ item: Belonging) -> some View {
         NavigationLink { ItemDetailView(item: item, putAway: putAway) } label: {
             HStack(spacing: 12) {
-                ItemRow(item: item)
+                ItemRow(item: item, query: query)
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.secondary).accessibilityHidden(true)
             }.card()
         }.buttonStyle(.plain)
@@ -120,16 +120,10 @@ struct PlaceTile: View {
     let place: Place
     var body: some View {
         let count = place.activeItemCount
-        VStack(alignment: .leading, spacing: 14) {
-            Image(systemName: PlaceTile.symbol(for: place.name)).font(.title3).foregroundStyle(Theme.purpleInk).accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(place.name).font(.wbItem).foregroundStyle(Theme.ink).lineLimit(2)
-                Text(count == 1 ? "1 thing" : "\(count) things").font(.wbCaption).foregroundStyle(Theme.purpleInk)
-            }
-        }
-        .padding(16).frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-        .background(Theme.mist, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .contentShape(Rectangle())
+        NotebookLine(name: place.name, detail: count == 1 ? "1 thing" : "\(count) things")
+            .padding(.vertical, 14).frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
+            .contentShape(Rectangle())
     }
 
     static func symbol(for name: String) -> String {
@@ -159,11 +153,10 @@ struct DueCard: View {
         HStack(spacing: 14) {
             IconTile(systemImage: DueLabel.symbol(for: deadline.kind), photo: deadline.item?.photo, size: 48, tone: pill?.1 ?? .neutral)
             VStack(alignment: .leading, spacing: 2) {
-                Text(deadline.item?.name ?? "Item unavailable").font(.wbItem).foregroundStyle(Theme.ink)
-                Text(caption).font(.wbCaption).foregroundStyle(Theme.secondary)
+                NotebookLine(name: deadline.item?.name ?? "Thing unavailable", detail: caption)
             }
             Spacer(minLength: 8)
-            if let pill { Pill(text: pill.0, tone: pill.1) }
+            if let pill { Stamp(text: pill.0, tone: pill.1) }
         }
         .modifier(EmbeddedCard(embedded: embedded))
     }
@@ -187,16 +180,13 @@ private struct EmbeddedCard: ViewModifier {
 struct ItemRow: View {
     @Environment(LocaliserStore.self) private var store
     let item: Belonging
+    var query = ""
     var body: some View {
         let _ = store.revision
         HStack(spacing: 14) {
             IconTile(systemImage: "shippingbox", photo: item.photo, size: 48)
             VStack(alignment: .leading, spacing: 3) {
-                Text(item.name).font(.wbItem).foregroundStyle(Theme.ink)
-                HStack(spacing: 0) {
-                    if !item.packedTrips.isEmpty { Text("Home: ").font(.wbCaption).foregroundStyle(Theme.secondary) }
-                    PlaceBreadcrumb(path: item.place?.path)
-                }
+                NotebookLine(name: item.name, detail: item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }
             }
             Spacer(minLength: 0)
@@ -360,9 +350,9 @@ struct ItemDetailView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)).accessibilityHidden(true)
                         }
                         HStack(spacing: 8) {
-                            if item.archived { Pill(text: "Archived") }
-                            else if !item.packedTrips.isEmpty { Pill(text: "Packed", tone: .due) }
-                            else { Pill(text: "At home", tone: .done) }
+                            if item.archived { Stamp(text: "Archived") }
+                            else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
+                            else { Stamp(text: "At home", tone: .done) }
                         }
                         Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         VStack(alignment: .leading, spacing: 12) {

@@ -33,7 +33,7 @@ struct ProView: View {
                     } else if let product = pro.product {
                         if foundersPricing {
                             HStack(spacing: 8) {
-                                Pill(text: "Founder's price", tone: .due)
+                                Stamp(text: "Founder's price", tone: .due)
                                 Text((product.price * 2).formatted(product.priceFormatStyle)).strikethrough().foregroundStyle(Theme.secondary)
                                     .accessibilityLabel("Usually \((product.price * 2).formatted(product.priceFormatStyle))")
                             }

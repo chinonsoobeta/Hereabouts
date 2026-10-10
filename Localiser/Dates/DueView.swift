@@ -154,8 +154,7 @@ struct DeadlineRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             if showsItem { Text(deadline.item?.name ?? "Item unavailable").font(.headline) }
-            LabeledContent(deadline.kind?.title ?? "Unknown date") { if let date = deadline.day?.date() { Text(date, format: .dateTime.year().month().day()) } }
-                .font(.subheadline).foregroundStyle(Theme.secondary)
+            NotebookLine(name: deadline.kind?.title ?? "Date", detail: deadline.day?.date()?.formatted(.dateTime.year().month().day()) ?? "Date not written down")
         }.padding(.vertical, 4)
     }
 }

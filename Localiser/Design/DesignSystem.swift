@@ -74,13 +74,12 @@ struct CardBackground: ViewModifier {
         content
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: Theme.ink.opacity(0.06), radius: 1, y: 1)
-            .shadow(color: Theme.ink.opacity(0.05), radius: 10, y: 6)
+            .background(Theme.paper)
+            .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
     }
 }
 
-/// A List row rendered as a floating card on the ground colour.
+/// A ruled row on the notebook paper.
 struct CardRow: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -109,17 +108,88 @@ struct SectionHeading: View {
     }
 }
 
-struct Pill: View {
+struct Stamp: View {
     enum Tone { case neutral, due, done }
     let text: String
     var tone: Tone = .neutral
+    private var ink: Color { tone == .due ? Theme.amber : tone == .done ? Theme.green : Theme.purpleInk }
     var body: some View {
-        Text(text)
-            .font(.wbLabel)
-            .foregroundStyle(tone == .due ? Theme.apricotInk : tone == .done ? Theme.sageInk : Theme.purpleInk)
-            .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(tone == .due ? Theme.apricot : tone == .done ? Theme.sage : Theme.mist, in: Capsule())
-            .fixedSize()
+        Text(text.uppercased())
+            .font(.wbLabel).tracking(1.54)
+            .foregroundStyle(ink)
+            .padding(.horizontal, 9).padding(.vertical, 5)
+            .overlay { RoundedRectangle(cornerRadius: 3).stroke(ink, lineWidth: 1.5) }
+            .overlay { RoundedRectangle(cornerRadius: 4).stroke(ink, lineWidth: 1).padding(-2) }
+            .rotationEffect(.degrees(-3))
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityLabel(text)
+    }
+}
+
+/// Name and place/count share a baseline at ordinary sizes and stack at accessibility sizes.
+struct NotebookLine: View {
+    @Environment(\.dynamicTypeSize) private var textSize
+    let name: String
+    let detail: String
+    var query = ""
+    var body: some View {
+        if textSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 6) { nameText; detailText }
+        } else {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    nameText.fixedSize(horizontal: true, vertical: true)
+                    DottedLeader().stroke(Theme.leader, style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [1, 4]))
+                        .frame(minWidth: 16, maxWidth: .infinity).frame(height: 2).accessibilityHidden(true)
+                    detailText.fixedSize(horizontal: true, vertical: true)
+                }
+                VStack(alignment: .leading, spacing: 6) { nameText; detailText }
+            }
+        }
+    }
+    private var nameText: some View { Text(highlighted(name)).font(.wbItem).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true) }
+    private var detailText: some View { Text(highlighted(detail)).font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+    private func highlighted(_ text: String) -> AttributedString {
+        var result = AttributedString(text)
+        let term = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !term.isEmpty else { return result }
+        var cursor = text.startIndex
+        while cursor < text.endIndex, let match = text.range(of: term, options: [.caseInsensitive, .diacriticInsensitive], range: cursor..<text.endIndex) {
+            if let lower = AttributedString.Index(match.lowerBound, within: result), let upper = AttributedString.Index(match.upperBound, within: result) {
+                result[lower..<upper].backgroundColor = Theme.highlighter
+            }
+            cursor = match.upperBound
+        }
+        return result
+    }
+}
+
+private struct DottedLeader: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { p in p.move(to: CGPoint(x: rect.minX, y: rect.midY)); p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY)) }
+    }
+}
+
+struct PenCheckbox: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let checked: Bool
+    var body: some View {
+        PenTick().trim(from: 0, to: checked ? 1 : 0)
+            .stroke(Theme.purpleInk, style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+            .padding(4).frame(width: 26, height: 26)
+            .overlay { RoundedRectangle(cornerRadius: 3).stroke(Theme.ink, lineWidth: 1.5) }
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.18), value: checked)
+            .accessibilityHidden(true)
+    }
+}
+
+private struct PenTick: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { p in
+            p.move(to: CGPoint(x: rect.width * 0.08, y: rect.height * 0.52))
+            p.addLine(to: CGPoint(x: rect.width * 0.36, y: rect.height * 0.86))
+            p.addLine(to: CGPoint(x: rect.width * 0.94, y: rect.height * 0.12))
+        }
     }
 }
 
@@ -127,7 +197,7 @@ struct IconTile: View {
     let systemImage: String
     var photo: Data? = nil
     var size: CGFloat = 48
-    var tone: Pill.Tone = .neutral
+    var tone: Stamp.Tone = .neutral
     var body: some View {
         Group {
             if let photo, let image = UIImage(data: photo) {
@@ -150,11 +220,11 @@ struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.wbItem)
+            .font(.wbBody.weight(.bold))
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, minHeight: 52)
             .padding(.horizontal, 20)
-            .background(Theme.purpleFill.opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.45), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .background(Theme.purpleFill.opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.45), in: RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -162,11 +232,11 @@ struct SoftButtonStyle: ButtonStyle {
     var compact = false
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.wbItem)
+            .font(.wbBody.weight(.bold))
             .foregroundStyle(Theme.purpleInk)
             .frame(maxWidth: compact ? nil : .infinity, minHeight: compact ? 44 : 52)
             .padding(.horizontal, compact ? 16 : 20)
-            .background(Theme.mist.opacity(configuration.isPressed ? 0.7 : 1), in: RoundedRectangle(cornerRadius: compact ? 14 : 16, style: .continuous))
+            .background(Theme.mist.opacity(configuration.isPressed ? 0.7 : 1), in: RoundedRectangle(cornerRadius: 6))
     }
 }
 
@@ -192,7 +262,7 @@ enum DueLabel {
         return Calendar(identifier: .gregorian).dateComponents([.day], from: today, to: target).day
     }
 
-    static func pill(for day: CalendarDay?) -> (String, Pill.Tone)? {
+    static func pill(for day: CalendarDay?) -> (String, Stamp.Tone)? {
         guard let days = days(until: day) else { return nil }
         switch days {
         case ..<0: return ("Missed", .due)

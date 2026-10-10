@@ -19,7 +19,7 @@ struct PlacesView: View {
                     }
                     Button("Add a place") { adding = true }.buttonStyle(PrimaryButtonStyle())
                 } else {
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                    VStack(spacing: 0) {
                         ForEach(store.places.filter { $0.parent == nil }) { place in
                             NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
                         }
@@ -45,17 +45,10 @@ struct NewPlaceTile: View {
     var action: () -> Void
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 14) {
-                Image(systemName: "plus").font(.title3.weight(.semibold)).accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("New place").font(.wbItem)
-                    Text("Room, shelf or box").font(.wbCaption).foregroundStyle(Theme.secondary)
-                }
-            }
-            .foregroundStyle(Theme.purpleInk)
-            .padding(16).frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-            .background(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.purple.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])))
-            .contentShape(Rectangle())
+            Label("New place", systemImage: "plus")
+                .font(.wbBody.weight(.bold)).foregroundStyle(Theme.purpleInk)
+                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -165,11 +158,7 @@ struct PlaceDetailView: View {
                     Section("Places inside") {
                         ForEach(place.children.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }) { child in
                             NavigationLink { PlaceDetailView(place: child) } label: {
-                                HStack {
-                                    Label { Text(child.name) } icon: { Image(systemName: PlaceTile.symbol(for: child.name)).foregroundStyle(Theme.purple) }
-                                    Spacer()
-                                    Text("\(child.activeItemCount)").font(.wbCaption).foregroundStyle(Theme.secondary)
-                                }
+                                NotebookLine(name: child.name, detail: "\(child.activeItemCount) things")
                             }
                         }
                     }

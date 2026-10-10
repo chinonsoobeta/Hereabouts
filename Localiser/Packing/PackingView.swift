@@ -51,12 +51,7 @@ struct PackingView: View {
                     }
                     ForEach(store.kits) { kit in
                         NavigationLink { KitDetailView(kit: kit) } label: {
-                            HStack(spacing: 14) {
-                                IconTile(systemImage: "checklist", size: 44)
-                                Text(kit.name).font(.wbItem).foregroundStyle(Theme.ink)
-                                Spacer(minLength: 8)
-                                Text(kit.entries.count == 1 ? "1 thing" : "\(kit.entries.count) things").font(.wbCaption).foregroundStyle(Theme.secondary)
-                            }.card()
+                            NotebookLine(name: kit.name, detail: kit.entries.count == 1 ? "1 thing" : "\(kit.entries.count) things").card()
                         }.buttonStyle(.plain)
                     }
                     Button("New kit", systemImage: "plus") { newKit = true }.buttonStyle(SoftButtonStyle())
@@ -77,11 +72,10 @@ struct TripRow: View {
         HStack(spacing: 14) {
             IconTile(systemImage: "suitcase", size: 44, tone: trip.state == .finished ? .done : .neutral)
             VStack(alignment: .leading, spacing: 2) {
-                Text(trip.name).font(.wbItem).foregroundStyle(Theme.ink)
-                Text(trip.dateRange).font(.wbCaption).foregroundStyle(Theme.secondary)
+                NotebookLine(name: trip.name, detail: trip.dateRange)
             }
             Spacer(minLength: 8)
-            Pill(text: trip.stateTitle, tone: trip.state == .finished ? .done : .neutral)
+            Stamp(text: trip.stateTitle, tone: trip.state == .finished ? .done : .neutral)
         }.card()
     }
 }
@@ -113,18 +107,15 @@ struct TripProgressCard: View {
         let fraction = needed == 0 ? 0 : Double(packed) / Double(needed)
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
-                Text(trip.name).font(.wbTitle)
-                Spacer(minLength: 8)
-                Text("\(packed) of \(needed) packed").font(.wbLabel)
+                NotebookLine(name: trip.name, detail: "\(packed) of \(needed) packed")
             }
             Text("\(trip.dateRange) · \(trip.details?.nights ?? 0) nights").font(.wbCaption).opacity(0.9)
-            Capsule().fill(.white.opacity(0.25)).frame(height: 8)
-                .overlay(alignment: .leading) { GeometryReader { proxy in Capsule().fill(.white).frame(width: proxy.size.width * fraction) } }
-                .accessibilityHidden(true)
+            ProgressView(value: fraction).tint(Theme.purpleInk).accessibilityLabel("Packing progress")
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(Theme.ink)
         .padding(16).frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.purpleFill, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .background(Theme.paper)
+        .overlay { Rectangle().stroke(Theme.ink, style: StrokeStyle(lineWidth: 1.5, dash: [2, 4])) }
     }
 }
 
@@ -376,7 +367,7 @@ struct TripDetailView: View {
                     ForEach(trip.tasks.sorted { $0.title < $1.title }) { task in
                         Button { attempt { try store.checkTask(task, checked: !task.checked) } } label: {
                             Label { Text(task.title).foregroundStyle(Theme.ink).strikethrough(task.checked, color: Theme.secondary) } icon: {
-                                Image(systemName: task.checked ? "checkmark.circle.fill" : "circle").foregroundStyle(task.checked ? Theme.purple : Theme.secondary).font(.title3)
+                                PenCheckbox(checked: task.checked)
                             }
                         }
                         .accessibilityLabel(task.title).accessibilityAddTraits(task.checked ? .isSelected : [])
@@ -441,7 +432,7 @@ struct TripDetailView: View {
                 Button {
                     attempt { try store.pack(entry, count: done ? 0 : entry.requiredCount) }
                 } label: {
-                    Image(systemName: done ? "checkmark.circle.fill" : "circle").font(.title2).foregroundStyle(done ? Theme.purple : Theme.secondary)
+                    PenCheckbox(checked: done)
                         .frame(width: 44, height: 44).contentShape(Rectangle())
                 }
                 .buttonStyle(.borderless)
@@ -449,8 +440,7 @@ struct TripDetailView: View {
             }
             NavigationLink { TripEntryDetailView(entry: entry) } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(entry.title).font(.wbItem)
-                    Text(entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed")
                     if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
                     if entry.unlinked && entry.item == nil { Text("Its item was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }

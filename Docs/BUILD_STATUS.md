@@ -448,3 +448,22 @@ Final results: **8/8 UI passed** on iPhone 17 / iOS 26.5; units **26 passed, 3 e
 Exported final typography screenshots to `/private/tmp/Hereabouts-fonts-final-attachments` and inspected Pro. The font/paper change is visible; the floating cards remain intentionally for the next component step. Existing audit exemptions are unchanged. `git diff --check` passed. Maximum text, night-mode completion, iPad and store screenshots are still pending. Local artboard browser inspection is unverified: the browser tool rejected the `file://` protocol. HTML copy and CSS were read directly.
 
 Next plan row: **10.8.2 — lists and rows across Find, Places, Thing, Due and Trips**. Steps 10.8.2–6 and remaining phase 3 work are not complete.
+
+## Phase 3.5 — 10.8.2 notebook rows (9 October 2026)
+
+Replaced floating card shadows with paper and bottom rules. Shared rows use dotted leaders, with stacked name/detail text when horizontal content does not fit or at accessibility sizes. Search matches use the highlighter token. State pills are replaced by double-outline stamps; trip checks use an animated pen tick that respects Reduce Motion. Applied the components to Find, Places, Thing dates/states, Due, kits and trips. No data, purchase, backup or trip lifecycle rules changed.
+
+Initial full run `/private/tmp/Hereabouts-rows-full-20261009.xcresult` failed: backup export encountered the Files provider still editing its folder name; photo/PDF flows expected the old combined date accessibility label. The ruled date now retains its year, and the two existing scan tests assert the separate kind/date labels. The backup flow passed unchanged in the focused rerun. All three selected flows passed in `/private/tmp/Hereabouts-rows-flows-fix1-20261009.xcresult`, exit 0. Earlier iOS 27 units passed 29/29 in `/private/tmp/Hereabouts-rows-units27-20261009.xcresult`. No tests or audit findings were newly skipped or exempted.
+
+Inspected demo Find screenshots from iPhone 17 Pro Max. The first row implementation split “Running shoes” inside a word; corrected it with horizontal fit detection and a stacked fallback. Verified the corrected screenshot `/private/tmp/Hereabouts-rows-demo-find-fit.png`. This check covers that viewport only; iPad and maximum text checks remain for 10.8.6. Computer Use could not bind the Simulator app; simulator screenshots were captured with `simctl`.
+
+Final commands:
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=B8B1FAFF-A20B-443F-9AA2-9D5A86987F23' -derivedDataPath DerivedData/Audit -resultBundlePath /private/tmp/Hereabouts-rows-full-final-20261009.xcresult -jobs 10 -parallel-testing-enabled NO test > /private/tmp/Hereabouts-rows-full-final-20261009.log 2>&1
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'id=74ED4118-BA51-47FA-9F21-17AB21E41D0D' -derivedDataPath DerivedData/Audit27 -resultBundlePath /private/tmp/Hereabouts-rows-units27-final-20261009.xcresult -jobs 10 -parallel-testing-enabled NO -only-testing:LocaliserTests test > /private/tmp/Hereabouts-rows-units27-final-20261009.log 2>&1
+```
+
+Final results: **8/8 UI passed**; iOS 26.5 units **26 passed, 3 existing skips, 0 failures**, full run exit 0. Separate iOS 27 units **29/29 passed**, zero skips, exit 0. The full bundle retains two “Invalid frame dimension (negative or non-finite)” warnings; the iOS 27 bundle has no runtime warnings. No new audit exemption. `git diff --check` passed.
+
+Next plan row: **10.8.3 — stock tab bar, Settings, Pro and Leaving**. Steps 10.8.3–6 and phase 3 remain incomplete.
