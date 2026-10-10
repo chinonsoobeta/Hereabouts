@@ -19,7 +19,7 @@ struct ProView: View {
                     }
                 }
                 Text(foundersPricing ? "For the first eight weeks. One payment, shared with your family. No subscription, ever." : "One payment, shared with your family. No subscription, ever.")
-                    .font(.wbBody).foregroundStyle(Theme.ink)
+                    .font(.wbBody).foregroundStyle(Theme.pencil)
                 VStack(spacing: 0) {
                     allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
                     allowance("Packing kits", free: CreationKind.kit.freeLimit.description)

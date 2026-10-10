@@ -12,6 +12,7 @@ struct FindView: View {
     @State private var settings = false
     @State private var addingPlace = false
     @State private var openedItem: Belonging?
+    @AppStorage(Home.nameKey) private var homeName = ""
 
     private var results: [Belonging] {
         _ = store.revision
@@ -51,6 +52,7 @@ struct FindView: View {
         }
         .background(Theme.ground)
         .navigationTitle("Hereabouts")
+        .navigationSubtitle("\(homeName.isEmpty ? Home.defaultName : homeName) · \(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))")
         .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }
@@ -82,9 +84,9 @@ struct FindView: View {
     @ViewBuilder private var dashboard: some View {
         if !dueSoon.isEmpty {
             HStack {
-                SectionHeading(title: "Due soon")
+                SectionHeading(title: "Due")
                 Spacer()
-                NavigationLink("See all") { DueView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk)
+                NavigationLink("All dates") { DueView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk)
             }.padding(.top, 4)
             ForEach(dueSoon.prefix(2)) { deadline in
                 NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
@@ -93,7 +95,7 @@ struct FindView: View {
         HStack {
             SectionHeading(title: "Places")
             Spacer()
-            if store.places.contains(where: { $0.parent == nil }) { NavigationLink("See all") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
+            if store.places.contains(where: { $0.parent == nil }) { NavigationLink("All places") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
         VStack(spacing: 0) {
             ForEach(store.places.filter { $0.parent == nil }.prefix(3)) { place in

@@ -62,6 +62,8 @@ struct RootView: View {
             Tab(value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
         }
         .tint(Theme.purpleInk)
+        .tipViewStyle(NotebookTipStyle())
+        .tipBackground(Theme.lilacPaper)
         .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {

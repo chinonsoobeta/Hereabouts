@@ -19,6 +19,7 @@ struct LibrarySettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
+    @AppStorage(Home.nameKey) private var homeName = ""
 
     var body: some View {
         List {
@@ -27,6 +28,9 @@ struct LibrarySettingsView: View {
                     NotebookLine(name: "Hereabouts Pro", detail: pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
                 }.accessibilityLabel("Purchase or restore lifetime Pro")
             }
+            Section {
+                TextField(Home.defaultName, text: $homeName).font(.wbItem).accessibilityLabel("Name of your home")
+            } header: { Text("Home") }
             Section {
                 Toggle("Show item names in reminders", isOn: $showItemNames)
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines) }
