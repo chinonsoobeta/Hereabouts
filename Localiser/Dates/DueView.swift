@@ -222,13 +222,13 @@ struct DeadlineEditor: View {
             if let scan {
                 Section("Scanned document") {
                     if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
-                    Text("A receipt date may be a purchase date. Confirm the date type and any missing terms; suggestions are not store policies.").font(.subheadline)
+                    Text("A receipt usually shows the day you bought something, not the last day to return it. Choose the kind of date below, and check the shop's terms.").font(.subheadline)
                     Toggle("Keep original document", isOn: $retainSource)
-                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this thing and included in your device backup and in Hereabouts backups." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text(retainSource ? "The original can show card or ID numbers. It's kept with this thing, in your iPhone's own backup, and in a Hereabouts backup if you include it." : "Only the date and what you type here are saved. The original and its text are thrown away when you close this.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
             Section(item.name) {
-                Picker("Date type", selection: $kind) { ForEach(DeadlineKind.allCases) { Text($0.title).tag($0) } }.disabled(existing != nil)
+                Picker("Kind of date", selection: $kind) { ForEach(DeadlineKind.allCases) { Text($0.title).tag($0) } }.disabled(existing != nil)
                 if kind == .returns {
                     Toggle("Calculate from a confirmed return window", isOn: $useWindow)
                     if useWindow {
@@ -249,13 +249,13 @@ struct DeadlineEditor: View {
                     Picker("Time", selection: $hour) { ForEach(0..<24) { Text(Self.hourLabel($0)).tag($0) } }
                     if leadDays > 0 { Text("A reminder also comes on the day itself, if notifications are on.").font(.caption).foregroundStyle(Theme.secondary) }
                 }
-                if kind == .expiry { Text("The lead time is your preference. It does not establish travel eligibility or insurance coverage.").font(.caption).foregroundStyle(Theme.secondary) }
+                if kind == .expiry { Text("How early to be reminded is up to you. It isn't advice about travel or insurance rules.").font(.caption).foregroundStyle(Theme.secondary) }
             }
             Section("Review before saving") {
                 if let value = finalDay?.date() { LabeledContent("Final date") { Text(value, format: .dateTime.year().month().day()).foregroundStyle(Theme.secondary) } }
                 if closed { Toggle("Reopen return decision", isOn: $reopen) }
                 if item.archived { Text("This thing is archived. Restore it in Find to get reminders.").foregroundStyle(Theme.secondary) }
-                Toggle("I have checked the date type and final date", isOn: $confirmed).accessibilityIdentifier("deadline.confirm")
+                Toggle("I've checked the kind of date and the final date", isOn: $confirmed).accessibilityIdentifier("deadline.confirm")
             }
         }
         .groundBackground().navigationTitle(existing == nil ? "Add date" : "Edit date").navigationBarTitleDisplayMode(.inline)

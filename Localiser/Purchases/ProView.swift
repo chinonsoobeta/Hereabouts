@@ -34,8 +34,10 @@ struct ProView: View {
                     Label("Pro is unlocked. Thank you.", systemImage: "checkmark.seal").font(.wbBody.weight(.bold)).foregroundStyle(Theme.green)
                 } else if let product = pro.product {
                     Button("Buy once for \(product.displayPrice)") { Task { await pro.purchase() } }.buttonStyle(PrimaryButtonStyle()).disabled(pro.busy)
+                } else if pro.productChecked {
+                    Text("Pro isn't available to buy right now. Try again later.").font(.wbBody).foregroundStyle(Theme.pencil)
                 } else {
-                    Text("Pro isn't available to buy right now. Everything you've saved stays available.").font(.wbBody).foregroundStyle(Theme.pencil)
+                    ProgressView().frame(maxWidth: .infinity)
                 }
                 Button("Restore purchases") { Task { await pro.restorePurchases() } }.buttonStyle(SoftButtonStyle()).disabled(pro.busy)
                 if pro.busy { ProgressView() }

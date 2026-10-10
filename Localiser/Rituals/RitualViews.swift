@@ -28,7 +28,7 @@ struct RecapView: View {
                 }
                 Text(keepingUpSentence(recap.keepingUp)).font(.wbBody).foregroundStyle(Theme.ink)
                 VStack(spacing: 0) {
-                    figure(recap.added.count, recap.added.count == 1 ? "new thing written down" : "new things written down", recap.added.isEmpty ? "Nothing new this week. That's fine." : ListFormatter.localizedString(byJoining: Array(recap.added.prefix(4))))
+                    figure(recap.added.count, recap.added.count == 1 ? "new thing written down" : "new things written down", recap.added.isEmpty ? "Nothing new this week. That's fine." : Self.names(recap.added))
                     figure(recap.moved, recap.moved == 1 ? "thing moved or put away" : "things moved or put away", nil)
                     figure(recap.confirmed, recap.confirmed == 1 ? "thing checked and still there" : "things checked and still there", nil)
                 }
@@ -39,6 +39,7 @@ struct RecapView: View {
                     ForEach(recap.due.prefix(5)) { deadline in
                         line(deadline.item?.name ?? "A saved thing", dueDetail(deadline))
                     }
+                    if recap.due.count > 5 { line("And \(recap.due.count - 5) more", "") }
                     if recap.stocktakeCount > 0 {
                         line("Stocktake", recap.stocktakeCount == 1 ? "1 quick question" : "\(recap.stocktakeCount) quick questions")
                     }
@@ -65,6 +66,12 @@ struct RecapView: View {
         .onAppear { readWeek = Rituals.recapWeekKey() }
         .navigationTitle("Recap").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+    }
+
+    /// Up to four names; past that, three and how many more: "Kettle, Torch, Passport and 5 more".
+    static func names(_ names: [String]) -> String {
+        guard names.count > 4 else { return ListFormatter.localizedString(byJoining: names) }
+        return ListFormatter.localizedString(byJoining: Array(names.prefix(3)) + ["\(names.count - 3) more"])
     }
 
     private func dueDetail(_ deadline: Deadline) -> String {

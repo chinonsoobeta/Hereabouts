@@ -9,19 +9,19 @@ enum LocaliserError: LocalizedError, Equatable {
         switch self {
         case .nameRequired: "Enter a name."
         case .tooLong(let field, let limit): "\(field) can be up to \(limit.formatted()) characters."
-        case .placeCycle: "A place cannot be moved into itself or one of its contents."
-        case .occupiedPlace: "Move what's inside first, or clear its place, before deleting this place."
-        case .schemaUnavailable: "The data model is missing. Your library has not been deleted."
+        case .placeCycle: "A place can't go inside itself, or inside anything it holds."
+        case .occupiedPlace: "Move what's inside somewhere else first."
+        case .schemaUnavailable: "Hereabouts couldn't open your notebook. Nothing has been deleted."
         case .dateNotConfirmed: "Review and confirm the final date before saving it."
-        case .invalidReminder: "Choose a valid reminder time and lead time."
-        case .closedReturn: "Choose to reopen this return decision before editing it."
+        case .invalidReminder: "Choose when to be reminded."
+        case .closedReturn: "Turn on Reopen return decision to change this date."
         case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
         case .invalidTripDates: "Come home on or after the day you leave."
         case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
         case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
         case .unresolvedHome: "Say where the rest of the things went before finishing coming home."
         case .invalidBackup(let reason): reason
-        case .libraryNotEmpty: "Your library already has records. Choose Erase and restore to replace them with this backup, or export them first."
+        case .libraryNotEmpty: "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first."
         }
     }
 }
@@ -190,10 +190,16 @@ final class LocaliserStore {
         try save()
     }
 
+    /// With `clearContents`, everything inside moves up a level: into the place's parent, or out of any place
+    /// when it was a room. Moving up isn't seeing a thing, so when each was last checked stays as it was.
     func deletePlace(_ place: Place, clearContents: Bool = false) throws {
         if !clearContents && (!place.items.isEmpty || !place.children.isEmpty) { throw LocaliserError.occupiedPlace }
-        for item in place.items { recordMove(item, to: nil) }
-        for child in place.children { child.parent = nil }
+        for item in place.items {
+            let seen = item.lastConfirmed
+            recordMove(item, to: place.parent)
+            item.confirmedAt = seen
+        }
+        for child in place.children { child.parent = place.parent }
         context.delete(place)
         try save()
     }

@@ -163,6 +163,25 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(migrated.items.first { $0.name == "Busy" }?.confirmedAt, moved)
     }
 
+    func testRecapCountsEachThingOnce() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let hall = try store.addPlace(name: "Hall"), shed = try store.addPlace(name: "Shed")
+        let keys = try store.addItem(name: "Keys", place: hall)
+        keys.createdAt = calendar.date(byAdding: .month, value: -2, to: .now)!
+        try store.move(keys, to: shed)
+        try store.move(keys, to: hall)
+        let recap = Rituals.recap(items: store.items, deadlines: [], calendar: calendar)
+        XCTAssertEqual(recap.moved, 1)
+        XCTAssertEqual(recap.confirmed, 0)
+    }
+
+    func testRecapNamesSayHowManyMore() {
+        XCTAssertFalse(RecapView.names(["Kettle", "Torch", "Passport", "Drill"]).contains("more"))
+        let six = RecapView.names(["Kettle", "Torch", "Passport", "Drill", "Goggles", "Socks"])
+        XCTAssertTrue(six.hasPrefix("Kettle") && six.hasSuffix("3 more"), six)
+        XCTAssertFalse(six.contains("Drill"), six)
+    }
+
     func testRecapIsOfferedFromSundayEvening() {
         // Sunday 11 October 2026: last week's recap until 18:00, then this week's, through Saturday.
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 11, 17), calendar: calendar), "2026-10-04")

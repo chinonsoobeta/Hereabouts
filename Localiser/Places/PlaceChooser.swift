@@ -21,6 +21,16 @@ import SwiftUI
         }
         return current!
     }
+
+    /// The deepest level of a typed path that already exists, or `parent` when even the first level is new.
+    func deepestExistingPlace(forPath text: String, under parent: Place? = nil) -> Place? {
+        var current = parent
+        for part in Self.pathComponents(text) {
+            guard let existing = duplicatePlace(named: part, parent: current) else { break }
+            current = existing
+        }
+        return current
+    }
 }
 
 /// A form row that opens the place chooser. Shows the chosen place as a breadcrumb.
@@ -107,7 +117,7 @@ struct PlaceChooser: View {
         }
         .groundBackground()
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Find or create a place")
-        .onSubmit(of: .search) { if exactMatch == nil && !typed.isEmpty { create() } else if let exactMatch { choose(exactMatch.id) } }
+        .onSubmit(of: .search) { if !typed.isEmpty { create() } }
         .navigationTitle("Choose a place").navigationBarTitleDisplayMode(.inline)
         .alert("Couldn't create that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
@@ -137,11 +147,12 @@ struct PlaceChooser: View {
 
     private func choose(_ id: UUID?) { selection = id; dismiss() }
 
+    /// Chooses the typed path, creating any levels that don't exist yet. A path that would end inside the place
+    /// being edited is refused before anything is created, so nothing is left behind.
     private func create() {
         do {
-            let place = try store.place(forPath: query, under: nil)
-            if let excluded, place.isWithin(excluded) { throw LocaliserError.placeCycle }
-            choose(place.id)
+            if let excluded, store.deepestExistingPlace(forPath: query)?.isWithin(excluded) == true { throw LocaliserError.placeCycle }
+            choose(try store.place(forPath: query, under: nil).id)
         } catch { self.error = error.localizedDescription }
     }
 }

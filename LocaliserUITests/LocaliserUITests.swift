@@ -246,7 +246,7 @@ import XCTest
                 // (bar 78–132, text from 133 on iPhone 17) is sampled against the blurred edge. Only text
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
-                if ["Packing kits", "Pro isn't available to buy right now. Everything you've saved stays available.", "Restore purchases"].contains(element.label) { return true }
+                if ["Packing kits", "Pro isn't available to buy right now. Try again later.", "Restore purchases"].contains(element.label) { return true }
                 if element.label.hasSuffix("One payment, shared with your family. No subscription, ever.") { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,

@@ -355,7 +355,10 @@ struct TripDetailView: View {
                 }.plainRow()
                 if trip.state == .packing { TipView(LeavingTip()).plainRow() }
                 stageButton
-                if trip.state == .packing { Button("Add something to pack", systemImage: "plus") { adding = true } }
+            }
+            // A card of its own. As the only ordinary row under the plain header, it had square top corners.
+            if trip.state == .packing {
+                Section { Button("Add something to pack", systemImage: "plus") { adding = true } }
             }
             ForEach(groups, id: \.self) { group in
                 Section(group) {
@@ -503,7 +506,7 @@ struct TripEntryDetailView: View {
                     Stepper("Needed: \(quantity)", value: $quantity, in: 0...9999)
                     Button("Use manual quantity") { attempt { try store.setTripQuantity(entry, override: quantity) } }
                     Button("Use kit rule") { attempt { try store.setTripQuantity(entry, override: nil); quantity = entry.requiredCount } }
-                    Text("Changing quantities does not erase the number already packed.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("Changing how many are needed doesn't unpack anything.").font(.caption).foregroundStyle(Theme.secondary)
                 }
                 Section { Button("Remove from this trip", role: .destructive) { deleting = true } }
             }

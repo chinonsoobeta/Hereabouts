@@ -24,7 +24,7 @@ struct LibrarySettingsView: View {
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
 
     var body: some View {
-        List {
+        SheetList {
             Section {
                 NavigationLink { ProView(showsClose: false) } label: {
                     NotebookLine(name: "Hereabouts Pro", detail: pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
@@ -47,9 +47,9 @@ struct LibrarySettingsView: View {
                 NavigationLink("Take your notebook with you.") { LeavingView() }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
-                Label("Your library stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
+                Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
                 Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
-            } header: { Text("Privacy & Support") }
+            } header: { Text("Privacy") }
             Section {
                 Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
                 Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
@@ -117,7 +117,7 @@ struct LeavingView: View {
                         optionLabel("Put dates in your calendar", "Returns, warranties and expiry dates keep reminding you after the app is gone.", "calendar")
                     }.accessibilityLabel("Put dates in your calendar").disabled(addingDates)
                 }.buttonStyle(.plain)
-                Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
+                Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups aren't encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
                 SectionHeading(title: "Then, if you like")
                 Button(role: .destructive) { confirmErase = true } label: {
@@ -135,7 +135,7 @@ struct LeavingView: View {
         }
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts things") { result in
-            switch result { case .success: notice = "Export saved."; case .failure(let failure): error = failure.localizedDescription }
+            switch result { case .success: notice = exportType == .json ? "Backup saved." : "Spreadsheet saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
         }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
@@ -159,7 +159,7 @@ struct LeavingView: View {
             }
         } message: {
             let summary = "\(pendingRestore?.contents ?? "A backup"), saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
-            Text(libraryIsEmpty ? summary : summary + " Your current library will be replaced. If anything goes wrong, it is kept exactly as it is.")
+            Text(libraryIsEmpty ? summary : summary + " This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is.")
         }
         .confirmationDialog("Erase this notebook?", isPresented: $confirmErase, titleVisibility: .visible) {
             Button("Continue to erase", role: .destructive) { erasePhrase = ""; erasing = true }
@@ -168,7 +168,7 @@ struct LeavingView: View {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
             Button("Erase", role: .destructive) {
-                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = "Library erased." } catch { self.error = error.localizedDescription }
+                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = "Notebook erased." } catch { self.error = error.localizedDescription }
             }.disabled(erasePhrase != "ERASE")
         } message: { Text("This can't be undone without a backup. Type ERASE to confirm.") }
         .alert("Couldn't finish that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }

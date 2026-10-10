@@ -140,6 +140,7 @@ struct DocumentCamera: UIViewControllerRepresentable {
 
 struct StoredScanView: View {
     @Environment(LocaliserStore.self) private var store
+    @Environment(ProAccess.self) private var pro
     let scan: ScanRecord
     @State private var removing = false
     @State private var error: String?
@@ -153,9 +154,9 @@ struct StoredScanView: View {
             } else { LibraryEmptyState(title: "Date-only scan", systemImage: "calendar", description: "The original wasn't kept. Your dates stay with the thing.") }
         }
         .navigationTitle(scan.filename).navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Remove the original? Your saved dates and completed-scan count will remain.", isPresented: $removing, titleVisibility: .visible) { Button("Remove original", role: .destructive) {
+        .confirmationDialog("Remove the original?", isPresented: $removing, titleVisibility: .visible) { Button("Remove original", role: .destructive) {
             do { try store.removeScanSource(scan) } catch { self.error = error.localizedDescription }
-        } }
+        } } message: { Text(pro.unlocked ? "Your dates stay with the thing." : "Your dates stay with the thing. The scan still counts toward this month's free scans.") }
         .alert("Couldn't remove the original", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }

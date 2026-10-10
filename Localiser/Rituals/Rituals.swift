@@ -107,8 +107,11 @@ enum Rituals {
         let since = calendar.date(byAdding: .day, value: -7, to: now) ?? now
         let live = items.filter { !$0.isDeleted }
         let added = live.filter { $0.createdAt > since }.sorted { $0.createdAt < $1.createdAt }
-        let moved = live.flatMap(\.movements).filter { $0.date > since }.count
-        let confirmed = live.filter { item in (item.confirmedAt ?? .distantPast) > since && item.createdAt <= since }.count
+        // Each figure counts things, once each. A move also counts as seeing a thing, so a thing moved this week
+        // is counted as moved, not again as checked.
+        let movedThisWeek = Set(live.filter { $0.movements.contains { $0.date > since } }.map(\.objectID))
+        let moved = movedThisWeek.count
+        let confirmed = live.filter { item in (item.confirmedAt ?? .distantPast) > since && item.createdAt <= since && !movedThisWeek.contains(item.objectID) }.count
         let horizon = CalendarDay(now, calendar: calendar).adding(days: 7, calendar: calendar)
         let due = deadlines.filter { deadline in
             guard deadline.active, let day = deadline.day, let horizon else { return false }

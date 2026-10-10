@@ -11,6 +11,8 @@ enum CreationKind {
     static let productID = "dev.localiser.pro.lifetime"
     private(set) var unlocked = false
     private(set) var product: Product?
+    /// Whether the App Store has answered at least once. Until then the Pro screen waits rather than saying Pro isn't for sale.
+    private(set) var productChecked = false
     private(set) var busy = false
     var message: String?
 
@@ -39,6 +41,7 @@ enum CreationKind {
     }
 
     func loadProduct() async {
+        defer { productChecked = true }
         do {
             // When the product is missing, the Pro screen says so itself.
             product = try await Product.products(for: [Self.productID]).first { $0.type == .nonConsumable }
@@ -52,12 +55,12 @@ enum CreationKind {
         do {
             switch try await product.purchase() {
             case .success(let result):
-                guard case .verified(let transaction) = result else { message = "The purchase could not be verified. Restore purchases or try again."; return }
+                guard case .verified(let transaction) = result else { message = "The App Store couldn't confirm that purchase. Try Restore purchases."; return }
                 await refresh(); await transaction.finish()
-                message = unlocked ? "Hereabouts Pro is unlocked." : "The purchase is not currently entitled. Try restoring purchases."
-            case .userCancelled: message = "Purchase canceled. Your library is unchanged."
-            case .pending: message = "Purchase awaiting approval. Free features remain available."
-            @unknown default: message = "Purchase status is unavailable. Try restoring purchases."
+                message = unlocked ? "Hereabouts Pro is unlocked." : "The App Store hasn't confirmed Pro yet. Try Restore purchases in a moment."
+            case .userCancelled: message = "Purchase canceled. Nothing was charged."
+            case .pending: message = "Waiting for approval. Everything free still works."
+            @unknown default: message = "The App Store didn't say what happened. Try Restore purchases."
             }
         } catch { message = error.localizedDescription }
     }
@@ -66,7 +69,7 @@ enum CreationKind {
         guard !busy else { return }
         busy = true; message = nil
         defer { busy = false }
-        do { try await AppStore.sync(); await refresh(); message = unlocked ? "Hereabouts Pro restored." : "No current lifetime purchase was found for this Apple account." }
+        do { try await AppStore.sync(); await refresh(); message = unlocked ? "Hereabouts Pro restored." : "No Pro purchase was found for this Apple Account." }
         catch { message = error.localizedDescription }
     }
 }

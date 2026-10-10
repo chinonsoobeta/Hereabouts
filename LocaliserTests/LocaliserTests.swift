@@ -52,7 +52,11 @@ final class LocaliserTests: XCTestCase {
         let session = try SKTestSession(contentsOf: file)
         session.resetToDefaultState(); session.disableDialogs = true; session.clearTransactions()
         defer { session.clearTransactions(); session.resetToDefaultState() }
-        let pro = ProAccess(); await pro.loadProduct()
+        let pro = ProAccess()
+        // Until the App Store answers, the Pro screen shows a spinner rather than "Pro isn't available".
+        XCTAssertFalse(pro.productChecked)
+        await pro.loadProduct()
+        XCTAssertTrue(pro.productChecked)
         _ = try XCTUnwrap(pro.product, "StoreKit did not load the local test product; do not enter an Apple account.")
         try await session.setSimulatedError(.generic(.userCancelled), forAPI: .purchase)
         await pro.purchase()
@@ -64,7 +68,7 @@ final class LocaliserTests: XCTestCase {
         session.askToBuyEnabled = true
         await pro.purchase()
         XCTAssertFalse(pro.unlocked)
-        XCTAssertEqual(pro.message, "Purchase awaiting approval. Free features remain available.")
+        XCTAssertEqual(pro.message, "Waiting for approval. Everything free still works.")
     }
 
     func testBackupRoundTripPreservesFilesDatesHistoryAndPacking() throws {
@@ -134,7 +138,11 @@ final class LocaliserTests: XCTestCase {
         XCTAssertThrowsError(try target.restore(bad))
         bad = good; bad.version = 2
         XCTAssertThrowsError(try target.restore(bad))
-        XCTAssertThrowsError(try LibraryBackup.decoded(Data("broken".utf8)))
+        XCTAssertThrowsError(try LibraryBackup.decoded(Data("broken".utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.notABackup)) }
+        XCTAssertThrowsError(try LibraryBackup.decoded(Data(#"{"version":2,"records":[{"future":true}]}"#.utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
+        XCTAssertThrowsError(try LibraryBackup.decoded(good.encoded().prefix(200))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.damaged)) }
+        bad = good; bad.version = 2
+        XCTAssertThrowsError(try target.restore(bad)) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
         let existing = try target.addItem(name: "Keep me")
         XCTAssertThrowsError(try target.restore(good)) { XCTAssertEqual($0 as? LocaliserError, .libraryNotEmpty) }
         XCTAssertEqual(target.items.map(\.id), [existing.id])
@@ -339,6 +347,34 @@ final class LocaliserTests: XCTestCase {
         XCTAssertNil(drawer.parent)
         XCTAssertEqual(store.items.count, 1)
         XCTAssertEqual(item.movements.first?.fromPath, "Room")
+        // A place inside another: what it holds moves up a level, and moving up isn't seeing.
+        let kitchen = try store.addPlace(name: "Kitchen")
+        let cupboard = try store.addPlace(name: "Cupboard", parent: kitchen)
+        let shelf = try store.addPlace(name: "Shelf", parent: cupboard)
+        let tin = try store.addItem(name: "Tin", place: cupboard)
+        let seen = Date(timeIntervalSinceNow: -120 * 86_400)
+        tin.confirmedAt = seen
+        // Restored from a backup older than V6: no check date until the next launch fills it in.
+        let jar = try store.addItem(name: "Jar", place: cupboard)
+        jar.createdAt = seen; jar.confirmedAt = nil
+        try store.deletePlace(cupboard, clearContents: true)
+        XCTAssertEqual(tin.place, kitchen)
+        XCTAssertEqual(shelf.parent, kitchen)
+        XCTAssertEqual(tin.confirmedAt, seen)
+        XCTAssertEqual(jar.lastConfirmed, seen)
+        XCTAssertEqual(tin.movements.map(\.toPath), ["Kitchen"])
+    }
+
+    func testTypedPathsFindTheDeepestPlaceThatExists() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let garage = try store.addPlace(name: "Garage")
+        let shelf = try store.addPlace(name: "Shelf", parent: garage)
+        XCTAssertEqual(store.deepestExistingPlace(forPath: "garage > shelf"), shelf)
+        // The chooser checks this before creating anything, so "Garage › Shelf › Box" can't be made inside Garage
+        // while Garage is the place being edited, and nothing is left behind.
+        XCTAssertEqual(store.deepestExistingPlace(forPath: "Garage › Shelf › Box"), shelf)
+        XCTAssertNil(store.deepestExistingPlace(forPath: "Loft / Box"))
+        XCTAssertEqual(store.places.count, 2)
     }
 
     func testNameOnlyCaptureAndMovementHistory() throws {

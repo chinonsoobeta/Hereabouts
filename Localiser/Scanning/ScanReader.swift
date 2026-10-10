@@ -11,7 +11,7 @@ enum ScanError: LocalizedError {
         switch self {
         case .tooLarge: "Choose a document under 20 MB or an image under 25 megapixels."
         case .tooManyPages: "Choose a document with at most ten pages."
-        case .unreadable: "This document could not be read. Try a clear photo, a PDF, or enter the date manually."
+        case .unreadable: "This document couldn't be read. Try a clearer photo or a PDF, or enter the date manually."
         case .lockedPDF: "Unlock the PDF before importing it."
         }
     }

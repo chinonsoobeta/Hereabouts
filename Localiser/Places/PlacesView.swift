@@ -196,7 +196,8 @@ struct PlaceDetailView: View {
                 do { try store.deletePlace(place, clearContents: true); dismiss() } catch { self.error = error.localizedDescription }
             }
         } message: {
-            Text("Things stored directly here will have no place set. Places inside move up to the top level. Nothing else is deleted.")
+            Text(place.parent.map { "Everything inside moves to \u{201C}\($0.name)\u{201D}. Nothing else is deleted." }
+                 ?? "Things stored directly here will have no place set. Places inside become rooms of their own. Nothing else is deleted.")
         }
         .alert("Couldn't delete", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }

@@ -28,9 +28,10 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     override init() {
         super.init()
         center.delegate = self
-        let keep = UNNotificationAction(identifier: "keep", title: "Keep purchase", options: [.foreground])
-        let returning = UNNotificationAction(identifier: "returning", title: "Plan to return", options: [.foreground])
-        center.setNotificationCategories([UNNotificationCategory(identifier: "localiser.return", actions: [keep, returning], intentIdentifiers: [])])
+        // The same answers as the Due screen, in the same order.
+        let returning = UNNotificationAction(identifier: "returning", title: "Returning it", options: [.foreground])
+        let keep = UNNotificationAction(identifier: "keep", title: "Keeping it", options: [.foreground])
+        center.setNotificationCategories([UNNotificationCategory(identifier: "localiser.return", actions: [returning, keep], intentIdentifiers: [])])
     }
 
     func enable() async {

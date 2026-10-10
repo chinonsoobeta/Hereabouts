@@ -122,13 +122,13 @@ struct StoreFailureView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Image(systemName: "externaldrive.badge.exclamationmark").font(.system(size: 44)).foregroundStyle(Theme.purple).accessibilityHidden(true)
-                    Text("Hereabouts couldn't open your library").font(.wbTitle).foregroundStyle(Theme.ink)
-                    Text("Nothing has been deleted. Restarting your phone often fixes this. If it keeps happening, save a copy of the library file and send it to us.").font(.wbBody).foregroundStyle(Theme.secondary)
+                    Text("Hereabouts couldn't open your notebook").font(.wbTitle).foregroundStyle(Theme.ink)
+                    Text("Nothing has been deleted. Restarting your phone often fixes this. If it keeps happening, save a copy of the notebook file and send it to us.").font(.wbBody).foregroundStyle(Theme.secondary)
                     if let reason { Text(reason).font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
                     if !files.isEmpty {
-                        ShareLink(items: files) { Label("Save a copy of the library file", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
+                        ShareLink(items: files) { Label("Save a copy of the notebook file", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
                     }
-                    Link(destination: Support.mail(subject: "Library won't open", body: reason ?? "")) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
+                    Link(destination: Support.mail(subject: "Notebook won't open", body: reason ?? "")) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
                 }
                 .padding(20)
             }

@@ -163,8 +163,11 @@ struct NotebookLine: View {
     /// Ink rather than pencil for the detail, where it is the answer (the Pro allowance table).
     var strongDetail = false
     var body: some View {
-        if textSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: 6) { nameText; detailText }
+        if detail.isEmpty {
+            // "Nothing due" has nothing to point at, so it gets no leader.
+            nameText.frame(maxWidth: .infinity, alignment: .leading)
+        } else if textSize.isAccessibilitySize {
+            stacked
         } else {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -173,10 +176,12 @@ struct NotebookLine: View {
                         .frame(minWidth: 16, maxWidth: .infinity).frame(height: 2).accessibilityHidden(true)
                     detailText.fixedSize(horizontal: true, vertical: true)
                 }
-                VStack(alignment: .leading, spacing: 6) { nameText; detailText }
+                stacked
             }
         }
     }
+    /// Name above detail, flush left. Without the full-width frame, a short pair sits in the middle of the row.
+    private var stacked: some View { VStack(alignment: .leading, spacing: 6) { nameText; detailText }.frame(maxWidth: .infinity, alignment: .leading) }
     private var nameText: some View { Text(highlighted(name)).font(.wbItem).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true) }
     private var detailText: some View { Text(highlighted(detail)).font(.wbCaption).foregroundStyle(strongDetail ? Theme.ink : Theme.pencil).fixedSize(horizontal: false, vertical: true) }
     private func highlighted(_ text: String) -> AttributedString {
