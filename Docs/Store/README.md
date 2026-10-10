@@ -20,8 +20,8 @@ Set the status bar first with `xcrun simctl status_bar <device> override --time 
 | `iPhone-6.9/7-stocktake.png` | Still there? Keeps itself honest |
 
 Before uploading:
-- **Due:** the test allows notifications on the simulator first, so Due shows reminders queued and no warning badge.
-- **Pro:** not included. The test scheme has no StoreKit configuration, so the Pro screen says the product is unavailable. Take it from a sandbox build once the App Store Connect product exists.
+- **Due:** the test turns reminders on before the first shot, so Due shows reminders queued and no screen carries the warning badge. The name-only capture test turns notifications off until the app is deleted, so on a simulator that has run the full suite, first run `xcrun simctl uninstall <device> dev.localiser.app`. If you forget, the test stops and says so.
+- **Pro:** not included. The iOS 26.5 simulator's local StoreKit service doesn't load the product (the purchase unit tests skip there for the same reason), so the Pro screen says Pro isn't available. Take it from a sandbox build once the App Store Connect product exists.
 - The app is iPhone-only, so iPad screenshots aren't required. App Store Connect scales the 6.9-inch set down for smaller iPhones.
 
 `night-review/` holds the same eight screens in dark mode, downscaled, for checking against the night board. They are not for the store.

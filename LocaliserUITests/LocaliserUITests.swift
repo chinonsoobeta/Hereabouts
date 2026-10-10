@@ -116,6 +116,22 @@ import XCTest
         app.launch()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
+        // Store shots show reminders on, as a real user would have them. Turn them on before the first shot: until
+        // then the Due tab carries a warning badge on every screen.
+        app.tabBars.buttons["Due"].tap()
+        let turnOn = app.buttons["Turn on reminders"]
+        if turnOn.waitForExistence(timeout: 2) {
+            turnOn.tap()
+            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+            if allow.waitForExistence(timeout: 5) { allow.tap() }
+            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
+        }
+        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
+        guard queued.waitForExistence(timeout: 5) else {
+            XCTFail("Notifications are off for Hereabouts on this simulator, so Due would show a warning. The name-only capture test turns them off. Uninstall Hereabouts from the simulator, then run this test on its own.")
+            return
+        }
+        app.tabBars.buttons["Find"].tap()
         try shot("1-find")
         search.tap(); search.typeText("pass\n")
         XCTAssertTrue(app.staticTexts["Passports (family)"].firstMatch.waitForExistence(timeout: 5))
@@ -128,14 +144,6 @@ import XCTest
         XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
         try shot("3-thing")
         app.tabBars.buttons["Due"].tap()
-        // Store shots show Due with reminders on, as a real user would have it.
-        let turnOn = app.buttons["Turn on reminders"]
-        if turnOn.waitForExistence(timeout: 2) {
-            turnOn.tap()
-            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
-            if allow.waitForExistence(timeout: 5) { allow.tap() }
-            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
-        }
         try shot("4-due")
         app.tabBars.buttons["Trips"].tap()
         try shot("5-trips")
@@ -165,6 +173,40 @@ import XCTest
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
         try shot("8-pro")
+        // Design review: the grouped lists and forms, which change the most between light and dark.
+        app.navigationBars["Pro"].buttons["Settings"].tap()
+        try shot("review-settings")
+        let leaving = app.buttons["settings.leaving"]
+        reveal(leaving, in: app); leaving.tap()
+        XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
+        try shot("review-leaving")
+        app.navigationBars["Leaving"].buttons["Settings"].tap()
+        app.buttons["Done"].tap()
+        app.tabBars.buttons["Places"].tap()
+        try shot("review-places")
+        app.staticTexts["Garage"].firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Garage"].waitForExistence(timeout: 5))
+        try shot("review-place")
+        app.tabBars.buttons["Find"].tap()
+        search.tap(); search.typeText("running\n")
+        app.staticTexts["Running shoes"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
+        app.buttons["item.move"].tap()
+        XCTAssertTrue(app.navigationBars["Choose a place"].waitForExistence(timeout: 5))
+        try shot("review-chooser")
+        app.navigationBars["Choose a place"].buttons["Cancel"].tap()
+        app.navigationBars["Running shoes"].buttons["Edit"].tap()
+        XCTAssertTrue(app.navigationBars["Edit thing"].waitForExistence(timeout: 5))
+        try shot("review-editor")
+        app.navigationBars["Edit thing"].buttons["Cancel"].tap()
+        app.tabBars.buttons["Trips"].tap()
+        app.staticTexts["4 things"].tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        try shot("review-kit")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.staticTexts["1 of 8 packed"].tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        try shot("review-trip")
     }
 
     func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
@@ -315,16 +357,21 @@ import XCTest
         app.tabBars.buttons["Due"].tap()
         let disabled = app.descendants(matching: .any).matching(identifier: "Open notification settings").firstMatch
         let turnOn = app.buttons["Turn on reminders"]
-        if !disabled.exists && turnOn.exists {
-            reveal(turnOn, in: app)
-            turnOn.tap()
-            let deny = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Don’t Allow"]
-            XCTAssertTrue(deny.waitForExistence(timeout: 5), app.debugDescription)
-            deny.tap()
+        // Turning notifications off can only be checked until something allows them. After the store screenshots
+        // have, reminders are queued and there is no warning to see.
+        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
+        if !queued.waitForExistence(timeout: 2) {
+            if !disabled.exists && turnOn.exists {
+                reveal(turnOn, in: app)
+                turnOn.tap()
+                let deny = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Don’t Allow"]
+                XCTAssertTrue(deny.waitForExistence(timeout: 5), app.debugDescription)
+                deny.tap()
+            }
+            reveal(disabled, in: app)
+            XCTAssertTrue(disabled.waitForExistence(timeout: 5))
+            let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
         }
-        reveal(disabled, in: app)
-        XCTAssertTrue(disabled.waitForExistence(timeout: 5))
-        let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
         app.tabBars.buttons["Find"].tap()
         app.staticTexts["Return by"].tap()
         reveal(app.buttons["Add to Calendar"], in: app)
@@ -479,9 +526,7 @@ import XCTest
         let local = app.staticTexts["On My iPhone"].firstMatch
         if local.waitForExistence(timeout: 5) { local.tap() }
         // Backup tests save into On My iPhone too, so the fixture can sort out of view. Search for it.
-        let search = app.searchFields["Search"].firstMatch
-        if search.waitForExistence(timeout: 5) { search.tap(); search.typeText("Localiser-test-expiry") }
-        let document = app.cells["Localiser-test-expiry, pdf"].firstMatch
+        let document = searchFilesPicker(app, for: "Localiser-test-expiry")["Localiser-test-expiry, pdf"].firstMatch
         XCTAssertTrue(document.waitForExistence(timeout: 10), app.debugDescription)
         document.tap()
         let candidate = app.buttons.containing(.staticText, identifier: "2028-07-14").firstMatch
@@ -548,7 +593,8 @@ import XCTest
         openLeaving(in: app)
         let chooseBackup = app.buttons["Restore from a backup"]
         reveal(chooseBackup, in: app); chooseBackup.tap()
-        let savedFile = app.cells.matching(NSPredicate(format: "label BEGINSWITH %@", backupName)).firstMatch
+        // Every run leaves a backup in On My iPhone, so this one can sort out of view. Search for it, as the PDF test does.
+        let savedFile = searchFilesPicker(app, for: uniqueName).matching(NSPredicate(format: "label BEGINSWITH %@", backupName)).firstMatch
         XCTAssertTrue(savedFile.waitForExistence(timeout: 10), app.debugDescription); savedFile.tap()
         let confirmation = app.alerts["Restore backup?"]
         XCTAssertTrue(confirmation.waitForExistence(timeout: 5), app.debugDescription)
@@ -570,6 +616,16 @@ import XCTest
         let leaving = app.buttons["settings.leaving"]
         reveal(leaving, in: app); leaving.tap()
         XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
+    }
+
+    /// Searches the Files picker and returns its result cells. The results sit over the folder the picker opened in,
+    /// which can hold the same file underneath, where it can't be tapped.
+    private func searchFilesPicker(_ app: XCUIApplication, for text: String) -> XCUIElementQuery {
+        let search = app.searchFields["Search"].firstMatch
+        if search.waitForExistence(timeout: 5) { search.tap(); search.typeText(text) }
+        let results = app.otherElements["DOCSearchControllerContainerViewIdentifier"]
+        let scope: XCUIElement = results.waitForExistence(timeout: 5) ? results : app
+        return scope.cells
     }
 
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
