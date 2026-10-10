@@ -20,6 +20,8 @@ struct LibrarySettingsView: View {
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @AppStorage(Home.nameKey) private var homeName = ""
+    @AppStorage(Rituals.recapKey) private var recapOn = true
+    @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
 
     var body: some View {
         List {
@@ -33,7 +35,11 @@ struct LibrarySettingsView: View {
             } header: { Text("Home") }
             Section {
                 Toggle("Show item names in reminders", isOn: $showItemNames)
-                    .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines) }
+                    .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
+                Toggle("Sunday recap", isOn: $recapOn)
+                    .onChange(of: recapOn) { _, _ in reminders.refreshRituals(store) }
+                Toggle("Monthly stocktake", isOn: $stocktakeOn)
+                    .onChange(of: stocktakeOn) { _, _ in reminders.refreshRituals(store) }
             } header: { Text("Reminders") }
               footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved item” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {

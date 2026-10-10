@@ -78,7 +78,18 @@ final class LocaliserStore {
         if let loadError { throw loadError }
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
+        try backfillConfirmation()
         try refresh()
+    }
+
+    /// Libraries from before V6 have no confirmation date; the last move or the day it was added stands in.
+    private func backfillConfirmation() throws {
+        let request = NSFetchRequest<Belonging>(entityName: "Belonging")
+        request.predicate = NSPredicate(format: "confirmedAt == nil")
+        let items = try context.fetch(request)
+        guard !items.isEmpty else { return }
+        for item in items { item.confirmedAt = item.movements.map(\.date).max() ?? item.createdAt }
+        try context.save()
     }
 
     /// The on-device library file. The name predates the Hereabouts rename and must not change.
@@ -119,7 +130,7 @@ final class LocaliserStore {
         let cleanNotes = try limited(notes, TextLimit.notes), cleanAliases = try limited(aliases, TextLimit.aliases)
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
         item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
-        item.createdAt = .now; item.archived = false; item.place = place; item.photo = photo
+        item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo
         try save()
         return item
     }
@@ -134,11 +145,19 @@ final class LocaliserStore {
 
     func move(_ item: Belonging, to place: Place?) throws {
         recordMove(item, to: place)
+        item.confirmedAt = .now
+        try save()
+    }
+
+    /// "Still there": the thing is where the notebook says.
+    func confirm(_ item: Belonging, on date: Date = .now) throws {
+        item.confirmedAt = date
         try save()
     }
 
     func recordMove(_ item: Belonging, to place: Place?) {
         guard item.place?.id != place?.id else { return }
+        item.confirmedAt = .now
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
         movement.id = UUID(); movement.date = .now; movement.item = item
         movement.fromPath = item.place?.path ?? "Unspecified"

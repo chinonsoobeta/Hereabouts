@@ -24,10 +24,10 @@ struct ProView: View {
                     allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
                     allowance("Packing kits", free: CreationKind.kit.freeLimit.description)
                     allowance("Receipt scans a month", free: CreationKind.scan.freeLimit.description)
-                    NotebookLine(name: "Everything else", detail: "Already free").card()
+                    NotebookLine(name: "Everything else", detail: "Already free", strongDetail: true).card()
                 }
                 StickyNote {
-                    Text("Reminders, calendar, backups, Siri and the widget are free for everyone. Pro only takes the limits off. If you never hit them, you never need it.")
+                    Text("Reminders, calendar, backups, Siri and Spotlight are free for everyone. Pro only takes the limits off. If you never hit them, you never need it.")
                         .font(.wbBody).foregroundStyle(Theme.ink)
                 }
                 if pro.unlocked {
@@ -67,6 +67,6 @@ struct ProView: View {
         }
     }
     private func allowance(_ name: String, free: String) -> some View {
-        NotebookLine(name: name, detail: "\(free) → No limit").card()
+        NotebookLine(name: name, detail: "\(free) → No limit", strongDetail: true).card()
     }
 }

@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="25000" systemVersion="24A" minimumToolsVersion="Automatic" sourceLanguage="Swift">
+  <entity name="Belonging" representedClassName="Belonging" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="notes" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="aliases" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="archived" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" />
+    <attribute name="confirmedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" />
+    <attribute name="photo" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" />
+    <relationship name="place" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Place" inverseName="items" inverseEntity="Place" />
+    <relationship name="movements" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Movement" inverseName="item" inverseEntity="Movement" />
+    <relationship name="deadlines" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Deadline" inverseName="item" inverseEntity="Deadline" />
+    <relationship name="scans" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ScanRecord" inverseName="item" inverseEntity="ScanRecord" />
+    <relationship name="kitEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="KitEntry" inverseName="item" inverseEntity="KitEntry" />
+    <relationship name="tripEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TripEntry" inverseName="item" inverseEntity="TripEntry" />
+  </entity>
+  <entity name="Place" representedClassName="Place" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Belonging" inverseName="place" inverseEntity="Belonging" />
+    <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Place" inverseName="children" inverseEntity="Place" />
+    <relationship name="children" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Place" inverseName="parent" inverseEntity="Place" />
+    <relationship name="tripHomes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TripEntry" inverseName="homePlace" inverseEntity="TripEntry" />
+  </entity>
+  <entity name="Movement" representedClassName="Movement" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" />
+    <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" />
+    <attribute name="fromPath" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="toPath" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="movements" inverseEntity="Belonging" />
+  </entity>
+  <entity name="Deadline" representedClassName="Deadline" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="dayString" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="kindRaw" optional="YES" attributeType="String" defaultValueString="returns" />
+    <attribute name="decisionRaw" optional="YES" attributeType="String" defaultValueString="open" />
+    <attribute name="source" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="leadDays" optional="YES" attributeType="Integer 16" defaultValueString="3" usesScalarValueType="YES" />
+    <attribute name="hour" optional="YES" attributeType="Integer 16" defaultValueString="9" usesScalarValueType="YES" />
+    <attribute name="enabled" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="deadlines" inverseEntity="Belonging" />
+  </entity>
+  <entity name="ScanRecord" representedClassName="ScanRecord" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="createdAt" optional="YES" attributeType="Date" />
+    <attribute name="filename" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="mime" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="scans" inverseEntity="Belonging" />
+    <attribute name="counted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+  </entity>
+  <entity name="Kit" representedClassName="Kit" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="entries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="KitEntry" inverseName="kit" inverseEntity="KitEntry" />
+    <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="KitTask" inverseName="kit" inverseEntity="KitTask" />
+  </entity>
+  <entity name="KitEntry" representedClassName="KitEntry" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="unitQuantity" optional="YES" attributeType="Integer 64" defaultValueString="1" usesScalarValueType="YES" />
+    <attribute name="perNight" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="perDay" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="unlinked" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="conditionRaw" optional="YES" attributeType="String" defaultValueString="always" />
+    <relationship name="kit" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Kit" inverseName="entries" inverseEntity="Kit" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="kitEntries" inverseEntity="Belonging" />
+  </entity>
+  <entity name="KitTask" representedClassName="KitTask" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="title" optional="YES" attributeType="String" defaultValueString="" />
+    <relationship name="kit" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Kit" inverseName="tasks" inverseEntity="Kit" />
+  </entity>
+  <entity name="TripRecord" representedClassName="TripRecord" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="startDay" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="endDay" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="flying" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="international" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="work" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="stateRaw" optional="YES" attributeType="String" defaultValueString="packing" />
+    <relationship name="entries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TripEntry" inverseName="trip" inverseEntity="TripEntry" />
+    <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TripTask" inverseName="trip" inverseEntity="TripTask" />
+  </entity>
+  <entity name="TripEntry" representedClassName="TripEntry" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="name" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="unitQuantity" optional="YES" attributeType="Integer 64" defaultValueString="1" usesScalarValueType="YES" />
+    <attribute name="perNight" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="perDay" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="unlinked" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <attribute name="conditionRaw" optional="YES" attributeType="String" defaultValueString="always" />
+    <attribute name="manualQuantity" optional="YES" attributeType="Integer 64" defaultValueString="-1" usesScalarValueType="YES" />
+    <attribute name="packedCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" />
+    <attribute name="resolutionRaw" optional="YES" attributeType="String" defaultValueString="pending" />
+    <relationship name="trip" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TripRecord" inverseName="entries" inverseEntity="TripRecord" />
+    <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Belonging" inverseName="tripEntries" inverseEntity="Belonging" />
+    <relationship name="homePlace" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Place" inverseName="tripHomes" inverseEntity="Place" />
+  </entity>
+  <entity name="TripTask" representedClassName="TripTask" syncable="YES">
+    <attribute name="id" optional="YES" attributeType="UUID" />
+    <attribute name="title" optional="YES" attributeType="String" defaultValueString="" />
+    <attribute name="checked" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" />
+    <relationship name="trip" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TripRecord" inverseName="tasks" inverseEntity="TripRecord" />
+  </entity>
+</model>

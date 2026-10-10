@@ -62,6 +62,94 @@ import XCTest
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "The flat ·")).firstMatch.exists, app.debugDescription)
     }
 
+    func testRecapStocktakeAndStillThere() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+
+        // A thing nobody has looked at for months asks on its own page.
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        let still = app.buttons["item.stillThere"]
+        XCTAssertTrue(still.waitForExistence(timeout: 5), app.debugDescription)
+        still.tap()
+        XCTAssertTrue(still.waitForNonExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        search.tap(); search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 6))
+
+        // Find offers the recap, which leads into the stocktake.
+        let readIt = app.buttons["Read it"]
+        XCTAssertTrue(readIt.waitForExistence(timeout: 5), app.debugDescription)
+        readIt.tap()
+        XCTAssertTrue(app.navigationBars["Recap"].waitForExistence(timeout: 5))
+        let recap = XCTAttachment(screenshot: app.screenshot()); recap.name = "Recap"; recap.lifetime = .keepAlways; add(recap)
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        let start = app.buttons["Start the stocktake"]
+        reveal(start, in: app); start.tap()
+
+        XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5), app.debugDescription)
+        let card = XCTAttachment(screenshot: app.screenshot()); card.name = "Stocktake"; card.lifetime = .keepAlways; add(card)
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        app.buttons["Still there"].tap()
+        app.buttons["Don't have it any more"].tap()
+        let undo = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Undo: keep")).firstMatch
+        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        undo.tap()
+        XCTAssertTrue(app.staticTexts["All checked. The notebook's up to date. See you next month."].waitForExistence(timeout: 5), app.debugDescription)
+        app.buttons["Done"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Keeping up."].waitForExistence(timeout: 5), "Once read, Find keeps only the keeping-up stamp")
+        XCTAssertFalse(readIt.exists, "The recap is offered once a week")
+        XCTAssertFalse(app.buttons["Start"].exists, "The stocktake is done for the month")
+    }
+
+    /// Store and design-review screenshots from the demo library. Runs only when asked:
+    /// `TEST_RUNNER_STORE_SHOTS=<folder> xcodebuild … -only-testing:LocaliserUITests/LocaliserUITests/testStoreScreenshots test`
+    func testStoreScreenshots() throws {
+        guard let path = ProcessInfo.processInfo.environment["STORE_SHOTS"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_STORE_SHOTS to a folder to take store screenshots") }
+        let folder = URL(fileURLWithPath: path)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let app = XCUIApplication()
+        func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        try shot("1-find")
+        search.tap(); search.typeText("pass")
+        XCTAssertTrue(app.staticTexts["Passports (family)"].firstMatch.waitForExistence(timeout: 5))
+        try shot("2-search")
+        search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 4))
+        search.typeText("running\n")
+        app.staticTexts["Running shoes"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
+        try shot("3-thing")
+        app.tabBars.buttons["Due"].tap()
+        try shot("4-due")
+        app.tabBars.buttons["Trips"].tap()
+        try shot("5-trips")
+        app.tabBars.buttons["Find"].tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        search.tap(); search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 8))
+        let readIt = app.buttons["Read it"]
+        if !readIt.isHittable { search.typeText("\n") }
+        XCTAssertTrue(readIt.waitForExistence(timeout: 5), app.debugDescription)
+        readIt.tap()
+        XCTAssertTrue(app.navigationBars["Recap"].waitForExistence(timeout: 5))
+        try shot("6-recap")
+        let start = app.buttons["Start the stocktake"]
+        reveal(start, in: app); start.tap()
+        XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5))
+        try shot("7-stocktake")
+        app.buttons["Later"].tap()
+        app.buttons["Settings"].firstMatch.tap()
+        let pro = app.buttons["Purchase or restore lifetime Pro"]
+        reveal(pro, in: app); pro.tap()
+        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
+        try shot("8-pro")
+    }
+
     func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]

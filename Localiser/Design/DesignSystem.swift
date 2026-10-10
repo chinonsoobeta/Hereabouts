@@ -14,8 +14,10 @@ enum Theme {
     static let deepInk = adaptive(0x3B2A7A, 0xB59CF5)
     static let pencil = adaptive(0x655C7A, 0xB5ABC9)
     static let rule = adaptive(0xD9D0E6, 0x3A3150)
-    static let leader = adaptive(0xB4A9C7, 0x5A4F78)
-    static let amber = adaptive(0x9A4A14, 0xE8A772)
+    static let leader = adaptive(0xB4A9C7, 0x4A4062)
+    static let amber = adaptive(0x9A4A14, 0xF0A86E)
+    /// The boxed note on Find (keeping up, stocktake): lilac by day, near-black by night.
+    static let noteBox = adaptive(0xECE5F3, 0x211B2E)
     static let green = adaptive(0x2E6B3F, 0x8BD1A0)
 
     // Existing component roles use the new palette during the sequential screen restyle.
@@ -111,10 +113,17 @@ struct SectionHeading: View {
 }
 
 struct Stamp: View {
-    enum Tone { case neutral, due, done }
+    enum Tone { case neutral, due, done, purple }
     let text: String
     var tone: Tone = .neutral
-    private var ink: Color { tone == .due ? Theme.amber : tone == .done ? Theme.green : Theme.ink }
+    private var ink: Color {
+        switch tone {
+        case .due: Theme.amber
+        case .done: Theme.green
+        case .purple: Theme.purpleInk
+        case .neutral: Theme.ink
+        }
+    }
     var body: some View {
         Text(text.uppercased())
             .font(.wbLabel).tracking(1.54)
@@ -134,6 +143,8 @@ struct NotebookLine: View {
     let name: String
     let detail: String
     var query = ""
+    /// Ink rather than pencil for the detail, where it is the answer (the Pro allowance table).
+    var strongDetail = false
     var body: some View {
         if textSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 6) { nameText; detailText }
@@ -150,7 +161,7 @@ struct NotebookLine: View {
         }
     }
     private var nameText: some View { Text(highlighted(name)).font(.wbItem).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true) }
-    private var detailText: some View { Text(highlighted(detail)).font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+    private var detailText: some View { Text(highlighted(detail)).font(.wbCaption).foregroundStyle(strongDetail ? Theme.ink : Theme.pencil).fixedSize(horizontal: false, vertical: true) }
     private func highlighted(_ text: String) -> AttributedString {
         var result = AttributedString(text)
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)

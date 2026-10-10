@@ -40,6 +40,8 @@ These are targets, not results. If one is missed, keep the failed run, fix the d
 - Calendar: add one date and all dates with write-only access, then with access denied.
 - Scanning: blurred receipt, several dates, no date, an expired document, camera, photo and PDF. A cancelled or failed scan must not use one of the 5 free monthly scans.
 - Purchases: StoreKit sandbox buy, restore on a second device, cancel, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
+- Siri: "Where is <thing> in Hereabouts", "Write something down in Hereabouts" and "What's due in Hereabouts", with the phone locked and unlocked. Check the thing picker understands nicknames, and that the 201st thing on the free plan is refused politely.
+- Sunday recap and stocktake: leave the phone through a Sunday 18:00 and a first Saturday with things not checked for three months. Tap each notification and check it opens the right sheet. Turn both off in Settings and check nothing more arrives. Check the trip-eve reminder the evening before a trip that isn't fully packed.
 - iPad: install on an iPad and walk all four tabs. The app is iPhone-only and runs in compatibility mode.
 
 No public launch with an open data-loss defect, a silently accepted wrong date or missing proof that real reminders fire.
@@ -76,6 +78,12 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 >
 > YOURS, ON YOUR PHONE
 > No account. No ads. No tracking. Everything stays on your iPhone and in your device backup. Export a backup or a spreadsheet whenever you like.
+>
+> KEEPS ITSELF HONEST
+> One quiet recap on Sunday evenings. Once a month, a few "Still there?" questions about things you haven't looked at in a while. Both can be turned off.
+>
+> ASK SIRI
+> "Where is my passport?" Hereabouts answers from your notebook. Add things and hear what's due, hands-free.
 >
 > FAIR PRICE
 > Free for up to 200 things, 2 kits and 5 scans a month. Hereabouts Pro removes the limits for a single payment, shared with your family. No subscription, ever. Every feature is in the free version.

@@ -9,6 +9,8 @@ final class Belonging: NSManagedObject, Identifiable {
     @NSManaged var aliases: String
     @NSManaged var archived: Bool
     @NSManaged var createdAt: Date
+    /// When someone last said this is where it lives: added, moved, put away or "Still there".
+    @NSManaged var confirmedAt: Date?
     @NSManaged var photo: Data?
     @NSManaged var place: Place?
     @NSManaged var movements: Set<Movement>
@@ -16,6 +18,7 @@ final class Belonging: NSManagedObject, Identifiable {
     @NSManaged var scans: Set<ScanRecord>
     @NSManaged var tripEntries: Set<TripEntry>
     @NSManaged var kitEntries: Set<KitEntry>
+    var lastConfirmed: Date { confirmedAt ?? movements.map(\.date).max() ?? createdAt }
     var packedTrips: [TripRecord] {
         var seen = Set<UUID>()
         return tripEntries.filter(\.allocatesItem).compactMap(\.trip).filter { seen.insert($0.id).inserted }.sorted { $0.startDay < $1.startDay }

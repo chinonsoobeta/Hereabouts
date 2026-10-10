@@ -17,13 +17,17 @@ enum DemoLibrary {
         let leftDrawer = try store.addPlace(name: "Left drawer", parent: office)
 
         let passport = try store.addItem(name: "Passports (family)", place: topShelf, aliases: "passport")
-        _ = try store.addItem(name: "Spare passport photos", place: leftDrawer)
-        _ = try store.addItem(name: "Cordless drill", place: rack)
+        let photos = try store.addItem(name: "Spare passport photos", place: leftDrawer)
+        let drill = try store.addItem(name: "Cordless drill", place: rack)
         let goggles = try store.addItem(name: "Ski goggles", place: rack)
         let layers = try store.addItem(name: "Base layers", place: drawer)
         let shoes = try store.addItem(name: "Running shoes", place: hall)
         let jacket = try store.addItem(name: "Rain jacket", place: hall)
-        _ = try store.addItem(name: "Winter tires", place: backWall)
+        let tires = try store.addItem(name: "Winter tires", place: backWall)
+        // A few things nobody has looked at in months, for the stocktake and the recap's drifting list.
+        for (item, months) in [(drill, -4), (tires, -7), (photos, -5)] {
+            try store.confirm(item, on: Calendar.current.date(byAdding: .month, value: months, to: .now) ?? .now)
+        }
 
         let today = CalendarDay(.now)
         func day(_ offset: Int) -> CalendarDay { today.adding(days: offset) ?? today }

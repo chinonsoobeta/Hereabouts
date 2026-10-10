@@ -13,6 +13,10 @@ struct FindView: View {
     @State private var addingPlace = false
     @State private var openedItem: Belonging?
     @AppStorage(Home.nameKey) private var homeName = ""
+    @Environment(ReminderService.self) private var reminders
+    @State private var ritual: Ritual?
+    @State private var showDue = false
+    @State private var photoFirst = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -72,16 +76,38 @@ struct FindView: View {
             }
             ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true }.popoverTip(ScanTip()) }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            ToolbarItem(placement: .topBarTrailing) { Button("Add item", systemImage: "plus") { showAdd = true }.buttonStyle(.borderedProminent).tint(Theme.purpleFill) }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button("Start with a name", systemImage: "character.cursor.ibeam") { photoFirst = false; showAdd = true }
+                    Button("Start with a photo", systemImage: "camera") { photoFirst = true; showAdd = true }
+                } label: { Label("Add item", systemImage: "plus") } primaryAction: { photoFirst = false; showAdd = true }
+                .buttonStyle(.borderedProminent).tint(Theme.purpleFill)
+                .accessibilityHint("Touch and hold to start with a photo")
+            }
         }
         .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
-        .sheet(isPresented: $showAdd) { NavigationStack { ItemEditor() } }
+        .sheet(isPresented: $showAdd) { NavigationStack { ItemEditor(photoFirst: photoFirst) } }
         .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
+        .sheet(item: $ritual) { ritual in
+            NavigationStack {
+                switch ritual {
+                case .recap: RecapView(seeDue: { showDue = true }, startStocktake: { Task { @MainActor in self.ritual = .stocktake } })
+                case .stocktake: StocktakeView()
+                }
+            }
+        }
+        .navigationDestination(isPresented: $showDue) { DueView() }
+        .onChange(of: reminders.openedRitual, initial: true) { _, value in
+            guard let value, let opened = Ritual(rawValue: value) else { return }
+            ritual = opened
+            reminders.openedRitual = nil
+        }
     }
 
     @ViewBuilder private var dashboard: some View {
+        RitualBanners { ritual = $0 }
         if !dueSoon.isEmpty {
             HStack {
                 SectionHeading(title: "Due")
@@ -212,9 +238,13 @@ struct ItemEditor: View {
     @State private var suggestion: ItemSearch.CaptureSuggestion?
     @State private var upgrade = false
     @FocusState private var nameFocused: Bool
+    /// Photo-first capture: the camera opens before the name. The place starts at the last one used.
+    private let photoFirst: Bool
+    static let lastPlaceKey = "lastPlaceID"
 
-    init(item: Belonging? = nil, place: Place? = nil) {
+    init(item: Belonging? = nil, place: Place? = nil, photoFirst: Bool = false) {
         self.item = item
+        self.photoFirst = photoFirst
         _name = State(initialValue: item?.name ?? ""); _notes = State(initialValue: item?.notes ?? "")
         _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id ?? place?.id)
         _photo = State(initialValue: item?.photo)
@@ -292,7 +322,15 @@ struct ItemEditor: View {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { nameFocused = false; UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) } }
         }
-        .onAppear { nameFocused = item == nil }
+        .onAppear {
+            if item == nil, placeID == nil, let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.places.contains(where: { $0.id == id }) {
+                placeID = id
+            }
+            if item == nil, photoFirst, photo == nil {
+                if CameraPicker.isAvailable { takingPhoto = true } else { choosingPhoto = true }
+            } else { nameFocused = item == nil }
+        }
+        .onChange(of: photo) { old, new in if photoFirst, old == nil, new != nil, name.isEmpty { nameFocused = true } }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .photosPicker(isPresented: $choosingPhoto, selection: $selectedPhoto, matching: .images)
         .fullScreenCover(isPresented: $takingPhoto) { CameraPicker { photo = PhotoResize.jpeg($0) }.ignoresSafeArea() }
@@ -319,7 +357,10 @@ struct ItemEditor: View {
         do {
             let place = store.places.first { $0.id == placeID }
             if let item { try store.editItem(item, name: name, place: place, notes: notes, aliases: aliases, photo: photo) }
-            else { try store.addItem(name: name, place: place, notes: notes, aliases: aliases, photo: photo) }
+            else {
+                try store.addItem(name: name, place: place, notes: notes, aliases: aliases, photo: photo)
+                UserDefaults.standard.set(place?.id.uuidString, forKey: Self.lastPlaceKey)
+            }
             dismiss()
         } catch { self.error = error.localizedDescription }
     }
@@ -378,6 +419,7 @@ struct ItemDetailView: View {
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
+                            if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
                             if confirmedPutAway { Label("Put away. Nice.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                         }
                         .card()

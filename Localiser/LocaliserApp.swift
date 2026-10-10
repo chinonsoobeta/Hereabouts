@@ -18,13 +18,21 @@ struct LocaliserApp: App {
                 let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 url = directory.appendingPathComponent("UITests/\(id.uuidString)/Localiser.sqlite")
                 UserDefaults.standard.set(true, forKey: OnboardingView.seenKey)
+                UserDefaults.standard.removeObject(forKey: Rituals.stocktakeDoneKey)
+                UserDefaults.standard.removeObject(forKey: Rituals.recapReadKey)
+                UserDefaults.standard.removeObject(forKey: ItemEditor.lastPlaceKey)
             }
             if arguments.contains("--show-onboarding") { UserDefaults.standard.set(false, forKey: OnboardingView.seenKey) }
+            if let index = arguments.firstIndex(of: "--open-ritual"), arguments.indices.contains(index + 1) {
+                let service = ReminderService(); service.openedRitual = arguments[index + 1]
+                _reminders = State(initialValue: service)
+            }
             #endif
             let store = try LocaliserStore(url: url)
             #if DEBUG
             if url != nil, ProcessInfo.processInfo.arguments.contains("--demo-library") { try MainActor.assumeIsolated { try DemoLibrary.seed(store) } }
             #endif
+            IntentLibrary.store = store
             _store = State(initialValue: store); loadError = nil
         }
         catch { loadError = error.localizedDescription }
@@ -70,8 +78,15 @@ struct RootView: View {
             OnboardingView { seenOnboarding = true }
         }
         .task { await pro.observeTransactions() }
-        .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); Spotlight.index(store) }
+        .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }
         .onChange(of: reminders.openedDeadline) { _, id in if id != nil { tab = .due } }
+        .onChange(of: reminders.openedRitual) { _, ritual in
+            switch ritual {
+            case "trip": tab = .packing; reminders.openedRitual = nil
+            case .some: tab = .find
+            case nil: break
+            }
+        }
         .onChange(of: store.openedItem) { _, id in if id != nil { tab = .find } }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let raw = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { store.openedItem = UUID(uuidString: raw) }

@@ -15,6 +15,9 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     @ObservationIgnored private(set) var pendingActions: [(id: UUID, action: String)] = []
     /// Deadline the person opened from a notification, for the Due soon tab to show.
     var openedDeadline: UUID?
+    /// Ritual opened from a notification: "recap", "stocktake" or "trip".
+    var openedRitual: String?
+    @ObservationIgnored private var ritualTask: Task<Void, Never>?
     /// True when some upcoming reminders cannot be delivered (permission off or over the system limit).
     var coverageGap: Bool { candidateCount > scheduled.count }
     static let showNamesKey = "reminderShowsItemNames"
@@ -33,7 +36,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     func enable() async {
         do { _ = try await center.requestAuthorization(options: [.alert, .sound, .badge]); error = nil }
         catch { self.error = error.localizedDescription }
-        if let store { refresh(store.deadlines) }
+        if let store { refresh(store.deadlines); refreshRituals(store) }
     }
 
     func refresh(_ deadlines: [Deadline]) {
@@ -89,10 +92,51 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions { [.banner, .sound] }
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        if let ritual = response.notification.request.content.userInfo["ritual"] as? String {
+            await MainActor.run { openedRitual = ritual }
+            return
+        }
         guard let raw = response.notification.request.content.userInfo["deadlineID"] as? String,
               let id = UUID(uuidString: raw) else { return }
         let action = response.actionIdentifier
         await handle(id: id, action: action)
+    }
+
+    /// Sunday recap, the monthly stocktake and the evening before a trip. Recomputed whenever the library changes.
+    func refreshRituals(_ store: LocaliserStore, now: Date = .now) {
+        let calendar = Calendar.current
+        var requests: [(id: String, title: String, body: String, ritual: String, when: DateComponents, repeats: Bool)] = []
+        if Rituals.recapEnabled {
+            requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's due this week and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
+        }
+        if Rituals.stocktakeEnabled, let date = Rituals.nextStocktakeDate(after: now, calendar: calendar) {
+            let count = min(Rituals.stale(store.items, now: date, calendar: calendar).count, Rituals.stocktakeSize)
+            if count > 0 {
+                requests.append(("localiser.ritual.stocktake", "Still there?", count == 1 ? "One quick question keeps the notebook honest." : "\(count) quick questions keep the notebook honest.", "stocktake", calendar.dateComponents([.year, .month, .day, .hour], from: date), false))
+            }
+        }
+        for trip in Rituals.tripsNeedingEveReminder(store.trips, now: now, calendar: calendar).prefix(5) {
+            guard let eve = CalendarDay(stored: trip.startDay)?.adding(days: -1, calendar: calendar)?.date(calendar: calendar, hour: 19), eve > now else { continue }
+            requests.append(("localiser.ritual.trip.\(trip.id.uuidString)", "Leaving tomorrow", "\(trip.name): some things aren't packed yet.", "trip", calendar.dateComponents([.year, .month, .day, .hour], from: eve), false))
+        }
+        let previous = ritualTask
+        previous?.cancel()
+        ritualTask = Task {
+            await previous?.value
+            guard !Task.isCancelled else { return }
+            let pending = await center.pendingNotificationRequests()
+            center.removePendingNotificationRequests(withIdentifiers: pending.filter { $0.identifier.hasPrefix("localiser.ritual.") }.map(\.identifier))
+            let settings = await center.notificationSettings()
+            guard [.authorized, .provisional, .ephemeral].contains(settings.authorizationStatus), !Task.isCancelled else { return }
+            for request in requests {
+                let content = UNMutableNotificationContent()
+                content.title = request.title; content.body = request.body; content.sound = .default
+                content.interruptionLevel = .passive
+                content.userInfo = ["ritual": request.ritual]
+                let trigger = UNCalendarNotificationTrigger(dateMatching: request.when, repeats: request.repeats)
+                try? await center.add(UNNotificationRequest(identifier: request.id, content: content, trigger: trigger))
+            }
+        }
     }
 
     func handle(id: UUID, action: String) {

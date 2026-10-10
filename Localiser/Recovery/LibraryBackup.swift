@@ -111,7 +111,7 @@ struct LibraryBackup: Codable, Sendable {
         } catch { staging.rollback(); context.rollback(); try? refresh(); throw error }
     }
 
-    static var laterFields: Set<String> { ["perDay", "unlinked"] }
+    static var laterFields: Set<String> { ["perDay", "unlinked", "confirmedAt"] }
 
     func validateBackup(_ file: LibraryBackup) throws {
         guard file.version == 1, file.records.count <= 100_000 else { throw LocaliserError.invalidBackup("This backup version or record count is unsupported.") }

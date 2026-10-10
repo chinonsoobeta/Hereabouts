@@ -487,3 +487,43 @@ Onboarding rebuilt to the three canvas pages: name the home (stored as `homeName
 New UI test `testOnboardingNamesHomeAndWritesFirstThing` walks all three pages with contrast, clipping, hit-region and description audits on each, and checks the first thing and the home subtitle appear on Find. First attempts failed on a caption hidden behind the keyboard and a clipped button label; the test now dismisses the keyboard with Return and onboarding buttons wrap.
 
 Full run `/private/tmp/hb-full4.log`: units 26 pass / 3 existing skips; UI 8/9. The failure was the Pro subtitle again, reproduced twice in focused runs with the nav bar frame logged: bar 78–132, sentence from 133, i.e. text sliding into the hard scroll-edge band after the test scrolls to Restore. Replaced Codex's headline-only rule with one exempting Pro text that starts within 24 points below the bar; the other three measured exemptions stay exact. Focused rerun passed. xcodebuild repeatedly hangs after printing results while writing the result bundle; test runs are now stopped once the final suite line prints, so some result bundles are incomplete and the logs are the record.
+
+## Phase 3.5 — 10.8.5 retention: keeping up, recap, stocktake (Claude, 10 October)
+
+Core Data **V6** adds `confirmedAt` to Belonging (lightweight migration). On open, any thing without it is backfilled from its latest move, else `createdAt`. Writing a thing down, moving it (from the Move sheet or the editor) and "Still there" all set it. Backups carry it as an optional later field, so older backups still restore.
+
+`Localiser/Rituals` holds the rules and the screens:
+- **Keeping up** counts consecutive Sunday-to-Saturday weeks with something written down, moved or checked, whatever the region's first weekday. This week joins the run once it has activity, so a quiet Monday shows last week's number rather than zero. The step back between weeks goes via midweek, so clock changes can't skip a Sunday.
+- **Sunday recap** sheet from the canvas: last seven days (added, moved, checked), next seven days of dates, the stocktake count, and up to three drifting things. It's offered on Find from Sunday 18:00 until read that week; once read, Find keeps just the "Keeping up" stamp. A repeating local notification fires Sunday 18:00.
+- **Monthly stocktake**: up to five "Still there?" cards for things not checked in three months, oldest first, archived excluded. Answers are Still there, Moved (place picker) and Don't have it any more (archive with undo, which stays reachable after the last card). The month is marked done when the cards run out. Its notification lands on the first Saturday at 10:00, only when something will be stale by then.
+- **Trip eve**: 19:00 the day before a trip still being packed with unpacked things, up to five trips.
+- **On a thing's page**, a thing not checked for a fortnight shows "Last checked … Is it still there?" with Still there / Moved.
+- Settings › Reminders gains **Sunday recap** and **Monthly stocktake** switches; both reschedule at once. Ritual notifications use the `localiser.ritual.` prefix, separate from the 50 deadline slots, and use passive interruption.
+- Tapping a ritual notification opens the recap or stocktake on Find, or the Trips tab for a trip.
+
+Canvas differences, on purpose: the stocktake card says "Last checked 10 March" rather than "by you" (there is only one person). The Find note says "Sunday's recap is ready." as drawn. Dark tokens matched to the night board: leader #4A4062, amber #F0A86E, and the Find note box #211B2E with an ink border.
+
+Debug only: `--open-ritual recap|stocktake` opens a sheet at launch for screenshots. The demo library now has three things last checked 4–7 months ago. UI-test libraries reset the stocktake-done and recap-read markers so tests don't leak into each other.
+
+Tests: new `RitualsTests` (12) cover Sunday weeks in a Monday-first region, the quiet-Monday rule, UK clock changes both ways, stocktake selection and once-a-month offer, first-Saturday dates, confirm/move/editor setting `confirmedAt`, recap contents, trip-eve selection, recap week from Sunday 18:00, and a real **V5 → V6 migration** with backfill. New UI test `testRecapStocktakeAndStillThere` confirms a thing from its page, reads the recap and runs the stocktake including archive-and-undo, with contrast, element, hit-region, description, clipping and trait audits on both sheets. The audit caught two real problems, both fixed: the progress dots were exposed as a too-small element, and archiving the last card hid its undo.
+
+## Phase 3 — Siri and Shortcuts (Claude, 10 October)
+
+`Localiser/System/Intents.swift` adds App Intents that run in the app's process on the same store:
+- **Where is it?** answers "Passport is in Hall closet › Top shelf." It also covers things that are archived, packed or have no place.
+- **Write a thing down** takes a name and an optional place. It respects the free allowance (200 things) and says so rather than failing silently.
+- **What's due?** reads the next three dates in the coming month.
+
+`HereaboutsShortcuts` registers Siri phrases ("Where is <thing> in Hereabouts", "Write something down in Hereabouts", "What's due in Hereabouts"). These also appear in Shortcuts, Spotlight and the Action button. Thing and place pickers search names and aliases and exclude archived things. Nothing is gated by Pro, matching the pricing decision.
+
+The Pro sticky note said Siri and the widget were free; the widget isn't built (it needs an App Group, so a paid team; see HUMAN_BLOCKED). It now says "Siri and Spotlight".
+
+New `IntentsTests` (4): answers, query matching by name and alias, adding into a chosen place, and stopping at the free allowance. Siri voice recognition itself needs a device; it's on the physical matrix.
+
+## Phase 3 — photo-first capture (Claude, 10 October)
+
+The + on Find keeps its tap behaviour, so name-only capture stays one tap. Touching and holding offers **Start with a name** or **Start with a photo**. Photo-first opens the camera, or the photo library where there is no camera, before anything else, then puts the cursor in the name. New things start in the **last place used**, which is visible and changeable in the picker. It is only remembered from saves, and only if that place still exists. UI-test libraries clear it. Camera capture itself needs a device and is on the physical matrix.
+
+## Pro allowance table and audit flake (Claude, 10 October)
+
+Full run `/private/tmp/hb-full6.log`: units 41 pass / 3 existing skips; UI 9/10. Typography failed on one new contrast finding, "Already free" on Pro. That is pencil on paper, 5.55:1, the same pair Codex measured; the same code passed in the run before (`/private/tmp/hb-full5.log`, 10/10). Rather than add a fifth exemption, the Pro allowance table's right-hand column is now ink, which also reads better as the answer column.
