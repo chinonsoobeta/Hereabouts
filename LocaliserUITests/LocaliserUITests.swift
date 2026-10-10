@@ -475,6 +475,9 @@ import XCTest
         if browse.waitForExistence(timeout: 5) { browse.tap() }
         let local = app.staticTexts["On My iPhone"].firstMatch
         if local.waitForExistence(timeout: 5) { local.tap() }
+        // Backup tests save into On My iPhone too, so the fixture can sort out of view. Search for it.
+        let search = app.searchFields["Search"].firstMatch
+        if search.waitForExistence(timeout: 5) { search.tap(); search.typeText("Localiser-test-expiry") }
         let document = app.cells["Localiser-test-expiry, pdf"].firstMatch
         XCTAssertTrue(document.waitForExistence(timeout: 10), app.debugDescription)
         document.tap()
