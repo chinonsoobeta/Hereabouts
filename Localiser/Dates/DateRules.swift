@@ -43,7 +43,9 @@ struct CalendarDay: Equatable, Comparable, Sendable {
 enum DeadlineKind: String, CaseIterable, Identifiable, Sendable {
     case returns, warranty, expiry
     var id: String { rawValue }
-    var title: String { switch self { case .returns: "Return deadline"; case .warranty: "Warranty end"; case .expiry: "Expiry" } }
+    var title: String { switch self { case .returns: "Return by"; case .warranty: "Warranty ends"; case .expiry: "Expires" } }
+    /// The date in a sentence, like "Looks like a return date".
+    var noun: String { switch self { case .returns: "return date"; case .warranty: "warranty end date"; case .expiry: "expiry date" } }
     var defaultLeadDays: Int { switch self { case .returns: 3; case .warranty: 30; case .expiry: 180 } }
 }
 
@@ -90,7 +92,7 @@ struct PlannedReminder: Equatable, Sendable {
 
     /// Notification wording. Item names appear unless the person turned them off in Settings.
     func content(showingNames: Bool) -> (title: String, body: String) {
-        let subject = showingNames && !itemName.isEmpty ? itemName : "A saved item"
+        let subject = showingNames && !itemName.isEmpty ? itemName : "A saved thing"
         let when = daysBefore == 0 ? "today" : (daysBefore == 1 ? "tomorrow" : "in \(daysBefore) days")
         let body: String = switch kind {
         case .returns: "\(subject): last day to return is \(when)."

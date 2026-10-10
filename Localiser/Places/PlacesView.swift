@@ -102,8 +102,8 @@ struct PlaceEditor: View {
                 }
             }
             Section {
-                PlacePicker(selection: $parentID, excluded: place, title: "Inside")
-            } footer: { Text("Leave as Unspecified for a room or other top-level place.").foregroundStyle(Theme.secondary) }
+                PlacePicker(selection: $parentID, excluded: place, title: "Inside", noneTitle: "None")
+            } footer: { Text("Choose None for a room or other top-level place.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
         .navigationTitle(place == nil ? "New place" : "Edit place").navigationBarTitleDisplayMode(.inline)
@@ -117,7 +117,7 @@ struct PlaceEditor: View {
                 } catch { self.error = error.localizedDescription }
             }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
         }
-        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -150,7 +150,7 @@ struct PlaceDetailView: View {
                         Text(count == 1 ? "1 thing" : "\(count) things").font(.wbCaption).foregroundStyle(Theme.purpleInk)
                     }.plainRow()
                     HStack(spacing: 10) {
-                        Button("Add item", systemImage: "plus") { addingItem = true }.buttonStyle(SoftButtonStyle(compact: true))
+                        Button("Add a thing", systemImage: "plus") { addingItem = true }.buttonStyle(SoftButtonStyle(compact: true))
                         Button("Add place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true))
                     }.plainRow()
                 }
@@ -158,7 +158,7 @@ struct PlaceDetailView: View {
                     Section("Places inside") {
                         ForEach(place.children.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }) { child in
                             NavigationLink { PlaceDetailView(place: child) } label: {
-                                NotebookLine(name: child.name, detail: "\(child.activeItemCount) things")
+                                NotebookLine(name: child.name, detail: child.activeItemCount == 1 ? "1 thing" : "\(child.activeItemCount) things")
                             }
                         }
                     }

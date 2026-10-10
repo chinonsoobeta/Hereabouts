@@ -279,7 +279,7 @@ struct PlaceBreadcrumb: View {
                 .font(.wbCaption)
                 .accessibilityLabel(path)
         } else {
-            Text("Location unspecified").font(.wbCaption).foregroundStyle(Theme.secondary)
+            Text("No place yet").font(.wbCaption).foregroundStyle(Theme.secondary)
         }
     }
 }
@@ -314,5 +314,15 @@ enum DueLabel {
 }
 
 extension CalendarDay {
-    var formatted: String { date().map { $0.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()) } ?? stored }
+    /// "Sun 11 Oct" this year, "3 Mar 2027" in another.
+    var formatted: String {
+        guard let date = date() else { return stored }
+        return date.isThisYear ? date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()) : date.formatted(.dateTime.day().month(.abbreviated).year())
+    }
+}
+
+extension Date {
+    var isThisYear: Bool { Calendar.current.isDate(self, equalTo: .now, toGranularity: .year) }
+    /// "14 March", with the year when it isn't this one.
+    var dayAndMonth: String { isThisYear ? formatted(.dateTime.day().month(.wide)) : formatted(.dateTime.day().month(.wide).year()) }
 }

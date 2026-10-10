@@ -29,10 +29,12 @@ struct PlacePicker: View {
     @Binding var selection: UUID?
     var excluded: Place? = nil
     var title = "Place"
+    /// What "no place" is called here: a thing without a place yet, or a place that isn't inside another.
+    var noneTitle = "No place yet"
     var body: some View {
         let _ = store.revision
         NavigationLink {
-            PlaceChooser(selection: $selection, excluded: excluded)
+            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle)
         } label: {
             HStack(spacing: 12) {
                 Text(title).foregroundStyle(Theme.ink)
@@ -40,7 +42,7 @@ struct PlacePicker: View {
                 if let place = store.places.first(where: { $0.id == selection }) {
                     PlaceBreadcrumb(path: place.path).multilineTextAlignment(.trailing)
                 } else {
-                    Text("Unspecified").font(.wbCaption).foregroundStyle(Theme.secondary)
+                    Text(noneTitle).font(.wbCaption).foregroundStyle(Theme.secondary)
                 }
             }
         }
@@ -54,6 +56,7 @@ struct PlaceChooser: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selection: UUID?
     var excluded: Place? = nil
+    var noneTitle = "No place yet"
     @State private var query = ""
     @State private var error: String?
 
@@ -96,7 +99,7 @@ struct PlaceChooser: View {
                 }
             }
             Section {
-                row(title: "Unspecified", detail: "Not sure yet", id: nil)
+                row(title: noneTitle, detail: noneTitle == "None" ? "A room or other top-level place" : "Not sure yet", id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
             } footer: {
                 if store.places.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }
@@ -128,7 +131,7 @@ struct PlaceChooser: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(id == nil ? "Unspecified" : (store.places.first { $0.id == id }?.path ?? title))
+        .accessibilityLabel(id == nil ? noneTitle : (store.places.first { $0.id == id }?.path ?? title))
         .accessibilityAddTraits(selection == id ? .isSelected : [])
     }
 

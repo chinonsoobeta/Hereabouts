@@ -7,7 +7,7 @@
       "familyShareable" : true,
       "internalID" : "6422170010",
       "localizations" : [
-        { "description" : "Unlimited items, kits and scans. Pay once.", "displayName" : "Hereabouts Pro", "locale" : "en_US" }
+        { "description" : "Unlimited things, kits and scans. Pay once.", "displayName" : "Hereabouts Pro", "locale" : "en_US" }
       ],
       "productID" : "dev.localiser.pro.lifetime",
       "referenceName" : "Hereabouts Pro Lifetime (local testing)",

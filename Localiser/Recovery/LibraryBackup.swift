@@ -134,7 +134,7 @@ struct LibraryBackup: Codable, Sendable {
                 }
             }
             if record.entity == "Deadline" {
-                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, DeadlineKind(rawValue: record.string("kindRaw") ?? "") != nil, ReturnDecision(rawValue: record.string("decisionRaw") ?? "") != nil, (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup("A deadline is invalid.") }
+                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, DeadlineKind(rawValue: record.string("kindRaw") ?? "") != nil, ReturnDecision(rawValue: record.string("decisionRaw") ?? "") != nil, (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup("A date in this backup is invalid.") }
             }
             if record.entity == "TripRecord" {
                 guard let start = CalendarDay(stored: record.string("startDay") ?? ""), let end = CalendarDay(stored: record.string("endDay") ?? ""), end >= start, TripState(rawValue: record.string("stateRaw") ?? "") != nil else { throw LocaliserError.invalidBackup("A trip date or status is invalid.") }
@@ -159,7 +159,7 @@ struct LibraryBackup: Codable, Sendable {
             if record.entity == "TripRecord", record.string("stateRaw") == TripState.finished.rawValue {
                 for id in record.relationships["entries"] ?? [] {
                     let entry = records[id]!
-                    guard (entry.integer("packedCount") ?? 0) == 0 || ![HomeResolution.pending.rawValue, HomeResolution.unresolved.rawValue].contains(entry.string("resolutionRaw") ?? "") else { throw LocaliserError.invalidBackup("A finished trip has unresolved items.") }
+                    guard (entry.integer("packedCount") ?? 0) == 0 || ![HomeResolution.pending.rawValue, HomeResolution.unresolved.rawValue].contains(entry.string("resolutionRaw") ?? "") else { throw LocaliserError.invalidBackup("A finished trip still has things to put away.") }
                 }
             }
         }

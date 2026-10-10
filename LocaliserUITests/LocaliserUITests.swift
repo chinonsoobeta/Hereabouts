@@ -13,7 +13,7 @@ import XCTest
         }
         app.tabBars.buttons["Find"].tap()
         app.buttons["Settings"].tap()
-        let pro = app.buttons["Purchase or restore lifetime Pro"]
+        let pro = app.buttons["Hereabouts Pro"]
         XCTAssertTrue(pro.waitForExistence(timeout: 5)); pro.tap()
         let restorePurchase = app.buttons["Restore purchases"]
         for _ in 0..<8 { if restorePurchase.isHittable { break }; app.swipeUp() }
@@ -161,7 +161,7 @@ import XCTest
         let settings = app.navigationBars["Hereabouts"].buttons["Settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 5), app.debugDescription)
         settings.tap()
-        let pro = app.buttons["Purchase or restore lifetime Pro"]
+        let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
         try shot("8-pro")
@@ -202,8 +202,8 @@ import XCTest
             app.tabBars.buttons[tab].tap()
             let labels: [String]
             switch tab {
-            case "Find": labels = ["Add your first item"]
-            case "Due": labels = ["Remember in time", "Add a return deadline, warranty end or expiry date to an item. Hereabouts reminds you before it passes."]
+            case "Find": labels = ["Add your first thing"]
+            case "Due": labels = ["Remember in time", "Add a return, warranty or expiry date to a thing. Hereabouts reminds you before it passes."]
             case "Trips": labels = ["Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home."]
             default: labels = []
             }
@@ -216,7 +216,7 @@ import XCTest
         }
         app.tabBars.buttons["Find"].tap()
         app.buttons["Settings"].tap()
-        let pro = app.buttons["Purchase or restore lifetime Pro"]
+        let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
         recordTypography(app, labels: ["Pay once. Keep it forever."], name: "Pro")
         reveal(app.buttons["Restore purchases"], in: app)
@@ -241,16 +241,18 @@ import XCTest
             if issue.auditType == .contrast, app.navigationBars["Pro"].isHittable {
                 // Inspected rendered Pro labels on 2026-10-09. Flat glyph/background pixels measure
                 // 14.38:1 (Packing kits), 5.55:1 (unavailable message), 5.65:1 (Restore purchases).
+                // The pricing sentence is the same pencil (#655C7A) on paper (#F6F1E9) pair, 5.55:1.
                 // After scrolling to Restore, text that has slid into the bar's scroll-edge band
                 // (bar 78–132, text from 133 on iPhone 17) is sampled against the blurred edge. Only text
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
                 if ["Packing kits", "Pro isn't available to buy right now. Everything you've saved stays available.", "Restore purchases"].contains(element.label) { return true }
+                if element.label.hasSuffix("One payment, shared with your family. No subscription, ever.") { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,
             // yet the contrast audit samples the card's soft shadow edge and reports a failure.
             // The Packing empty card sentence is the same ink-on-white case, checked by eye the same day.
-            if issue.auditType == .contrast && (element.label.hasPrefix("Add a return deadline, warranty end or expiry date") || element.label.hasPrefix("Make a checklist for a trip")) { return true }
+            if issue.auditType == .contrast && (element.label.hasPrefix("Add a return, warranty or expiry date") || element.label.hasPrefix("Make a checklist for a trip")) { return true }
             // Verified at Accessibility Extra Large: this Settings footer grows like every other footer.
             if issue.auditType == .dynamicType && element.label.hasPrefix("A backup holds your places") { return true }
             guard issue.auditType == .dynamicType else { return false }
@@ -283,7 +285,7 @@ import XCTest
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Find"].tap()
-        app.buttons["Add item"].tap()
+        app.buttons["Add a thing"].tap()
         let name = "Verification cable \(UUID().uuidString.prefix(8))"
         let field = app.textFields["item.name"]
         XCTAssertTrue(field.waitForExistence(timeout: 5))
@@ -305,7 +307,7 @@ import XCTest
         let confirmation = XCTAttachment(screenshot: app.screenshot()); confirmation.name = "Date after confirmation"; confirmation.lifetime = .keepAlways; add(confirmation)
         save.tap()
         XCTAssertTrue(save.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Return deadline"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Return by"].waitForExistence(timeout: 5))
         // The reminders card only shows once there is an active date.
         app.tabBars.buttons["Due"].tap()
         let disabled = app.descendants(matching: .any).matching(identifier: "Open notification settings").firstMatch
@@ -321,7 +323,7 @@ import XCTest
         XCTAssertTrue(disabled.waitForExistence(timeout: 5))
         let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
         app.tabBars.buttons["Find"].tap()
-        app.staticTexts["Return deadline"].tap()
+        app.staticTexts["Return by"].tap()
         reveal(app.buttons["Add to Calendar"], in: app)
         app.buttons["Add to Calendar"].tap()
         let calendarTitle = app.textFields.matching(NSPredicate(format: "identifier == %@ OR label == %@", "title-field", "Title")).firstMatch
@@ -338,7 +340,7 @@ import XCTest
         XCTAssertTrue(deleteDate.isHittable); deleteDate.tap()
         app.sheets.buttons["Delete date"].tap()
         XCTAssertTrue(app.buttons["Add date"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["Return deadline"].exists)
+        XCTAssertFalse(app.staticTexts["Return by"].exists)
         app.terminate(); app.launch()
         app.tabBars.buttons["Find"].tap()
         let search = app.searchFields.firstMatch
@@ -346,10 +348,10 @@ import XCTest
         search.tap(); search.typeText(name)
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
         app.staticTexts[name].tap()
-        app.buttons["Item options"].tap()
-        let remove = app.buttons["Delete item permanently"].firstMatch
+        app.buttons["More"].tap()
+        let remove = app.buttons["Delete permanently"].firstMatch
         XCTAssertTrue(remove.waitForExistence(timeout: 5)); remove.tap()
-        let confirmDelete = app.buttons.matching(NSPredicate(format: "label == %@", "Delete item permanently")).firstMatch
+        let confirmDelete = app.buttons.matching(NSPredicate(format: "label == %@", "Delete permanently")).firstMatch
         XCTAssertTrue(confirmDelete.waitForExistence(timeout: 5)); confirmDelete.tap()
         XCTAssertTrue(app.navigationBars["Hereabouts"].waitForExistence(timeout: 5))
     }
@@ -431,10 +433,10 @@ import XCTest
         reveal(candidate, in: app)
         XCTAssertTrue(candidate.waitForExistence(timeout: 5), app.debugDescription); candidate.tap()
         let name = "Expiry document \(UUID().uuidString.prefix(6))"
-        let nameField = app.textFields["Or name a new item"]
+        let nameField = app.textFields["Or name a new thing"]
         reveal(nameField, in: app); nameField.tap(); nameField.typeText(name + "\n")
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
-        reveal(app.buttons["Create item"], in: app); app.buttons["Create item"].tap()
+        reveal(app.buttons["Write it down"], in: app); app.buttons["Write it down"].tap()
         reveal(app.buttons["Review and confirm date"], in: app)
         app.buttons["Review and confirm date"].tap()
         let save = app.buttons["deadline.save"]
@@ -448,11 +450,11 @@ import XCTest
         save.tap()
         XCTAssertTrue(app.navigationBars["Hereabouts"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5)); app.staticTexts[name].tap()
-        reveal(app.staticTexts["Expiry"], in: app)
-        XCTAssertTrue(app.staticTexts["Expiry"].exists)
+        reveal(app.staticTexts["Expires"], in: app)
+        XCTAssertTrue(app.staticTexts["Expires"].exists)
         XCTAssertTrue(app.staticTexts["Jul 14, 2028"].exists, app.debugDescription)
         reveal(app.staticTexts["Date-only scan"], in: app); app.staticTexts["Date-only scan"].tap()
-        XCTAssertTrue(app.staticTexts["The original is not retained. Your saved dates remain with the item."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["The original wasn't kept. Your dates stay with the thing."].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Remove original document"].exists)
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "Confirmed date-only photo scan"; screenshot.lifetime = .keepAlways; add(screenshot)
@@ -479,9 +481,9 @@ import XCTest
         let candidate = app.buttons.containing(.staticText, identifier: "2028-07-14").firstMatch
         reveal(candidate, in: app); candidate.tap()
         let name = "PDF expiry \(UUID().uuidString.prefix(6))"
-        let field = app.textFields["Or name a new item"]
+        let field = app.textFields["Or name a new thing"]
         reveal(field, in: app); field.tap(); field.typeText(name + "\n")
-        reveal(app.buttons["Create item"], in: app); app.buttons["Create item"].tap()
+        reveal(app.buttons["Write it down"], in: app); app.buttons["Write it down"].tap()
         reveal(app.buttons["Review and confirm date"], in: app); app.buttons["Review and confirm date"].tap()
         let save = app.buttons["deadline.save"]
         XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
@@ -495,7 +497,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 10)); app.staticTexts[name].tap()
         reveal(app.staticTexts["Jul 14, 2028"], in: app)
         XCTAssertTrue(app.staticTexts["Jul 14, 2028"].exists)
-        XCTAssertTrue(app.staticTexts["Expiry"].exists)
+        XCTAssertTrue(app.staticTexts["Expires"].exists)
         let retained = app.staticTexts["Localiser-test-expiry.pdf"]
         reveal(retained, in: app); retained.tap()
         XCTAssertTrue(app.buttons["Remove original document"].waitForExistence(timeout: 5))
@@ -512,7 +514,7 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        app.buttons["Add item"].tap()
+        app.buttons["Add a thing"].tap()
         let name = "Recovery item \(UUID().uuidString.prefix(8))"
         let field = app.textFields["item.name"]
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText(name)

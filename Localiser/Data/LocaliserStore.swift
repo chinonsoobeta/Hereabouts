@@ -10,16 +10,16 @@ enum LocaliserError: LocalizedError, Equatable {
         case .nameRequired: "Enter a name."
         case .tooLong(let field, let limit): "\(field) can be up to \(limit.formatted()) characters."
         case .placeCycle: "A place cannot be moved into itself or one of its contents."
-        case .occupiedPlace: "Move the contents first, or explicitly clear their locations before deleting this place."
+        case .occupiedPlace: "Move what's inside first, or clear its place, before deleting this place."
         case .schemaUnavailable: "The data model is missing. Your library has not been deleted."
         case .dateNotConfirmed: "Review and confirm the final date before saving it."
         case .invalidReminder: "Choose a valid reminder time and lead time."
         case .closedReturn: "Choose to reopen this return decision before editing it."
-        case .invalidPackingEntry: "Check the item, quantity, and trip status before updating this checklist."
+        case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
         case .invalidTripDates: "The return date must be on or after the departure date."
-        case .packingConflict(let trip): "This physical item is already packed for \(trip). Unpack it there or resolve that trip first."
+        case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
         case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
-        case .unresolvedHome: "Confirm where the remaining items were put before finishing coming home."
+        case .unresolvedHome: "Say where the rest of the things went before finishing coming home."
         case .invalidBackup(let reason): reason
         case .libraryNotEmpty: "Your library already has records. Choose Erase and restore to replace them with this backup, or export them first."
         }
@@ -160,8 +160,8 @@ final class LocaliserStore {
         item.confirmedAt = .now
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
         movement.id = UUID(); movement.date = .now; movement.item = item
-        movement.fromPath = item.place?.path ?? "Unspecified"
-        movement.toPath = place?.path ?? "Unspecified"
+        movement.fromPath = item.place?.path ?? Movement.noPlace
+        movement.toPath = place?.path ?? Movement.noPlace
         item.place = place
     }
 

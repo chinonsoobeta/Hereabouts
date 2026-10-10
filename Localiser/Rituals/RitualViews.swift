@@ -189,7 +189,7 @@ struct StocktakeView: View {
                 Text("lives in").font(.wbBody).foregroundStyle(Theme.pencil)
                 PlaceBreadcrumb(path: item.place?.path)
             }
-            Text("Last checked \(item.lastConfirmed.formatted(.dateTime.day().month(.wide))). Is it still there?").font(.wbCaption).foregroundStyle(Theme.ink)
+            Text("Last checked \(item.lastConfirmed.dayAndMonth). Is it still there?").font(.wbCaption).foregroundStyle(Theme.ink)
         }
         .padding(18).frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.paper, in: RoundedRectangle(cornerRadius: 8))
@@ -276,7 +276,7 @@ struct StillThereRow: View {
         let recent = item.lastConfirmed > Calendar.current.date(byAdding: .day, value: -14, to: .now) ?? .now
         VStack(alignment: .leading, spacing: 10) {
             if !recent {
-                Text("Last checked \(item.lastConfirmed.formatted(.dateTime.day().month(.wide))). Is it still there?")
+                Text("Last checked \(item.lastConfirmed.dayAndMonth). Is it still there?")
                     .font(.wbCaption).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 10) {
                     Button("Still there") {

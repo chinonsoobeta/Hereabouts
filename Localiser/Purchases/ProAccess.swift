@@ -40,8 +40,8 @@ enum CreationKind {
 
     func loadProduct() async {
         do {
+            // When the product is missing, the Pro screen says so itself.
             product = try await Product.products(for: [Self.productID]).first { $0.type == .nonConsumable }
-            if product == nil { message = "The lifetime product is unavailable. You can keep using the free features and export your library." }
         } catch { message = error.localizedDescription }
     }
 

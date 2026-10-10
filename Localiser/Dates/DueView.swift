@@ -36,7 +36,7 @@ struct DueView: View {
                             Image(systemName: "calendar.badge.clock").foregroundStyle(Theme.purple).accessibilityHidden(true)
                             Text("Remember in time").fixedSize(horizontal: false, vertical: true)
                         }.font(.wbTitle)
-                        Text("Add a return deadline, warranty end or expiry date to an item. Hereabouts reminds you before it passes.")
+                        Text("Add a return, warranty or expiry date to a thing. Hereabouts reminds you before it passes.")
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }.card(padding: 16)
                 } else {
@@ -78,14 +78,14 @@ struct DueView: View {
             List {
                 if store.items.filter({ !$0.archived }).isEmpty {
                     Section {
-                        Text("Dates belong to an item. Add the item first, then its return, warranty or expiry date.").foregroundStyle(Theme.secondary)
-                        NavigationLink { ItemEditor() } label: { Label("Add an item", systemImage: "plus") }
+                        Text("Dates belong to a thing. Write the thing down first, then add its date.").foregroundStyle(Theme.secondary)
+                        NavigationLink { ItemEditor() } label: { Label("Add a thing", systemImage: "plus") }
                     }
                 }
                 ForEach(store.items.filter { !$0.archived }) { item in NavigationLink { DeadlineEditor(item: item) } label: { ItemRow(item: item) } }
-            }.groundBackground().navigationTitle("Which item?").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { addDate = false } } }
+            }.groundBackground().navigationTitle("Which thing?").toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { addDate = false } } }
         } }
-        .alert("Could not update date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't update the date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     @ViewBuilder private func dateSection(_ group: DueGroup) -> some View {
@@ -123,7 +123,7 @@ struct DueView: View {
                 Button("Turn on reminders") { Task { await reminders.enable() } }.buttonStyle(PrimaryButtonStyle())
             }
             if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
-            Text(ReminderService.showsItemNames ? "Reminders show item names. You can hide them in Settings." : "Item names are hidden in reminders. You can show them in Settings.").font(.wbCaption).foregroundStyle(Theme.secondary)
+            Text(ReminderService.showsItemNames ? "Reminders show the names of things. You can hide them in Settings." : "Names are hidden in reminders. You can show them in Settings.").font(.wbCaption).foregroundStyle(Theme.secondary)
         }
         .foregroundStyle(Theme.ink)
         .card(padding: 16)
@@ -163,7 +163,7 @@ struct DeadlineRow: View {
     var showsItem = true
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            if showsItem { Text(deadline.item?.name ?? "Item unavailable").font(.headline) }
+            if showsItem { Text(deadline.item?.name ?? "Thing unavailable").font(.headline) }
             NotebookLine(name: deadline.kind?.title ?? "Date", detail: deadline.day?.date()?.formatted(.dateTime.year().month().day()) ?? "Date not written down")
         }.padding(.vertical, 4)
     }
@@ -206,6 +206,11 @@ struct DeadlineEditor: View {
         _enabled = State(initialValue: existing?.enabled ?? true)
     }
 
+    /// "9 AM" or "09:00", as this iPhone shows times.
+    static func hourLabel(_ hour: Int) -> String {
+        Calendar.current.date(from: DateComponents(year: 2000, month: 1, day: 1, hour: hour))?.formatted(date: .omitted, time: .shortened) ?? "\(hour):00"
+    }
+
     private var finalDay: CalendarDay? {
         if kind == .returns && useWindow { return CalendarDay(anchor).adding(days: windowDays - (includeAnchor ? 1 : 0)) }
         return CalendarDay(date)
@@ -219,7 +224,7 @@ struct DeadlineEditor: View {
                     if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
                     Text("A receipt date may be a purchase date. Confirm the date type and any missing terms; suggestions are not store policies.").font(.subheadline)
                     Toggle("Keep original document", isOn: $retainSource)
-                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this item and included in your device backup and in Hereabouts backups." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text(retainSource ? "The original may contain identification numbers. It will be stored with this thing and included in your device backup and in Hereabouts backups." : "Only the confirmed date and your entered details will be saved. The original and recognized text will be discarded when this review closes.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
             Section(item.name) {
@@ -240,16 +245,16 @@ struct DeadlineEditor: View {
             Section("Reminders") {
                 Toggle("Remind me", isOn: $enabled)
                 if enabled {
-                    Stepper("\(leadDays) days before", value: $leadDays, in: 0...3650)
-                    Picker("Local time", selection: $hour) { ForEach(0..<24) { Text(String(format: "%02d:00", $0)).tag($0) } }
-                    Text("A reminder is also scheduled on the date, if it is still in the future and queue space is available. Enable notifications in Due soon.").font(.caption).foregroundStyle(Theme.secondary)
+                    Stepper(leadDays == 0 ? "On the day" : leadDays == 1 ? "1 day before" : "\(leadDays) days before", value: $leadDays, in: 0...3650)
+                    Picker("Time", selection: $hour) { ForEach(0..<24) { Text(Self.hourLabel($0)).tag($0) } }
+                    if leadDays > 0 { Text("A reminder also comes on the day itself, if notifications are on.").font(.caption).foregroundStyle(Theme.secondary) }
                 }
                 if kind == .expiry { Text("The lead time is your preference. It does not establish travel eligibility or insurance coverage.").font(.caption).foregroundStyle(Theme.secondary) }
             }
             Section("Review before saving") {
-                if let value = finalDay?.date() { LabeledContent("Confirmed deadline") { Text(value, format: .dateTime.year().month().day()).foregroundStyle(Theme.secondary) } }
+                if let value = finalDay?.date() { LabeledContent("Final date") { Text(value, format: .dateTime.year().month().day()).foregroundStyle(Theme.secondary) } }
                 if closed { Toggle("Reopen return decision", isOn: $reopen) }
-                if item.archived { Text("This item is archived. Restore it in Find before reminders can be scheduled.").foregroundStyle(Theme.secondary) }
+                if item.archived { Text("This thing is archived. Restore it in Find to get reminders.").foregroundStyle(Theme.secondary) }
                 Toggle("I have checked the date type and final date", isOn: $confirmed).accessibilityIdentifier("deadline.confirm")
             }
         }
@@ -266,7 +271,7 @@ struct DeadlineEditor: View {
         .onChange(of: useWindow) { _, _ in confirmed = false }
         .onChange(of: anchorType) { _, _ in confirmed = false }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
-        .alert("Could not save date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private func save() {
@@ -309,6 +314,8 @@ struct DeadlineDetailView: View {
                     Text("Reminders stop once a date is completed.").foregroundStyle(Theme.secondary)
                 } else if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
                     Text("No reminders left before this date.").foregroundStyle(Theme.secondary)
+                } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
+                    Button("Open notification settings", systemImage: "bell.slash") { UIApplication.shared.open(url) }
                 } else {
                     Button("Turn on reminders", systemImage: "bell") { Task { await reminders.enable() } }
                 }
@@ -334,11 +341,11 @@ struct DeadlineDetailView: View {
         .toolbar { if deadline.item != nil { Button("Edit") { editing = true } } }
         .sheet(isPresented: $editing) { if let item = deadline.item { NavigationStack { DeadlineEditor(item: item, existing: deadline) } } }
         .sheet(isPresented: $calendar) { CalendarEventEditor(deadline: deadline) }
-        .confirmationDialog("Mark it as returned?", isPresented: $confirmReturned, titleVisibility: .visible) { Button("It's been returned") { decide(.returned) } } message: { Text("The item moves to your archive and its reminders stop. Its history is kept.") }
+        .confirmationDialog("Mark it as returned?", isPresented: $confirmReturned, titleVisibility: .visible) { Button("It's been returned") { decide(.returned) } } message: { Text("It moves to your archive and its reminders stop. Its history is kept.") }
         .confirmationDialog("Delete this date and its reminders?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete date", role: .destructive) {
             do { try store.deleteDeadline(deadline); dismiss() } catch { self.error = error.localizedDescription }
         } }
-        .alert("Could not update date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't update the date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
     private func decide(_ decision: ReturnDecision) { do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription } }
 }

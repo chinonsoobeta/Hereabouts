@@ -46,6 +46,7 @@ struct TripDetails: Sendable {
         guard let startDate = start.date(calendar: calendar), let endDate = end.date(calendar: calendar) else { return 0 }
         return max(0, calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0)
     }
+    var nightsLabel: String { nights == 0 ? "Day trip" : nights == 1 ? "1 night" : "\(nights) nights" }
     /// Days away, counting both the departure and the return day.
     var days: Int { nights + 1 }
     func quantity(unit: Int, perNight: Bool, perDay: Bool = false, condition: PackingCondition) -> Int {

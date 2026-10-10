@@ -109,7 +109,7 @@ struct TripProgressCard: View {
             HStack(alignment: .firstTextBaseline) {
                 NotebookLine(name: trip.name, detail: "\(packed) of \(needed) packed")
             }
-            Text("\(trip.dateRange) · \(trip.details?.nights ?? 0) nights").font(.wbCaption).opacity(0.9)
+            Text([trip.dateRange, trip.details?.nightsLabel].compactMap { $0 }.joined(separator: " · ")).font(.wbCaption).opacity(0.9)
             ProgressView(value: fraction).tint(Theme.purpleInk).accessibilityLabel("Packing progress")
         }
         .foregroundStyle(Theme.ink)
@@ -147,7 +147,7 @@ struct KitEditor: View {
                     do { if let kit { try store.editKit(kit, name: name) } else { try store.addKit(name: name) }; dismiss() } catch { self.error = error.localizedDescription }
                 }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.save") }
             }
-            .alert("Could not save kit", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+            .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
             .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
     }
 }
@@ -175,7 +175,7 @@ struct KitDetailView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(entry.title).font(.wbItem).foregroundStyle(Theme.ink)
                             Text(entry.ruleSummary).font(.wbCaption).foregroundStyle(Theme.secondary)
-                            if entry.unlinked && entry.item == nil { Text("Its item was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                            if entry.unlinked && entry.item == nil { Text("The thing was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                             if entry.item?.archived == true { Text("Archived, so new trips leave it out.").font(.wbCaption).foregroundStyle(Theme.warning) }
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
@@ -253,13 +253,13 @@ struct KitEntryEditor: View {
     }
     var body: some View {
         Form {
-            Picker("Item", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Phone charger", text: $name).accessibilityIdentifier("kit.entry.name") }
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
             Picker("Amount", selection: $scale) { ForEach(PackingScale.allCases) { Text($0.title).tag($0) } }
             Text(scaleHint).font(.caption).foregroundStyle(Theme.secondary)
             Picker("Include for", selection: $condition) { ForEach(PackingCondition.allCases) { Text($0.title).tag($0) } }
-            Text("Linking an item groups it by where it lives, so you can pack room by room.").font(.caption).foregroundStyle(Theme.secondary)
+            Text("Linking a thing groups it by where it lives, so you can pack room by room.").font(.caption).foregroundStyle(Theme.secondary)
         }
         .groundBackground().navigationTitle(entry == nil ? "Add to kit" : "Edit").navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -268,7 +268,7 @@ struct KitEntryEditor: View {
                 do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.entry.save") }
         }
-        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -299,15 +299,15 @@ struct TripEditor: View {
                 TextField("Trip name", text: $name).accessibilityIdentifier("trip.name")
                 DatePicker("Depart", selection: $start, displayedComponents: .date)
                 DatePicker("Come home", selection: $end, displayedComponents: .date)
-                Text("\(details.nights) nights")
-                if details.end < details.start { Text("Come-home date must be on or after departure.").foregroundStyle(.red) }
+                if details.end < details.start { Text("Come home on or after the day you leave.").foregroundStyle(Theme.warning) }
+                else { Text(details.nightsLabel) }
                 Toggle("Flying", isOn: $flying); Toggle("International", isOn: $international); Toggle("Work", isOn: $work)
                 if trip == nil { Picker("Kit", selection: $kitID) { Text("Start without a kit").tag(nil as UUID?); ForEach(store.kits) { Text($0.name).tag(Optional($0.id)) } } }
             }
             if let trip {
                 Section("Quantity changes") {
                     ForEach(trip.entries.filter { $0.required(for: details) != $0.requiredCount }.sorted { $0.title < $1.title }) { entry in Text("\(entry.title): \(entry.requiredCount) → \(entry.required(for: details)); \(entry.packedCount) already packed") }
-                    Text("Packed counts and manual quantity overrides will be kept. Review any excess or missing items after saving.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("Packed counts and manual quantity overrides will be kept. Check for extra or missing things after saving.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }
@@ -318,7 +318,7 @@ struct TripEditor: View {
                 do { if let trip { try store.editTrip(trip, details: details) } else { try store.addTrip(details, kit: store.kits.first { $0.id == kitID }) }; dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || details.end < details.start).accessibilityIdentifier("trip.save") }
         }
-        .alert("Could not save trip", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -401,7 +401,7 @@ struct TripDetailView: View {
         .sheet(isPresented: $edit) { NavigationStack { TripEditor(trip: trip) } }
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("Its packing list is kept for reference. Where your things live doesn't change.") }
-        .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("The trip and its lists go. Your items and where they live are kept.") }
+        .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("The trip and its lists go. Your things and their places are kept.") }
         .alert("Not quite ready", isPresented: Binding(get: { notReady != nil }, set: { if !$0 { notReady = nil } })) {
             Button("Keep packing", role: .cancel) { notReady = nil }
             Button("Leave anyway") { notReady = nil; attempt { try store.changeTripState(trip, to: .comingHome) } }
@@ -442,7 +442,7 @@ struct TripDetailView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed")
                     if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
-                    if entry.unlinked && entry.item == nil { Text("Its item was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                    if entry.unlinked && entry.item == nil { Text("The thing was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
                 }
             }
@@ -460,7 +460,7 @@ struct TripEntryAdder: View {
     @State private var error: String?
     var body: some View {
         Form {
-            Picker("Item", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Sunglasses", text: $name) }
         }
         .groundBackground().navigationTitle("Add something to pack").navigationBarTitleDisplayMode(.inline)
@@ -513,7 +513,7 @@ struct TripEntryDetailView: View {
                     if entry.item?.archived == true {
                         Button("Confirm already returned / archived") { attempt { try store.resolveHome(entry, resolution: .noLongerHere) } }
                     } else {
-                        Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? "location unspecified")") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
+                        Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? "no place yet")") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
                         if entry.item != nil {
                             PlacePicker(selection: $placeID)
                             Button("Confirm new place") { attempt { try store.resolveHome(entry, resolution: .newPlace, newPlace: store.places.first { $0.id == placeID }) } }.disabled(placeID == nil)

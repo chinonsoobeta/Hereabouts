@@ -234,7 +234,7 @@ final class LocaliserTests: XCTestCase {
     func testReminderWordingNamesTheItemOnlyWhenAllowed() throws {
         let reminder = PlannedReminder(id: "x", deadlineID: UUID(), fireDate: .now, kind: .returns, daysBefore: 1, itemName: "Headphones")
         XCTAssertEqual(reminder.content(showingNames: true).body, "Headphones: last day to return is tomorrow.")
-        XCTAssertEqual(reminder.content(showingNames: false).body, "A saved item: last day to return is tomorrow.")
+        XCTAssertEqual(reminder.content(showingNames: false).body, "A saved thing: last day to return is tomorrow.")
         XCTAssertEqual(reminder.content(showingNames: true).title, "Return window closing")
         let today = PlannedReminder(id: "y", deadlineID: UUID(), fireDate: .now, kind: .warranty, daysBefore: 0, itemName: "Drill")
         XCTAssertEqual(today.content(showingNames: true).body, "Drill: warranty ends today.")
@@ -561,7 +561,7 @@ final class LocaliserTests: XCTestCase {
         for request in initial {
             XCTAssertFalse(request.content.body.contains("12345")); XCTAssertFalse(request.content.body.contains("Sensitive"))
             XCTAssertEqual(request.content.title, "Expiry coming up")
-            XCTAssertTrue(request.content.body.hasPrefix("A saved item"))
+            XCTAssertTrue(request.content.body.hasPrefix("A saved thing"))
             let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
             XCTAssertFalse(trigger.repeats); XCTAssertEqual(trigger.dateComponents.hour, 9)
         }

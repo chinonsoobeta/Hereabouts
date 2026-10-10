@@ -75,18 +75,19 @@ struct OnboardingView: View {
 
     @ViewBuilder private var nudgePage: some View {
         headline("A nudge before it's too late.")
-        Text("Hereabouts only speaks up about your own dates and one quiet recap on Sundays. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
+        Text("Hereabouts only speaks up about your own things. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
         VStack(spacing: 0) {
             nudge("Return", "Three days before a return window closes, and on the day")
             nudge("Warranty", "A month before a warranty ends")
             nudge("Trip", "The evening before you leave, if something's unpacked")
             nudge("Sunday", "One recap. What you added, what's due, what's drifting.")
+            nudge("Monthly", "Still there? A few quick questions on the first Saturday")
         }
         .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
         StickyNote {
             VStack(alignment: .leading, spacing: 6) {
                 Text("“Running shoes: last day to return is Sunday.”").font(.wbQuote).foregroundStyle(Theme.ink)
-                Text("How a reminder reads. Item names can be hidden in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
+                Text("How a reminder reads. Names can be hidden in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
             }
         }
     }

@@ -28,20 +28,20 @@ struct LibrarySettingsView: View {
             Section {
                 NavigationLink { ProView(showsClose: false) } label: {
                     NotebookLine(name: "Hereabouts Pro", detail: pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
-                }.accessibilityLabel("Purchase or restore lifetime Pro")
+                }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.unlocked ? "Unlocked" : "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
             }
             Section {
                 TextField(Home.defaultName, text: $homeName).font(.wbItem).accessibilityLabel("Name of your home")
             } header: { Text("Home") }
             Section {
-                Toggle("Show item names in reminders", isOn: $showItemNames)
+                Toggle("Show names in reminders", isOn: $showItemNames)
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
                 Toggle("Sunday recap", isOn: $recapOn)
                     .onChange(of: recapOn) { _, _ in reminders.refreshRituals(store) }
                 Toggle("Monthly stocktake", isOn: $stocktakeOn)
                     .onChange(of: stocktakeOn) { _, _ in reminders.refreshRituals(store) }
             } header: { Text("Reminders") }
-              footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved item” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
+              footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved thing” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {
                 NavigationLink("Take your notebook with you.") { LeavingView() }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
@@ -216,7 +216,7 @@ struct BackupFilesView: View {
                     }
                 } footer: { Text("Files make a backup larger. A backup can be up to 200 MB.").foregroundStyle(Theme.secondary) }
                 if !photos.isEmpty {
-                    Section { ForEach(photos) { toggle($0.id, title: $0.name) } } header: { Text("Item photos").foregroundStyle(Theme.secondary) }
+                    Section { ForEach(photos) { toggle($0.id, title: $0.name) } } header: { Text("Photos of things").foregroundStyle(Theme.secondary) }
                 }
                 if !documents.isEmpty {
                     Section { ForEach(documents) { toggle($0.id, title: "\($0.item?.name ?? "Document") · \($0.filename)") } } header: { Text("Kept documents").foregroundStyle(Theme.secondary) }

@@ -36,13 +36,13 @@ struct FindView: View {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if store.items.isEmpty {
                     LibraryEmptyState(title: "Find it next time", systemImage: "magnifyingglass", description: "Save something and where you put it. A name is enough to start, like \u{201C}Spare keys\u{201D} in \u{201C}Kitchen › Top drawer\u{201D}.")
-                    Button { showAdd = true } label: { Text("Add your first item").fixedSize(horizontal: false, vertical: true) }
+                    Button { showAdd = true } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
                     dashboard
                 } else {
                     if putAway {
-                        Label("Choose an item, then confirm where you put it.", systemImage: "tray.and.arrow.down")
+                        Label("Choose a thing, then say where you put it.", systemImage: "tray.and.arrow.down")
                             .font(.wbBody).foregroundStyle(.white)
                             .padding(16).frame(maxWidth: .infinity, alignment: .leading)
                             .background(Theme.purpleFill, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -68,7 +68,7 @@ struct FindView: View {
             ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { settings = true } }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Toggle("Show archived items", systemImage: "archivebox", isOn: $showArchived)
+                    Toggle("Show archived things", systemImage: "archivebox", isOn: $showArchived)
                     Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $putAway)
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
@@ -80,7 +80,7 @@ struct FindView: View {
                 Menu {
                     Button("Start with a name", systemImage: "character.cursor.ibeam") { photoFirst = false; showAdd = true }
                     Button("Start with a photo", systemImage: "camera") { photoFirst = true; showAdd = true }
-                } label: { Label("Add item", systemImage: "plus") } primaryAction: { photoFirst = false; showAdd = true }
+                } label: { Label("Add a thing", systemImage: "plus") } primaryAction: { photoFirst = false; showAdd = true }
                 .buttonStyle(.borderedProminent).tint(Theme.purpleFill)
                 .accessibilityHint("Touch and hold to start with a photo")
             }
@@ -322,14 +322,14 @@ struct ItemEditor: View {
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
-            Button(item == nil ? "Save item" : "Save changes") { save() }
+            Button(item == nil ? "Write it down" : "Save changes") { save() }
                 .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier("item.save")
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .padding(.horizontal, 20).padding(.vertical, 12)
                 .background(Theme.ground)
         }
-        .navigationTitle(item == nil ? "New item" : "Edit item").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(item == nil ? "New thing" : "Edit thing").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { nameFocused = false; UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) } }
@@ -358,7 +358,7 @@ struct ItemEditor: View {
                 selectedPhoto = nil
             }
         }
-        .alert("Could not save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private func counter(_ text: String, _ limit: Int) -> some View {
@@ -466,27 +466,27 @@ struct ItemDetailView: View {
                     }
                 }
                 if !item.movements.isEmpty {
-                    Section("Location history") {
+                    Section("Where it's been") {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
                             VStack(alignment: .leading) {
-                                Text("\(movement.fromPath) → \(movement.toPath)")
-                                Text(movement.date, format: .dateTime.month().day().hour().minute()).font(.caption).foregroundStyle(Theme.secondary)
+                                Text("\(Movement.display(movement.fromPath)) → \(Movement.display(movement.toPath))")
+                                Text(movement.date, format: movement.date.isThisYear ? .dateTime.month().day().hour().minute() : .dateTime.year().month().day().hour().minute()).font(.caption).foregroundStyle(Theme.secondary)
                             }
                         }
                     }
                 }
                 Section {
-                    Button(item.archived ? "Restore item" : "Archive item", systemImage: item.archived ? "tray.and.arrow.up" : "archivebox") { toggleArchive() }
+                    Button(item.archived ? "Restore this thing" : "Archive this thing", systemImage: item.archived ? "tray.and.arrow.up" : "archivebox") { toggleArchive() }
                         .buttonStyle(SoftButtonStyle())
                 } footer: {
-                    Text(item.archived ? "Restored items show up in search again." : "Archive things you've given away or no longer own. They leave search and don't count toward the free plan, but their history is kept.")
+                    Text(item.archived ? "Restored things show up in search again." : "Archive things you've given away or no longer own. They leave search and don't count toward the free plan, but their history is kept.")
                         .foregroundStyle(Theme.secondary)
                 }
                 .listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            } else { ContentUnavailableView("Item deleted", systemImage: "trash") }
+            } else { ContentUnavailableView("This thing was deleted", systemImage: "trash") }
         }
         .groundBackground()
-        .navigationTitle(available ? item.name : "Item deleted").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(available ? item.name : "Deleted").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if available {
                 ToolbarItem(placement: .topBarTrailing) { Button("Edit") { editing = true } }
@@ -494,11 +494,11 @@ struct ItemDetailView: View {
                     Menu {
                         Button("Move…", systemImage: "arrow.right.circle") { moving = true }
                         Button("Add date", systemImage: "calendar.badge.plus") { addingDate = true }
-                        Button(item.archived ? "Restore item" : "Archive item", systemImage: "archivebox") { toggleArchive() }
+                        Button(item.archived ? "Restore this thing" : "Archive this thing", systemImage: "archivebox") { toggleArchive() }
                         Divider()
-                        Button("Delete item permanently", systemImage: "trash", role: .destructive) { deleting = true }
+                        Button("Delete permanently", systemImage: "trash", role: .destructive) { deleting = true }
                     } label: { Image(systemName: "ellipsis") }
-                    .accessibilityLabel("Item options")
+                    .accessibilityLabel("More")
                 }
             }
         }
@@ -515,12 +515,12 @@ struct ItemDetailView: View {
         .sheet(isPresented: $addingDate) { NavigationStack { DeadlineEditor(item: item) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? item.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
-            Button("Delete item permanently", role: .destructive) {
+            Button("Delete permanently", role: .destructive) {
                 do { try store.deleteItem(item); dismiss() } catch { self.error = error.localizedDescription }
             }
             if !item.archived { Button("Archive instead") { toggleArchive() } }
         } message: {
-            Text("Its dates, scans and location history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
+            Text("Its dates, scans and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
         }
         .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }

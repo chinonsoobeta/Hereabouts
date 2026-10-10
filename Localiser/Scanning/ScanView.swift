@@ -45,20 +45,20 @@ struct ScanView: View {
                                 Text(candidate.line).font(.caption).foregroundStyle(Theme.secondary)
                                 if candidate.shortYear { Text("The year has two digits, so check the century before you confirm.").font(.caption).foregroundStyle(Theme.warning) }
                                 else if candidate.ambiguous { Text("This could be day/month or month/day. Pick the one that matches the receipt.").font(.caption).foregroundStyle(Theme.warning) }
-                                Text(candidate.hint.map { "Possible \($0.title.lowercased()); confirm this." } ?? "Date type is unknown; confirm it in the next step.").font(.caption)
+                                Text(candidate.hint.map { "Looks like a \($0.noun). You'll confirm it next." } ?? "Not sure what kind of date this is. You'll choose next.").font(.caption)
                             }
                         }
                     }
                     Button("Enter a different date manually") { candidateID = nil }
-                    Text("A purchase date isn't a return deadline. You'll confirm the date type next, and nothing is scheduled until you do.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("A purchase date isn't the last day to return. You'll confirm the kind of date next, and nothing is scheduled until you do.").font(.caption).foregroundStyle(Theme.secondary)
                 }
-                Section("Which item is it for?") {
-                    Picker("Existing item", selection: $itemID) {
-                        Text("Choose an item").tag(nil as UUID?)
+                Section("Which thing is it for?") {
+                    Picker("Thing", selection: $itemID) {
+                        Text("Choose a thing").tag(nil as UUID?)
                         ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) }
                     }
-                    TextField("Or name a new item", text: $newName).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }
-                    Button("Create item") {
+                    TextField("Or name a new thing", text: $newName).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }
+                    Button("Write it down") {
                         guard pro.allows(.item, count: store.activeItemCount) else { upgrade = true; return }
                         do { itemID = try store.addItem(name: newName).id; newName = "" } catch { self.error = error.localizedDescription }
                     }.disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -99,7 +99,7 @@ struct ScanView: View {
                 } catch { processing = false; self.error = error.localizedDescription }
             }
         }
-        .alert("Could not read document", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't read that document", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private func read(_ data: Data, filename: String, mime: String) {
@@ -150,13 +150,13 @@ struct StoredScanView: View {
                 if scan.mime == "application/pdf" { PDFPreview(data: data) }
                 else if let image = UIImage(data: data) { ScrollView { Image(uiImage: image).resizable().scaledToFit() } }
                 Button("Remove original document", role: .destructive) { removing = true }.padding()
-            } else { LibraryEmptyState(title: "Date-only scan", systemImage: "calendar", description: "The original is not retained. Your saved dates remain with the item.") }
+            } else { LibraryEmptyState(title: "Date-only scan", systemImage: "calendar", description: "The original wasn't kept. Your dates stay with the thing.") }
         }
         .navigationTitle(scan.filename).navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Remove the original? Your saved dates and completed-scan count will remain.", isPresented: $removing, titleVisibility: .visible) { Button("Remove original", role: .destructive) {
             do { try store.removeScanSource(scan) } catch { self.error = error.localizedDescription }
         } }
-        .alert("Could not remove original", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't remove the original", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 

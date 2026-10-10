@@ -23,7 +23,7 @@ import UniformTypeIdentifiers
             let items = entries.map { entry in
                 let attributes = CSSearchableItemAttributeSet(contentType: .content)
                 attributes.title = entry.name
-                attributes.contentDescription = entry.path.isEmpty ? "Location not set" : entry.path
+                attributes.contentDescription = entry.path.isEmpty ? "No place yet" : entry.path
                 attributes.keywords = entry.aliases.split(whereSeparator: \.isNewline).map(String.init)
                 return CSSearchableItem(uniqueIdentifier: entry.id.uuidString, domainIdentifier: domain, attributeSet: attributes)
             }
