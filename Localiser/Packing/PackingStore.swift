@@ -131,6 +131,8 @@ import CoreData
         if let item = entry.item {
             if resolution == .putBack { recordMove(item, to: entry.homePlace) }
             if resolution == .newPlace { recordMove(item, to: newPlace) }
+            // Back where it lives isn't a move, but it was just seen there.
+            if resolution == .putBack || resolution == .newPlace { item.confirmedAt = .now }
         }
         entry.resolutionRaw = resolution.rawValue; try save()
     }

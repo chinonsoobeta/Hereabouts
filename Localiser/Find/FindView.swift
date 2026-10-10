@@ -130,7 +130,8 @@ struct FindView: View {
             NewPlaceTile { addingPlace = true }
         }
         SectionHeading(title: "Put away lately").padding(.top, 8)
-        ForEach(results.sorted { ($0.movements.map(\.date).max() ?? $0.createdAt) > ($1.movements.map(\.date).max() ?? $1.createdAt) }.prefix(3)) { item in itemCard(item) }
+        let lately = results.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
+        ForEach(lately) { item in itemCard(item) }
     }
 
     private func itemCard(_ item: Belonging) -> some View {

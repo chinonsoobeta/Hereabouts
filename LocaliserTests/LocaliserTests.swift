@@ -365,6 +365,37 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(ItemSearch.suggestion("Keys in Drawer", places: [(id, "Bedroom › Drawer")])?.placeID, id)
         XCTAssertNil(ItemSearch.suggestion("Keys in Drawer", places: [(id, "Bedroom › Drawer"), (UUID(), "Office › Drawer")])?.placeID)
         XCTAssertEqual(ItemSearch.score(query: "drawr", name: "Keys", aliases: "", place: "Bedroom › Drawer", notes: ""), 500)
+        // The editor's own hint has to work.
+        let drawer = UUID()
+        let hint = ItemSearch.suggestion("passport in the bedroom drawer", places: [(drawer, "Bedroom › Drawer"), (UUID(), "Office › Drawer")])
+        XCTAssertEqual(hint, .init(name: "passport", placeID: drawer, unrecognizedPlace: nil))
+        XCTAssertEqual(ItemSearch.suggestion("My keys are in the hall closet", places: [(id, "Hall closet")]), .init(name: "keys", placeID: id, unrecognizedPlace: nil))
+        XCTAssertEqual(ItemSearch.suggestion("Tent in the loft", places: [])?.unrecognizedPlace, "loft")
+    }
+
+    func testOldHistoryIsTrimmedFromTheLibraryFile() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("history-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let store = try LocaliserStore(url: folder.appendingPathComponent("Localiser.sqlite"))
+        try store.addItem(name: "Torch")
+        func transactions() throws -> Int {
+            let result = try store.context.execute(NSPersistentHistoryChangeRequest.fetchHistory(after: .distantPast)) as? NSPersistentHistoryResult
+            return (result?.result as? [NSPersistentHistoryTransaction])?.count ?? 0
+        }
+        XCTAssertGreaterThan(try transactions(), 0)
+        try store.trimHistory(before: .now.addingTimeInterval(1))
+        XCTAssertEqual(try transactions(), 0)
+        XCTAssertEqual(store.items.map(\.name), ["Torch"], "Trimming history never touches the library itself.")
+    }
+
+    func testDateSourcesHaveALimit() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Kettle")
+        let day = try XCTUnwrap(CalendarDay(stored: "2030-01-01"))
+        XCTAssertThrowsError(try store.setDeadline(item: item, kind: .returns, day: day, source: String(repeating: "a", count: TextLimit.source + 1), leadDays: 3, hour: 9, enabled: true, confirmed: true)) { error in
+            XCTAssertEqual(error.localizedDescription, "Source or terms can be up to 2,000 characters.")
+        }
+        XCTAssertTrue(store.deadlines.isEmpty, "A rejected date never lingers half-made.")
     }
 
     func testSearchPerformanceAtFiveThousandItems() throws {
@@ -752,6 +783,25 @@ final class LocaliserTests: XCTestCase {
         try store.changeTripState(trip, to: .finished)
         XCTAssertEqual(item.place, hall); XCTAssertTrue(item.packedTrips.isEmpty)
         XCTAssertEqual(item.movements.count, 1)
+    }
+
+    func testPuttingAThingBackCountsAsSeeingIt() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drawer = try store.addPlace(name: "Drawer")
+        let item = try store.addItem(name: "Passport", place: drawer)
+        let kit = try store.addKit(name: "Travel")
+        try store.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
+        let trip = try store.addTrip(TripDetails(name: "Trip", start: CalendarDay(.now), end: CalendarDay(.now)), kit: kit)
+        for entry in trip.entries { try store.pack(entry, count: entry.requiredCount) }
+        for task in trip.tasks { try store.checkTask(task, checked: true) }
+        try store.changeTripState(trip, to: .away)
+        try store.changeTripState(trip, to: .comingHome)
+        let weekAgo = Date.now.addingTimeInterval(-7 * 86_400)
+        item.confirmedAt = weekAgo
+        try store.resolveHome(XCTUnwrap(trip.entries.first { $0.item != nil }), resolution: .putBack)
+        XCTAssertEqual(item.place, drawer)
+        XCTAssertTrue(item.movements.isEmpty, "Back where it lives isn't a move.")
+        XCTAssertGreaterThan(try XCTUnwrap(item.confirmedAt), weekAgo)
     }
 
     func testReturnedPackedItemCanBeResolvedWithoutPuttingItBack() throws {

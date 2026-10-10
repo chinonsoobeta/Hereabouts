@@ -81,15 +81,30 @@ enum ItemSearch {
     struct CaptureSuggestion: Equatable { var name: String; var placeID: UUID?; var unrecognizedPlace: String? }
 
     static func suggestion(_ sentence: String, places: [(UUID, String)]) -> CaptureSuggestion? {
-        let separators = [" is in ", " is at ", " in ", " at "]
+        let separators = [" is in ", " is at ", " are in ", " are at ", " in ", " at "]
         for separator in separators {
             guard let range = sentence.range(of: separator, options: .caseInsensitive) else { continue }
-            let name = String(sentence[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
-            let location = String(sentence[range.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let name = withoutArticle(String(sentence[..<range.lowerBound]))
+            let location = withoutArticle(String(sentence[range.upperBound...]))
             guard !name.isEmpty, !location.isEmpty else { return nil }
-            let matches = places.filter { normalized($0.1) == normalized(location) || normalized($0.1.components(separatedBy: " › ").last ?? "") == normalized(location) }
+            // "the bedroom drawer" matches Bedroom › Drawer; "drawer" matches the one place called Drawer.
+            let wanted = words(location)
+            let matches = places.filter { words($0.1) == wanted || words($0.1.components(separatedBy: " › ").last ?? "") == wanted }
             return CaptureSuggestion(name: name, placeID: matches.count == 1 ? matches.first?.0 : nil, unrecognizedPlace: matches.count == 1 ? nil : location)
         }
         return nil
+    }
+
+    private static let articles: Set<String> = ["a", "an", "the", "my", "our", "your"]
+
+    /// Lower-cased words without articles, so "the Bedroom › Drawer" and "bedroom drawer" compare equal.
+    private static func words(_ text: String) -> [String] {
+        normalized(text).split { !$0.isLetter && !$0.isNumber }.map(String.init).filter { !articles.contains($0) }
+    }
+
+    private static func withoutArticle(_ text: String) -> String {
+        let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let space = clean.firstIndex(of: " "), articles.contains(normalized(String(clean[..<space]))) else { return clean }
+        return clean[space...].trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

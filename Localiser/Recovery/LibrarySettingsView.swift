@@ -32,6 +32,7 @@ struct LibrarySettingsView: View {
             }
             Section {
                 TextField(Home.defaultName, text: $homeName).font(.wbItem).accessibilityLabel("Name of your home")
+                    .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
             } header: { Text("Home") }
             Section {
                 Toggle("Show names in reminders", isOn: $showItemNames)

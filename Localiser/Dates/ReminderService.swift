@@ -106,7 +106,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     func refreshRituals(_ store: LocaliserStore, now: Date = .now) {
         let calendar = Calendar.current
         var requests: [(id: String, title: String, body: String, ritual: String, when: DateComponents, repeats: Bool)] = []
-        if Rituals.recapEnabled {
+        if Rituals.recapEnabled && !store.items.isEmpty {
             requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's due this week and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
         }
         if Rituals.stocktakeEnabled, let date = Rituals.nextStocktakeDate(after: now, calendar: calendar) {
@@ -131,7 +131,8 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
             for request in requests {
                 let content = UNMutableNotificationContent()
                 content.title = request.title; content.body = request.body; content.sound = .default
-                content.interruptionLevel = .passive
+                // The night before a trip is worth hearing; recaps and stocktakes wait quietly.
+                content.interruptionLevel = request.ritual == "trip" ? .active : .passive
                 content.userInfo = ["ritual": request.ritual]
                 let trigger = UNCalendarNotificationTrigger(dateMatching: request.when, repeats: request.repeats)
                 try? await center.add(UNNotificationRequest(identifier: request.id, content: content, trigger: trigger))

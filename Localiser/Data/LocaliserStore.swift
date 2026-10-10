@@ -31,6 +31,7 @@ enum TextLimit {
     static let name = 120
     static let aliases = 1_000
     static let notes = 5_000
+    static let source = 2_000
 }
 
 @MainActor @Observable
@@ -79,7 +80,15 @@ final class LocaliserStore {
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
         try backfillConfirmation()
+        // Nothing reads the history, so a failed trim only costs disk space.
+        if !inMemory { try? trimHistory() }
         try refresh()
+    }
+
+    /// History tracking stays on (see above), but nothing reads it. Without trimming, every edit ever made
+    /// stays in the library file.
+    func trimHistory(before cutoff: Date = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .now) throws {
+        try context.execute(NSPersistentHistoryChangeRequest.deleteHistory(before: cutoff))
     }
 
     /// Libraries from before V6 have no confirmation date; the last move or the day it was added stands in.
@@ -127,7 +136,7 @@ final class LocaliserStore {
     func addItem(name: String, place: Place? = nil, notes: String = "", aliases: String = "", photo: Data? = nil) throws -> Belonging {
         // Validate everything before inserting, so a rejected item never lingers half-made in the context.
         let clean = try requiredName(name)
-        let cleanNotes = try limited(notes, TextLimit.notes), cleanAliases = try limited(aliases, TextLimit.aliases)
+        let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
         item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
         item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo
@@ -137,7 +146,7 @@ final class LocaliserStore {
 
     func editItem(_ item: Belonging, name: String, place: Place?, notes: String, aliases: String, photo: Data?) throws {
         let clean = try requiredName(name)
-        let cleanNotes = try limited(notes, TextLimit.notes), cleanAliases = try limited(aliases, TextLimit.aliases)
+        let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
         recordMove(item, to: place)
         item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases; item.photo = photo
         try save()
@@ -231,11 +240,12 @@ final class LocaliserStore {
         guard confirmed else { throw LocaliserError.dateNotConfirmed }
         guard (0...3650).contains(leadDays), (0...23).contains(hour) else { throw LocaliserError.invalidReminder }
         if let existing, existing.kind == .returns, [.keeping, .returned].contains(existing.decision), !reopen { throw LocaliserError.closedReturn }
+        let cleanSource = try limited(source, TextLimit.source, field: "Source or terms")
         let deadline = existing ?? (NSEntityDescription.insertNewObject(forEntityName: "Deadline", into: context) as! Deadline)
         if existing == nil { deadline.id = UUID(); deadline.decisionRaw = ReturnDecision.open.rawValue }
         if reopen { deadline.decisionRaw = ReturnDecision.open.rawValue }
         deadline.item = item; deadline.kindRaw = kind.rawValue; deadline.dayString = day.stored
-        deadline.source = source; deadline.leadDays = Int16(leadDays); deadline.hour = Int16(hour); deadline.enabled = enabled
+        deadline.source = cleanSource; deadline.leadDays = Int16(leadDays); deadline.hour = Int16(hour); deadline.enabled = enabled
         if let scan {
             let record = NSEntityDescription.insertNewObject(forEntityName: "ScanRecord", into: context) as! ScanRecord
             record.id = UUID(); record.createdAt = .now; record.item = item
@@ -269,9 +279,9 @@ final class LocaliserStore {
         return clean
     }
 
-    func limited(_ text: String, _ limit: Int) throws -> String {
+    func limited(_ text: String, _ limit: Int, field: String) throws -> String {
         let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard clean.count <= limit else { throw LocaliserError.tooLong(limit == TextLimit.notes ? "Notes" : "Other names", limit) }
+        guard clean.count <= limit else { throw LocaliserError.tooLong(field, limit) }
         return clean
     }
 

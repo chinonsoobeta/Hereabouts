@@ -4,6 +4,8 @@ import SwiftUI
 enum Home {
     static let nameKey = "homeName"
     static let defaultName = "Home"
+    /// Long enough for "Grandma's cottage by the sea", short enough for the Find subtitle.
+    static let maxLength = 40
     static var name: String {
         let stored = UserDefaults.standard.string(forKey: nameKey)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return stored.isEmpty ? defaultName : stored
@@ -21,6 +23,8 @@ struct OnboardingView: View {
     @State private var thing = "Spare keys"
     @State private var room = ""
     @State private var error: String?
+    /// The thing written down on page 2. Going back and writing again edits it rather than adding another.
+    @State private var written: Belonging?
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -60,6 +64,7 @@ struct OnboardingView: View {
         Text("Write down where things live. Ask it later. It stays on this phone and never needs an account.").font(.wbBody).foregroundStyle(Theme.ink)
         Text("What shall we call home?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
         underlinedField("The flat", text: $homeName).accessibilityLabel("What shall we call home?")
+            .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
         suggestions(["The flat", "Home", "Mum's house", "The boat"], selected: homeName) { homeName = $0 }
     }
 
@@ -154,13 +159,18 @@ struct OnboardingView: View {
 
     private func writeItDown() {
         focused = false
+        let rewriting = written.map { $0.managedObjectContext != nil && !$0.isDeleted } ?? false
         // Replaying the introduction never adds past the free allowance; the editor handles Pro.
-        guard store.activeItemCount < CreationKind.item.freeLimit else { withAnimation { page = 2 }; return }
+        guard rewriting || store.activeItemCount < CreationKind.item.freeLimit else { withAnimation { page = 2 }; return }
         do {
             let roomName = room.trimmingCharacters(in: .whitespacesAndNewlines)
             var place: Place?
             if !roomName.isEmpty { place = try store.duplicatePlace(named: roomName, parent: nil) ?? store.addPlace(name: roomName) }
-            try store.addItem(name: thing, place: place)
+            if rewriting, let written {
+                try store.editItem(written, name: thing, place: place, notes: written.notes, aliases: written.aliases, photo: written.photo)
+            } else {
+                written = try store.addItem(name: thing, place: place)
+            }
             withAnimation { page = 2 }
         } catch { self.error = error.localizedDescription }
     }
