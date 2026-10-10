@@ -42,7 +42,7 @@ Earlier work was already in place: Spotlight indexing, the place chooser, camera
 | `cca1419` | **10.8.4** Three-page canvas onboarding: name your home, write down the first thing and its room, turn on nudges. The home name appears on Find and is editable in Settings. Tips use the sticky-note style. |
 | `a408946` | **10.8.5** Core Data V6 (`confirmedAt`) with backfill. Sunday recap, monthly "Still there?" stocktake with undo, keeping-up count, "Is it still there?" on a thing's page, trip-eve reminder, and Settings switches. **Siri/Shortcuts:** "Where is…", "Write something down", "What's due". **Photo-first capture:** touch and hold +. New things default to the last place used. Night-board dark tokens. |
 | `4b4e9da` | **10.8.6** Store screenshots (6.9-inch, light) in `Docs/Store/`, and dark-mode review shots |
-| last commit | Find note stacks at the largest text sizes. Next-date stamp on a thing's page. iPad compatibility check. This report. |
+| `7fa0c68` | Find note stacks at the largest text sizes. Next-date stamp on a thing's page. iPad compatibility check. This report. |
 
 The tests caught real bugs along the way, and all are fixed:
 - the stocktake's undo vanished after the last card;
