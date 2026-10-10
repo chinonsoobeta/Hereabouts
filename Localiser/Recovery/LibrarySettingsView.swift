@@ -19,6 +19,44 @@ struct LibrarySettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
+
+    var body: some View {
+        List {
+            Section {
+                NavigationLink { ProView(showsClose: false) } label: {
+                    NotebookLine(name: "Hereabouts Pro", detail: pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
+                }.accessibilityLabel("Purchase or restore lifetime Pro")
+            }
+            Section {
+                Toggle("Show item names in reminders", isOn: $showItemNames)
+                    .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines) }
+            } header: { Text("Reminders") }
+              footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved item” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
+            Section {
+                NavigationLink("Take your notebook with you.") { LeavingView() }.accessibilityIdentifier("settings.leaving")
+            } header: { Text("Leaving") }
+            Section {
+                Label("Your library stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
+                Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
+            } header: { Text("Privacy & Support") }
+            Section {
+                Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
+                Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
+                Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
+                Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
+                Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
+            } header: { Text("Help") }
+            Section {} footer: { Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.pencil) }
+        }
+        .listStyle(.plain)
+        .font(.wbBody).tint(Theme.purpleInk).groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
+    }
+}
+
+struct LeavingView: View {
+    @Environment(LocaliserStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedFiles = Set<UUID>()
     @State private var document: LibraryExportDocument?
     @State private var exportType = UTType.json
@@ -26,6 +64,7 @@ struct LibrarySettingsView: View {
     @State private var importing = false
     @State private var pendingRestore: LibraryBackup?
     @State private var confirmingRestore = false
+    @State private var confirmErase = false
     @State private var erasing = false
     @State private var erasePhrase = ""
     @State private var error: String?
@@ -35,64 +74,50 @@ struct LibrarySettingsView: View {
     private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count + store.items.flatMap(\.scans).filter { $0.data != nil }.count }
 
     var body: some View {
-        Form {
-            Section {
-                NavigationLink { ProView(showsClose: false) } label: {
-                    HStack(spacing: 12) {
-                        IconTile(systemImage: "sparkles", size: 40)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Hereabouts Pro").font(.wbItem).foregroundStyle(Theme.ink)
-                            Text(pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) items").font(.wbCaption).foregroundStyle(Theme.secondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Take your notebook with you.").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
+                Text("Nothing leaves this phone unless you carry it out. Every page is yours to keep, in a form you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
+                SectionHeading(title: "Keep a copy")
+                VStack(spacing: 0) {
+                    Button { prepareBackup() } label: {
+                        optionLabel("Back up everything", "Places, things, dates, trips and the photos you choose. Restores into a fresh Hereabouts.", "arrow.down.doc")
+                    }.accessibilityLabel("Back up everything")
+                    Button { prepareCSV() } label: {
+                        optionLabel("Export a spreadsheet", "A plain list of things and places. Opens in Numbers, Excel or anything else.", "tablecells")
+                    }.accessibilityLabel("Export a spreadsheet")
+                    NavigationLink { BackupFilesView(selectedFiles: $selectedFiles) } label: {
+                        optionLabel("Photos and documents to include", selectedFiles.isEmpty ? "None selected" : "\(selectedFiles.count) of \(retainedFileCount) selected", "photo.on.rectangle")
+                    }.accessibilityLabel("Photos and documents to include")
+                    Button { importing = true } label: {
+                        optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
+                    }.accessibilityLabel("Restore from a backup")
+                    Button {
+                        Task {
+                            do { let count = try await CalendarExport.addAll(store.deadlines.filter(\.active)); notice = "\(count) dates added to Calendar." }
+                            catch { self.error = error.localizedDescription }
                         }
-                    }
+                    } label: {
+                        optionLabel("Put dates in your calendar", "Returns, warranties and expiry dates keep reminding you after the app is gone.", "calendar")
+                    }.accessibilityLabel("Put dates in your calendar")
+                }.buttonStyle(.plain)
+                Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
+                    .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
+                SectionHeading(title: "Then, if you like")
+                Button(role: .destructive) { confirmErase = true } label: {
+                    optionLabel("Erase this notebook", "Wipes everything on this phone. We'll ask twice. Your backups stay wherever you put them.", "trash")
+                }.buttonStyle(.plain).foregroundStyle(Theme.amber).accessibilityLabel("Erase this notebook")
+                if let notice { Label(notice, systemImage: "checkmark.circle").font(.wbBody).foregroundStyle(Theme.green) }
+                StickyNote {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("“If you ever come back, a backup brings everything home.”").font(.wbQuote)
+                        Text("No account was made, so there's nothing to close. Thanks for keeping a notebook.").font(.wbCaption)
+                    }.foregroundStyle(Theme.ink)
                 }
-                .accessibilityLabel("Purchase or restore lifetime Pro")
-            }
-            Section {
-                Toggle("Show item names in reminders", isOn: $showItemNames)
-                    .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines) }
-            } header: { Text("Reminders").foregroundStyle(Theme.secondary) }
-              footer: { Text(showItemNames ? "Reminders say which item is due, for example \u{201C}Headphones: last day to return is tomorrow.\u{201D} Anyone who sees your lock screen can read them." : "Reminders say \u{201C}A saved item\u{201D} instead of the name.").foregroundStyle(Theme.secondary) }
-            Section {
-                Button("Export restorable backup", systemImage: "arrow.down.doc") { prepareBackup() }
-                Button("Export inventory CSV", systemImage: "tablecells") { prepareCSV() }
-                NavigationLink {
-                    BackupFilesView(selectedFiles: $selectedFiles)
-                } label: {
-                    Label {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Photos and documents to include")
-                            Text(selectedFiles.isEmpty ? "None selected" : "\(selectedFiles.count) of \(retainedFileCount) selected").font(.wbCaption).foregroundStyle(Theme.ink)
-                        }
-                    } icon: { Image(systemName: "photo.on.rectangle") }
-                }
-                Button("Restore from a backup", systemImage: "arrow.counterclockwise") { importing = true }
-            } header: { Text("Backup").foregroundStyle(Theme.secondary) }
-              footer: { Text("A backup holds your places, items, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups are not encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.").font(.wbCaption).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true) }
-            Section {
-                Label("Your library stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
-                Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
-            } header: { Text("Privacy").foregroundStyle(Theme.secondary) }
-            .font(.wbBody)
-            Section {
-                Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
-                Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
-                Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
-                Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
-                Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
-            } header: { Text("Help").foregroundStyle(Theme.secondary) }
-            Section {
-                Button("Erase all local records…", systemImage: "trash", role: .destructive) { erasePhrase = ""; erasing = true }
-                    .foregroundStyle(Theme.warning)
-            } footer: { Text("Export a backup first. Erasing removes every item, place, date, kit and trip from this iPhone.").foregroundStyle(Theme.secondary) }
-            if let notice { Section { Label(notice, systemImage: "checkmark.circle").foregroundStyle(Theme.sageInk) } }
-            Section {} footer: {
-                Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.secondary).frame(maxWidth: .infinity)
-            }
+                Button("I'll stay a while") { dismiss() }.buttonStyle(SoftButtonStyle())
+            }.padding(20)
         }
-        .tint(Theme.purpleInk)
-        .groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
+        .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts inventory") { result in
             switch result { case .success: notice = "Export saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
@@ -121,7 +146,10 @@ struct LibrarySettingsView: View {
             let summary = "\(count == 1 ? "1 record" : "\(count) records") saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
             Text(libraryIsEmpty ? summary : summary + " Your current library will be replaced. If anything goes wrong, it is kept exactly as it is.")
         }
-        .alert("Erase all local records?", isPresented: $erasing) {
+        .confirmationDialog("Erase this notebook?", isPresented: $confirmErase, titleVisibility: .visible) {
+            Button("Continue to erase", role: .destructive) { erasePhrase = ""; erasing = true }
+        } message: { Text("Wipes everything on this phone. We'll ask twice. Your backups stay wherever you put them.") }
+        .alert("Erase this notebook?", isPresented: $erasing) {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
             Button("Erase", role: .destructive) {
@@ -131,10 +159,20 @@ struct LibrarySettingsView: View {
         .alert("Couldn't finish that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
+    private func optionLabel(_ title: String, _ detail: String, _ symbol: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol).font(.system(size: 20)).frame(width: 26).accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title).font(.wbBody.weight(.bold)).foregroundStyle(Theme.ink)
+                Text(detail).font(.wbCaption).foregroundStyle(Theme.pencil)
+            }.fixedSize(horizontal: false, vertical: true)
+        }.frame(maxWidth: .infinity, minHeight: 44, alignment: .leading).card(padding: 12).contentShape(Rectangle())
+    }
+
     private func restore(replacing: Bool) {
         defer { pendingRestore = nil }
         do {
-            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored. Check reminders are on in Due soon." }
+            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored. Check reminders are on in Due." }
         } catch { self.error = error.localizedDescription }
     }
     private func prepareCSV() {

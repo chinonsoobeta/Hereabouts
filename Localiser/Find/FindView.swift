@@ -59,12 +59,11 @@ struct FindView: View {
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Where is…")
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { settings = true } }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Toggle("Show archived items", systemImage: "archivebox", isOn: $showArchived)
                     Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $putAway)
-                    Divider()
-                    Button("Settings", systemImage: "gear") { settings = true }
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
                 .popoverTip(PutAwayTip())
@@ -103,7 +102,7 @@ struct FindView: View {
             NewPlaceTile { addingPlace = true }
         }
         SectionHeading(title: "Put away lately").padding(.top, 8)
-        ForEach(results.prefix(3)) { item in itemCard(item) }
+        ForEach(results.sorted { ($0.movements.map(\.date).max() ?? $0.createdAt) > ($1.movements.map(\.date).max() ?? $1.createdAt) }.prefix(3)) { item in itemCard(item) }
     }
 
     private func itemCard(_ item: Belonging) -> some View {

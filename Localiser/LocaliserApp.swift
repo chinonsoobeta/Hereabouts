@@ -55,12 +55,13 @@ struct RootView: View {
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = false
     var body: some View {
         TabView(selection: $tab) {
-            Tab("Find", systemImage: "magnifyingglass", value: AppTab.find) { NavigationStack { FindView() } }
-            Tab("Places", systemImage: "shippingbox", value: AppTab.places) { NavigationStack { PlacesView().settingsButton() } }
-            Tab("Due soon", systemImage: "calendar.badge.clock", value: AppTab.due) { NavigationStack { DueView().settingsButton() } }
+            Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.places) { NavigationStack { PlacesView().settingsButton() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.due) { NavigationStack { DueView().settingsButton() } } label: { Label("Due", systemImage: "calendar").environment(\.symbolVariants, .none) }
                 .badge(reminders.coverageGap ? Text("!") : nil)
-            Tab("Packing", systemImage: "suitcase", value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } }
+            Tab(value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
         }
+        .tint(Theme.purpleInk)
         .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {

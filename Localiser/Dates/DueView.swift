@@ -47,7 +47,7 @@ struct DueView: View {
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .background(Theme.ground).navigationTitle("Due soon")
+        .background(Theme.ground).navigationTitle("Due")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu("More", systemImage: "ellipsis.circle") {

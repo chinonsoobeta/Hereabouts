@@ -52,6 +52,8 @@ extension Font {
     static let wbItem = notebook("Fraunces-Regular", size: 19, relativeTo: .body, serif: true).weight(.medium)
     static let wbCaption = notebook("AtkinsonHyperlegible-Regular", size: 13, relativeTo: .footnote).weight(.medium)
     static let wbLabel = notebook("AtkinsonHyperlegible-Bold", size: 11, relativeTo: .footnote)
+    static let wbPrice = notebook("Fraunces-Regular", size: 64, relativeTo: .largeTitle, serif: true).weight(.medium)
+    static let wbQuote = notebook("Fraunces-Italic", size: 18, relativeTo: .body, serif: true)
 
     static func appearanceFont(_ name: String, size: CGFloat, weight: UIFont.Weight, style: UIFont.TextStyle) -> UIFont {
         let base = UIFont(name: name, size: size) ?? UIFont(name: "Georgia", size: size) ?? .systemFont(ofSize: size, weight: weight)
@@ -112,7 +114,7 @@ struct Stamp: View {
     enum Tone { case neutral, due, done }
     let text: String
     var tone: Tone = .neutral
-    private var ink: Color { tone == .due ? Theme.amber : tone == .done ? Theme.green : Theme.purpleInk }
+    private var ink: Color { tone == .due ? Theme.amber : tone == .done ? Theme.green : Theme.ink }
     var body: some View {
         Text(text.uppercased())
             .font(.wbLabel).tracking(1.54)
@@ -161,6 +163,22 @@ struct NotebookLine: View {
             cursor = match.upperBound
         }
         return result
+    }
+}
+
+struct StickyNote<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View {
+        content.fixedSize(horizontal: false, vertical: true)
+            .padding(16).frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.lilacPaper, in: RoundedRectangle(cornerRadius: 6))
+            .overlay(alignment: .top) {
+                Rectangle().fill(Theme.paper.opacity(0.85))
+                    .overlay { Rectangle().stroke(Theme.rule, lineWidth: 1) }
+                    .frame(width: 46, height: 14).offset(y: -7).accessibilityHidden(true)
+            }
+            .rotationEffect(.degrees(-0.8))
+            .padding(.vertical, 8)
     }
 }
 

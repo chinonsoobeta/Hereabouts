@@ -59,7 +59,7 @@ struct PackingView: View {
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .background(Theme.ground).navigationTitle("Packing")
+        .background(Theme.ground).navigationTitle("Trips")
         .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Plan a trip", systemImage: "plus") { newTrip = true } } }
         .sheet(isPresented: $newTrip) { NavigationStack { TripEditor() } }
         .sheet(isPresented: $newKit) { NavigationStack { KitEditor() } }
