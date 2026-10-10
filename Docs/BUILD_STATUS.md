@@ -527,3 +527,7 @@ The + on Find keeps its tap behaviour, so name-only capture stays one tap. Touch
 ## Pro allowance table and audit flake (Claude, 10 October)
 
 Full run `/private/tmp/hb-full6.log`: units 41 pass / 3 existing skips; UI 9/10. Typography failed on one new contrast finding, "Already free" on Pro. That is pencil on paper, 5.55:1, the same pair Codex measured; the same code passed in the run before (`/private/tmp/hb-full5.log`, 10/10). Rather than add a fifth exemption, the Pro allowance table's right-hand column is now ink, which also reads better as the answer column.
+
+## Phase 3.5 — 10.8.6 store screenshots and night board (Claude, 10 October)
+
+New opt-in UI test `testStoreScreenshots` writes PNGs straight to a folder named by `TEST_RUNNER_STORE_SHOTS`. Writing directly avoids the result-bundle hang; the test skips itself in ordinary runs. Six light screenshots at 6.9-inch are in `Docs/Store/iPhone-6.9` with captions in `Docs/Store/README.md`. Pro is left out because the test scheme has no StoreKit configuration. Eight dark screenshots are in `Docs/Store/night-review`. Checked against the night board: paper #17131F, ink #F1EBF7, purple #B59CF5, the boxed Find note, amber stamps and leaders all match after this step's token changes. No dark-mode defects found on Find, search, a thing, Due, Trips, recap, stocktake or Pro.

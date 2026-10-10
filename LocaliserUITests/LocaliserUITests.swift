@@ -117,15 +117,25 @@ import XCTest
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         try shot("1-find")
-        search.tap(); search.typeText("pass")
+        search.tap(); search.typeText("pass\n")
         XCTAssertTrue(app.staticTexts["Passports (family)"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
         try shot("2-search")
+        search.tap()
         search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 4))
         search.typeText("running\n")
         app.staticTexts["Running shoes"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
         try shot("3-thing")
         app.tabBars.buttons["Due"].tap()
+        // Store shots show Due with reminders on, as a real user would have it.
+        let turnOn = app.buttons["Turn on reminders"]
+        if turnOn.waitForExistence(timeout: 2) {
+            turnOn.tap()
+            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+            if allow.waitForExistence(timeout: 5) { allow.tap() }
+            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
+        }
         try shot("4-due")
         app.tabBars.buttons["Trips"].tap()
         try shot("5-trips")
@@ -143,7 +153,14 @@ import XCTest
         XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5))
         try shot("7-stocktake")
         app.buttons["Later"].tap()
-        app.buttons["Settings"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Still there?"].waitForNonExistence(timeout: 5))
+        // Leave the search field so the navigation bar's buttons come back.
+        for label in ["Close", "Cancel"] where app.navigationBars.buttons[label].exists || app.buttons[label].exists {
+            app.buttons[label].firstMatch.tap()
+        }
+        let settings = app.navigationBars["Hereabouts"].buttons["Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 5), app.debugDescription)
+        settings.tap()
         let pro = app.buttons["Purchase or restore lifetime Pro"]
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
