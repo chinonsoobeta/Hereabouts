@@ -1,3 +1,60 @@
+# Status report — 10 October 2026
+
+## This morning: the end-to-end sweep
+
+You asked for an adversarial sweep of the whole app: UI, code and engineering, fixing what turned up. Everything is committed locally on `main`. Nothing was pushed, uploaded or published. Your iPhone has the latest app, installed over the air today.
+
+What was actually wrong, in order of how much it would have hurt:
+
+| Found | Fixed in |
+| --- | --- |
+| "Add all to Calendar" added every date again on each tap, and each event covered two days | `bbd08c8` |
+| Passed warranty and expiry dates stayed on Due as if still due | `9d708bc` |
+| The app version was fixed at 1.0 (1) in Info.plist, so a version bump would never have shipped | `0a5678b` |
+| The library file kept every edit ever made (history tracked, never read or trimmed) | `0a5678b` |
+| Going Back in onboarding and writing again added a second thing | `0a5678b` |
+| Putting a thing back after a trip didn't count as seeing it, so it came up in Still there? | `0a5678b` |
+| Deleting a place left its things with no place, made its shelves into rooms, and counted the things as checked | `9451eb4` |
+| Siri read dates as "Sun 11 Oct", and could say "last in no particular place" | `c47e428` |
+| Places quick start offered six rooms but vanished after the first tap | `c47e428` |
+| On the two Sundays the clocks change, the recap opened an hour early or late | `c47e428` |
+| Every visit to the Pro screen opened with "Pro isn't available to buy right now" until the App Store answered | `9451eb4` |
+| In dark mode, lists and forms showed grey system panels on the purple-black paper | `e75c7ba` |
+| The recap named four of eight new things as if that were all | `9451eb4` |
+| The recap counted moves, not things, and counted a moved thing again as checked | `9451eb4` |
+| A cut-off backup was called "not a Hereabouts backup" | `9451eb4` |
+| The store screenshots showed a red warning badge on Due, and their recap said "8 new things" while calling one of them unchecked since March | `b3ca71e` |
+| The place chooser left a stray place behind when it refused a path | `9451eb4` |
+| In dark mode, Settings still had grey rows; long lines stacked in the middle of the row; a trip's add row looked torn off | `9451eb4` |
+| "Item", "location", "deadline", "library", "records" and "Could not…" all over the app; "Put away. Nice." praised; reminder buttons said "Keep purchase" where Due says "Keeping it" | `ce122d5`, `c47e428`, `e75c7ba`, `9451eb4` |
+| The PDF import test failed when the test phone's Files folder filled up | `7bdd327` |
+
+Smaller fixes are listed in `BUILD_STATUS.md` under "End-to-end sweep".
+
+Checked and fine: the privacy manifest, photo storage and memory, the 64-reminder system limit, Siri sharing the app's store, every tip pointing at a real control, the usage strings and the store icon.
+
+Three word choices are yours:
+- "Archive" is on the voice guide's don't-use list, but nothing has replaced it.
+- The expiry kind says "Expires" rather than "Goes off", because its 180-day lead fits passports and licences.
+- British and American English are mixed: "The flat" and "Don't have it any more", but "canceled" and "Winter tires". The launch plan makes en-GB primary; tell me which way to go and I'll make it consistent.
+
+One design item: the app icon is still the pin-and-box mark, with no dark or tinted version. It works, but it predates the notebook look.
+
+Last runs, after every fix above:
+
+| Suite | Result |
+| --- | --- |
+| Unit tests, iPhone 17, iOS 26.5 | **54**: 52 passed, 2 skipped (purchases need iOS 27 here), 0 failed |
+| UI tests, iPhone 17, iOS 26.5 | **10 of 10** passed (one after a test fix*); the screenshot test skips itself, as designed |
+| Unit tests, iPhone 17 Pro, iOS 27 | **54 passed**, 0 skipped, 0 failed |
+| Store screenshots, iPhone 17 Pro Max | Light and dark sets retaken, both passing |
+
+*In the full run, the backup restore test failed because old test backups had pushed its file out of view in the picker. The test now searches for it and takes it from the search results. Rerun with the PDF test, which uses the same search, both passed.
+
+Your iPhone has this build: `9451eb4`, installed over the air and opened. Everything committed after it is tests, demo data and notes, which don't change the app.
+
+---
+
 # Overnight status report — 10 October 2026
 
 Claude picked up from Codex at 00:01 and stopped at about 01:45. Everything is committed locally on `main`; nothing was pushed, uploaded or published. The last full test run is green.
