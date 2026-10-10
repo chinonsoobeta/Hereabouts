@@ -282,6 +282,12 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(csv.contains("\"'=SUM(1,2)\""))
         XCTAssertTrue(csv.contains("\"A \"\"quote\"\"\nand comma,\""))
         XCTAssertTrue(csv.contains("\"'@command\""))
+        XCTAssertTrue(csv.hasPrefix("\"id\",\"name\",\"place\",\"notes\",\"other names\",\"archived\",\"dates\""))
+        let kettle = try store.addItem(name: "Kettle")
+        try store.setDeadline(item: kettle, kind: .warranty, day: XCTUnwrap(CalendarDay(stored: "2030-01-01")), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        XCTAssertTrue(store.inventoryCSV().contains("\"Warranty ends 2030-01-01\""))
+        XCTAssertEqual(try store.backup().contents, "2 things and 1 date")
+        XCTAssertEqual(LibraryBackup(records: []).contents, "An empty notebook")
     }
 
     func testLocalPersistenceAndContainerMove() throws {

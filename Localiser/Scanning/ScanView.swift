@@ -24,7 +24,7 @@ struct ScanView: View {
     private var selected: DateCandidate? { draft?.candidates.first { $0.id == candidateID } }
 
     var body: some View {
-        Form {
+        SheetForm {
             Section("Read a receipt or label") {
                 Button("Scan with camera", systemImage: "doc.viewfinder") { camera = true }.disabled(!VNDocumentCameraViewController.isSupported || processing)
                 PhotosPicker(selection: $photo, matching: .images) { Label("Choose a photo", systemImage: "photo") }.disabled(processing)

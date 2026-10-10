@@ -102,7 +102,7 @@ struct PlaceEditor: View {
     private var parent: Place? { store.places.first { $0.id == parentID } }
     private var duplicate: Place? { store.duplicatePlace(named: name, parent: parent, excluding: place) }
     var body: some View {
-        Form {
+        SheetForm {
             Section {
                 TextField("Name, like Kitchen or Top drawer", text: $name).accessibilityIdentifier("place.name")
                 if let duplicate {
@@ -149,7 +149,7 @@ struct PlaceDetailView: View {
 
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             if available {
                 Section {
                     VStack(alignment: .leading, spacing: 6) {

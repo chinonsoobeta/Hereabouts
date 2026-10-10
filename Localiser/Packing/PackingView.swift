@@ -138,7 +138,7 @@ struct KitEditor: View {
     @State private var upgrade = false
     init(kit: Kit? = nil) { self.kit = kit; _name = State(initialValue: kit?.name ?? "") }
     var body: some View {
-        Form { TextField("Kit name", text: $name).accessibilityIdentifier("kit.name") }
+        SheetForm { TextField("Kit name", text: $name).accessibilityIdentifier("kit.name") }
             .groundBackground().navigationTitle(kit == nil ? "New kit" : "Edit kit").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
@@ -165,7 +165,7 @@ struct KitDetailView: View {
     @State private var error: String?
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             Section {
                 Button("Plan a trip with this kit", systemImage: "suitcase") { trip = true }.buttonStyle(PrimaryButtonStyle()).plainRow()
             }
@@ -252,7 +252,7 @@ struct KitEntryEditor: View {
         }
     }
     var body: some View {
-        Form {
+        SheetForm {
             Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Phone charger", text: $name).accessibilityIdentifier("kit.entry.name") }
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
@@ -294,7 +294,7 @@ struct TripEditor: View {
     }
     private var details: TripDetails { TripDetails(name: name, start: CalendarDay(start), end: CalendarDay(end), flying: flying, international: international, work: work) }
     var body: some View {
-        Form {
+        SheetForm {
             Section("Trip") {
                 TextField("Trip name", text: $name).accessibilityIdentifier("trip.name")
                 DatePicker("Depart", selection: $start, displayedComponents: .date)
@@ -346,7 +346,7 @@ struct TripDetailView: View {
     }
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             Section {
                 VStack(alignment: .leading, spacing: 12) {
                     TripProgressCard(trip: trip)
@@ -459,7 +459,7 @@ struct TripEntryAdder: View {
     @State private var name = ""
     @State private var error: String?
     var body: some View {
-        Form {
+        SheetForm {
             Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Sunglasses", text: $name) }
         }
@@ -486,7 +486,7 @@ struct TripEntryDetailView: View {
     init(entry: TripEntry) { self.entry = entry; _packed = State(initialValue: Int(entry.packedCount)); _quantity = State(initialValue: entry.requiredCount) }
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             Section {
                 Text("\(entry.packedCount) of \(entry.requiredCount) packed")
                 Text(entry.item?.place?.path ?? "Anywhere").foregroundStyle(Theme.secondary)

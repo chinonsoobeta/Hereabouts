@@ -35,7 +35,7 @@ struct FindView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if store.items.isEmpty {
-                    LibraryEmptyState(title: "Find it next time", systemImage: "magnifyingglass", description: "Save something and where you put it. A name is enough to start, like \u{201C}Spare keys\u{201D} in \u{201C}Kitchen › Top drawer\u{201D}.")
+                    LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "The first thing is the hardest to lose.")
                     Button { showAdd = true } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
@@ -264,7 +264,7 @@ struct ItemEditor: View {
     }
 
     var body: some View {
-        Form {
+        SheetForm {
             Section {
                 Menu {
                     if CameraPicker.isAvailable { Button("Take photo", systemImage: "camera") { takingPhoto = true } }
@@ -399,7 +399,7 @@ struct ItemDetailView: View {
 
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             if available {
                 Section {
                     VStack(alignment: .leading, spacing: 14) {

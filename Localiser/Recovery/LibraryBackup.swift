@@ -28,6 +28,17 @@ struct LibraryBackup: Codable, Sendable {
         guard data.count <= Self.maximumBytes else { throw LocaliserError.invalidBackup("This export exceeds 200 MB. Choose fewer original files; all library records can still be included.") }
         return data
     }
+    /// What's inside, as a person would say it: "12 things, 5 places and 3 dates".
+    var contents: String {
+        let kinds = [("Belonging", "thing", "things"), ("Place", "place", "places"), ("Deadline", "date", "dates"), ("Kit", "kit", "kits"), ("TripRecord", "trip", "trips")]
+        let parts = kinds.compactMap { entity, one, many -> String? in
+            let count = records.filter { $0.entity == entity }.count
+            return count == 0 ? nil : count == 1 ? "1 \(one)" : "\(count) \(many)"
+        }
+        guard let last = parts.last else { return "An empty notebook" }
+        return parts.count == 1 ? last : parts.dropLast().joined(separator: ", ") + " and " + last
+    }
+
     static func decoded(_ data: Data) throws -> Self {
         guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup("Choose a Hereabouts backup under 200 MB.") }
         return try JSONDecoder().decode(Self.self, from: data)
@@ -180,9 +191,10 @@ struct LibraryBackup: Codable, Sendable {
             let safe = first.map { "=+-@".contains($0) } == true ? "'" + text : text
             return "\"" + safe.replacingOccurrences(of: "\"", with: "\"\"") + "\""
         }
-        let heading = ["id", "name", "place", "notes", "aliases", "archived", "confirmed dates"].map(escaped).joined(separator: ",")
+        let heading = ["id", "name", "place", "notes", "other names", "archived", "dates"].map(escaped).joined(separator: ",")
         return ([heading] + items.map { item in
-            [item.id.uuidString, item.name, item.place?.path ?? "", item.notes, item.aliases, item.archived ? "true" : "false", item.deadlines.sorted { $0.dayString < $1.dayString }.map { "\($0.kindRaw):\($0.dayString)" }.joined(separator: "; ")].map(escaped).joined(separator: ",")
+            let dates = item.deadlines.sorted { $0.dayString < $1.dayString }.map { "\($0.kind?.title ?? "Date") \($0.dayString)" }
+            return [item.id.uuidString, item.name, item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
         }).joined(separator: "\r\n") + "\r\n"
     }
 

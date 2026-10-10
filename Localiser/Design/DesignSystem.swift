@@ -19,6 +19,9 @@ enum Theme {
     /// The boxed note on Find (keeping up, stocktake): lilac by day, near-black by night.
     static let noteBox = adaptive(0xECE5F3, 0x211B2E)
     static let green = adaptive(0x2E6B3F, 0x8BD1A0)
+    /// Grouped list rows: white by day, as the system draws them; the night board's raised surface by night,
+    /// where the system's neutral grey would sit off-palette on the purple-black paper.
+    static let sheet = adaptive(0xFFFFFF, 0x211B2E)
 
     // Existing component roles use the new palette during the sequential screen restyle.
     static let purple = purpleInk
@@ -83,6 +86,18 @@ struct CardBackground: ViewModifier {
     }
 }
 
+/// A grouped List whose ordinary rows use the sheet colour, so they match the paper by night as well as by day.
+struct SheetList<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View { List { Group { content }.sheetRows() } }
+}
+
+/// A Form whose rows use the sheet colour.
+struct SheetForm<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View { Form { Group { content }.sheetRows() } }
+}
+
 /// A ruled row on the notebook paper.
 struct CardRow: ViewModifier {
     func body(content: Content) -> some View {
@@ -99,6 +114,8 @@ extension View {
     func cardRow() -> some View { modifier(CardRow()) }
     /// Clears the system grouped background so screens sit on the Wherebox ground colour.
     func groundBackground() -> some View { scrollContentBackground(.hidden).background(Theme.ground) }
+    /// Gives a list's ordinary rows the sheet colour. Rows that set their own background keep it.
+    func sheetRows() -> some View { listRowBackground(Theme.sheet) }
     /// A List row with no card, aligned to the card gutter.
     func plainRow() -> some View {
         listRowBackground(Color.clear).listRowSeparator(.hidden).listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))

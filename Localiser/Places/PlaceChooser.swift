@@ -78,7 +78,7 @@ struct PlaceChooser: View {
 
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             if !typed.isEmpty, exactMatch == nil {
                 Section {
                     Button {

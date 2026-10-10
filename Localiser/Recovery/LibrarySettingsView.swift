@@ -134,7 +134,7 @@ struct LeavingView: View {
             }.padding(20)
         }
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
-        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts inventory") { result in
+        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts things") { result in
             switch result { case .success: notice = "Export saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
         }
@@ -158,8 +158,7 @@ struct LeavingView: View {
                 Button("Erase and restore", role: .destructive) { restore(replacing: true) }
             }
         } message: {
-            let count = pendingRestore?.records.count ?? 0
-            let summary = "\(count == 1 ? "1 record" : "\(count) records") saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
+            let summary = "\(pendingRestore?.contents ?? "A backup"), saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
             Text(libraryIsEmpty ? summary : summary + " Your current library will be replaced. If anything goes wrong, it is kept exactly as it is.")
         }
         .confirmationDialog("Erase this notebook?", isPresented: $confirmErase, titleVisibility: .visible) {
@@ -207,7 +206,7 @@ struct BackupFilesView: View {
     private var photos: [Belonging] { store.items.filter { $0.photo != nil } }
     private var documents: [ScanRecord] { store.items.flatMap { Array($0.scans) }.filter { $0.data != nil }.sorted { $0.createdAt < $1.createdAt } }
     var body: some View {
-        Form {
+        SheetForm {
             if photos.isEmpty && documents.isEmpty {
                 Text("No photos or kept documents yet.").foregroundStyle(Theme.secondary)
             } else {

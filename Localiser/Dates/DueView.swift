@@ -75,7 +75,7 @@ struct DueView: View {
         .sheet(item: $calendarFor) { CalendarEventEditor(deadline: $0) }
         .alert("Calendar", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) { Button("OK") { notice = nil } } message: { Text(notice ?? "") }
         .sheet(isPresented: $addDate) { NavigationStack {
-            List {
+            SheetList {
                 if store.items.filter({ !$0.archived }).isEmpty {
                     Section {
                         Text("Dates belong to a thing. Write the thing down first, then add its date.").foregroundStyle(Theme.secondary)
@@ -218,7 +218,7 @@ struct DeadlineEditor: View {
     private var closed: Bool { existing?.kind == .returns && (existing?.decision == .keeping || existing?.decision == .returned) }
 
     var body: some View {
-        Form {
+        SheetForm {
             if let scan {
                 Section("Scanned document") {
                     if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
@@ -300,7 +300,7 @@ struct DeadlineDetailView: View {
     @State private var error: String?
     var body: some View {
         let _ = store.revision
-        List {
+        SheetList {
             Section {
                 DeadlineRow(deadline: deadline, showsItem: false)
                 if !deadline.source.isEmpty { Label("From \(deadline.source)", systemImage: "doc.text").font(.subheadline).foregroundStyle(Theme.secondary) }
