@@ -543,3 +543,10 @@ Thing page: per the Item board, a thing with a date in the next 30 days now show
 Full run `/private/tmp/hb-full8.log` (before the thing-page stamp): units 45 pass / 3 existing skips; UI 10/10, store-screenshot test skipped as designed.
 
 Final full run `/private/tmp/hb-full9.log` (everything above included): units **45 passed**, 3 existing skips, 0 failures; UI **10/10**, store-screenshot test skipped as designed. The only audit line printed was the Pro subtitle inside the scroll-edge band, which the existing rule exempts. iOS 27 units `/private/tmp/hb-u27.log`: **45/45**, no skips. Overnight summary for the owner: `Docs/STATUS_REPORT.md`.
+
+## Owner decisions applied (Claude, 10 October, morning)
+
+- **Due screen** now groups dates as **Missed / This week / Later / Done**, as on the canvas. "This week" covers dates up to seven days out. The reminders card and Calendar tip moved to the top. Open returns have "Returning it" and "Keeping it" buttons on the card. "Done" shows the five most recent settled dates from the last 30 days, and "Show everything done" shows them all. Settled cards carry a Returned, Kept, Archived or Passed stamp.
+- **Recap and stocktake** stay on by default (unchanged).
+- **Last place used:** a new thing starts in the last place only if that place was saved within the past 10 minutes. This keeps batch-adding into one cupboard quick without quietly filing tomorrow's things in yesterday's room.
+- **Widget:** waits for developer enrolment.

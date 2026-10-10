@@ -78,11 +78,11 @@ Logs are in `/private/tmp/hb-full*.log`. They will not survive a restart; BUILD_
 | Onboarding "read the name off a label" | Left out: there is no name recognition, and the line would promise something the app doesn't do. |
 | Everything already in `HUMAN_BLOCKED.md` | Domain, privacy pages, developer enrolment, App Store product, name clearance, TestFlight. |
 
-## Needs your decision
+## Decisions (answered 10 October, morning)
 
-1. **Due screen layout.** The canvas groups dates as "This week / Later / Done" under a line saying "Nudges are on", with "Add all to Calendar" at the top. The app, as Codex restyled it, groups them as "Decide soon / Expiring" with the reminders card at the bottom. Both work. I didn't restructure it overnight because it changes how people triage dates. Say which you want.
-2. **Recap and stocktake are on by default.** Both can be switched off in Settings, and onboarding mentions the Sunday recap. Keep them on by default?
-3. **New things start in the last place used.** This makes adding several things to one cupboard quick, but someone could save a thing in the wrong room without noticing. Keep it?
-4. **The widget.** Once you enrol in the developer programme, it's about one session of work.
+1. **Due screen:** This week / Later / Done. Done.
+2. **Recap and stocktake:** on by default. Already the case.
+3. **Last place used:** kept, but only within 10 minutes of the last save. Done.
+4. **Widget:** to be built after developer enrolment.
 
 To see the new screens: run the app with the demo library, then add `--open-ritual recap` or `--open-ritual stocktake` to open them directly.

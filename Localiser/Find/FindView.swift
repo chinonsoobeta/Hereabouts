@@ -176,7 +176,7 @@ struct DueCard: View {
     let deadline: Deadline
     var embedded = false
     var body: some View {
-        let pill = DueLabel.pill(for: deadline.day)
+        let pill = deadline.active ? DueLabel.pill(for: deadline.day) : settledStamp
         HStack(spacing: 14) {
             IconTile(systemImage: DueLabel.symbol(for: deadline.kind), photo: deadline.item?.photo, size: 48, tone: pill?.1 ?? .neutral)
             VStack(alignment: .leading, spacing: 2) {
@@ -186,6 +186,15 @@ struct DueCard: View {
             if let pill { Stamp(text: pill.0, tone: pill.1) }
         }
         .modifier(EmbeddedCard(embedded: embedded))
+    }
+
+    /// Dates that need nothing more: a decided return, or a warranty or expiry that has passed.
+    private var settledStamp: (String, Stamp.Tone)? {
+        switch deadline.decision {
+        case .returned?: ("Returned", .done)
+        case .keeping?: ("Kept", .done)
+        default: deadline.item?.archived == true ? ("Archived", .neutral) : ("Passed", .neutral)
+        }
     }
 
     private var caption: String {
@@ -241,6 +250,9 @@ struct ItemEditor: View {
     /// Photo-first capture: the camera opens before the name. The place starts at the last one used.
     private let photoFirst: Bool
     static let lastPlaceKey = "lastPlaceID"
+    static let lastPlaceTimeKey = "lastPlaceSavedAt"
+    /// Only a run of additions reuses the place, so yesterday's room isn't quietly carried over.
+    static let lastPlaceWindow: TimeInterval = 10 * 60
 
     init(item: Belonging? = nil, place: Place? = nil, photoFirst: Bool = false) {
         self.item = item
@@ -323,7 +335,9 @@ struct ItemEditor: View {
             ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("Done") { nameFocused = false; UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) } }
         }
         .onAppear {
-            if item == nil, placeID == nil, let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.places.contains(where: { $0.id == id }) {
+            let savedAt = UserDefaults.standard.object(forKey: Self.lastPlaceTimeKey) as? Date ?? .distantPast
+            if item == nil, placeID == nil, Date.now.timeIntervalSince(savedAt) < Self.lastPlaceWindow,
+               let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.places.contains(where: { $0.id == id }) {
                 placeID = id
             }
             if item == nil, photoFirst, photo == nil {
@@ -360,6 +374,7 @@ struct ItemEditor: View {
             else {
                 try store.addItem(name: name, place: place, notes: notes, aliases: aliases, photo: photo)
                 UserDefaults.standard.set(place?.id.uuidString, forKey: Self.lastPlaceKey)
+                UserDefaults.standard.set(Date.now, forKey: Self.lastPlaceTimeKey)
             }
             dismiss()
         } catch { self.error = error.localizedDescription }

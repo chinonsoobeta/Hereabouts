@@ -12,13 +12,22 @@ struct DueView: View {
     @State private var addingAll = false
     @State private var notice: String?
     @State private var error: String?
-    private let sections = ["Missed", "Decide soon", "Returning", "Warranties ending", "Expiring"]
+    /// Grouped as on the Due board: what needs attention this week, what's further off, and what's settled.
+    private let sections = ["Missed", "This week", "Later"]
 
     private func section(_ deadline: Deadline) -> String {
-        if let day = deadline.day, day < CalendarDay(.now) { return "Missed" }
-        if deadline.kind == .warranty { return "Warranties ending" }
-        if deadline.kind == .expiry { return "Expiring" }
-        return deadline.decision == .returning ? "Returning" : "Decide soon"
+        guard let day = deadline.day else { return "Later" }
+        let today = CalendarDay(.now)
+        if day < today { return "Missed" }
+        if let weekOut = today.adding(days: 7), day <= weekOut { return "This week" }
+        return "Later"
+    }
+
+    /// Recently settled dates: decided returns and anything whose day passed in the last month.
+    private var recentlyDone: [Deadline] {
+        let monthAgo = CalendarDay(.now).adding(days: -30) ?? CalendarDay(.now)
+        return store.deadlines.filter { !$0.active && $0.item != nil && ($0.day.map { $0 >= monthAgo } ?? false) }
+            .sorted { $0.dayString > $1.dayString }
     }
 
     var body: some View {
@@ -35,15 +44,18 @@ struct DueView: View {
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                     }.card(padding: 16)
                 }
-                if store.deadlines.contains(where: \.active) { TipView(CalendarTip()).tipBackground(Theme.card) }
+                if store.deadlines.contains(where: \.active) {
+                    coverageCard
+                    TipView(CalendarTip()).tipBackground(Theme.card)
+                }
                 ForEach(sections, id: \.self) { heading in dateSection(heading) }
-                if showClosed {
-                    SectionHeading(title: "Completed").padding(.top, 8)
-                    ForEach(store.deadlines.filter { !$0.active }) { deadline in
+                let done = showClosed ? store.deadlines.filter { !$0.active }.sorted { $0.dayString > $1.dayString } : Array(recentlyDone.prefix(5))
+                if !done.isEmpty {
+                    SectionHeading(title: "Done").padding(.top, 8)
+                    ForEach(done) { deadline in
                         NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
                     }
                 }
-                if store.deadlines.contains(where: \.active) { coverageCard.padding(.top, 8) }
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
@@ -53,7 +65,7 @@ struct DueView: View {
                 Menu("More", systemImage: "ellipsis.circle") {
                     Button("Add all to Calendar", systemImage: "calendar.badge.plus") { Task { await addAllToCalendar() } }.disabled(upcoming.isEmpty || addingAll)
                     if store.deadlines.contains(where: { !$0.active }) {
-                        Toggle("Show completed", systemImage: "checkmark.circle", isOn: $showClosed)
+                        Toggle("Show everything done", systemImage: "checkmark.circle", isOn: $showClosed)
                     }
                 }
             }
@@ -80,13 +92,13 @@ struct DueView: View {
                     if !dates.isEmpty {
                         SectionHeading(title: heading).padding(.top, 8)
                         ForEach(dates) { deadline in
-                            if heading == "Decide soon" {
+                            if deadline.kind == .returns && deadline.decision == .open {
                                 VStack(spacing: 14) {
                                     NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
                                         .contextMenu { calendarMenu(deadline) }
                                     HStack(spacing: 10) {
-                                        Button("Return it") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
-                                        Button("Keep it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
+                                        Button("Returning it") { decide(deadline, .returning) }.buttonStyle(PrimaryButtonStyle())
+                                        Button("Keeping it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
                                     }
                                 }.card()
                             } else {
