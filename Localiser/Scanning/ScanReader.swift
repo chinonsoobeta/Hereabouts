@@ -91,7 +91,8 @@ enum ScanDates {
 enum ScanReader {
     static let maximumBytes = 20 * 1024 * 1024
 
-    static func read(data: Data, filename: String, mime: String) throws -> ScanDraft {
+    /// `maximumPages`: the share sheet reads fewer, since extensions get far less memory than the app.
+    static func read(data: Data, filename: String, mime: String, maximumPages: Int = 10) throws -> ScanDraft {
         guard !data.isEmpty else { throw ScanError.unreadable }
         guard data.count <= maximumBytes else { throw ScanError.tooLarge }
         var lines: [String] = []
@@ -101,8 +102,9 @@ enum ScanReader {
         if mime == "application/pdf" {
             guard let document = PDFDocument(data: data) else { throw ScanError.unreadable }
             guard !document.isLocked else { throw ScanError.lockedPDF }
-            guard document.pageCount > 0, document.pageCount <= 10 else { throw ScanError.tooManyPages }
-            for index in 0..<document.pageCount {
+            guard document.pageCount > 0, maximumPages < 10 || document.pageCount <= 10 else { throw ScanError.tooManyPages }
+            // A shorter limit reads the first pages rather than refusing; order emails put dates up top.
+            for index in 0..<min(document.pageCount, maximumPages) {
                 guard let page = document.page(at: index) else { throw ScanError.unreadable }
                 let bounds = page.bounds(for: .mediaBox)
                 guard bounds.width.isFinite, bounds.height.isFinite, bounds.width > 0, bounds.height > 0 else { throw ScanError.unreadable }
