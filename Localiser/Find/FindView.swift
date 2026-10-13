@@ -563,7 +563,8 @@ struct ItemDetailView: View {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
                             VStack(alignment: .leading) {
                                 Text(movement.summary)
-                                Text(movement.date, format: movement.date.isThisYear ? .dateTime.month().day().hour().minute() : .dateTime.year().month().day().hour().minute()).font(.caption).foregroundStyle(Theme.secondary)
+                                let when = movement.date.formatted(movement.date.isThisYear ? .dateTime.month().day().hour().minute() : .dateTime.year().month().day().hour().minute())
+                                Text(movement.byline.map { "\($0) · \(when)" } ?? when).font(.caption).foregroundStyle(Theme.secondary)
                             }
                         }
                     }

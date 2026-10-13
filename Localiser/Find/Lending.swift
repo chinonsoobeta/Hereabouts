@@ -11,7 +11,7 @@ import CoreData
     func lend(_ item: Belonging, to person: String, askBackOn day: CalendarDay?, hour: Int = 9, on date: Date = .now) throws -> Deadline? {
         let who = try requiredName(person)
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
-        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.lent.rawValue
+        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.lent.rawValue; movement.by = author
         movement.fromPath = item.place?.path ?? Movement.noPlace
         movement.toPath = who
         item.lentTo = who; item.lentAt = date
@@ -24,7 +24,7 @@ import CoreData
     func gotBack(_ item: Belonging, on date: Date = .now) throws {
         guard item.isLent else { return }
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
-        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.back.rawValue
+        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.back.rawValue; movement.by = author
         movement.fromPath = item.lentTo
         movement.toPath = item.place?.path ?? Movement.noPlace
         item.lentTo = ""; item.lentAt = nil; item.confirmedAt = date

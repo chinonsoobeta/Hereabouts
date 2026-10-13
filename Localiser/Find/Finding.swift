@@ -14,7 +14,7 @@ import CoreData
     /// Records where it turned up, even when that's where it was meant to be. Finding a thing is seeing it.
     func found(_ item: Belonging, at place: Place?, on date: Date = .now) throws {
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
-        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.found.rawValue
+        movement.id = UUID(); movement.date = date; movement.item = item; movement.kindRaw = Movement.Kind.found.rawValue; movement.by = author
         movement.fromPath = item.place?.path ?? Movement.noPlace
         movement.toPath = place?.path ?? Movement.noPlace
         item.place = place
@@ -49,6 +49,9 @@ extension Movement {
         case .back: "Back from \(fromPath)"
         }
     }
+
+    /// "Sam, Tuesday": who made the move, once a home is shared. Nil for the phone's owner.
+    var byline: String? { by.isEmpty ? nil : by }
 
     /// What the app says after a find: "Noted. Next time, look in Hall › Drawer."
     static func foundSentence(_ place: Place?) -> String {

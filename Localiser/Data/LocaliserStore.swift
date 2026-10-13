@@ -50,6 +50,8 @@ final class LocaliserStore {
     var trips: [TripRecord] = []
     var tripEntries: [TripEntry] = []
     var homes: [HomeRecord] = []
+    /// Who is making changes, for "Sam moved it". Empty for the phone's owner; set once a home is shared.
+    var author = ""
     var currentHomeID = UserDefaults.standard.string(forKey: LocaliserStore.currentHomeKey).flatMap(UUID.init(uuidString:))
     var revision = 0
     /// Name of the most recent permanent deletion that can still be undone.
@@ -180,7 +182,7 @@ final class LocaliserStore {
         guard item.place?.id != place?.id else { return }
         item.confirmedAt = .now
         let movement = NSEntityDescription.insertNewObject(forEntityName: "Movement", into: context) as! Movement
-        movement.id = UUID(); movement.date = .now; movement.item = item
+        movement.id = UUID(); movement.date = .now; movement.item = item; movement.by = author
         movement.fromPath = item.place?.path ?? Movement.noPlace
         movement.toPath = place?.path ?? Movement.noPlace
         item.place = place

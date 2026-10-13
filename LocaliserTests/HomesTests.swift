@@ -71,6 +71,17 @@ import CoreData
         XCTAssertEqual(store.recentPlaces(), [mumsHall])
     }
 
+    func testMovesRecordWhoMadeThem() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let shed = try store.addPlace(name: "Shed")
+        let drill = try store.addItem(name: "Drill")
+        try store.move(drill, to: shed)
+        XCTAssertNil(drill.movements.first?.byline, "The phone's owner isn't named")
+        store.author = "Sam"
+        _ = try store.lend(drill, to: "Alex", askBackOn: nil)
+        XCTAssertEqual(drill.movements.first { $0.kind == .lent }?.byline, "Sam")
+    }
+
     func testOnlyAnEmptyHomeCanGoAndNeverTheLast() throws {
         let store = try LocaliserStore(inMemory: true)
         let first = try XCTUnwrap(store.currentHome)
