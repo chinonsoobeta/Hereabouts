@@ -11,9 +11,10 @@ Phase B, as far as it goes before enrolment:
 | B5 Homes | **Done** (`3c7ac8d`). More than one home, a switcher on Find and Places, Settings › Homes. Two homes on the free plan. |
 | B6 Household sharing | Groundwork (`ecc2553`): every move records who made it. Sharing itself needs iCloud. |
 | B4 iCloud sync | Groundwork (`692fd19`): Places offers to tidy up empty copies of a place, the problem two phones set up apart would cause. Sync needs the paid account. |
-| B1 Shared notebook file | Groundwork (`afb5362`): moving the notebook with its photos, and reading changes from other processes, both tested. Switching it on needs an App Group. |
+| B1 Shared notebook file | Built (`afb5362`, `ac5d641`): moving the notebook with its photos at launch, and reading other processes' changes. Off until `HEREABOUTS_APP_GROUP` names a group, which needs the paid account. |
 | B2 Widget | Waiting for your word that you've enrolled, as agreed. |
-| B3 Share sheet, B7 TestFlight | Need the paid account. |
+| B3 Share sheet | App side built (`fe79f08`): reading what's shared and the save screen. The extension needs the App Group. |
+| B7 TestFlight | Needs the paid account. |
 
 `HUMAN_BLOCKED.md` has a row for each, with what to do. One thing only your phone can tell us: whether "Several things in this photo?" names a real shelf well. It needs Apple Intelligence on.
 

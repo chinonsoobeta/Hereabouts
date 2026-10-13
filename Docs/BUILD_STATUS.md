@@ -606,7 +606,10 @@ Built from `Docs/FEATURE_PLAN.md`, one commit per step, each with green tests.
 - `692fd19` **B4 groundwork.** Places offers "Tidy up" when an empty place copies another's name, level and home. Anything inside moves across; places holding things, archived ones included, are never merged.
 - `afb5362` **B1 groundwork.** `NotebookFile.move` copies the notebook with its photos, checks every kind of record arrived, and leaves the original for a later launch. Nothing calls it yet. The app now reads changes other processes save from the history, skipping its own, and trims history only behind every reader.
 
-Still waiting for enrolment: the widget (B2), wiring B1 to an App Group, the share sheet (B3), iCloud (B4), sharing a home (B6) and TestFlight (B7). `HUMAN_BLOCKED.md` lists each with what's needed.
+- `ac5d641` **B1 wiring.** With `HEREABOUTS_APP_GROUP` set, the first launch copies the notebook into the group folder and the next removes the original. A failed copy leaves it where it was. The setting is empty until enrolment, so nothing moves today. Pro status is written to the group's settings. The Find subtitle and the recap read the home's name from the notebook.
+- `fe79f08` **B3 app side.** `ShareImport` reads shared text, the first five pages of a PDF, or a photo. Its dates come back return-by first. `ShareSaveView` asks which date and which thing, within the free thing and scan limits. Unit tests: 114 of 114 on iOS 27.
+
+Still waiting for enrolment: the widget (B2), the share extension (B3), iCloud (B4), sharing a home (B6) and TestFlight (B7). `HUMAN_BLOCKED.md` lists each with what's needed.
 
 Tests changed along the way:
 - The accessibility audit helper exempts contrast reports on text starting within 24 points under a hittable bar, where the audit samples the bar's blurred edge. This was checked by screenshot.
