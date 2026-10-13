@@ -115,6 +115,7 @@ extension RootView {
     func open(_ link: AppLink) {
         switch link {
         case .item(let id): store.openedItem = id
+        case .place(let id): tab = .places; store.openedPlace = id
         case .due: tab = .due
         case .find, .new, .putAway: tab = .find; store.findRequest = link
         }

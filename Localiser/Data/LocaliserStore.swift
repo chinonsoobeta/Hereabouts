@@ -54,6 +54,8 @@ final class LocaliserStore {
     var openedItem: UUID?
     /// An app icon shortcut or link for Find: search, write something down, or put something away.
     var findRequest: AppLink?
+    /// A place opened from a box label.
+    var openedPlace: UUID?
     var context: NSManagedObjectContext { container.viewContext }
     /// Items that count toward the free tier. Archived items never do.
     var activeItemCount: Int { items.lazy.filter { !$0.archived }.count }

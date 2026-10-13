@@ -4,6 +4,10 @@ struct PlacesView: View {
     @Environment(LocaliserStore.self) private var store
     @State private var adding = false
     @State private var error: String?
+    @State private var printing = false
+    @State private var scanning = false
+    @State private var labelled: Place?
+    @State private var unknownLabel = false
     private let starters = ["Kitchen", "Bedroom", "Garage", "Hall cupboard", "Office", "Loft"]
     var body: some View {
         ScrollView {
@@ -32,8 +36,30 @@ struct PlacesView: View {
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
         .background(Theme.ground).navigationTitle("Places")
-        .toolbar { Button("Add place", systemImage: "plus") { adding = true } }
+        .toolbar {
+            if !store.places.isEmpty {
+                Menu {
+                    Button("Print labels", systemImage: "printer") { printing = true }
+                    if LabelScanner.isAvailable { Button("Scan a label", systemImage: "qrcode.viewfinder") { scanning = true } }
+                } label: { Image(systemName: "qrcode") }.accessibilityLabel("Box labels")
+            }
+            Button("Add place", systemImage: "plus") { adding = true }
+        }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor() } }
+        .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: []) } }
+        .fullScreenCover(isPresented: $scanning) {
+            NavigationStack {
+                LabelScanner { id in scanning = false; store.openedPlace = id }.ignoresSafeArea()
+                    .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { scanning = false } } }
+            }
+        }
+        .navigationDestination(item: $labelled) { place in PlaceDetailView(place: place, fromLabel: true) }
+        .onChange(of: store.openedPlace, initial: true) { _, id in
+            guard let id else { return }
+            store.openedPlace = nil
+            if let place = store.places.first(where: { $0.id == id }) { labelled = place } else { unknownLabel = true }
+        }
+        .alert("This label's box isn't in your notebook", isPresented: $unknownLabel) { Button("OK") {} } message: { Text("It may have been deleted, or the label was made on another phone.") }
         .alert("Couldn't add that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
@@ -140,7 +166,10 @@ struct PlaceDetailView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     let place: Place
+    /// Opened by scanning its label: lead with putting things in.
+    var fromLabel = false
     @State private var editing = false
+    @State private var printing = false
     @State private var adding = false
     @State private var addingItem = false
     @State private var deleting = false
@@ -164,6 +193,10 @@ struct PlaceDetailView: View {
                         let count = place.activeItemCount
                         Text(count == 1 ? "1 thing" : "\(count) things").font(.wbCaption).foregroundStyle(Theme.purpleInk)
                     }.plainRow()
+                    if fromLabel {
+                        Button("Put things in this box", systemImage: "tray.and.arrow.down") { addingItem = true }
+                            .buttonStyle(PrimaryButtonStyle()).plainRow()
+                    }
                     HStack(spacing: 10) {
                         Button("Add a thing", systemImage: "plus") { addingItem = true }.buttonStyle(SoftButtonStyle(compact: true))
                         Button("Add place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true))
@@ -192,7 +225,13 @@ struct PlaceDetailView: View {
         }
         .groundBackground()
         .navigationTitle(available ? place.name : "").navigationBarTitleDisplayMode(.inline)
-        .toolbar { if available { Button("Edit") { editing = true } } }
+        .toolbar {
+            if available {
+                Button("Print a label", systemImage: "printer") { printing = true }
+                Button("Edit") { editing = true }
+            }
+        }
+        .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: [place]) } }
         .sheet(isPresented: $editing) { NavigationStack { PlaceEditor(place: place) } }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor(parent: place) } }
         .sheet(isPresented: $addingItem) { NavigationStack { ItemEditor(place: place) } }
