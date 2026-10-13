@@ -25,7 +25,7 @@ Last runs:
 | Unit tests, iOS 26.5 | **110**: 104 passed, 6 skipped (purchase tests need iOS 27's local StoreKit), 0 failed |
 | UI tests, iOS 26.5 | **18**: 17 passed, the screenshot test skipped itself as designed |
 
-Your phones have the build from before A1. Free-team installs stop opening on **Sat 17 Oct at 12:11 PDT**. Reinstall before then to get everything above.
+Neither phone has these features yet. Free-team installs stop opening on **Sat 17 Oct at 12:11 PDT**. Reinstall before then to get everything above.
 
 ---
 
