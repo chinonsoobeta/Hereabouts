@@ -193,6 +193,10 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
             "Write something down in \(.applicationName)",
             "Add a thing to \(.applicationName)",
         ], shortTitle: "Write it down", systemImageName: "square.and.pencil")
+        AppShortcut(intent: PutAwayIntent(), phrases: [
+            "Put something away in \(.applicationName)",
+            "\(.applicationName) put away",
+        ], shortTitle: "Put away", systemImageName: "tray.and.arrow.down")
         AppShortcut(intent: FoundThingIntent(), phrases: [
             "I found \(\.$thing) in \(.applicationName)",
             "Tell \(.applicationName) I found something",

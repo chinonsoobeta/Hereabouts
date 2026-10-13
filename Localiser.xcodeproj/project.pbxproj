@@ -10,6 +10,7 @@
 		0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E822257E4E7F4DD2DD6454C /* Finding.swift */; };
 		10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56936067B918AEFABF8680BB /* ScanView.swift */; };
 		17A3067D0A104EFF1BCC30D7 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */; };
+		1B49871AFDAA83DEE0936687 /* PutAway.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5125DB3495BBECED9AFA8D3 /* PutAway.swift */; };
 		1E00789AD31D3C6550A6764C /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */; };
 		20874F8ED8AD6F6763DE22BE /* FindingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2863FFD39C6F0B33AEEE6EE4 /* FindingTests.swift */; };
 		2161F67397C5D6F0052EAB27 /* AtkinsonHyperlegible-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4A566E279AA3E08ADBA1C450 /* AtkinsonHyperlegible-Regular.ttf */; };
@@ -24,6 +25,7 @@
 		3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688EA727718F4AD230A48BBB /* LocaliserStore.swift */; };
 		3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25EBA641962B55EE0850C76 /* DueView.swift */; };
 		4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */; };
+		4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */; };
 		4636EB3F5C930EA1A8B0DFF0 /* AppLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4830CE7139FF6711AB1EFDA /* AppLinkTests.swift */; };
 		4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9129D1892BAA558D32EE09BC /* OnboardingView.swift */; };
 		55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A961609BF5723FD7F58316C /* LocaliserUITests.swift */; };
@@ -31,6 +33,7 @@
 		5FE9188B9C4AD13FD9CF70FA /* atkinsonhyperlegible-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0E9B4590CDB9EA9F56F6FABD /* atkinsonhyperlegible-OFL.txt */; };
 		6420857F484D25F7378A0505 /* Lending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024256BC9684B9B0C8066558 /* Lending.swift */; };
 		6B45D3468D549925ABFB994C /* Rituals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECED7D62F188EA3BF86B26C /* Rituals.swift */; };
+		719454CA26F6D3FA20E43E6D /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
 		723298C2EE434DF675B9562B /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495FD0CD72900A5932FC8DE9 /* DesignSystem.swift */; };
 		73184C07C0834BF531F95BBB /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A21167AF6F6CAEF79448DE /* Records.swift */; };
 		761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF170C8864C322B2EF738BC7 /* PackingRecords.swift */; };
@@ -42,6 +45,7 @@
 		85F6CA5CBCE26F22AC58B41F /* fraunces-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 69C7E4D9B7BFE1016E67E998 /* fraunces-OFL.txt */; };
 		883F90525273EB06CDF36579 /* Tips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C11FBF78BD6877C6EF37AD /* Tips.swift */; };
 		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
+		93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A645341D05015908431977CC /* HereaboutsControls.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		A9EEAFF0C7CD07C937642857 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
@@ -58,6 +62,8 @@
 		CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE95939E5941898426B7EBDF /* DateRules.swift */; };
 		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
+		DFAC0D3F3D4C343CC54022BB /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
+		EB966890C60DC9CA8A89420C /* HereaboutsControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840994DA311385611BD55A2F /* HereaboutsControls.swift */; };
 		F0B1C83EBB9EB2928A914AC0 /* RitualViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22648BF6C6BEC527A3DBC941 /* RitualViews.swift */; };
 		F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */; };
 		F51008C9D776CF6895283174 /* PlaceChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */; };
@@ -74,6 +80,13 @@
 			remoteGlobalIDString = 679E7C83180DB5491E324FDC;
 			remoteInfo = Localiser;
 		};
+		8C2A1BDACFE4C028ADDF83B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9135C812E82901EB376BFE69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1BF18B3DFC73F440343DC3BC;
+			remoteInfo = HereaboutsControls;
+		};
 		CE69FBDF49D76229B82D0158 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9135C812E82901EB376BFE69 /* Project object */;
@@ -83,7 +96,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		B5E8E7409DB5288F882FA8B9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayIntent.swift; sourceTree = "<group>"; };
 		00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExport.swift; sourceTree = "<group>"; };
 		024256BC9684B9B0C8066558 /* Lending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lending.swift; sourceTree = "<group>"; };
 		028E66C2B29C2D4C913E61B7 /* Fraunces[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
@@ -104,6 +132,7 @@
 		2863FFD39C6F0B33AEEE6EE4 /* FindingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindingTests.swift; sourceTree = "<group>"; };
 		2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */ = {isa = PBXFileReference; path = Localiser.storekit; sourceTree = "<group>"; };
 		2CBDDD809F49498AEDB7145F /* LocaliserV6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV6.xcdatamodel; sourceTree = "<group>"; };
+		3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayTests.swift; sourceTree = "<group>"; };
 		3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
 		3ECED7D62F188EA3BF86B26C /* Rituals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rituals.swift; sourceTree = "<group>"; };
 		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
@@ -127,6 +156,7 @@
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		796960A07F97C020E62944E3 /* IntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentsTests.swift; sourceTree = "<group>"; };
 		838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Bold.ttf"; sourceTree = "<group>"; };
+		840994DA311385611BD55A2F /* HereaboutsControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HereaboutsControls.swift; sourceTree = "<group>"; };
 		879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateThingsTests.swift; sourceTree = "<group>"; };
 		8A961609BF5723FD7F58316C /* LocaliserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserUITests.swift; sourceTree = "<group>"; };
 		8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Italic.ttf"; sourceTree = "<group>"; };
@@ -134,13 +164,16 @@
 		953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
 		9690100A2F7DD2AC90139B89 /* ScanReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanReader.swift; sourceTree = "<group>"; };
 		A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A645341D05015908431977CC /* HereaboutsControls.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = HereaboutsControls.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A73C34594A1DA3A80DA79A05 /* Spotlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotlight.swift; sourceTree = "<group>"; };
 		AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualsTests.swift; sourceTree = "<group>"; };
 		B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-BoldItalic.ttf"; sourceTree = "<group>"; };
 		B49010154C3398D4E23CF9AF /* LendingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LendingTests.swift; sourceTree = "<group>"; };
+		B5125DB3495BBECED9AFA8D3 /* PutAway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAway.swift; sourceTree = "<group>"; };
 		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
 		CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoDeletionToast.swift; sourceTree = "<group>"; };
+		DB1A82975351814180D15AAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DBCC79A8C661311C9C70A285 /* ProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProView.swift; sourceTree = "<group>"; };
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
@@ -160,6 +193,7 @@
 			children = (
 				E7820544499355832A71CE7A /* AppLinks.swift */,
 				0BEF6DC9D14F261BA2BE55D1 /* Intents.swift */,
+				003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */,
 				A73C34594A1DA3A80DA79A05 /* Spotlight.swift */,
 				02C11FBF78BD6877C6EF37AD /* Tips.swift */,
 			);
@@ -229,6 +263,7 @@
 				60A697438CB089D0830D4DC2 /* FindView.swift */,
 				024256BC9684B9B0C8066558 /* Lending.swift */,
 				0E29FE6FB9A6F892A2BEE1EE /* LendSheet.swift */,
+				B5125DB3495BBECED9AFA8D3 /* PutAway.swift */,
 				153312694358421F11F17E69 /* Search.swift */,
 				CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */,
 			);
@@ -256,6 +291,7 @@
 		675B25DED9A59CCD220E0A20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				A645341D05015908431977CC /* HereaboutsControls.appex */,
 				0807D105D68201D35D8DF977 /* Localiser.app */,
 				FD8E6A9C1D66453E2DA206F9 /* LocaliserTests.xctest */,
 				A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */,
@@ -309,6 +345,7 @@
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
 				F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */,
 				879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */,
+				3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */,
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
 				746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */,
 			);
@@ -318,6 +355,7 @@
 		C9AE5FC5DE68511F2455EFA1 = {
 			isa = PBXGroup;
 			children = (
+				FABB52978A42C6E01168888C /* HereaboutsControls */,
 				9530E7D7FDE5FF75EB3FC201 /* Localiser */,
 				BFBADADEA1980E22D2A5D605 /* LocaliserTests */,
 				4D338B76994D0905C61DAEBB /* LocaliserUITests */,
@@ -367,19 +405,47 @@
 			path = Rituals;
 			sourceTree = "<group>";
 		};
+		FABB52978A42C6E01168888C /* HereaboutsControls */ = {
+			isa = PBXGroup;
+			children = (
+				840994DA311385611BD55A2F /* HereaboutsControls.swift */,
+				DB1A82975351814180D15AAE /* Info.plist */,
+			);
+			path = HereaboutsControls;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1BF18B3DFC73F440343DC3BC /* HereaboutsControls */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05E5F4CD910F1FCADB0C5570 /* Build configuration list for PBXNativeTarget "HereaboutsControls" */;
+			buildPhases = (
+				B276E830EB55E43B8EA81A1B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HereaboutsControls;
+			packageProductDependencies = (
+			);
+			productName = HereaboutsControls;
+			productReference = A645341D05015908431977CC /* HereaboutsControls.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		679E7C83180DB5491E324FDC /* Localiser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 794214AA05BF9504E1A90CBD /* Build configuration list for PBXNativeTarget "Localiser" */;
 			buildPhases = (
 				F2733260586BE79B4235AA8D /* Sources */,
 				64D6D6B14CBAFECE73C93D61 /* Resources */,
+				B5E8E7409DB5288F882FA8B9 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4599C2476D7C7B52353AE651 /* PBXTargetDependency */,
 			);
 			name = Localiser;
 			packageProductDependencies = (
@@ -434,6 +500,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					1BF18B3DFC73F440343DC3BC = {
+						DevelopmentTeam = "";
+					};
 					679E7C83180DB5491E324FDC = {
 						DevelopmentTeam = "";
 					};
@@ -460,6 +529,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				1BF18B3DFC73F440343DC3BC /* HereaboutsControls */,
 				679E7C83180DB5491E324FDC /* Localiser */,
 				93FA7CA2C450B36166149B45 /* LocaliserTests */,
 				F83E690651F319F1104F5837 /* LocaliserUITests */,
@@ -507,8 +577,18 @@
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
 				7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */,
 				3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */,
+				4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */,
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
 				35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B276E830EB55E43B8EA81A1B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB966890C60DC9CA8A89420C /* HereaboutsControls.swift in Sources */,
+				DFAC0D3F3D4C343CC54022BB /* PutAwayIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,6 +629,8 @@
 				CA2AEB951D2C0E57C4B22732 /* PlacesView.swift in Sources */,
 				2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */,
 				FF71503CD114EC4282272846 /* ProView.swift in Sources */,
+				1B49871AFDAA83DEE0936687 /* PutAway.swift in Sources */,
+				719454CA26F6D3FA20E43E6D /* PutAwayIntent.swift in Sources */,
 				73184C07C0834BF531F95BBB /* Records.swift in Sources */,
 				5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */,
 				F0B1C83EBB9EB2928A914AC0 /* RitualViews.swift in Sources */,
@@ -566,6 +648,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4599C2476D7C7B52353AE651 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1BF18B3DFC73F440343DC3BC /* HereaboutsControls */;
+			targetProxy = 8C2A1BDACFE4C028ADDF83B9 /* PBXContainerItemProxy */;
+		};
 		6D3F083AC75E7DD19C7EEEA2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 679E7C83180DB5491E324FDC /* Localiser */;
@@ -579,6 +666,25 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		078C61168402F8F76C80F9F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HereaboutsControls/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app.controls;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HEREABOUTS_CONTROLS";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		12E1AEE3B35DE4A6922B9F76 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -803,6 +909,25 @@
 			};
 			name = Release;
 		};
+		E9CF1062B88A05938BB4B4F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HereaboutsControls/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app.controls;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HEREABOUTS_CONTROLS";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		F34EB58FCD02CD6148AA5038 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -833,6 +958,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		05E5F4CD910F1FCADB0C5570 /* Build configuration list for PBXNativeTarget "HereaboutsControls" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9CF1062B88A05938BB4B4F1 /* Debug */,
+				078C61168402F8F76C80F9F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		1C3CAB57C8C222837F2614ED /* Build configuration list for PBXNativeTarget "LocaliserTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

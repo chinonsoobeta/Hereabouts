@@ -75,7 +75,7 @@ struct FindView: View {
             switch request {
             case .find?: searchFocused = true
             case .new?: newThing = NewThing()
-            case .putAway?: putAway = true; searchFocused = true
+            case .putAway?: newThing = NewThing(photoFirst: true)
             default: return
             }
             store.findRequest = nil
@@ -277,6 +277,7 @@ struct ItemEditor: View {
     @State private var takingPhoto = false
     @State private var error: String?
     @State private var suggestion: ItemSearch.CaptureSuggestion?
+    @State private var nameIdeas: [String] = []
     @State private var upgrade = false
     @FocusState private var nameFocused: Bool
     /// Photo-first capture: the camera opens before the name. The place starts at the last one used.
@@ -326,6 +327,16 @@ struct ItemEditor: View {
             Section {
                 TextField("Name", text: $name).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }.accessibilityIdentifier("item.name")
                 if name.count > TextLimit.name - 20 { counter(name, TextLimit.name) }
+                if item == nil, name.isEmpty, !nameIdeas.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("From the photo").font(.wbCaption).foregroundStyle(Theme.secondary)
+                        FlowLayout(spacing: 8) {
+                            ForEach(nameIdeas, id: \.self) { idea in
+                                Button(idea) { name = idea; nameFocused = false }.buttonStyle(SoftButtonStyle(compact: true))
+                            }
+                        }
+                    }
+                }
                 if item == nil && name.split(separator: " ").count >= 3 && suggestion == nil {
                     Button("Split into name and place", systemImage: "wand.and.stars") {
                         suggestion = ItemSearch.suggestion(name, places: store.places.map { ($0.id, $0.path) })
@@ -343,7 +354,7 @@ struct ItemEditor: View {
                 }
             } header: { Text("What is it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
-                PlacePicker(selection: $placeID)
+                PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [])
             } header: { Text("Where does it live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
                 TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
@@ -383,7 +394,11 @@ struct ItemEditor: View {
                 if CameraPicker.isAvailable { takingPhoto = true } else { choosingPhoto = true }
             } else { nameFocused = item == nil }
         }
-        .onChange(of: photo) { old, new in if photoFirst, old == nil, new != nil, name.isEmpty { nameFocused = true } }
+        .onChange(of: photo) { old, new in
+            if photoFirst, old == nil, new != nil, name.isEmpty { nameFocused = true }
+            guard item == nil, let new else { nameIdeas = []; return }
+            Task { nameIdeas = await NameSuggestions.read(new) }
+        }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .photosPicker(isPresented: $choosingPhoto, selection: $selectedPhoto, matching: .images)
         .fullScreenCover(isPresented: $takingPhoto) { CameraPicker { photo = PhotoResize.jpeg($0) }.ignoresSafeArea() }

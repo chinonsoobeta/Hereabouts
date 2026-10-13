@@ -41,10 +41,12 @@ struct PlacePicker: View {
     var title = "Place"
     /// What "no place" is called here: a thing without a place yet, or a place that isn't inside another.
     var noneTitle = "No place yet"
+    /// Offered first in the chooser, under "Recent".
+    var recent: [Place] = []
     var body: some View {
         let _ = store.revision
         NavigationLink {
-            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle)
+            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: "Recent")
         } label: {
             HStack(spacing: 12) {
                 Text(title).foregroundStyle(Theme.ink)
@@ -69,6 +71,7 @@ struct PlaceChooser: View {
     var noneTitle = "No place yet"
     /// Shown first when nothing is typed, as "Try here first". Used by "Found it".
     var suggested: [Place] = []
+    var suggestedTitle = "Try here first"
     var title = "Choose a place"
     @State private var query = ""
     @State private var error: String?
@@ -112,7 +115,7 @@ struct PlaceChooser: View {
                 }
             }
             if query.isEmpty, !suggested.isEmpty {
-                Section("Try here first") {
+                Section(suggestedTitle) {
                     ForEach(suggested) { place in row(title: place.path, detail: nil, id: place.id) }
                 }
             }

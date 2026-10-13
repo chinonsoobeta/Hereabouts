@@ -160,7 +160,7 @@ import XCTest
         XCTAssertTrue(app.tabBars.buttons["Due"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.tabBars.buttons["Due"].isSelected, app.debugDescription)
         follow("hereabouts://putaway")
-        XCTAssertTrue(app.staticTexts["Choose a thing, then say where you put it."].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), "Put away opens the capture screen, photo first")
     }
 
     func testNotThereFoundItAndWriteDownFromAnEmptySearch() throws {

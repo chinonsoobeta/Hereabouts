@@ -65,6 +65,30 @@ targets:
         MARKETING_VERSION: '1.0'
         CURRENT_PROJECT_VERSION: '1'
         CODE_SIGN_ENTITLEMENTS: Localiser/Localiser.entitlements
+    dependencies:
+      - target: HereaboutsControls
+  # Control Centre and Lock Screen buttons. No App Group: they only open the app. B2's widget joins here.
+  HereaboutsControls:
+    type: app-extension
+    platform: iOS
+    sources:
+      - HereaboutsControls
+      - Localiser/System/PutAwayIntent.swift
+    info:
+      path: HereaboutsControls/Info.plist
+      properties:
+        CFBundleDisplayName: Hereabouts
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.localiser.app.controls
+        MARKETING_VERSION: '1.0'
+        CURRENT_PROJECT_VERSION: '1'
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) HEREABOUTS_CONTROLS
+        GENERATE_INFOPLIST_FILE: YES
   LocaliserTests:
     type: bundle.unit-test
     platform: iOS
