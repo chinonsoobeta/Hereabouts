@@ -54,6 +54,7 @@
 		AE2CA3E64FE2044260D54BF0 /* Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEF6DC9D14F261BA2BE55D1 /* Intents.swift */; };
 		AFCCE7204D1ED840AA374C37 /* AtkinsonHyperlegible-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */; };
 		B00FDD89F85E125E5F236A48 /* CalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */; };
+		B1A6C3A0B5E63D27D0D04860 /* OrderEmailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E6D84793073270F992B600 /* OrderEmailTests.swift */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
 		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
@@ -63,6 +64,7 @@
 		CBF25115806EB6C59B30735D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */; };
 		CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE95939E5941898426B7EBDF /* DateRules.swift */; };
 		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
+		DD55D6B73E0869B435C703D6 /* OrderEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D996B5E908CAAEA38BE946D /* OrderEmail.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
 		DFAC0D3F3D4C343CC54022BB /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
 		EB966890C60DC9CA8A89420C /* HereaboutsControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840994DA311385611BD55A2F /* HereaboutsControls.swift */; };
@@ -137,6 +139,7 @@
 		2CBDDD809F49498AEDB7145F /* LocaliserV6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV6.xcdatamodel; sourceTree = "<group>"; };
 		3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayTests.swift; sourceTree = "<group>"; };
 		3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
+		3D996B5E908CAAEA38BE946D /* OrderEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderEmail.swift; sourceTree = "<group>"; };
 		3ECED7D62F188EA3BF86B26C /* Rituals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rituals.swift; sourceTree = "<group>"; };
 		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		4437E05350A4892C18DA9522 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
@@ -165,6 +168,7 @@
 		8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Italic.ttf"; sourceTree = "<group>"; };
 		9129D1892BAA558D32EE09BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
+		95E6D84793073270F992B600 /* OrderEmailTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderEmailTests.swift; sourceTree = "<group>"; };
 		9690100A2F7DD2AC90139B89 /* ScanReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanReader.swift; sourceTree = "<group>"; };
 		A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A645341D05015908431977CC /* HereaboutsControls.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = HereaboutsControls.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -350,6 +354,7 @@
 				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
 				F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */,
+				95E6D84793073270F992B600 /* OrderEmailTests.swift */,
 				879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */,
 				3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */,
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
@@ -396,6 +401,7 @@
 		E6D8F6FB14A17F86314E10CB /* Scanning */ = {
 			isa = PBXGroup;
 			children = (
+				3D996B5E908CAAEA38BE946D /* OrderEmail.swift */,
 				9690100A2F7DD2AC90139B89 /* ScanReader.swift */,
 				56936067B918AEFABF8680BB /* ScanView.swift */,
 			);
@@ -583,6 +589,7 @@
 				3B502E6540534A84813DEFBE /* LendingTests.swift in Sources */,
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
 				7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */,
+				B1A6C3A0B5E63D27D0D04860 /* OrderEmailTests.swift in Sources */,
 				3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */,
 				4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */,
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
@@ -630,6 +637,7 @@
 				C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */,
 				3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */,
 				4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */,
+				DD55D6B73E0869B435C703D6 /* OrderEmail.swift in Sources */,
 				761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */,
 				DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */,
 				4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */,

@@ -143,6 +143,46 @@ import XCTest
         XCTAssertTrue(app.staticTexts["Back from Sam"].exists, app.debugDescription)
     }
 
+    func testPastingAnOrderEmailOffersItsDates() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        reveal(app.buttons["Add date"], in: app)
+        app.buttons["Add date"].tap()
+        let paste = app.buttons["deadline.paste"]
+        XCTAssertTrue(paste.waitForExistence(timeout: 5), app.debugDescription)
+        UIPasteboard.general.string = "Thanks for your shopping.\nNo dates here."
+        paste.tap()
+        XCTAssertTrue(app.staticTexts["deadline.pasteNone"].waitForExistence(timeout: 5), app.debugDescription)
+        UIPasteboard.general.string = "Order placed: October 3, 2026\nArriving Oct 7, 2026\nYou can return this item until November 6, 2026."
+        paste.tap()
+        XCTAssertTrue(app.staticTexts["Looks like the last day to return"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Looks like the delivery date"].exists)
+        XCTAssertFalse(app.staticTexts["deadline.pasteNone"].exists)
+        // The system's "pasted from" banner covers the toolbar for a few seconds; audit once it has gone.
+        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'Hereabouts pasted'")).firstMatch
+        _ = banner.waitForNonExistence(timeout: 8)
+        _ = XCTWaiter.wait(for: [XCTestExpectation(description: "banner fades")], timeout: 1)
+        let pastedShot = XCTAttachment(screenshot: app.screenshot()); pastedShot.name = "Pasted order email"; pastedShot.lifetime = .keepAlways; add(pastedShot)
+        // The return-by date became the final date, waiting to be checked.
+        XCTAssertFalse(app.buttons["deadline.save"].isEnabled)
+        let confirm = app.switches["deadline.confirm"]
+        reveal(confirm, in: app)
+        XCTAssertTrue(app.staticTexts["Final date, Nov 6, 2026"].exists, app.debugDescription)
+        confirm.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: app.buttons["deadline.save"])
+        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
+        // Back to the top, one drag at a time so the sheet isn't pulled down.
+        for _ in 0..<6 where !paste.isHittable {
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35)).press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)))
+        }
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+    }
+
     func testAppLinksOpenWritingDownAndDue() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
@@ -372,8 +412,12 @@ import XCTest
     /// large content viewer rather than growing with the text size, which the audit flags anyway.
     private func audit(_ app: XCUIApplication, _ types: XCUIAccessibilityAuditType) throws {
         try app.performAccessibilityAudit(for: types) { issue in
-            print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.detailedDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero)")
+            print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.detailedDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero) | \(issue.element.map { "\($0.elementType.rawValue) \($0.identifier) exists=\($0.exists)" } ?? "no element")")
             guard let element = issue.element else { return false }
+            // Checked by screenshot on 2026-10-12: a sheet's first section header is ink on paper, but it starts
+            // just under the bar and the audit samples it against the bar's scroll-edge band, as on Pro below.
+            if issue.auditType == .contrast, element.elementType == .staticText, let bar = app.navigationBars.allElementsBoundByIndex.first(where: \.isHittable),
+               element.frame.minY >= bar.frame.maxY, element.frame.minY < bar.frame.maxY + 24 { return true }
             if issue.auditType == .contrast, app.navigationBars["Pro"].isHittable {
                 // Inspected rendered Pro labels on 2026-10-09. Flat glyph/background pixels measure
                 // 14.38:1 (Packing kits), 5.55:1 (unavailable message), 5.65:1 (Restore purchases).
