@@ -89,16 +89,20 @@ final class LocaliserStore {
         if let loadError { throw loadError }
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
+        context.transactionAuthor = Self.appAuthor
         try backfillConfirmation()
         try ensureHomes()
-        // Nothing reads the history, so a failed trim only costs disk space.
+        // A failed trim only costs disk space.
         if !inMemory { try? trimHistory() }
         try refresh()
     }
 
-    /// History tracking stays on (see above), but nothing reads it. Without trimming, every edit ever made
-    /// stays in the library file.
-    func trimHistory(before cutoff: Date = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .now) throws {
+    /// Who the app's own saves are from, so it can skip them when reading the history.
+    static let appAuthor = "app"
+
+    /// Without trimming, every edit ever made stays in the library file. Only history every reader has
+    /// seen goes (see `mergeOutsideChanges`).
+    func trimHistory(before cutoff: Date = LocaliserStore.historyCutoff()) throws {
         try context.execute(NSPersistentHistoryChangeRequest.deleteHistory(before: cutoff))
     }
 

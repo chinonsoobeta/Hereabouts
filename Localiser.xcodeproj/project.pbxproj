@@ -35,6 +35,7 @@
 		5FE9188B9C4AD13FD9CF70FA /* atkinsonhyperlegible-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0E9B4590CDB9EA9F56F6FABD /* atkinsonhyperlegible-OFL.txt */; };
 		6420857F484D25F7378A0505 /* Lending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024256BC9684B9B0C8066558 /* Lending.swift */; };
 		67FB59F06A60287DEE855233 /* BoxLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA4F5A37C76D31EF393EB90 /* BoxLabels.swift */; };
+		6A95B849D0CCE6B868758893 /* NotebookFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78D7DD00872972F7C3608BE /* NotebookFile.swift */; };
 		6B45D3468D549925ABFB994C /* Rituals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECED7D62F188EA3BF86B26C /* Rituals.swift */; };
 		6D238D0A3848A3ADE503BD46 /* ShelfPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8870DF501521F78C26C26D /* ShelfPhoto.swift */; };
 		719454CA26F6D3FA20E43E6D /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
@@ -68,6 +69,7 @@
 		CBE7A67F93F5679BB5F0627E /* BoxLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE993F1CE374783F6D1BB8F /* BoxLabelTests.swift */; };
 		CBF25115806EB6C59B30735D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */; };
 		CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE95939E5941898426B7EBDF /* DateRules.swift */; };
+		D00D6178D45D745553B8D9F0 /* NotebookFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */; };
 		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
 		DD55D6B73E0869B435C703D6 /* OrderEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D996B5E908CAAEA38BE946D /* OrderEmail.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
@@ -148,6 +150,7 @@
 		3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayTests.swift; sourceTree = "<group>"; };
 		3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
 		3D996B5E908CAAEA38BE946D /* OrderEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderEmail.swift; sourceTree = "<group>"; };
+		3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookFileTests.swift; sourceTree = "<group>"; };
 		3ECED7D62F188EA3BF86B26C /* Rituals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rituals.swift; sourceTree = "<group>"; };
 		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		4437E05350A4892C18DA9522 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
@@ -205,6 +208,7 @@
 		F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelV7Tests.swift; sourceTree = "<group>"; };
 		F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceChooser.swift; sourceTree = "<group>"; };
 		F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserTests.swift; sourceTree = "<group>"; };
+		F78D7DD00872972F7C3608BE /* NotebookFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookFile.swift; sourceTree = "<group>"; };
 		FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingStore.swift; sourceTree = "<group>"; };
 		FCA4F5A37C76D31EF393EB90 /* BoxLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxLabels.swift; sourceTree = "<group>"; };
 		FD8E6A9C1D66453E2DA206F9 /* LocaliserTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +314,7 @@
 			children = (
 				785940DE809D3794AA488637 /* Homes.swift */,
 				688EA727718F4AD230A48BBB /* LocaliserStore.swift */,
+				F78D7DD00872972F7C3608BE /* NotebookFile.swift */,
 				76A21167AF6F6CAEF79448DE /* Records.swift */,
 				9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */,
 			);
@@ -375,6 +380,7 @@
 				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
 				F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */,
+				3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */,
 				95E6D84793073270F992B600 /* OrderEmailTests.swift */,
 				879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */,
 				3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */,
@@ -613,6 +619,7 @@
 				3B502E6540534A84813DEFBE /* LendingTests.swift in Sources */,
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
 				7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */,
+				D00D6178D45D745553B8D9F0 /* NotebookFileTests.swift in Sources */,
 				B1A6C3A0B5E63D27D0D04860 /* OrderEmailTests.swift in Sources */,
 				3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */,
 				4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */,
@@ -664,6 +671,7 @@
 				F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */,
 				C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */,
 				3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */,
+				6A95B849D0CCE6B868758893 /* NotebookFile.swift in Sources */,
 				4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */,
 				DD55D6B73E0869B435C703D6 /* OrderEmail.swift in Sources */,
 				761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */,

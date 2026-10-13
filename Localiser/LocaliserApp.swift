@@ -108,7 +108,7 @@ struct RootView: View {
             do { try store.refresh() } catch { reminders.error = error.localizedDescription }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange).receive(on: RunLoop.main)) { _ in
-            do { try store.refresh() } catch { reminders.error = error.localizedDescription }
+            do { try store.mergeOutsideChanges(); try store.refresh() } catch { reminders.error = error.localizedDescription }
         }
     }
 }
