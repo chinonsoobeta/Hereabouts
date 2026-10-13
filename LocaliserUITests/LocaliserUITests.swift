@@ -120,6 +120,29 @@ import XCTest
         XCTAssertFalse(app.buttons["Start"].exists, "The stocktake is done for the month")
     }
 
+    func testLendingAThingAndGettingItBack() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        app.buttons["More"].firstMatch.tap()
+        app.buttons["Lend it…"].tap()
+        let person = app.textFields["lend.person"]
+        XCTAssertTrue(person.waitForExistence(timeout: 5), app.debugDescription)
+        person.tap(); person.typeText("Sam")
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        app.buttons["lend.save"].tap()
+        let back = app.buttons["item.back"]
+        XCTAssertTrue(back.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["With Sam"].exists)
+        back.tap()
+        XCTAssertTrue(back.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Back from Sam"].exists, app.debugDescription)
+    }
+
     func testAppLinksOpenWritingDownAndDue() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]

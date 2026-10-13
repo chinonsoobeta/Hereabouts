@@ -8,7 +8,7 @@ enum ItemSearch {
         let createdAt: Date
         init(_ item: Belonging) {
             self.item = item; archived = item.archived; createdAt = item.createdAt
-            text = SearchText(name: item.name, aliases: item.aliases, place: item.place?.path ?? "", notes: item.notes)
+            text = SearchText(name: item.name, aliases: item.aliases, place: item.place?.path ?? "", notes: item.notes, person: item.lentTo)
         }
     }
 
@@ -17,9 +17,12 @@ enum ItemSearch {
         let aliases: [String]
         let place: String
         let notes: String
+        /// Who it's lent to, so searching "Sam" finds what Sam has.
+        let person: String
         let words: [String]
         let placeWords: [String]
-        init(name: String, aliases: String, place: String, notes: String) {
+        init(name: String, aliases: String, place: String, notes: String, person: String = "") {
+            self.person = normalized(person)
             self.name = normalized(name)
             self.aliases = aliases.components(separatedBy: .newlines).map(normalized)
             self.place = normalized(place); self.notes = normalized(notes)
@@ -54,6 +57,7 @@ enum ItemSearch {
         if text.name.hasPrefix(query) { return 900 }
         if text.name.contains(query) { return 800 }
         if text.aliases.contains(where: { $0.contains(query) }) { return 750 }
+        if !text.person.isEmpty && text.person.contains(query) { return 720 }
         if text.place.contains(query) { return 700 }
         if query.count >= 3 && tokens.allSatisfy({ token in text.words.contains { word in
             abs(word.count - token.count) <= 1 && distance(word, token) <= 1

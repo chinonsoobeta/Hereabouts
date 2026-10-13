@@ -332,6 +332,7 @@ struct TripDetailView: View {
     @State private var canceling = false
     @State private var taskTitle = ""
     @State private var notReady: String?
+    @State private var lentPacking: TripEntry?
     @State private var error: String?
     private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? "Anywhere" }).sorted() }
     /// Says exactly what is left before the trip can be marked away.
@@ -405,6 +406,10 @@ struct TripDetailView: View {
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("Its packing list is kept for reference. Where your things live doesn't change.") }
         .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("The trip and its lists go. Your things and their places are kept.") }
+        .confirmationDialog("\(lentPacking?.title ?? "It") is with \(lentPacking?.item?.lentTo ?? "someone")", isPresented: Binding(get: { lentPacking != nil }, set: { if !$0 { lentPacking = nil } }), titleVisibility: .visible, presenting: lentPacking) { entry in
+            Button("Pack it anyway") { attempt { try store.pack(entry, count: entry.requiredCount) } }
+            if let item = entry.item { Button("It's back, pack it") { attempt { try store.gotBack(item); try store.pack(entry, count: entry.requiredCount) } } }
+        } message: { _ in Text("The notebook says it's lent out.") }
         .alert("Not quite ready", isPresented: Binding(get: { notReady != nil }, set: { if !$0 { notReady = nil } })) {
             Button("Keep packing", role: .cancel) { notReady = nil }
             Button("Leave anyway") { notReady = nil; attempt { try store.changeTripState(trip, to: .comingHome) } }
@@ -433,7 +438,9 @@ struct TripDetailView: View {
             if trip.state == .packing {
                 let done = entry.requiredCount > 0 && Int(entry.packedCount) >= entry.requiredCount
                 Button {
-                    attempt { try store.pack(entry, count: done ? 0 : entry.requiredCount) }
+                    // Packing something that's lent out is probably a mistake; ask first.
+                    if !done, entry.item?.isLent == true { lentPacking = entry }
+                    else { attempt { try store.pack(entry, count: done ? 0 : entry.requiredCount) } }
                 } label: {
                     PenCheckbox(checked: done)
                         .frame(width: 44, height: 44).contentShape(Rectangle())
@@ -445,6 +452,7 @@ struct TripDetailView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed")
                     if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
+                    if let item = entry.item, item.isLent { Text("With \(item.lentTo)").font(.wbCaption).foregroundStyle(Theme.warning) }
                     if entry.unlinked && entry.item == nil { Text("The thing was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
                 }

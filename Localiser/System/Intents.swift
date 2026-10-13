@@ -98,6 +98,7 @@ struct FindThingIntent: AppIntent {
         if item.isPrivate { return "That one's private. Open Hereabouts to see it." }
         let path = item.place?.path
         if item.archived { return path.map { "\(item.name) is archived. It was last in \($0)." } ?? "\(item.name) is archived." }
+        if item.isLent { return item.lentAt.map { "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide)))." } ?? "\(item.name) is with \(item.lentTo)." }
         if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). It lives in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
         guard let path else { return "\(item.name) is written down, but without a place yet." }
         return "\(item.name) is in \(path)."

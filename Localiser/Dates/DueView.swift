@@ -102,6 +102,15 @@ struct DueView: View {
                             Button("Keeping it") { decide(deadline, .keeping) }.buttonStyle(SoftButtonStyle())
                         }
                     }.card()
+                } else if deadline.kind == .askBack, deadline.active, let item = deadline.item {
+                    VStack(spacing: 14) {
+                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline, embedded: true) }.buttonStyle(.plain)
+                            .contextMenu { calendarMenu(deadline) }
+                        HStack(spacing: 10) {
+                            Button("It's back") { act { try store.gotBack(item) } }.buttonStyle(PrimaryButtonStyle())
+                            Button("Ask again next week") { act { try store.askAgainNextWeek(deadline) } }.buttonStyle(SoftButtonStyle())
+                        }
+                    }.card()
                 } else {
                     NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
                         .contextMenu { calendarMenu(deadline) }
@@ -128,6 +137,8 @@ struct DueView: View {
         .foregroundStyle(Theme.ink)
         .card(padding: 16)
     }
+
+    private func act(_ change: () throws -> Void) { do { try change() } catch { self.error = error.localizedDescription } }
 
     private func decide(_ deadline: Deadline, _ decision: ReturnDecision) {
         do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription }
@@ -334,6 +345,14 @@ struct DeadlineDetailView: View {
                     }
                 } header: { Text("Keep or return?").foregroundStyle(Theme.secondary) }
             }
+            if deadline.kind == .askBack, let item = deadline.item {
+                Section {
+                    if deadline.active {
+                        Button("It's back") { act { try store.gotBack(item) } }.buttonStyle(PrimaryButtonStyle()).plainRow()
+                        Button("Ask again next week") { act { try store.askAgainNextWeek(deadline) } }.buttonStyle(SoftButtonStyle()).plainRow()
+                    } else { Label("It's back.", systemImage: "checkmark.circle").foregroundStyle(Theme.sageInk) }
+                } header: { Text(item.isLent ? "With \(item.lentTo)" : "Lent out").foregroundStyle(Theme.secondary) }
+            }
             if let item = deadline.item { Section { NavigationLink("Open \(item.name)") { ItemDetailView(item: item) } } }
             Section { Button("Delete date", role: .destructive) { deleting = true } }
         }
@@ -347,6 +366,7 @@ struct DeadlineDetailView: View {
         } }
         .alert("Couldn't update the date", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
+    private func act(_ change: () throws -> Void) { do { try change() } catch { self.error = error.localizedDescription } }
     private func decide(_ decision: ReturnDecision) { do { try store.decide(deadline, decision) } catch { self.error = error.localizedDescription } }
 }
 

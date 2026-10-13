@@ -251,7 +251,8 @@ struct ItemRow: View {
         HStack(spacing: 14) {
             IconTile(systemImage: "shippingbox", photo: item.photo, size: 48)
             VStack(alignment: .leading, spacing: 3) {
-                NotebookLine(name: item.name, detail: item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
+                NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
+                if item.isLent, let home = item.place { Text("Lives in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }
             }
@@ -440,6 +441,7 @@ struct ItemDetailView: View {
     @State private var addingDate = false
     @State private var moving = false
     @State private var finding = false
+    @State private var lending = false
     @State private var foundNote: String?
     @State private var confirmedPutAway = false
     @State private var upgrade = false
@@ -461,6 +463,7 @@ struct ItemDetailView: View {
                         FlowLayout(spacing: 8) {
                             if item.archived { Stamp(text: "Archived") }
                             else if item.isMissing { Stamp(text: "Missing", tone: .due) }
+                            else if item.isLent { Stamp(text: "With \(item.lentTo)", tone: .purple) }
                             else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
                             else { Stamp(text: "At home", tone: .done) }
                             // The canvas leads with the next date when one is close.
@@ -492,7 +495,12 @@ struct ItemDetailView: View {
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
-                            if item.isMissing, !item.archived {
+                            if item.isLent, !item.archived {
+                                if let line = item.lentLine { Text(line).font(.wbCaption).foregroundStyle(Theme.ink) }
+                                Button("It's back") {
+                                    do { try store.gotBack(item) } catch { self.error = error.localizedDescription }
+                                }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.back")
+                            } else if item.isMissing, !item.archived {
                                 Text("Missing since \(item.missingSince?.dayAndMonth ?? "recently").").font(.wbCaption).foregroundStyle(Theme.ink)
                                 Button("Found it") { finding = true }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
                             } else if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
@@ -557,6 +565,7 @@ struct ItemDetailView: View {
                     Menu {
                         Button("Move…", systemImage: "arrow.right.circle") { moving = true }
                         Button("Add date", systemImage: "calendar.badge.plus") { addingDate = true }
+                        if !item.archived, !item.isLent { Button("Lend it…", systemImage: "person.badge.clock") { lending = true } }
                         if !item.archived {
                             Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { finding = true }
                             if !item.isMissing {
@@ -581,6 +590,7 @@ struct ItemDetailView: View {
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
             }
         }
+        .sheet(isPresented: $lending) { NavigationStack { LendSheet(item: item) } }
         .sheet(isPresented: $finding) {
             NavigationStack {
                 PlaceChooser(selection: Binding(get: { nil }, set: { id in

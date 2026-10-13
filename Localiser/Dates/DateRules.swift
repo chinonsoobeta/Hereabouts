@@ -65,7 +65,8 @@ enum DueGroup: String, CaseIterable, Sendable {
     static func of(kind: DeadlineKind?, active: Bool, day: CalendarDay?, today: CalendarDay, calendar: Calendar = .current) -> DueGroup {
         guard active else { return .done }
         guard let day else { return .later }
-        if day < today { return kind == .returns ? .missed : .done }
+        // A lent thing still out after its ask-back day waits, like a return, until it's back.
+        if day < today { return kind == .returns || kind == .askBack ? .missed : .done }
         if let weekOut = today.adding(days: 7, calendar: calendar), day <= weekOut { return .thisWeek }
         return .later
     }
@@ -82,6 +83,8 @@ struct ReminderInput: Sendable {
     var decision: ReturnDecision
     var itemName: String = ""
     var itemID: UUID?
+    /// Who has it, for an ask-back date. Empty for a private thing.
+    var person: String = ""
 }
 
 struct PlannedReminder: Equatable, Sendable {
@@ -93,6 +96,7 @@ struct PlannedReminder: Equatable, Sendable {
     var itemName: String = ""
     var itemID: UUID?
     var day: CalendarDay?
+    var person: String = ""
 
     /// Notification wording. Item names appear unless the person turned them off in Settings.
     func content(showingNames: Bool) -> (title: String, body: String) {
@@ -102,7 +106,7 @@ struct PlannedReminder: Equatable, Sendable {
         case .returns: "\(subject): last day to return is \(when)."
         case .warranty: "\(subject): warranty ends \(when)."
         case .expiry: "\(subject): expires \(when)."
-        case .askBack: "\(subject): time to ask for it back \(when)."
+        case .askBack: showingNames && !itemName.isEmpty && !person.isEmpty ? "Ask \(person) for \(itemName) back." : "Ask for something back."
         }
         let title: String = switch kind { case .returns: "Return window closing"; case .warranty: "Warranty ending"; case .expiry: "Expiry coming up"; case .askBack: "Lent out" }
         return (title, body)
@@ -118,7 +122,7 @@ enum ReminderPlan {
             return offsets.compactMap { offset in
                 guard let day = input.day.adding(days: -offset, calendar: calendar),
                       let fireDate = day.date(calendar: calendar, hour: input.hour), fireDate > now else { return nil }
-                return PlannedReminder(id: "localiser.deadline.\(input.id.uuidString).\(offset)", deadlineID: input.id, fireDate: fireDate, kind: input.kind, daysBefore: offset, itemName: input.itemName, itemID: input.itemID, day: input.day)
+                return PlannedReminder(id: "localiser.deadline.\(input.id.uuidString).\(offset)", deadlineID: input.id, fireDate: fireDate, kind: input.kind, daysBefore: offset, itemName: input.itemName, itemID: input.itemID, day: input.day, person: input.person)
             }
         }.sorted { $0.fireDate == $1.fireDate ? $0.id < $1.id : $0.fireDate < $1.fireDate }
     }

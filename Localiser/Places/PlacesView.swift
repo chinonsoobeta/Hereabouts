@@ -22,6 +22,12 @@ struct PlacesView: View {
                     // Quick start stays for the first few rooms, so more than one can be picked.
                     if rooms.count < 3, !unusedStarters.isEmpty { quickStart(unusedStarters) }
                 }
+                if !store.lentItems.isEmpty {
+                    SectionHeading(title: "Lent out").padding(.top, 8)
+                    ForEach(store.lentItems) { item in
+                        NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain)
+                    }
+                }
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
