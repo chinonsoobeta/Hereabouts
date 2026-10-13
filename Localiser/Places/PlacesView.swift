@@ -12,7 +12,8 @@ struct PlacesView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if store.places.isEmpty {
+                HomeSwitcher()
+                if store.placesHere.isEmpty {
                     LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
                     quickStart(starters)
                     Button("Add a place") { adding = true }.buttonStyle(PrimaryButtonStyle())
@@ -37,7 +38,7 @@ struct PlacesView: View {
         }
         .background(Theme.ground).navigationTitle("Places")
         .toolbar {
-            if !store.places.isEmpty {
+            if !store.placesHere.isEmpty {
                 Menu {
                     Button("Print labels", systemImage: "printer") { printing = true }
                     if LabelScanner.isAvailable { Button("Scan a label", systemImage: "qrcode.viewfinder") { scanning = true } }
@@ -63,7 +64,7 @@ struct PlacesView: View {
         .alert("Couldn't add that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    private var rooms: [Place] { store.places.filter { $0.parent == nil } }
+    private var rooms: [Place] { store.placesHere.filter { $0.parent == nil } }
     private var unusedStarters: [String] { starters.filter { name in !rooms.contains { $0.name.localizedCaseInsensitiveCompare(name) == .orderedSame } } }
 
     @ViewBuilder private func quickStart(_ names: [String]) -> some View {
@@ -132,7 +133,7 @@ struct PlaceEditor: View {
         _parentID = State(initialValue: place?.parent?.id ?? parent?.id)
     }
     private var parent: Place? { store.places.first { $0.id == parentID } }
-    private var duplicate: Place? { store.duplicatePlace(named: name, parent: parent, excluding: place) }
+    private var duplicate: Place? { store.duplicatePlace(named: name, parent: parent, excluding: place, home: place?.home) }
     var body: some View {
         SheetForm {
             Section {
@@ -143,7 +144,7 @@ struct PlaceEditor: View {
                 }
             }
             Section {
-                PlacePicker(selection: $parentID, excluded: place, title: "Inside", noneTitle: "None")
+                PlacePicker(selection: $parentID, excluded: place, title: "Inside", noneTitle: "None", home: place?.home)
             } footer: { Text("Choose None for a room or other top-level place.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()

@@ -56,7 +56,7 @@ final class SubscriptionTests: XCTestCase {
         let first = try XCTUnwrap(store.items.first)
         try store.editItem(first, name: "Still editable", place: nil, notes: "", aliases: "", photo: nil)
         XCTAssertEqual(first.name, "Still editable")
-        XCTAssertEqual(try store.backup().records.count, CreationKind.item.freeLimit + 2)
+        XCTAssertEqual(try store.backup().records.filter { $0.entity != "Home" }.count, CreationKind.item.freeLimit + 2)
     }
 
     func testRefundLocks() async throws {

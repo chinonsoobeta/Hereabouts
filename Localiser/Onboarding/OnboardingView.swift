@@ -100,7 +100,11 @@ struct OnboardingView: View {
     @ViewBuilder private var actions: some View {
         switch page {
         case 0:
-            Button { focused = false; homeName = homeName.trimmingCharacters(in: .whitespacesAndNewlines); withAnimation { page = 1 } } label: { wrapping("Open it") }
+            Button {
+                focused = false; homeName = homeName.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !homeName.isEmpty, let home = store.currentHome { try? store.renameHome(home, to: homeName) }
+                withAnimation { page = 1 }
+            } label: { wrapping("Open it") }
                 .buttonStyle(PrimaryButtonStyle())
             Text("You can rename it any time in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
         case 1:

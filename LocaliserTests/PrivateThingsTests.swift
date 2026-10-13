@@ -38,6 +38,6 @@ final class PrivateThingsTests: XCTestCase {
         let spoken = WhatsDueIntent.answer(for: store.deadlines)
         XCTAssertFalse(spoken.contains("Ring"), spoken)
         XCTAssertTrue(store.inventoryCSV().contains("\"Ring\""), "Exports still include it")
-        XCTAssertTrue(store.inventoryCSV().hasPrefix("\"id\",\"name\",\"place\",\"notes\",\"other names\",\"archived\",\"private\""))
+        XCTAssertTrue(store.inventoryCSV().hasPrefix("\"id\",\"name\",\"home\",\"place\",\"notes\",\"other names\",\"archived\",\"private\""))
     }
 }

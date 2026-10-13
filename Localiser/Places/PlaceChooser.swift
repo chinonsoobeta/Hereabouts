@@ -10,23 +10,23 @@ import SwiftUI
 
     /// Finds or creates each level of a typed path under `parent`, reusing places that already exist.
     @discardableResult
-    func place(forPath text: String, under parent: Place? = nil) throws -> Place {
+    func place(forPath text: String, under parent: Place? = nil, home: HomeRecord? = nil) throws -> Place {
         let parts = Self.pathComponents(text)
         guard !parts.isEmpty else { throw LocaliserError.nameRequired }
         for part in parts { _ = try requiredName(part) }
         var current = parent
         for part in parts {
-            if let existing = duplicatePlace(named: part, parent: current) { current = existing }
-            else { current = try addPlace(name: part, parent: current) }
+            if let existing = duplicatePlace(named: part, parent: current, home: home) { current = existing }
+            else { current = try addPlace(name: part, parent: current, home: home) }
         }
         return current!
     }
 
     /// The deepest level of a typed path that already exists, or `parent` when even the first level is new.
-    func deepestExistingPlace(forPath text: String, under parent: Place? = nil) -> Place? {
+    func deepestExistingPlace(forPath text: String, under parent: Place? = nil, home: HomeRecord? = nil) -> Place? {
         var current = parent
         for part in Self.pathComponents(text) {
-            guard let existing = duplicatePlace(named: part, parent: current) else { break }
+            guard let existing = duplicatePlace(named: part, parent: current, home: home) else { break }
             current = existing
         }
         return current
@@ -43,10 +43,12 @@ struct PlacePicker: View {
     var noneTitle = "No place yet"
     /// Offered first in the chooser, under "Recent".
     var recent: [Place] = []
+    /// Whose places to offer. The current home when nil.
+    var home: HomeRecord? = nil
     var body: some View {
         let _ = store.revision
         NavigationLink {
-            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: "Recent")
+            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: "Recent", home: home)
         } label: {
             HStack(spacing: 12) {
                 Text(title).foregroundStyle(Theme.ink)
@@ -73,11 +75,13 @@ struct PlaceChooser: View {
     var suggested: [Place] = []
     var suggestedTitle = "Try here first"
     var title = "Choose a place"
+    /// Whose places to offer, and where a typed place is made. The current home when nil.
+    var home: HomeRecord? = nil
     @State private var query = ""
     @State private var error: String?
 
     private var candidates: [Place] {
-        let allowed = store.places.filter { place in excluded.map { !place.isWithin($0) } ?? true }
+        let allowed = scope.filter { place in excluded.map { !place.isWithin($0) } ?? true }
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return allowed }
         return allowed.filter { $0.path.localizedStandardContains(text) }
@@ -85,12 +89,14 @@ struct PlaceChooser: View {
     private var typed: [String] { LocaliserStore.pathComponents(query) }
     private var exactMatch: Place? {
         let wanted = typed.joined(separator: " › ")
-        return store.places.first { $0.path.localizedCaseInsensitiveCompare(wanted) == .orderedSame }
+        return scope.first { $0.path.localizedCaseInsensitiveCompare(wanted) == .orderedSame }
     }
     private var duplicateName: Place? {
         guard typed.count == 1, exactMatch == nil else { return nil }
-        return store.places.first { $0.name.localizedCaseInsensitiveCompare(typed[0]) == .orderedSame }
+        return scope.first { $0.name.localizedCaseInsensitiveCompare(typed[0]) == .orderedSame }
     }
+    private var scopeHome: HomeRecord? { home ?? store.currentHome }
+    private var scope: [Place] { store.places.filter { scopeHome == nil || $0.home == scopeHome } }
 
     var body: some View {
         let _ = store.revision
@@ -123,7 +129,7 @@ struct PlaceChooser: View {
                 row(title: noneTitle, detail: noneTitle == "None" ? "A room or other top-level place" : "Not sure yet", id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
             } footer: {
-                if store.places.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }
+                if scope.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }
             }
         }
         .groundBackground()
@@ -162,8 +168,8 @@ struct PlaceChooser: View {
     /// being edited is refused before anything is created, so nothing is left behind.
     private func create() {
         do {
-            if let excluded, store.deepestExistingPlace(forPath: query)?.isWithin(excluded) == true { throw LocaliserError.placeCycle }
-            choose(try store.place(forPath: query, under: nil).id)
+            if let excluded, store.deepestExistingPlace(forPath: query, home: scopeHome)?.isWithin(excluded) == true { throw LocaliserError.placeCycle }
+            choose(try store.place(forPath: query, under: nil, home: scopeHome).id)
         } catch { self.error = error.localizedDescription }
     }
 }

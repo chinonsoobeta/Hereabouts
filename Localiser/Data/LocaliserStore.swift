@@ -4,7 +4,7 @@ import Observation
 enum LocaliserError: LocalizedError, Equatable {
     case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder, closedReturn
     case invalidPackingEntry, invalidTripDates, packingConflict(String), incompleteDeparture, unresolvedHome
-    case invalidBackup(String), libraryNotEmpty, tooLong(String, Int)
+    case invalidBackup(String), libraryNotEmpty, tooLong(String, Int), homeNotEmpty, lastHome
     var errorDescription: String? {
         switch self {
         case .nameRequired: "Enter a name."
@@ -21,6 +21,8 @@ enum LocaliserError: LocalizedError, Equatable {
         case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
         case .unresolvedHome: "Say where the rest of the things went before finishing coming home."
         case .invalidBackup(let reason): reason
+        case .homeNotEmpty: "Move or delete what's in this home first."
+        case .lastHome: "The notebook needs at least one home."
         case .libraryNotEmpty: "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first."
         }
     }
@@ -47,6 +49,8 @@ final class LocaliserStore {
     var kits: [Kit] = []
     var trips: [TripRecord] = []
     var tripEntries: [TripEntry] = []
+    var homes: [HomeRecord] = []
+    var currentHomeID = UserDefaults.standard.string(forKey: LocaliserStore.currentHomeKey).flatMap(UUID.init(uuidString:))
     var revision = 0
     /// Name of the most recent permanent deletion that can still be undone.
     var undoableDeletion: String?
@@ -84,6 +88,7 @@ final class LocaliserStore {
         context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         context.automaticallyMergesChangesFromParent = true
         try backfillConfirmation()
+        try ensureHomes()
         // Nothing reads the history, so a failed trim only costs disk space.
         if !inMemory { try? trimHistory() }
         try refresh()
@@ -126,6 +131,7 @@ final class LocaliserStore {
         kits = try context.fetch(NSFetchRequest<Kit>(entityName: "Kit")).sorted { $0.name < $1.name }
         trips = try context.fetch(NSFetchRequest<TripRecord>(entityName: "TripRecord")).sorted { $0.startDay > $1.startDay }
         tripEntries = try context.fetch(NSFetchRequest<TripEntry>(entityName: "TripEntry"))
+        homes = try context.fetch(NSFetchRequest<HomeRecord>(entityName: "Home")).sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
         revision += 1
     }
 
@@ -144,6 +150,7 @@ final class LocaliserStore {
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
         item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
         item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo; item.isPrivate = isPrivate
+        item.home = place?.home ?? currentHome
         try save()
         return item
     }
@@ -177,13 +184,15 @@ final class LocaliserStore {
         movement.fromPath = item.place?.path ?? Movement.noPlace
         movement.toPath = place?.path ?? Movement.noPlace
         item.place = place
+        if let home = place?.home { item.home = home }
     }
 
     @discardableResult
-    func addPlace(name: String, parent: Place? = nil) throws -> Place {
+    func addPlace(name: String, parent: Place? = nil, home: HomeRecord? = nil) throws -> Place {
         let clean = try requiredName(name)
         let place = NSEntityDescription.insertNewObject(forEntityName: "Place", into: context) as! Place
         place.id = UUID(); place.name = clean; place.parent = parent
+        place.home = parent?.home ?? home ?? currentHome
         try save()
         return place
     }
@@ -192,6 +201,7 @@ final class LocaliserStore {
         let clean = try requiredName(name)
         if parent?.isWithin(place) == true { throw LocaliserError.placeCycle }
         place.name = clean; place.parent = parent
+        if let parent { move(place, into: parent.home) }
         try save()
     }
 
@@ -297,8 +307,9 @@ final class LocaliserStore {
     }
 
     /// Another place with the same name at the same level, if one exists. Used to warn, not to block.
-    func duplicatePlace(named name: String, parent: Place?, excluding: Place? = nil) -> Place? {
+    func duplicatePlace(named name: String, parent: Place?, excluding: Place? = nil, home: HomeRecord? = nil) -> Place? {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return places.first { $0 != excluding && $0.parent == parent && $0.name.localizedCaseInsensitiveCompare(clean) == .orderedSame }
+        let home = parent?.home ?? home ?? currentHome
+        return places.first { $0 != excluding && $0.parent == parent && $0.home == home && $0.name.localizedCaseInsensitiveCompare(clean) == .orderedSame }
     }
 }

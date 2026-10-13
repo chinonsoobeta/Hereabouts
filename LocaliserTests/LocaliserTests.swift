@@ -43,7 +43,7 @@ final class LocaliserTests: XCTestCase {
         XCTAssertFalse(pro.unlocked)
         XCTAssertEqual(store.items.first?.id, item.id)
         XCTAssertTrue(store.inventoryCSV().contains(item.name))
-        XCTAssertEqual(try store.backup().records.count, 1)
+        XCTAssertEqual(try store.backup().records.filter { $0.entity != "Home" }.count, 1)
         try store.editItem(item, name: "Editable after refund", place: nil, notes: "", aliases: "", photo: nil)
         XCTAssertEqual(item.name, "Editable after refund")
     }
@@ -89,7 +89,7 @@ final class LocaliserTests: XCTestCase {
         try source.checkTask(try XCTUnwrap(trip.tasks.first), checked: true)
         let scanID = try XCTUnwrap(item.scans.first?.id)
         let file = try LibraryBackup.decoded(source.backup(attachmentIDs: [item.id, scanID]).encoded())
-        XCTAssertEqual(Set(file.records.map(\.entity)).count, 11)
+        XCTAssertEqual(Set(file.records.map(\.entity)).count, 12)
         let restored = try LocaliserStore(inMemory: true)
         try restored.restore(file)
         XCTAssertEqual(restored.items.first?.id, item.id)
@@ -106,7 +106,7 @@ final class LocaliserTests: XCTestCase {
         let dateOnly = try source.backup()
         XCTAssertFalse(dateOnly.records.contains { $0.attributes.values.contains { if case .data = $0 { true } else { false } } })
         try restored.resetLibrary()
-        XCTAssertTrue(try restored.backup().records.isEmpty)
+        XCTAssertEqual(try restored.backup().records.map(\.entity), ["Home"], "Erasing leaves one empty home")
         try restored.restore(dateOnly)
         XCTAssertNil(restored.items.first?.photo)
         XCTAssertNil(restored.items.first?.scans.first?.data)
@@ -123,7 +123,7 @@ final class LocaliserTests: XCTestCase {
         var bad = good
         bad.records.append(good.records[0])
         XCTAssertThrowsError(try target.restore(bad))
-        XCTAssertTrue(try target.backup().records.isEmpty)
+        XCTAssertTrue(try target.backup().records.filter { $0.entity != "Home" }.isEmpty)
         bad = good
         let index = try XCTUnwrap(bad.records.firstIndex { $0.entity == "Belonging" })
         bad.records[index].relationships["place"] = [UUID()]
@@ -138,12 +138,12 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(target.places.isEmpty)
         bad = good; bad.records[index].attributes["name"] = .integer(42)
         XCTAssertThrowsError(try target.restore(bad))
-        bad = good; bad.version = 3
+        bad = good; bad.version = LibraryBackup.currentVersion + 1
         XCTAssertThrowsError(try target.restore(bad))
         XCTAssertThrowsError(try LibraryBackup.decoded(Data("broken".utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.notABackup)) }
-        XCTAssertThrowsError(try LibraryBackup.decoded(Data(#"{"version":3,"records":[{"future":true}]}"#.utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
+        XCTAssertThrowsError(try LibraryBackup.decoded(Data(#"{"version":99,"records":[{"future":true}]}"#.utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
         XCTAssertThrowsError(try LibraryBackup.decoded(good.encoded().prefix(200))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.damaged)) }
-        bad = good; bad.version = 3
+        bad = good; bad.version = LibraryBackup.currentVersion + 1
         XCTAssertThrowsError(try target.restore(bad)) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
         let existing = try target.addItem(name: "Keep me")
         XCTAssertThrowsError(try target.restore(good)) { XCTAssertEqual($0 as? LocaliserError, .libraryNotEmpty) }
@@ -292,7 +292,7 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(csv.contains("\"'=SUM(1,2)\""))
         XCTAssertTrue(csv.contains("\"A \"\"quote\"\"\nand comma,\""))
         XCTAssertTrue(csv.contains("\"'@command\""))
-        XCTAssertTrue(csv.hasPrefix("\"id\",\"name\",\"place\",\"notes\",\"other names\",\"archived\",\"private\",\"dates\""))
+        XCTAssertTrue(csv.hasPrefix("\"id\",\"name\",\"home\",\"place\",\"notes\",\"other names\",\"archived\",\"private\",\"dates\""))
         let kettle = try store.addItem(name: "Kettle")
         try store.setDeadline(item: kettle, kind: .warranty, day: XCTUnwrap(CalendarDay(stored: "2030-01-01")), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
         XCTAssertTrue(store.inventoryCSV().contains("\"Warranty ends 2030-01-01\""))

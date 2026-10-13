@@ -38,7 +38,7 @@ enum NameSuggestions {
         }
         var chosen: [Place] = []
         for (_, place) in (moves + added).sorted(by: { $0.0 > $1.0 }) {
-            guard let place, !chosen.contains(place) else { continue }
+            guard let place, place.home == currentHome, !chosen.contains(place) else { continue }
             chosen.append(place)
             if chosen.count == limit { break }
         }

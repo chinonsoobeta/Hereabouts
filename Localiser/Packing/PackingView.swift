@@ -12,7 +12,7 @@ struct PackingView: View {
         let _ = store.revision
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                if store.trips.isEmpty && store.kits.isEmpty {
+                if store.trips.isEmpty && store.kitsHere.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(alignment: .top) {
                             Image(systemName: "suitcase.rolling").foregroundStyle(Theme.purple).accessibilityHidden(true)
@@ -46,10 +46,10 @@ struct PackingView: View {
                         .tint(Theme.purpleInk)
                     }
                     SectionHeading(title: "Kits").padding(.top, 8)
-                    if store.kits.isEmpty {
+                    if store.kitsHere.isEmpty {
                         Text("A kit is a list you reuse, like \u{201C}Weekend away\u{201D}. New trips can start from it.").font(.wbCaption).foregroundStyle(Theme.secondary)
                     }
-                    ForEach(store.kits) { kit in
+                    ForEach(store.kitsHere) { kit in
                         NavigationLink { KitDetailView(kit: kit) } label: {
                             NotebookLine(name: kit.name, detail: kit.entries.count == 1 ? "1 thing" : "\(kit.entries.count) things").card()
                         }.buttonStyle(.plain)
@@ -238,6 +238,7 @@ struct KitEntryEditor: View {
     @State private var scale: PackingScale
     @State private var condition: PackingCondition
     @State private var error: String?
+    private var home: HomeRecord? { kit.home }
     init(kit: Kit, entry: KitEntry? = nil) {
         self.kit = kit; self.entry = entry
         _name = State(initialValue: entry?.name ?? ""); _itemID = State(initialValue: entry?.item?.id)
@@ -253,7 +254,7 @@ struct KitEntryEditor: View {
     }
     var body: some View {
         SheetForm {
-            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived && (home == nil || $0.home == home) }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Phone charger", text: $name).accessibilityIdentifier("kit.entry.name") }
             Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
             Picker("Amount", selection: $scale) { ForEach(PackingScale.allCases) { Text($0.title).tag($0) } }
@@ -302,7 +303,7 @@ struct TripEditor: View {
                 if details.end < details.start { Text("Come home on or after the day you leave.").foregroundStyle(Theme.warning) }
                 else { Text(details.nightsLabel) }
                 Toggle("Flying", isOn: $flying); Toggle("International", isOn: $international); Toggle("Work", isOn: $work)
-                if trip == nil { Picker("Kit", selection: $kitID) { Text("Start without a kit").tag(nil as UUID?); ForEach(store.kits) { Text($0.name).tag(Optional($0.id)) } } }
+                if trip == nil { Picker("Kit", selection: $kitID) { Text("Start without a kit").tag(nil as UUID?); ForEach(store.kitsHere) { Text($0.name).tag(Optional($0.id)) } } }
             }
             if let trip {
                 Section("Quantity changes") {
@@ -466,12 +467,13 @@ struct TripEntryAdder: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     let trip: TripRecord
+    private var home: HomeRecord? { trip.home }
     @State private var itemID: UUID?
     @State private var name = ""
     @State private var error: String?
     var body: some View {
         SheetForm {
-            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived }) { Text($0.name).tag(Optional($0.id)) } }
+            Picker("Thing", selection: $itemID) { Text("None, just a name").tag(nil as UUID?); ForEach(store.items.filter { !$0.archived && (home == nil || $0.home == home) }) { Text($0.name).tag(Optional($0.id)) } }
             if itemID == nil { TextField("Name, like Sunglasses", text: $name) }
         }
         .groundBackground().navigationTitle("Add something to pack").navigationBarTitleDisplayMode(.inline)
@@ -526,7 +528,7 @@ struct TripEntryDetailView: View {
                     } else {
                         Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? "no place yet")") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
                         if entry.item != nil {
-                            PlacePicker(selection: $placeID)
+                            PlacePicker(selection: $placeID, home: entry.item?.home)
                             Button("Confirm new place") { attempt { try store.resolveHome(entry, resolution: .newPlace, newPlace: store.places.first { $0.id == placeID }) } }.disabled(placeID == nil)
                         }
                     }

@@ -19,7 +19,6 @@ struct LibrarySettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
-    @AppStorage(Home.nameKey) private var homeName = ""
     @AppStorage(Rituals.recapKey) private var recapOn = true
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
 
@@ -31,8 +30,9 @@ struct LibrarySettingsView: View {
                 }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.standing?.summary ?? "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
             }
             Section {
-                TextField(Home.defaultName, text: $homeName).font(.wbItem).accessibilityLabel("Name of your home")
-                    .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
+                NavigationLink { HomesView() } label: {
+                    NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename, or add another home")
+                }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
             Section {
                 Toggle("Show names in reminders", isOn: $showItemNames)

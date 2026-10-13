@@ -17,8 +17,9 @@ struct BackupRecord: Codable, Sendable {
 }
 
 struct LibraryBackup: Codable, Sendable {
-    /// 2 added private, missing and lent things, kinds of move, and ask-back dates. Version 1 backups still restore.
-    static let currentVersion = 2
+    /// 2 added private, missing and lent things, kinds of move, and ask-back dates. 3 added homes and who moved
+    /// a thing. Version 1 and 2 backups still restore, into one home.
+    static let currentVersion = 3
     var version = currentVersion
     var createdAt = Date()
     var records: [BackupRecord]
@@ -106,9 +107,11 @@ struct LibraryBackup: Codable, Sendable {
                 if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
             }
         } else {
-            for entity in container.managedObjectModel.entities {
+            // A new notebook already has its first, empty home. It gives way to the backup's homes.
+            for entity in container.managedObjectModel.entities where entity.name != "Home" {
                 if let name = entity.name, try context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: name)) > 0 { throw LocaliserError.libraryNotEmpty }
             }
+            for home in try context.fetch(NSFetchRequest<HomeRecord>(entityName: "Home")) { context.delete(home) }
         }
         let staging = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         staging.parent = context
@@ -130,10 +133,13 @@ struct LibraryBackup: Codable, Sendable {
                 try object.validateForInsert()
             }
             try staging.save(); try save()
+            try ensureHomes(); try refresh()
         } catch { staging.rollback(); context.rollback(); try? refresh(); throw error }
     }
 
-    static var laterFields: Set<String> { ["perDay", "unlinked", "confirmedAt", "isPrivate", "missingSince", "lentTo", "lentAt", "kindRaw"] }
+    static var laterFields: Set<String> { ["perDay", "unlinked", "confirmedAt", "isPrivate", "missingSince", "lentTo", "lentAt", "kindRaw", "by"] }
+    /// Links added after the first format. Older backups omit them; restoring puts everything in one home.
+    static var laterRelationships: Set<String> { ["home"] }
 
     func validateBackup(_ file: LibraryBackup) throws {
         guard file.version <= LibraryBackup.currentVersion else { throw LocaliserError.invalidBackup(LibraryBackup.newerVersion) }
@@ -146,7 +152,7 @@ struct LibraryBackup: Codable, Sendable {
             let fields = entity.attributesByName.filter { $0.key != "id" }
             // Fields added after the first backup format; older backups omit them and get the model default.
             let required = Set(fields.filter { $0.value.attributeType != .binaryDataAttributeType && !Self.laterFields.contains($0.key) }.keys)
-            guard required.isSubset(of: Set(record.attributes.keys)), Set(record.attributes.keys).isSubset(of: Set(fields.keys)), Set(record.relationships.keys) == Set(entity.relationshipsByName.keys) else { throw LocaliserError.invalidBackup("Part of this backup is damaged, or from a newer Hereabouts.") }
+            guard required.isSubset(of: Set(record.attributes.keys)), Set(record.attributes.keys).isSubset(of: Set(fields.keys)), Set(record.relationships.keys).isSubset(of: Set(entity.relationshipsByName.keys)), Set(entity.relationshipsByName.keys).subtracting(record.relationships.keys).isSubset(of: Self.laterRelationships) else { throw LocaliserError.invalidBackup("Part of this backup is damaged, or from a newer Hereabouts.") }
             for (key, value) in record.attributes {
                 switch (fields[key]!.attributeType, value) {
                 case (.stringAttributeType, .string(let value)):
@@ -204,10 +210,10 @@ struct LibraryBackup: Codable, Sendable {
             let safe = first.map { "=+-@".contains($0) } == true ? "'" + text : text
             return "\"" + safe.replacingOccurrences(of: "\"", with: "\"\"") + "\""
         }
-        let heading = ["id", "name", "place", "notes", "other names", "archived", "private", "dates"].map(escaped).joined(separator: ",")
+        let heading = ["id", "name", "home", "place", "notes", "other names", "archived", "private", "dates"].map(escaped).joined(separator: ",")
         return ([heading] + items.map { item in
             let dates = item.deadlines.sorted { $0.dayString < $1.dayString }.map { "\($0.kind?.title ?? "Date") \($0.dayString)" }
-            return [item.id.uuidString, item.name, item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", item.isPrivate ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
+            return [item.id.uuidString, item.name, item.home?.name ?? "", item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", item.isPrivate ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
         }).joined(separator: "\r\n") + "\r\n"
     }
 
@@ -217,5 +223,6 @@ struct LibraryBackup: Codable, Sendable {
             if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
         }
         try save()
+        try ensureHomes(); try refresh()
     }
 }

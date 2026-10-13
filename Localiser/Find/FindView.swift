@@ -123,6 +123,7 @@ struct FindView: View {
     }
 
     @ViewBuilder private var dashboard: some View {
+        HomeSwitcher()
         RitualBanners { ritual = $0 }
         if !store.missingItems.isEmpty {
             SectionHeading(title: "Looking for").padding(.top, 4)
@@ -141,16 +142,16 @@ struct FindView: View {
         HStack {
             SectionHeading(title: "Places")
             Spacer()
-            if store.places.contains(where: { $0.parent == nil }) { NavigationLink("All places") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
+            if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink("All places") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
         VStack(spacing: 0) {
-            ForEach(store.places.filter { $0.parent == nil }.prefix(3)) { place in
+            ForEach(store.placesHere.filter { $0.parent == nil }.prefix(3)) { place in
                 NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
             }
             NewPlaceTile { addingPlace = true }
         }
         SectionHeading(title: "Put away lately").padding(.top, 8)
-        let lately = results.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
+        let lately = results.filter { !store.hasSeveralHomes || $0.home == store.currentHome }.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
         ForEach(lately) { item in itemCard(item) }
     }
 
@@ -253,6 +254,7 @@ struct ItemRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
                 if item.isLent, let home = item.place { Text("Lives in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                if store.hasSeveralHomes, let home = item.home, home != store.currentHome { Text("At \(home.name)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }
             }
@@ -359,7 +361,7 @@ struct ItemEditor: View {
                 }
             } header: { Text("What is it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
-                PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [])
+                PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [], home: item?.home)
             } header: { Text("Where does it live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
                 TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
@@ -392,7 +394,7 @@ struct ItemEditor: View {
         .onAppear {
             let savedAt = UserDefaults.standard.object(forKey: Self.lastPlaceTimeKey) as? Date ?? .distantPast
             if item == nil, placeID == nil, Date.now.timeIntervalSince(savedAt) < Self.lastPlaceWindow,
-               let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.places.contains(where: { $0.id == id }) {
+               let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.placesHere.contains(where: { $0.id == id }) {
                 placeID = id
             }
             if item == nil, photoFirst, photo == nil {
@@ -611,7 +613,7 @@ struct ItemDetailView: View {
             NavigationStack {
                 PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
                     do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
-                }))
+                }), home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
             }
         }
@@ -621,7 +623,7 @@ struct ItemDetailView: View {
                 PlaceChooser(selection: Binding(get: { nil }, set: { id in
                     let place = store.places.first { $0.id == id }
                     do { try store.found(item, at: place); foundNote = Movement.foundSentence(place) } catch { self.error = error.localizedDescription }
-                }), noneTitle: "Somewhere without a place", suggested: store.foundSuggestions(for: item), title: "Where was it?")
+                }), noneTitle: "Somewhere without a place", suggested: store.foundSuggestions(for: item), title: "Where was it?", home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finding = false } } }
             }
         }

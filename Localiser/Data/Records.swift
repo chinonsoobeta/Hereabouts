@@ -20,6 +20,8 @@ final class Belonging: NSManagedObject, Identifiable {
     @NSManaged var lentTo: String
     @NSManaged var lentAt: Date?
     @NSManaged var place: Place?
+    /// The home it belongs to; follows its place, and stays put when it has none.
+    @NSManaged var home: HomeRecord?
     @NSManaged var movements: Set<Movement>
     @NSManaged var deadlines: Set<Deadline>
     @NSManaged var scans: Set<ScanRecord>
@@ -44,6 +46,21 @@ final class Place: NSManagedObject, Identifiable {
     @NSManaged var parent: Place?
     @NSManaged var children: Set<Place>
     @NSManaged var items: Set<Belonging>
+    /// Every place in a tree has its top place's home.
+    @NSManaged var home: HomeRecord?
+
+    /// This place and everything inside it.
+    var subtree: [Place] {
+        var result: [Place] = []
+        var queue = [self]
+        var seen = Set<UUID>()
+        while let next = queue.popLast() {
+            guard seen.insert(next.id).inserted else { continue }
+            result.append(next)
+            queue.append(contentsOf: next.children)
+        }
+        return result
+    }
 
     var path: String {
         var names = [name]
@@ -67,6 +84,20 @@ final class Place: NSManagedObject, Identifiable {
     }
 }
 
+/// A home: the top of the notebook. Places, things, kits and trips belong to one.
+@objc(HomeRecord)
+final class HomeRecord: NSManagedObject, Identifiable {
+    /// Read defensively: a view can still hold an object for one frame after it is deleted.
+    var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
+    @NSManaged var name: String
+    @NSManaged var createdAt: Date?
+    @NSManaged var places: Set<Place>
+    @NSManaged var items: Set<Belonging>
+    @NSManaged var kits: Set<Kit>
+    @NSManaged var trips: Set<TripRecord>
+    var isEmpty: Bool { places.isEmpty && items.isEmpty && kits.isEmpty && trips.isEmpty }
+}
+
 @objc(Movement)
 final class Movement: NSManagedObject, Identifiable {
     /// Read defensively: a view can still hold an object for one frame after it is deleted.
@@ -75,6 +106,8 @@ final class Movement: NSManagedObject, Identifiable {
     @NSManaged var fromPath: String
     @NSManaged var toPath: String
     @NSManaged var kindRaw: String
+    /// Who made the move, once a home is shared. Empty for the phone's owner.
+    @NSManaged var by: String
     @NSManaged var item: Belonging?
 
     enum Kind: String, Sendable { case moved, found, lent, back }

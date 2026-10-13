@@ -5,7 +5,7 @@ import CoreData
     func addKit(name: String) throws -> Kit {
         let clean = try requiredName(name)
         let kit = NSEntityDescription.insertNewObject(forEntityName: "Kit", into: context) as! Kit
-        kit.id = UUID(); kit.name = clean
+        kit.id = UUID(); kit.name = clean; kit.home = currentHome
         for title in ["Check appliances", "Lock doors", "Take keys"] {
             let task = NSEntityDescription.insertNewObject(forEntityName: "KitTask", into: context) as! KitTask
             task.id = UUID(); task.title = title; task.kit = kit
@@ -42,7 +42,7 @@ import CoreData
         let clean = try requiredName(details.name)
         guard details.end >= details.start else { throw LocaliserError.invalidTripDates }
         let trip = NSEntityDescription.insertNewObject(forEntityName: "TripRecord", into: context) as! TripRecord
-        trip.id = UUID(); trip.stateRaw = TripState.packing.rawValue
+        trip.id = UUID(); trip.stateRaw = TripState.packing.rawValue; trip.home = kit?.home ?? currentHome
         apply(details, name: clean, to: trip)
         for template in kit?.entries ?? [] where template.item?.archived != true {
             let entry = NSEntityDescription.insertNewObject(forEntityName: "TripEntry", into: context) as! TripEntry

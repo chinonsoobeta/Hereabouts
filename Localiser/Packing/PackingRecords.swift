@@ -60,6 +60,7 @@ struct TripDetails: Sendable {
     /// Read defensively: a view can still hold an object for one frame after it is deleted.
     var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var name: String
+    @NSManaged var home: HomeRecord?
     @NSManaged var entries: Set<KitEntry>
     @NSManaged var tasks: Set<KitTask>
 }
@@ -91,6 +92,8 @@ struct TripDetails: Sendable {
     /// Read defensively: a view can still hold an object for one frame after it is deleted.
     var id: UUID { get { (value(forKey: "id") as? UUID) ?? LocaliserModel.missingID } set { setValue(newValue, forKey: "id") } }
     @NSManaged var name: String
+    /// A trip packs from its own home's things.
+    @NSManaged var home: HomeRecord?
     @NSManaged var startDay: String
     @NSManaged var endDay: String
     @NSManaged var flying: Bool

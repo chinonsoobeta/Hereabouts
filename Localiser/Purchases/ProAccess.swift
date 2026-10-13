@@ -3,9 +3,9 @@ import Observation
 import UserNotifications
 
 enum CreationKind {
-    case item, kit, scan
+    case item, kit, scan, home
     /// Free-tier allowance. Pro removes every limit; nothing else is gated.
-    var freeLimit: Int { switch self { case .item: Self.freeThings; case .kit: 2; case .scan: 5 } }
+    var freeLimit: Int { switch self { case .item: Self.freeThings; case .kit: 2; case .scan: 5; case .home: 2 } }
 
     /// 20 in TestFlight and App Store builds. Builds installed straight onto a phone set `HEREABOUTS_FREE_THINGS=200`,
     /// because they can't buy Pro.

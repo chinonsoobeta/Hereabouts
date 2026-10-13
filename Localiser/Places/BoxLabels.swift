@@ -125,7 +125,7 @@ struct LabelSheetView: View {
         SheetForm {
             if picking {
                 Section {
-                    ForEach(store.places.sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }) { place in
+                    ForEach(store.placesHere.sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }) { place in
                         Toggle(place.path, isOn: Binding(get: { chosen.contains(place.id) }, set: { on in if on { chosen.insert(place.id) } else { chosen.remove(place.id) } }))
                     }
                 } header: { Text("Which places?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }

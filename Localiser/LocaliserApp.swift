@@ -22,6 +22,8 @@ struct LocaliserApp: App {
                 UserDefaults.standard.removeObject(forKey: Rituals.stocktakeDoneKey)
                 UserDefaults.standard.removeObject(forKey: Rituals.recapReadKey)
                 UserDefaults.standard.removeObject(forKey: ItemEditor.lastPlaceKey)
+                UserDefaults.standard.removeObject(forKey: Home.nameKey)
+                UserDefaults.standard.removeObject(forKey: LocaliserStore.currentHomeKey)
             }
             if arguments.contains("--show-onboarding") { UserDefaults.standard.set(false, forKey: OnboardingView.seenKey) }
             if let index = arguments.firstIndex(of: "--open-ritual"), arguments.indices.contains(index + 1) {

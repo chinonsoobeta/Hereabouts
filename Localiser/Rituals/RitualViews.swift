@@ -171,7 +171,7 @@ struct StocktakeView: View {
             NavigationStack {
                 PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
                     answer { try store.move(item, to: store.places.first { $0.id == id }) }
-                }))
+                }), home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = nil } } }
             }
         }
