@@ -120,6 +120,61 @@ import XCTest
         XCTAssertFalse(app.buttons["Start"].exists, "The stocktake is done for the month")
     }
 
+    func testAppLinksOpenWritingDownAndDue() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5))
+        func follow(_ link: String) {
+            app.open(URL(string: link)!)
+            let open = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Open"]
+            if open.waitForExistence(timeout: 3) { open.tap() }
+        }
+        follow("hereabouts://new")
+        XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), app.debugDescription)
+        app.buttons["Cancel"].firstMatch.tap()
+        follow("hereabouts://due")
+        XCTAssertTrue(app.tabBars.buttons["Due"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.tabBars.buttons["Due"].isSelected, app.debugDescription)
+        follow("hereabouts://putaway")
+        XCTAssertTrue(app.staticTexts["Choose a thing, then say where you put it."].waitForExistence(timeout: 5), app.debugDescription)
+    }
+
+    func testNotThereFoundItAndWriteDownFromAnEmptySearch() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        let notThere = app.buttons["item.notThere"]
+        XCTAssertTrue(notThere.waitForExistence(timeout: 5), app.debugDescription)
+        notThere.tap()
+        let found = app.buttons["item.found"]
+        XCTAssertTrue(found.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Missing"].exists)
+        found.tap()
+        XCTAssertTrue(app.navigationBars["Where was it?"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Try here first"].exists || app.otherElements["Try here first"].exists, app.debugDescription)
+        // iOS 27 flags its own glass Cancel button and search bar here, as on the existing place chooser.
+        try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
+        app.buttons["Garage › Back wall"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Noted. Next time, look in Garage › Back wall."].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertFalse(found.exists)
+        app.navigationBars.buttons.firstMatch.tap()
+
+        // A search that finds nothing offers to write the thing down, name and all.
+        search.tap(); search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 6) + "Bike pump")
+        let writeDown = app.buttons["find.writeDown"]
+        XCTAssertTrue(writeDown.waitForExistence(timeout: 5), app.debugDescription)
+        writeDown.tap()
+        XCTAssertEqual(app.textFields.firstMatch.value as? String, "Bike pump")
+        app.buttons["item.save"].tap()
+        XCTAssertTrue(app.staticTexts["Bike pump"].firstMatch.waitForExistence(timeout: 5), app.debugDescription)
+    }
+
     /// Store and design-review screenshots from the demo library. Runs only when asked:
     /// `TEST_RUNNER_STORE_SHOTS=<folder> xcodebuild … -only-testing:LocaliserUITests/LocaliserUITests/testStoreScreenshots test`
     func testStoreScreenshots() throws {

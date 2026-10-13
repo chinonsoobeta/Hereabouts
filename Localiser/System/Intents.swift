@@ -124,6 +124,23 @@ struct AddThingIntent: AppIntent {
     }
 }
 
+struct FoundThingIntent: AppIntent {
+    static var title: LocalizedStringResource { "I found it" }
+    static var description: IntentDescription { IntentDescription("Notes where a lost thing turned up. Without a place, it was where it should be.") }
+    @Parameter(title: "Thing", requestValueDialog: "What did you find?") var thing: ThingEntity
+    @Parameter(title: "Place", requestValueDialog: "Where was it?") var place: PlaceEntity?
+
+    static var parameterSummary: some ParameterSummary { Summary("Found \(\.$thing) in \(\.$place)") }
+
+    @MainActor func perform() async throws -> some IntentResult & ProvidesDialog {
+        let store = try IntentLibrary.open()
+        guard let item = store.items.first(where: { $0.id == thing.id && !$0.isDeleted }) else { throw HereaboutsIntentError.notFound }
+        let chosen = place.flatMap { entity in store.places.first { $0.id == entity.id } } ?? item.place
+        try store.found(item, at: chosen)
+        return .result(dialog: IntentDialog(stringLiteral: item.isPrivate ? "Noted." : Movement.foundSentence(chosen)))
+    }
+}
+
 struct WhatsDueIntent: AppIntent {
     static var title: LocalizedStringResource { "What's due?" }
     static var description: IntentDescription { IntentDescription("Reads the next return, warranty and expiry dates.") }
@@ -175,6 +192,10 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
             "Write something down in \(.applicationName)",
             "Add a thing to \(.applicationName)",
         ], shortTitle: "Write it down", systemImageName: "square.and.pencil")
+        AppShortcut(intent: FoundThingIntent(), phrases: [
+            "I found \(\.$thing) in \(.applicationName)",
+            "Tell \(.applicationName) I found something",
+        ], shortTitle: "I found it", systemImageName: "sparkle.magnifyingglass")
         AppShortcut(intent: WhatsDueIntent(), phrases: [
             "What's due in \(.applicationName)",
             "Ask \(.applicationName) what's due",

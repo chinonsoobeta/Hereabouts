@@ -5,7 +5,8 @@ import TipKit
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
     @State private var query = ""
-    @State private var showAdd = false
+    @State private var newThing: NewThing?
+    @FocusState private var searchFocused: Bool
     @State private var scanning = false
     @State private var showArchived = false
     @State private var putAway = false
@@ -16,7 +17,6 @@ struct FindView: View {
     @Environment(ReminderService.self) private var reminders
     @State private var ritual: Ritual?
     @State private var showDue = false
-    @State private var photoFirst = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -36,7 +36,7 @@ struct FindView: View {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if store.items.isEmpty {
                     LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "The first thing is the hardest to lose.")
-                    Button { showAdd = true } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
+                    Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
                     dashboard
@@ -47,7 +47,13 @@ struct FindView: View {
                             .padding(16).frame(maxWidth: .infinity, alignment: .leading)
                             .background(Theme.purpleFill, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                     }
-                    if results.isEmpty { ContentUnavailableView.search(text: query) }
+                    if results.isEmpty {
+                        ContentUnavailableView.search(text: query)
+                        if !putAway {
+                            Button("Found it? Write down where") { newThing = NewThing(name: query.trimmingCharacters(in: .whitespacesAndNewlines)) }
+                                .buttonStyle(SoftButtonStyle()).accessibilityIdentifier("find.writeDown")
+                        }
+                    }
                     else { Text(results.count == 1 ? "1 match" : "\(results.count) matches").font(.wbLabel).textCase(.uppercase).foregroundStyle(Theme.secondary) }
                     ForEach(results) { item in itemCard(item) }
                 }
@@ -64,6 +70,16 @@ struct FindView: View {
             store.openedItem = nil
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Where is…")
+        .searchFocused($searchFocused)
+        .onChange(of: store.findRequest, initial: true) { _, request in
+            switch request {
+            case .find?: searchFocused = true
+            case .new?: newThing = NewThing()
+            case .putAway?: putAway = true; searchFocused = true
+            default: return
+            }
+            store.findRequest = nil
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { settings = true } }
             ToolbarItem(placement: .topBarLeading) {
@@ -78,15 +94,15 @@ struct FindView: View {
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button("Start with a name", systemImage: "character.cursor.ibeam") { photoFirst = false; showAdd = true }
-                    Button("Start with a photo", systemImage: "camera") { photoFirst = true; showAdd = true }
-                } label: { Label("Add a thing", systemImage: "plus") } primaryAction: { photoFirst = false; showAdd = true }
+                    Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
+                    Button("Start with a photo", systemImage: "camera") { newThing = NewThing(photoFirst: true) }
+                } label: { Label("Add a thing", systemImage: "plus") } primaryAction: { newThing = NewThing() }
                 .buttonStyle(.borderedProminent).tint(Theme.purpleFill)
                 .accessibilityHint("Touch and hold to start with a photo")
             }
         }
         .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
-        .sheet(isPresented: $showAdd) { NavigationStack { ItemEditor(photoFirst: photoFirst) } }
+        .sheet(item: $newThing) { new in NavigationStack { ItemEditor(name: new.name, photoFirst: new.photoFirst) } }
         .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
@@ -108,6 +124,10 @@ struct FindView: View {
 
     @ViewBuilder private var dashboard: some View {
         RitualBanners { ritual = $0 }
+        if !store.missingItems.isEmpty {
+            SectionHeading(title: "Looking for").padding(.top, 4)
+            ForEach(store.missingItems) { item in itemCard(item) }
+        }
         if !dueSoon.isEmpty {
             HStack {
                 SectionHeading(title: "Due")
@@ -142,6 +162,13 @@ struct FindView: View {
             }.card()
         }.buttonStyle(.plain)
     }
+}
+
+/// What the add sheet starts with: a name typed into a search that found nothing, or the camera first.
+struct NewThing: Identifiable {
+    let id = UUID()
+    var name = ""
+    var photoFirst = false
 }
 
 struct PlaceTile: View {
@@ -225,6 +252,7 @@ struct ItemRow: View {
             IconTile(systemImage: "shippingbox", photo: item.photo, size: 48)
             VStack(alignment: .leading, spacing: 3) {
                 NotebookLine(name: item.name, detail: item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
+                if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }
             }
             Spacer(minLength: 0)
@@ -257,10 +285,10 @@ struct ItemEditor: View {
     /// Only a run of additions reuses the place, so yesterday's room isn't quietly carried over.
     static let lastPlaceWindow: TimeInterval = 10 * 60
 
-    init(item: Belonging? = nil, place: Place? = nil, photoFirst: Bool = false) {
+    init(item: Belonging? = nil, place: Place? = nil, name: String = "", photoFirst: Bool = false) {
         self.item = item
         self.photoFirst = photoFirst
-        _name = State(initialValue: item?.name ?? ""); _notes = State(initialValue: item?.notes ?? "")
+        _name = State(initialValue: item?.name ?? name); _notes = State(initialValue: item?.notes ?? "")
         _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id ?? place?.id)
         _photo = State(initialValue: item?.photo)
         _isPrivate = State(initialValue: item?.isPrivate ?? false)
@@ -411,6 +439,8 @@ struct ItemDetailView: View {
     @State private var editing = false
     @State private var addingDate = false
     @State private var moving = false
+    @State private var finding = false
+    @State private var foundNote: String?
     @State private var confirmedPutAway = false
     @State private var upgrade = false
     @State private var error: String?
@@ -430,6 +460,7 @@ struct ItemDetailView: View {
                         }
                         FlowLayout(spacing: 8) {
                             if item.archived { Stamp(text: "Archived") }
+                            else if item.isMissing { Stamp(text: "Missing", tone: .due) }
                             else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
                             else { Stamp(text: "At home", tone: .done) }
                             // The canvas leads with the next date when one is close.
@@ -461,7 +492,11 @@ struct ItemDetailView: View {
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
-                            if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
+                            if item.isMissing, !item.archived {
+                                Text("Missing since \(item.missingSince?.dayAndMonth ?? "recently").").font(.wbCaption).foregroundStyle(Theme.ink)
+                                Button("Found it") { finding = true }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
+                            } else if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
+                            if let foundNote { Label(foundNote, systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                             if confirmedPutAway { Label("Put away.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                         }
                         .card()
@@ -492,7 +527,7 @@ struct ItemDetailView: View {
                     Section("Where it's been") {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
                             VStack(alignment: .leading) {
-                                Text("\(Movement.display(movement.fromPath)) → \(Movement.display(movement.toPath))")
+                                Text(movement.summary)
                                 Text(movement.date, format: movement.date.isThisYear ? .dateTime.month().day().hour().minute() : .dateTime.year().month().day().hour().minute()).font(.caption).foregroundStyle(Theme.secondary)
                             }
                         }
@@ -512,11 +547,24 @@ struct ItemDetailView: View {
         .navigationTitle(available ? item.name : "Deleted").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if available {
+                if let sentence = item.whereItIsSentence {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ShareLink(item: sentence) { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Send where it is")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) { Button("Edit") { editing = true } }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button("Move…", systemImage: "arrow.right.circle") { moving = true }
                         Button("Add date", systemImage: "calendar.badge.plus") { addingDate = true }
+                        if !item.archived {
+                            Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { finding = true }
+                            if !item.isMissing {
+                                Button("Can't find it", systemImage: "questionmark.circle") {
+                                    do { try store.markMissing(item); foundNote = nil } catch { self.error = error.localizedDescription }
+                                }
+                            }
+                        }
                         Button(item.archived ? "Restore this thing" : "Archive this thing", systemImage: "archivebox") { toggleArchive() }
                         Divider()
                         Button("Delete permanently", systemImage: "trash", role: .destructive) { deleting = true }
@@ -531,6 +579,15 @@ struct ItemDetailView: View {
                     do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
                 }))
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
+            }
+        }
+        .sheet(isPresented: $finding) {
+            NavigationStack {
+                PlaceChooser(selection: Binding(get: { nil }, set: { id in
+                    let place = store.places.first { $0.id == id }
+                    do { try store.found(item, at: place); foundNote = Movement.foundSentence(place) } catch { self.error = error.localizedDescription }
+                }), noneTitle: "Somewhere without a place", suggested: store.foundSuggestions(for: item), title: "Where was it?")
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finding = false } } }
             }
         }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }

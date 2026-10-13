@@ -31,6 +31,7 @@ struct RecapView: View {
                     figure(recap.added.count, recap.added.count == 1 ? "new thing written down" : "new things written down", recap.added.isEmpty ? "Nothing new this week. That's fine." : Self.names(recap.added))
                     figure(recap.moved, recap.moved == 1 ? "thing moved or put away" : "things moved or put away", nil)
                     figure(recap.confirmed, recap.confirmed == 1 ? "thing checked and still there" : "things checked and still there", nil)
+                    if recap.found > 0 { figure(recap.found, recap.found == 1 ? "lost thing found" : "lost things found", nil) }
                 }
                 .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
                 SectionHeading(title: "Next week").padding(.top, 6)
@@ -141,6 +142,8 @@ struct StocktakeView: View {
                         Button { moving = item } label: { Label("Moved", systemImage: "pencil") }
                             .buttonStyle(SoftButtonStyle())
                     }
+                    Button("Can't find it") { answer { try store.markMissing(item) } }
+                        .font(.wbBody).foregroundStyle(Theme.purpleInk).frame(maxWidth: .infinity, minHeight: 44)
                     Button("Don't have it any more") { answer { try store.setArchived(item, true); lastArchived = item } }
                         .font(.wbBody).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity, minHeight: 44)
                 } else {
@@ -291,6 +294,9 @@ struct StillThereRow: View {
                         do { try store.confirm(item) } catch { self.error = error.localizedDescription }
                     }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.stillThere")
                     Button("Moved", action: move).buttonStyle(SoftButtonStyle(compact: true))
+                    Button("Not there") {
+                        do { try store.markMissing(item) } catch { self.error = error.localizedDescription }
+                    }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.notThere")
                 }
             }
         }

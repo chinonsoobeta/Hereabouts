@@ -7,6 +7,7 @@ struct LocaliserApp: App {
     @State private var store: LocaliserStore?
     /// Created at launch so a notification tapped while the app was closed is not lost.
     @State private var reminders = ReminderService()
+    @UIApplicationDelegateAdaptor(HereaboutsAppDelegate.self) private var appDelegate
     private let loadError: String?
 
     init() {
@@ -59,7 +60,7 @@ struct RootView: View {
     @Environment(ReminderService.self) private var reminders
     @Environment(\.scenePhase) private var scenePhase
     @State private var pro = ProAccess()
-    @State private var tab = AppTab.find
+    @State var tab = AppTab.find
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = false
     var body: some View {
         TabView(selection: $tab) {
@@ -91,11 +92,11 @@ struct RootView: View {
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let raw = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { store.openedItem = UUID(uuidString: raw) }
         }
-        .onOpenURL { url in
-            // hereabouts://item/<id> and hereabouts://due, used by the widget.
-            guard url.scheme == "hereabouts" else { return }
-            if url.host() == "item", let id = UUID(uuidString: url.lastPathComponent) { store.openedItem = id }
-            if url.host() == "due" { tab = .due }
+        .onOpenURL { url in if let link = AppLink(url: url) { open(link) } }
+        .onChange(of: QuickActions.shared.link, initial: true) { _, link in
+            guard let link else { return }
+            open(link)
+            QuickActions.shared.link = nil
         }
         .onChange(of: scenePhase) { _, value in
             if value == .active { do { try store.refresh() } catch { reminders.error = error.localizedDescription }; Task { await pro.refresh() } }
@@ -106,6 +107,16 @@ struct RootView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange).receive(on: RunLoop.main)) { _ in
             do { try store.refresh() } catch { reminders.error = error.localizedDescription }
+        }
+    }
+}
+
+extension RootView {
+    func open(_ link: AppLink) {
+        switch link {
+        case .item(let id): store.openedItem = id
+        case .due: tab = .due
+        case .find, .new, .putAway: tab = .find; store.findRequest = link
         }
     }
 }

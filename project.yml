@@ -35,6 +35,17 @@ targets:
         # Things the free plan holds. Builds installed straight onto a phone pass HEREABOUTS_FREE_THINGS=200.
         HereaboutsFreeThings: $(HEREABOUTS_FREE_THINGS)
         NSUserActivityTypes: [com.apple.corespotlightitem]
+        # Fixed app icon shortcuts. Each type is the link it opens; see System/AppLinks.swift.
+        UIApplicationShortcutItems:
+          - UIApplicationShortcutItemType: hereabouts://find
+            UIApplicationShortcutItemTitle: Find something
+            UIApplicationShortcutItemIconSymbolName: magnifyingglass
+          - UIApplicationShortcutItemType: hereabouts://putaway
+            UIApplicationShortcutItemTitle: Put something away
+            UIApplicationShortcutItemIconSymbolName: tray.and.arrow.down
+          - UIApplicationShortcutItemType: hereabouts://due
+            UIApplicationShortcutItemTitle: What's due
+            UIApplicationShortcutItemIconSymbolName: calendar
         CFBundleURLTypes:
           - CFBundleURLName: dev.localiser.app
             CFBundleURLSchemes: [hereabouts]

@@ -51,7 +51,7 @@ enum Rituals {
 
     @MainActor static func stale(_ items: [Belonging], now: Date = .now, calendar: Calendar = .current) -> [Belonging] {
         guard let cutoff = calendar.date(byAdding: .month, value: -staleMonths, to: now) else { return [] }
-        return items.filter { !$0.archived && !$0.isDeleted && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
+        return items.filter { !$0.archived && !$0.isDeleted && !$0.isMissing && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
     }
 
     /// Up to five things to ask about this month, oldest confirmation first.
@@ -95,6 +95,7 @@ enum Rituals {
     struct Recap {
         var added: [String]
         var moved: Int
+        var found: Int = 0
         var confirmed: Int
         var due: [Deadline]
         var drifting: [Belonging]
@@ -109,8 +110,10 @@ enum Rituals {
         let added = live.filter { $0.createdAt > since }.sorted { $0.createdAt < $1.createdAt }
         // Each figure counts things, once each. A move also counts as seeing a thing, so a thing moved this week
         // is counted as moved, not again as checked.
+        // A find is counted as a find rather than a move.
+        let foundThisWeek = Set(live.filter { $0.movements.contains { $0.date > since && $0.kind == .found } }.map(\.objectID))
         let movedThisWeek = Set(live.filter { $0.movements.contains { $0.date > since } }.map(\.objectID))
-        let moved = movedThisWeek.count
+        let moved = movedThisWeek.subtracting(foundThisWeek).count
         let confirmed = live.filter { item in (item.confirmedAt ?? .distantPast) > since && item.createdAt <= since && !movedThisWeek.contains(item.objectID) }.count
         let horizon = CalendarDay(now, calendar: calendar).adding(days: 7, calendar: calendar)
         let due = deadlines.filter { deadline in
@@ -118,7 +121,7 @@ enum Rituals {
             return day >= CalendarDay(now, calendar: calendar) && day <= horizon
         }.sorted { $0.dayString < $1.dayString }
         let stale = stale(live, now: now, calendar: calendar)
-        return Recap(added: added.map(\.name), moved: moved, confirmed: confirmed, due: due, drifting: Array(stale.prefix(3)),
+        return Recap(added: added.map(\.name), moved: moved, found: foundThisWeek.count, confirmed: confirmed, due: due, drifting: Array(stale.prefix(3)),
                      stocktakeCount: min(stale.count, stocktakeSize), keepingUp: keepingUpWeeks(activity: activity(in: live), now: now, calendar: calendar))
     }
 

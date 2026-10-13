@@ -67,6 +67,9 @@ struct PlaceChooser: View {
     @Binding var selection: UUID?
     var excluded: Place? = nil
     var noneTitle = "No place yet"
+    /// Shown first when nothing is typed, as "Try here first". Used by "Found it".
+    var suggested: [Place] = []
+    var title = "Choose a place"
     @State private var query = ""
     @State private var error: String?
 
@@ -108,6 +111,11 @@ struct PlaceChooser: View {
                     }
                 }
             }
+            if query.isEmpty, !suggested.isEmpty {
+                Section("Try here first") {
+                    ForEach(suggested) { place in row(title: place.path, detail: nil, id: place.id) }
+                }
+            }
             Section {
                 row(title: noneTitle, detail: noneTitle == "None" ? "A room or other top-level place" : "Not sure yet", id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
@@ -118,7 +126,7 @@ struct PlaceChooser: View {
         .groundBackground()
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Find or create a place")
         .onSubmit(of: .search) { if !typed.isEmpty { create() } }
-        .navigationTitle("Choose a place").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
         .alert("Couldn't create that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 

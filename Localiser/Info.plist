@@ -50,5 +50,32 @@
 		<string>Fraunces-Italic[SOFT,WONK,opsz,wght].ttf</string>
 		<string>Fraunces[SOFT,WONK,opsz,wght].ttf</string>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>magnifyingglass</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Find something</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>hereabouts://find</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>tray.and.arrow.down</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Put something away</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>hereabouts://putaway</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>calendar</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>What's due</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>hereabouts://due</string>
+		</dict>
+	</array>
 </dict>
 </plist>

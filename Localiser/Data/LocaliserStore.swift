@@ -52,6 +52,8 @@ final class LocaliserStore {
     var undoableDeletion: String?
     /// Item to show on the Find tab, set by Spotlight, Siri or a widget.
     var openedItem: UUID?
+    /// An app icon shortcut or link for Find: search, write something down, or put something away.
+    var findRequest: AppLink?
     var context: NSManagedObjectContext { container.viewContext }
     /// Items that count toward the free tier. Archived items never do.
     var activeItemCount: Int { items.lazy.filter { !$0.archived }.count }
