@@ -38,7 +38,8 @@ struct ThingEntity: AppEntity {
 }
 
 extension ThingEntity {
-    @MainActor init(_ item: Belonging) { self.init(id: item.id, name: item.name, path: item.place?.path ?? "") }
+    /// A private thing can still be asked for by name, but its place isn't shown.
+    @MainActor init(_ item: Belonging) { self.init(id: item.id, name: item.name, path: item.isPrivate ? "Private" : item.place?.path ?? "") }
 }
 
 struct ThingQuery: EntityStringQuery {
@@ -52,7 +53,7 @@ struct ThingQuery: EntityStringQuery {
     }
     @MainActor func suggestedEntities() async throws -> [ThingEntity] {
         let store = try IntentLibrary.open()
-        return store.items.filter { !$0.archived && !$0.isDeleted }.sorted { $0.lastConfirmed > $1.lastConfirmed }.prefix(12).map(ThingEntity.init)
+        return store.items.filter { !$0.archived && !$0.isDeleted && !$0.isPrivate }.sorted { $0.lastConfirmed > $1.lastConfirmed }.prefix(12).map(ThingEntity.init)
     }
 }
 
@@ -94,6 +95,7 @@ struct FindThingIntent: AppIntent {
     }
 
     @MainActor static func answer(for item: Belonging) -> String {
+        if item.isPrivate { return "That one's private. Open Hereabouts to see it." }
         let path = item.place?.path
         if item.archived { return path.map { "\(item.name) is archived. It was last in \($0)." } ?? "\(item.name) is archived." }
         if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). It lives in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
@@ -137,7 +139,7 @@ struct WhatsDueIntent: AppIntent {
         let due = deadlines.filter { $0.active && ($0.day.map { $0 >= today && $0 <= horizon } ?? false) }.sorted { $0.dayString < $1.dayString }
         guard !due.isEmpty else { return "Nothing is due in the next month." }
         let lines = due.prefix(3).map { deadline -> String in
-            let name = deadline.item?.name ?? "A saved thing"
+            let name = deadline.item.map(\.publicName).flatMap { $0.isEmpty ? nil : $0 } ?? "A saved thing"
             let day = deadline.day?.spoken(today: today) ?? ""
             switch deadline.kind {
             case .returns: return "\(name): last day to return is \(day)"

@@ -2,7 +2,7 @@ import CoreSpotlight
 import UniformTypeIdentifiers
 
 /// Puts item names, aliases and places in Spotlight so a search outside the app finds them.
-/// Only names and place paths are indexed; notes, photos and documents are not.
+/// Only names and place paths are indexed; notes, photos and documents are not. Private things stay out.
 @MainActor enum Spotlight {
     static let domain = "dev.localiser.items"
     private static var pending: Task<Void, Never>?
@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
     static func index(_ store: LocaliserStore) {
         guard store.isUserLibrary else { return }
-        let entries = store.items.filter { !$0.archived && !$0.isDeleted }.map { (id: $0.id, name: $0.name, aliases: $0.aliases, path: $0.place?.path ?? "") }
+        let entries = indexable(store.items).map { (id: $0.id, name: $0.name, aliases: $0.aliases, path: $0.place?.path ?? "") }
         var hasher = Hasher()
         for entry in entries { hasher.combine(entry.id); hasher.combine(entry.name); hasher.combine(entry.aliases); hasher.combine(entry.path) }
         let signature = hasher.finalize()
@@ -32,6 +32,9 @@ import UniformTypeIdentifiers
             if !items.isEmpty { try? await index.indexSearchableItems(items) }
         }
     }
+
+    /// What Spotlight may show: current things, never private ones.
+    static func indexable(_ items: [Belonging]) -> [Belonging] { items.filter { !$0.archived && !$0.isDeleted && !$0.isPrivate } }
 
     static func clear() {
         lastSignature = 0

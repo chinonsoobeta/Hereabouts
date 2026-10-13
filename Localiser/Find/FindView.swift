@@ -242,6 +242,7 @@ struct ItemEditor: View {
     @State private var aliases: String
     @State private var placeID: UUID?
     @State private var photo: Data?
+    @State private var isPrivate: Bool
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var choosingPhoto = false
     @State private var takingPhoto = false
@@ -262,6 +263,7 @@ struct ItemEditor: View {
         _name = State(initialValue: item?.name ?? ""); _notes = State(initialValue: item?.notes ?? "")
         _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id ?? place?.id)
         _photo = State(initialValue: item?.photo)
+        _isPrivate = State(initialValue: item?.isPrivate ?? false)
     }
 
     var body: some View {
@@ -321,6 +323,9 @@ struct ItemEditor: View {
                 if aliases.count > TextLimit.aliases - 200 { counter(aliases, TextLimit.aliases) }
             } header: { Text("Optional details").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
               footer: { Text("Other names help search. Add what you might type later, like \u{201C}ID\u{201D} for a passport.").foregroundStyle(Theme.secondary) }
+            Section {
+                Toggle("Keep private", isOn: $isPrivate).accessibilityIdentifier("item.private")
+            } footer: { Text("Stays out of Spotlight, Siri, notifications and widgets. Still in backups and exports.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
@@ -387,9 +392,9 @@ struct ItemEditor: View {
         if item == nil && !pro.allows(.item, count: store.activeItemCount) { upgrade = true; return }
         do {
             let place = store.places.first { $0.id == placeID }
-            if let item { try store.editItem(item, name: name, place: place, notes: notes, aliases: aliases, photo: photo) }
+            if let item { try store.editItem(item, name: name, place: place, notes: notes, aliases: aliases, photo: photo, isPrivate: isPrivate) }
             else {
-                try store.addItem(name: name, place: place, notes: notes, aliases: aliases, photo: photo)
+                try store.addItem(name: name, place: place, notes: notes, aliases: aliases, photo: photo, isPrivate: isPrivate)
                 UserDefaults.standard.set(place?.id.uuidString, forKey: Self.lastPlaceKey)
                 UserDefaults.standard.set(Date.now, forKey: Self.lastPlaceTimeKey)
             }

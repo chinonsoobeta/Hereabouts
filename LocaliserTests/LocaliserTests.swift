@@ -292,7 +292,7 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(csv.contains("\"'=SUM(1,2)\""))
         XCTAssertTrue(csv.contains("\"A \"\"quote\"\"\nand comma,\""))
         XCTAssertTrue(csv.contains("\"'@command\""))
-        XCTAssertTrue(csv.hasPrefix("\"id\",\"name\",\"place\",\"notes\",\"other names\",\"archived\",\"dates\""))
+        XCTAssertTrue(csv.hasPrefix("\"id\",\"name\",\"place\",\"notes\",\"other names\",\"archived\",\"private\",\"dates\""))
         let kettle = try store.addItem(name: "Kettle")
         try store.setDeadline(item: kettle, kind: .warranty, day: XCTUnwrap(CalendarDay(stored: "2030-01-01")), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
         XCTAssertTrue(store.inventoryCSV().contains("\"Warranty ends 2030-01-01\""))

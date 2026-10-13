@@ -30,7 +30,7 @@ enum CalendarExport {
         let alarm = TimeInterval(Int(deadline.hour) * 3600 - leadDays * 86_400)
         var notes = "Added by Hereabouts."
         if !deadline.source.isEmpty { notes = deadline.source + "\n\n" + notes }
-        return EventPlan(title: kind.calendarTitle(itemName: deadline.item?.name), start: start, end: end, alarmOffset: alarm, notes: notes)
+        return EventPlan(title: kind.calendarTitle(itemName: deadline.item?.publicName), start: start, end: end, alarmOffset: alarm, notes: notes)
     }
 
     static func makeEvent(_ plan: EventPlan, in store: EKEventStore) -> EKEvent {

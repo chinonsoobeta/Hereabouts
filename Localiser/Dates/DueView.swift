@@ -359,7 +359,7 @@ struct CalendarEventEditor: UIViewControllerRepresentable {
         let eventStore = EKEventStore()
         let event: EKEvent
         if let plan = CalendarExport.plan(for: deadline) { event = CalendarExport.makeEvent(plan, in: eventStore) }
-        else { event = EKEvent(eventStore: eventStore); event.title = (deadline.kind ?? .returns).calendarTitle(itemName: deadline.item?.name) }
+        else { event = EKEvent(eventStore: eventStore); event.title = (deadline.kind ?? .returns).calendarTitle(itemName: deadline.item?.publicName) }
         controller.eventStore = eventStore; controller.event = event; controller.editViewDelegate = context.coordinator
         return controller
     }

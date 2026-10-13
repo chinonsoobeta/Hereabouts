@@ -204,10 +204,10 @@ struct LibraryBackup: Codable, Sendable {
             let safe = first.map { "=+-@".contains($0) } == true ? "'" + text : text
             return "\"" + safe.replacingOccurrences(of: "\"", with: "\"\"") + "\""
         }
-        let heading = ["id", "name", "place", "notes", "other names", "archived", "dates"].map(escaped).joined(separator: ",")
+        let heading = ["id", "name", "place", "notes", "other names", "archived", "private", "dates"].map(escaped).joined(separator: ",")
         return ([heading] + items.map { item in
             let dates = item.deadlines.sorted { $0.dayString < $1.dayString }.map { "\($0.kind?.title ?? "Date") \($0.dayString)" }
-            return [item.id.uuidString, item.name, item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
+            return [item.id.uuidString, item.name, item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", item.isPrivate ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
         }).joined(separator: "\r\n") + "\r\n"
     }
 

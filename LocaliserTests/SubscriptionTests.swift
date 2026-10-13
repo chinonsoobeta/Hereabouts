@@ -15,7 +15,8 @@ final class SubscriptionTests: XCTestCase {
 
     /// StoreKit's test service applies changes a moment later, so check again until it has.
     private func eventually(_ pro: ProAccess, _ condition: () -> Bool) async throws {
-        for _ in 0..<50 {
+        // Up to 15 seconds: after a long suite the test store can be slow to report a purchase.
+        for _ in 0..<150 {
             await pro.refresh()
             if condition() { return }
             try await Task.sleep(for: .milliseconds(100))

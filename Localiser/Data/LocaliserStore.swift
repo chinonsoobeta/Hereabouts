@@ -133,22 +133,23 @@ final class LocaliserStore {
     }
 
     @discardableResult
-    func addItem(name: String, place: Place? = nil, notes: String = "", aliases: String = "", photo: Data? = nil) throws -> Belonging {
+    func addItem(name: String, place: Place? = nil, notes: String = "", aliases: String = "", photo: Data? = nil, isPrivate: Bool = false) throws -> Belonging {
         // Validate everything before inserting, so a rejected item never lingers half-made in the context.
         let clean = try requiredName(name)
         let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
         item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
-        item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo
+        item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo; item.isPrivate = isPrivate
         try save()
         return item
     }
 
-    func editItem(_ item: Belonging, name: String, place: Place?, notes: String, aliases: String, photo: Data?) throws {
+    func editItem(_ item: Belonging, name: String, place: Place?, notes: String, aliases: String, photo: Data?, isPrivate: Bool? = nil) throws {
         let clean = try requiredName(name)
         let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
         recordMove(item, to: place)
         item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases; item.photo = photo
+        if let isPrivate { item.isPrivate = isPrivate }
         try save()
     }
 

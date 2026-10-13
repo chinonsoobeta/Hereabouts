@@ -28,6 +28,8 @@ final class Belonging: NSManagedObject, Identifiable {
     var lastConfirmed: Date { confirmedAt ?? movements.map(\.date).max() ?? createdAt }
     var isLent: Bool { !lentTo.isEmpty }
     var isMissing: Bool { missingSince != nil }
+    /// The name to show outside the app: empty for a private thing, so the caller says "A saved thing".
+    var publicName: String { isPrivate ? "" : name }
     var packedTrips: [TripRecord] {
         var seen = Set<UUID>()
         return tripEntries.filter(\.allocatesItem).compactMap(\.trip).filter { seen.insert($0.id).inserted }.sorted { $0.startDay < $1.startDay }
@@ -105,7 +107,7 @@ final class Deadline: NSManagedObject, Identifiable {
     var needsAttention: Bool { group != .done }
     var reminderInput: ReminderInput? {
         guard let day, let kind, let decision else { return nil }
-        return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision, itemName: item?.name ?? "", itemID: item?.id)
+        return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision, itemName: item?.publicName ?? "", itemID: item?.id)
     }
 }
 
