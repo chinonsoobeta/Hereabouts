@@ -204,6 +204,7 @@ struct DueCard: View {
         case .returns: return deadline.decision == .returning ? "Returning · drop off by \(day)" : "Return by \(day)"
         case .warranty: return "Warranty ends \(day)"
         case .expiry: return "Expires \(day)"
+        case .askBack: return "Ask for it back \(day)"
         case nil: return day
         }
     }

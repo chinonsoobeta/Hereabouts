@@ -80,6 +80,7 @@ struct RecapView: View {
         case .returns: verb = "Return by"
         case .warranty: verb = "Warranty ends"
         case .expiry: verb = "Expires"
+        case .askBack: verb = "Ask for it back"
         case nil: verb = "Due"
         }
         return verb + " " + (deadline.day?.formatted ?? "")

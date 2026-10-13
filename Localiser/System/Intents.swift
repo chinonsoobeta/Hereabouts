@@ -143,6 +143,7 @@ struct WhatsDueIntent: AppIntent {
             case .returns: return "\(name): last day to return is \(day)"
             case .warranty: return "\(name): warranty ends \(day)"
             case .expiry: return "\(name): expires \(day)"
+            case .askBack: return "\(name): ask for it back \(day)"
             case nil: return "\(name): \(day)"
             }
         }

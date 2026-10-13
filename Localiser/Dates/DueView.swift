@@ -228,7 +228,7 @@ struct DeadlineEditor: View {
                 }
             }
             Section(item.name) {
-                Picker("Kind of date", selection: $kind) { ForEach(DeadlineKind.allCases) { Text($0.title).tag($0) } }.disabled(existing != nil)
+                Picker("Kind of date", selection: $kind) { ForEach(DeadlineKind.chosen + (kind == .askBack ? [.askBack] : [])) { Text($0.title).tag($0) } }.disabled(existing != nil)
                 if kind == .returns {
                     Toggle("Calculate from a confirmed return window", isOn: $useWindow)
                     if useWindow {

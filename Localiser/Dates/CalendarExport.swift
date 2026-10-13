@@ -3,7 +3,7 @@ import EventKit
 extension DeadlineKind {
     /// Calendar event title, like "Return: Blue kettle".
     func calendarTitle(itemName: String?) -> String {
-        let prefix = switch self { case .returns: "Return"; case .warranty: "Warranty ends"; case .expiry: "Expires" }
+        let prefix = switch self { case .returns: "Return"; case .warranty: "Warranty ends"; case .expiry: "Expires"; case .askBack: "Ask for it back" }
         let name = itemName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return name.isEmpty ? prefix : "\(prefix): \(name)"
     }

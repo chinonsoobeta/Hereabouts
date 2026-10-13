@@ -42,11 +42,15 @@ struct CalendarDay: Equatable, Comparable, Sendable {
 
 enum DeadlineKind: String, CaseIterable, Identifiable, Sendable {
     case returns, warranty, expiry
+    /// The day to ask for a lent thing back. Set from "Lend it…", not chosen in the date editor.
+    case askBack
     var id: String { rawValue }
-    var title: String { switch self { case .returns: "Return by"; case .warranty: "Warranty ends"; case .expiry: "Expires" } }
+    /// The kinds a person picks in the date editor.
+    static let chosen: [DeadlineKind] = [.returns, .warranty, .expiry]
+    var title: String { switch self { case .returns: "Return by"; case .warranty: "Warranty ends"; case .expiry: "Expires"; case .askBack: "Ask for it back" } }
     /// The date in a sentence, like "Looks like a return date".
-    var noun: String { switch self { case .returns: "return date"; case .warranty: "warranty end date"; case .expiry: "expiry date" } }
-    var defaultLeadDays: Int { switch self { case .returns: 3; case .warranty: 30; case .expiry: 180 } }
+    var noun: String { switch self { case .returns: "return date"; case .warranty: "warranty end date"; case .expiry: "expiry date"; case .askBack: "ask-back date" } }
+    var defaultLeadDays: Int { switch self { case .returns: 3; case .warranty: 30; case .expiry: 180; case .askBack: 0 } }
 }
 
 enum ReturnDecision: String, Sendable { case open, keeping, returning, returned }
@@ -98,8 +102,9 @@ struct PlannedReminder: Equatable, Sendable {
         case .returns: "\(subject): last day to return is \(when)."
         case .warranty: "\(subject): warranty ends \(when)."
         case .expiry: "\(subject): expires \(when)."
+        case .askBack: "\(subject): time to ask for it back \(when)."
         }
-        let title: String = switch kind { case .returns: "Return window closing"; case .warranty: "Warranty ending"; case .expiry: "Expiry coming up" }
+        let title: String = switch kind { case .returns: "Return window closing"; case .warranty: "Warranty ending"; case .expiry: "Expiry coming up"; case .askBack: "Lent out" }
         return (title, body)
     }
 }

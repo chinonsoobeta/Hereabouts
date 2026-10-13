@@ -17,7 +17,9 @@ struct BackupRecord: Codable, Sendable {
 }
 
 struct LibraryBackup: Codable, Sendable {
-    var version = 1
+    /// 2 added private, missing and lent things, kinds of move, and ask-back dates. Version 1 backups still restore.
+    static let currentVersion = 2
+    var version = currentVersion
     var createdAt = Date()
     var records: [BackupRecord]
     static let maximumBytes = 200 * 1024 * 1024
@@ -45,7 +47,7 @@ struct LibraryBackup: Codable, Sendable {
         do { return try JSONDecoder().decode(Self.self, from: data) } catch {
             // Say which problem it is. A newer app's backup gives its version. Every backup this app writes starts
             // with its date, because the keys are sorted, so a cut-off one is damaged. Anything else was never a backup.
-            if let header = try? JSONDecoder().decode(Header.self, from: data), header.version > 1 { throw LocaliserError.invalidBackup(newerVersion) }
+            if let header = try? JSONDecoder().decode(Header.self, from: data), header.version > currentVersion { throw LocaliserError.invalidBackup(newerVersion) }
             throw LocaliserError.invalidBackup(data.starts(with: Data(#"{"createdAt":"#.utf8)) ? damaged : notABackup)
         }
     }
@@ -131,11 +133,11 @@ struct LibraryBackup: Codable, Sendable {
         } catch { staging.rollback(); context.rollback(); try? refresh(); throw error }
     }
 
-    static var laterFields: Set<String> { ["perDay", "unlinked", "confirmedAt"] }
+    static var laterFields: Set<String> { ["perDay", "unlinked", "confirmedAt", "isPrivate", "missingSince", "lentTo", "lentAt", "kindRaw"] }
 
     func validateBackup(_ file: LibraryBackup) throws {
-        guard file.version <= 1 else { throw LocaliserError.invalidBackup(LibraryBackup.newerVersion) }
-        guard file.version == 1 else { throw LocaliserError.invalidBackup(LibraryBackup.notABackup) }
+        guard file.version <= LibraryBackup.currentVersion else { throw LocaliserError.invalidBackup(LibraryBackup.newerVersion) }
+        guard file.version >= 1 else { throw LocaliserError.invalidBackup(LibraryBackup.notABackup) }
         guard file.records.count <= 100_000 else { throw LocaliserError.invalidBackup("This backup is too big to restore.") }
         let schema = container.managedObjectModel.entitiesByName
         var records: [UUID: BackupRecord] = [:]

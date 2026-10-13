@@ -138,12 +138,12 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(target.places.isEmpty)
         bad = good; bad.records[index].attributes["name"] = .integer(42)
         XCTAssertThrowsError(try target.restore(bad))
-        bad = good; bad.version = 2
+        bad = good; bad.version = 3
         XCTAssertThrowsError(try target.restore(bad))
         XCTAssertThrowsError(try LibraryBackup.decoded(Data("broken".utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.notABackup)) }
-        XCTAssertThrowsError(try LibraryBackup.decoded(Data(#"{"version":2,"records":[{"future":true}]}"#.utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
+        XCTAssertThrowsError(try LibraryBackup.decoded(Data(#"{"version":3,"records":[{"future":true}]}"#.utf8))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
         XCTAssertThrowsError(try LibraryBackup.decoded(good.encoded().prefix(200))) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.damaged)) }
-        bad = good; bad.version = 2
+        bad = good; bad.version = 3
         XCTAssertThrowsError(try target.restore(bad)) { XCTAssertEqual($0 as? LocaliserError, .invalidBackup(LibraryBackup.newerVersion)) }
         let existing = try target.addItem(name: "Keep me")
         XCTAssertThrowsError(try target.restore(good)) { XCTAssertEqual($0 as? LocaliserError, .libraryNotEmpty) }

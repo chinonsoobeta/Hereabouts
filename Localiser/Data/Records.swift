@@ -12,6 +12,13 @@ final class Belonging: NSManagedObject, Identifiable {
     /// When someone last said this is where it lives: added, moved, put away or "Still there".
     @NSManaged var confirmedAt: Date?
     @NSManaged var photo: Data?
+    /// Kept out of Spotlight, Siri, notifications, widgets and the calendar. Still in backups and exports.
+    @NSManaged var isPrivate: Bool
+    /// Set by "Not there"; cleared when it's found.
+    @NSManaged var missingSince: Date?
+    /// Who has it, when it's lent out. Empty when it's at home.
+    @NSManaged var lentTo: String
+    @NSManaged var lentAt: Date?
     @NSManaged var place: Place?
     @NSManaged var movements: Set<Movement>
     @NSManaged var deadlines: Set<Deadline>
@@ -19,6 +26,8 @@ final class Belonging: NSManagedObject, Identifiable {
     @NSManaged var tripEntries: Set<TripEntry>
     @NSManaged var kitEntries: Set<KitEntry>
     var lastConfirmed: Date { confirmedAt ?? movements.map(\.date).max() ?? createdAt }
+    var isLent: Bool { !lentTo.isEmpty }
+    var isMissing: Bool { missingSince != nil }
     var packedTrips: [TripRecord] {
         var seen = Set<UUID>()
         return tripEntries.filter(\.allocatesItem).compactMap(\.trip).filter { seen.insert($0.id).inserted }.sorted { $0.startDay < $1.startDay }
@@ -63,7 +72,11 @@ final class Movement: NSManagedObject, Identifiable {
     @NSManaged var date: Date
     @NSManaged var fromPath: String
     @NSManaged var toPath: String
+    @NSManaged var kindRaw: String
     @NSManaged var item: Belonging?
+
+    enum Kind: String, Sendable { case moved, found, lent, back }
+    var kind: Kind { Kind(rawValue: kindRaw) ?? .moved }
 
     /// Moves record "Unspecified" when there was no place. The stored word stays for older backups.
     static let noPlace = "Unspecified"

@@ -29,6 +29,7 @@
 		761357327C5678A9A0FD4EBD /* PackingRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF170C8864C322B2EF738BC7 /* PackingRecords.swift */; };
 		77FB78B5D6ABB46495F54672 /* IntentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796960A07F97C020E62944E3 /* IntentsTests.swift */; };
 		7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */; };
+		7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */; };
 		7DFD233175BBDBC456DF0025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDA7CB51BE2372853A56B223 /* Assets.xcassets */; };
 		85F6CA5CBCE26F22AC58B41F /* fraunces-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 69C7E4D9B7BFE1016E67E998 /* fraunces-OFL.txt */; };
 		883F90525273EB06CDF36579 /* Tips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C11FBF78BD6877C6EF37AD /* Tips.swift */; };
@@ -105,6 +106,7 @@
 		56936067B918AEFABF8680BB /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySettingsView.swift; sourceTree = "<group>"; };
 		60A697438CB089D0830D4DC2 /* FindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindView.swift; sourceTree = "<group>"; };
+		672DA0E99BE0C2F2B120E9B2 /* LocaliserV7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV7.xcdatamodel; sourceTree = "<group>"; };
 		688EA727718F4AD230A48BBB /* LocaliserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserStore.swift; sourceTree = "<group>"; };
 		69C7E4D9B7BFE1016E67E998 /* fraunces-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fraunces-OFL.txt"; sourceTree = "<group>"; };
 		6A479972608E485C29556D57 /* LocaliserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserApp.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
 		EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV3.xcdatamodel; sourceTree = "<group>"; };
+		F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelV7Tests.swift; sourceTree = "<group>"; };
 		F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceChooser.swift; sourceTree = "<group>"; };
 		F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserTests.swift; sourceTree = "<group>"; };
 		FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingStore.swift; sourceTree = "<group>"; };
@@ -281,6 +284,7 @@
 				796960A07F97C020E62944E3 /* IntentsTests.swift */,
 				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
+				F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */,
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
 				746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */,
 			);
@@ -474,6 +478,7 @@
 			files = (
 				77FB78B5D6ABB46495F54672 /* IntentsTests.swift in Sources */,
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
+				7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */,
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
 				35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */,
 			);
@@ -844,8 +849,9 @@
 				1C3B642F632850FB2BF802A7 /* LocaliserV4.xcdatamodel */,
 				0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */,
 				2CBDDD809F49498AEDB7145F /* LocaliserV6.xcdatamodel */,
+				672DA0E99BE0C2F2B120E9B2 /* LocaliserV7.xcdatamodel */,
 			);
-			currentVersion = 2CBDDD809F49498AEDB7145F /* LocaliserV6.xcdatamodel */;
+			currentVersion = 672DA0E99BE0C2F2B120E9B2 /* LocaliserV7.xcdatamodel */;
 			path = Localiser.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
