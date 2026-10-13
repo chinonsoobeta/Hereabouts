@@ -78,6 +78,7 @@ struct ProStanding: Equatable, Sendable {
         }
         standing = best
         unlocked = best != nil
+        NotebookFile.sharedDefaults()?.set(unlocked, forKey: NotebookFile.proUnlockedKey)
         if best == nil { lapsed = await hadSubscription() } else { lapsed = false }
         if let product = products[.yearly] ?? products[.monthly] { trialEligible = await product.subscription?.isEligibleForIntroOffer ?? false }
         TrialReminder.update(best)

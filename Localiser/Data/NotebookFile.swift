@@ -5,6 +5,40 @@ import CoreData
 enum NotebookFile {
     enum Outcome: Equatable { case moved, alreadyThere, nothingToMove }
 
+    static let movedKey = "notebookMovedToGroup"
+    /// Read by the widget and share sheet to apply the free limits.
+    static let proUnlockedKey = "proUnlocked"
+
+    /// The App Group named by `HEREABOUTS_APP_GROUP`, or nil while it's empty (before enrolment).
+    static var appGroup: String? {
+        let name = (Bundle.main.object(forInfoDictionaryKey: "HereaboutsAppGroup") as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
+        return name.isEmpty || name.hasPrefix("$(") ? nil : name
+    }
+
+    static func sharedDefaults(group: String? = appGroup) -> UserDefaults? { group.flatMap(UserDefaults.init(suiteName:)) }
+
+    /// Where the notebook lives in the group's folder, when there is a group and the phone grants it.
+    static func groupStoreURL(group: String? = appGroup) -> URL? {
+        guard let group, let folder = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group) else { return nil }
+        return folder.appendingPathComponent("Library/Application Support/Localiser.sqlite")
+    }
+
+    /// The notebook to open. With an App Group, the first launch copies the notebook across and opens
+    /// the copy; the launch after that removes the original. Without one, or if the copy fails, the
+    /// notebook stays where it was.
+    @MainActor static func location(legacy: URL, group: URL? = groupStoreURL(), defaults: UserDefaults = .standard) -> URL {
+        guard let group else { return legacy }
+        if defaults.bool(forKey: movedKey) {
+            try? removeOriginal(at: legacy)
+            return group
+        }
+        do {
+            switch try move(from: legacy, to: group) {
+            case .moved, .alreadyThere, .nothingToMove: defaults.set(true, forKey: movedKey); return group
+            }
+        } catch { return legacy }
+    }
+
     enum MoveError: LocalizedError {
         case countsDiffer(String)
         var errorDescription: String? {

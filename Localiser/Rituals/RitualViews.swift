@@ -9,7 +9,6 @@ enum Ritual: String, Identifiable {
 struct RecapView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @AppStorage(Home.nameKey) private var homeName = ""
     @AppStorage(Rituals.recapReadKey) private var readWeek = ""
     var seeDue: () -> Void = {}
     var startStocktake: () -> Void = {}
@@ -21,7 +20,8 @@ struct RecapView: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
                 HStack(alignment: .top) {
-                    Text("This week at \(homeName.isEmpty ? "home" : homeName.lowercasedFirstArticle)").font(.wbDisplay).foregroundStyle(Theme.ink)
+                    // The recap covers every home, so with several it's simply "home".
+                    Text("This week at \(store.hasSeveralHomes ? "home" : store.currentHome?.name.lowercasedFirstArticle ?? "home")").font(.wbDisplay).foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
                     if recap.keepingUp > 0 { Stamp(text: recap.keepingUp == 1 ? "1 week" : "\(recap.keepingUp) weeks", tone: .purple) }

@@ -128,7 +128,8 @@ extension RootView {
 struct StoreFailureView: View {
     let reason: String?
     private var files: [URL] {
-        guard let base = try? LocaliserStore.defaultStoreURL() else { return [] }
+        guard let legacy = try? LocaliserStore.defaultStoreURL() else { return [] }
+        let base = NotebookFile.groupStoreURL().flatMap { FileManager.default.fileExists(atPath: $0.path) ? $0 : nil } ?? legacy
         return ["", "-wal", "-shm"].map { URL(fileURLWithPath: base.path + $0) }.filter { FileManager.default.fileExists(atPath: $0.path) }
     }
     var body: some View {

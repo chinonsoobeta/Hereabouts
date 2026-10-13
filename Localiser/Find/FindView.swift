@@ -13,7 +13,6 @@ struct FindView: View {
     @State private var settings = false
     @State private var addingPlace = false
     @State private var openedItem: Belonging?
-    @AppStorage(Home.nameKey) private var homeName = ""
     @Environment(ReminderService.self) private var reminders
     @State private var ritual: Ritual?
     @State private var showDue = false
@@ -62,7 +61,7 @@ struct FindView: View {
         }
         .background(Theme.ground)
         .navigationTitle("Hereabouts")
-        .navigationSubtitle("\(homeName.isEmpty ? Home.defaultName : homeName) · \(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))")
+        .navigationSubtitle("\(store.currentHome?.name ?? Home.defaultName) · \(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))")
         .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }

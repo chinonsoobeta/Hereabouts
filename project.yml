@@ -12,6 +12,8 @@ settings:
     HEREABOUTS_SITE_URL: https://hereabouts.app
     HEREABOUTS_SUPPORT_EMAIL: support@hereabouts.app
     HEREABOUTS_FREE_THINGS: '20'
+    # The App Group shared with the widget and share sheet. Empty until enrolment; the notebook stays put.
+    HEREABOUTS_APP_GROUP: ''
 targets:
   Localiser:
     type: application
@@ -34,6 +36,7 @@ targets:
           - "Fraunces[SOFT,WONK,opsz,wght].ttf"
         # Things the free plan holds. Builds installed straight onto a phone pass HEREABOUTS_FREE_THINGS=200.
         HereaboutsFreeThings: $(HEREABOUTS_FREE_THINGS)
+        HereaboutsAppGroup: $(HEREABOUTS_APP_GROUP)
         NSUserActivityTypes: [com.apple.corespotlightitem]
         # Fixed app icon shortcuts. Each type is the link it opens; see System/AppLinks.swift.
         UIApplicationShortcutItems:

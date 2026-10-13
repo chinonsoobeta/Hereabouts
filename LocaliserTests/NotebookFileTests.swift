@@ -65,6 +65,20 @@ import CoreData
         XCTAssertEqual(try app.mergeOutsideChanges(ledger: ledger), 0, "Its own saves aren't outside changes")
     }
 
+    func testLaunchesMoveTheNotebookOnceThenRemoveTheOriginal() throws {
+        let legacy = folder.appendingPathComponent("Old/Localiser.sqlite")
+        let group = folder.appendingPathComponent("Group/Localiser.sqlite")
+        let defaults = ledger().defaults
+        do { let store = try LocaliserStore(url: legacy); try store.addItem(name: "Passport") }
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: nil, defaults: defaults), legacy, "No App Group yet: nothing moves")
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: legacy.path), "Kept for the first launch")
+        XCTAssertEqual(try LocaliserStore(url: group).items.map(\.name), ["Passport"])
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: legacy.path), "Gone on the next launch")
+        XCTAssertNil(NotebookFile.appGroup, "Empty until enrolment")
+    }
+
     func testHistoryIsTrimmedOnlyBehindEveryReader() {
         let ledger = ledger()
         let now = Date(timeIntervalSince1970: 2_000_000_000)

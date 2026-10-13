@@ -73,7 +73,7 @@ final class LocaliserStore {
         let description = NSPersistentStoreDescription()
         if inMemory { description.type = NSInMemoryStoreType }
         else {
-            let file = try url ?? Self.defaultStoreURL()
+            let file = try url ?? NotebookFile.location(legacy: Self.defaultStoreURL())
             try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
             description.url = file
         }
