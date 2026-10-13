@@ -258,6 +258,26 @@ import XCTest
         XCTAssertEqual(switcher.value as? String, "Home")
     }
 
+    func testEmptyCopiesOfAPlaceCanBeTidiedUp() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launch()
+        app.tabBars.buttons["Places"].tap()
+        app.buttons["Loft"].firstMatch.tap()
+        app.navigationBars["Places"].buttons["Add place"].tap()
+        let name = app.textFields["place.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.tap(); name.typeText("Loft")
+        app.buttons["Save"].tap()
+        let tidy = app.buttons["places.tidy"]
+        XCTAssertTrue(tidy.waitForExistence(timeout: 5), app.debugDescription)
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        tidy.tap()
+        app.buttons["Fold in 1 place"].tap()
+        XCTAssertTrue(tidy.waitForNonExistence(timeout: 5))
+    }
+
     func testAppLinksOpenWritingDownAndDue() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]

@@ -52,6 +52,7 @@
 		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
 		93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A645341D05015908431977CC /* HereaboutsControls.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
+		9CD309E6883093FB8EA60265 /* DuplicatePlacesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BABBA14900028F94ABED25B /* DuplicatePlacesTests.swift */; };
 		A9EEAFF0C7CD07C937642857 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */; };
 		AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9690100A2F7DD2AC90139B89 /* ScanReader.swift */; };
 		AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73C34594A1DA3A80DA79A05 /* Spotlight.swift */; };
@@ -71,6 +72,7 @@
 		DD55D6B73E0869B435C703D6 /* OrderEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D996B5E908CAAEA38BE946D /* OrderEmail.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
 		DFAC0D3F3D4C343CC54022BB /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
+		E7E36B97B6E5232E78BE6B24 /* DuplicatePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CBA3966D5474BD1C5AF970 /* DuplicatePlaces.swift */; };
 		EB966890C60DC9CA8A89420C /* HereaboutsControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840994DA311385611BD55A2F /* HereaboutsControls.swift */; };
 		F0B1C83EBB9EB2928A914AC0 /* RitualViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22648BF6C6BEC527A3DBC941 /* RitualViews.swift */; };
 		F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */; };
@@ -152,6 +154,7 @@
 		495FD0CD72900A5932FC8DE9 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		4A566E279AA3E08ADBA1C450 /* AtkinsonHyperlegible-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Regular.ttf"; sourceTree = "<group>"; };
 		4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBackup.swift; sourceTree = "<group>"; };
+		4BABBA14900028F94ABED25B /* DuplicatePlacesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatePlacesTests.swift; sourceTree = "<group>"; };
 		4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingView.swift; sourceTree = "<group>"; };
 		501CA93C23A339C49D35AA3D /* Localiser.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Localiser.entitlements; sourceTree = "<group>"; };
 		5069E12580E69C9EE6901EAC /* LocaliserV8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV8.xcdatamodel; sourceTree = "<group>"; };
@@ -166,6 +169,7 @@
 		6A479972608E485C29556D57 /* LocaliserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserApp.swift; sourceTree = "<group>"; };
 		6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoLibrary.swift; sourceTree = "<group>"; };
 		6EE4809D10B04BE9A39FB756 /* HomesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomesView.swift; sourceTree = "<group>"; };
+		71CBA3966D5474BD1C5AF970 /* DuplicatePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatePlaces.swift; sourceTree = "<group>"; };
 		746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTests.swift; sourceTree = "<group>"; };
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		785940DE809D3794AA488637 /* Homes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homes.swift; sourceTree = "<group>"; };
@@ -261,6 +265,7 @@
 			isa = PBXGroup;
 			children = (
 				FCA4F5A37C76D31EF393EB90 /* BoxLabels.swift */,
+				71CBA3966D5474BD1C5AF970 /* DuplicatePlaces.swift */,
 				6EE4809D10B04BE9A39FB756 /* HomesView.swift */,
 				F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */,
 				953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */,
@@ -362,6 +367,7 @@
 			children = (
 				E4830CE7139FF6711AB1EFDA /* AppLinkTests.swift */,
 				2BE993F1CE374783F6D1BB8F /* BoxLabelTests.swift */,
+				4BABBA14900028F94ABED25B /* DuplicatePlacesTests.swift */,
 				2863FFD39C6F0B33AEEE6EE4 /* FindingTests.swift */,
 				2D3457C1DD9B16B068DE78F8 /* HomesTests.swift */,
 				796960A07F97C020E62944E3 /* IntentsTests.swift */,
@@ -600,6 +606,7 @@
 			files = (
 				4636EB3F5C930EA1A8B0DFF0 /* AppLinkTests.swift in Sources */,
 				CBE7A67F93F5679BB5F0627E /* BoxLabelTests.swift in Sources */,
+				9CD309E6883093FB8EA60265 /* DuplicatePlacesTests.swift in Sources */,
 				20874F8ED8AD6F6763DE22BE /* FindingTests.swift in Sources */,
 				F993D8ABDA51B08E5B9635A0 /* HomesTests.swift in Sources */,
 				77FB78B5D6ABB46495F54672 /* IntentsTests.swift in Sources */,
@@ -644,6 +651,7 @@
 				DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */,
 				723298C2EE434DF675B9562B /* DesignSystem.swift in Sources */,
 				3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */,
+				E7E36B97B6E5232E78BE6B24 /* DuplicatePlaces.swift in Sources */,
 				93A170C63D8339AC3420650A /* FindView.swift in Sources */,
 				0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */,
 				325B36BA7A564D10338A0ECC /* Homes.swift in Sources */,

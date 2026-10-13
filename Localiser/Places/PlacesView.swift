@@ -8,11 +8,27 @@ struct PlacesView: View {
     @State private var scanning = false
     @State private var labelled: Place?
     @State private var unknownLabel = false
+    @State private var tidying = false
     private let starters = ["Kitchen", "Bedroom", "Garage", "Hall cupboard", "Office", "Loft"]
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HomeSwitcher()
+                let spares = store.sparePlaces
+                if !spares.isEmpty {
+                    StickyNote {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(spares.count == 1 ? "\u{201C}\(spares[0].path)\u{201D} is an empty copy of another place." : "\(spares.count) empty places are copies of others, like \u{201C}\(spares[0].path)\u{201D}.")
+                                .font(.wbBody).foregroundStyle(Theme.ink)
+                            Button("Tidy up") { tidying = true }.buttonStyle(SoftButtonStyle()).accessibilityIdentifier("places.tidy")
+                        }
+                    }
+                    .confirmationDialog("Fold the empty copies into the places they copy?", isPresented: $tidying, titleVisibility: .visible) {
+                        Button(spares.count == 1 ? "Fold in 1 place" : "Fold in \(spares.count) places") {
+                            do { try store.mergeSparePlaces() } catch { self.error = error.localizedDescription }
+                        }
+                    } message: { Text("Only places with nothing written down in them are folded in. Anything inside them moves across.") }
+                }
                 if store.placesHere.isEmpty {
                     LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
                     quickStart(starters)
