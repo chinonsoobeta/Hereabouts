@@ -15,6 +15,25 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'platform
 
 Run the logic tests with `test -only-testing:LocaliserTests` and the UI tests with `test -only-testing:LocaliserUITests`.
 
+There are two targets. `Localiser` is the app. `HereaboutsControls` is a small extension holding the Control Centre and Lock Screen button, "Put something away". It only opens the app, so it needs no App Group and builds on a free Personal Team.
+
+Phone installs on the free team pass `HEREABOUTS_FREE_THINGS=200`, because they can't buy Pro.
+
+## Links and shortcuts
+
+The app opens these links, from the app icon's shortcuts, Siri, box labels and (later) the widget:
+
+| Link | Opens |
+| --- | --- |
+| `hereabouts://find` | Find, with the search field focused |
+| `hereabouts://new` | The new-thing screen |
+| `hereabouts://putaway` | The new-thing screen, camera first |
+| `hereabouts://due` | Due |
+| `hereabouts://item/<id>` | A thing |
+| `hereabouts://place/<id>` | A place; box labels carry this as a QR code |
+
+App Shortcuts cover finding a thing, writing one down, putting something away, "I found my…" and what's due.
+
 ## Test fixtures
 
 Two UI tests need synthetic files in the test simulator. Never seed a personal phone.
@@ -32,6 +51,9 @@ Launch arguments for manual checks:
 | `--ui-test-library <UUID>` | Opens a fresh, separate library and skips the introduction |
 | `--demo-library` | Fills that library with sample places, items, dates and kits |
 | `--show-onboarding` | Shows the introduction again |
+| `--show-tips` | Shows the sticky-note tips, which UI tests otherwise hide |
+| `--open-ritual recap` or `stocktake` | Opens the Sunday recap or the monthly stocktake |
+| `--stand-in-shelf-reader` | Debug builds: "Several things in this photo?" returns Drill, Spirit level and Tape measure instead of asking the on-device model |
 
 ## Screenshots
 
@@ -46,6 +68,12 @@ The test turns reminders on before the first shot, so Due shows no warning. The 
 ## Purchases
 
 `LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.localiser.pro.monthly` at US$2.99 and `dev.localiser.pro.yearly` at US$19.99, each with a two-week free trial) and `dev.localiser.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 20 things, set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
+
+## Notebook data
+
+The Core Data model is at V8. Above places sits `Home`: things, places, kits and trips each belong to one, and a notebook from before V8 lands in one home named as before. The current home lives in `UserDefaults` (`currentHomeID`); the home's name is in the record, and `homeName` only mirrors the current one for the Find subtitle and the recap.
+
+Backups are JSON, format 3 (`LibraryBackup.currentVersion`). Formats 1 and 2 still restore; anything they lack, such as homes or who made a move, is filled in on restore. The spreadsheet export has a `home` column after the name.
 
 ## Where things are
 

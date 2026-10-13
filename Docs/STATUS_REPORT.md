@@ -1,3 +1,34 @@
+# Status report — 12 October 2026
+
+You asked for the whole feature plan: Phase A, then as much of Phase B as works without the paid account. Everything is committed locally on `main`. Nothing was pushed, uploaded or published.
+
+Phase A is done, A1 to A10: the subscription, private things, Found it, quick wins, Lent to, camera-first Put away with the Control Centre button, box labels, pasting an order email, and naming a shelf from one photo.
+
+Phase B, as far as it goes before enrolment:
+
+| Step | State |
+| --- | --- |
+| B5 Homes | **Done** (`3c7ac8d`). More than one home, a switcher on Find and Places, Settings › Homes. Two homes on the free plan. |
+| B6 Household sharing | Groundwork (`ecc2553`): every move records who made it. Sharing itself needs iCloud. |
+| B4 iCloud sync | Groundwork (`692fd19`): Places offers to tidy up empty copies of a place, the problem two phones set up apart would cause. Sync needs the paid account. |
+| B1 Shared notebook file | Groundwork (`afb5362`): moving the notebook with its photos, and reading changes from other processes, both tested. Switching it on needs an App Group. |
+| B2 Widget | Waiting for your word that you've enrolled, as agreed. |
+| B3 Share sheet, B7 TestFlight | Need the paid account. |
+
+`HUMAN_BLOCKED.md` has a row for each, with what to do. One thing only your phone can tell us: whether "Several things in this photo?" names a real shelf well. It needs Apple Intelligence on.
+
+Last runs:
+
+| Suite | Result |
+| --- | --- |
+| Unit tests, iOS 27 | **110 of 110** passed |
+| Unit tests, iOS 26.5 | **110**: 104 passed, 6 skipped (purchase tests need iOS 27's local StoreKit), 0 failed |
+| UI tests, iOS 26.5 | **18**: 17 passed, the screenshot test skipped itself as designed |
+
+Your phones have the build from before A1. Free-team installs stop opening on **Sat 17 Oct at 12:11 PDT**. Reinstall before then to get everything above.
+
+---
+
 # Status report — 10 October 2026
 
 ## This morning: the end-to-end sweep
