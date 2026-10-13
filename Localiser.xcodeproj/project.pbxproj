@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00F23149788730C9B46F3D62 /* ShelfPhotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */; };
 		0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E822257E4E7F4DD2DD6454C /* Finding.swift */; };
 		10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56936067B918AEFABF8680BB /* ScanView.swift */; };
 		17A3067D0A104EFF1BCC30D7 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */; };
@@ -34,6 +35,7 @@
 		6420857F484D25F7378A0505 /* Lending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024256BC9684B9B0C8066558 /* Lending.swift */; };
 		67FB59F06A60287DEE855233 /* BoxLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA4F5A37C76D31EF393EB90 /* BoxLabels.swift */; };
 		6B45D3468D549925ABFB994C /* Rituals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECED7D62F188EA3BF86B26C /* Rituals.swift */; };
+		6D238D0A3848A3ADE503BD46 /* ShelfPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8870DF501521F78C26C26D /* ShelfPhoto.swift */; };
 		719454CA26F6D3FA20E43E6D /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
 		723298C2EE434DF675B9562B /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495FD0CD72900A5932FC8DE9 /* DesignSystem.swift */; };
 		73184C07C0834BF531F95BBB /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A21167AF6F6CAEF79448DE /* Records.swift */; };
@@ -177,11 +179,13 @@
 		B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-BoldItalic.ttf"; sourceTree = "<group>"; };
 		B49010154C3398D4E23CF9AF /* LendingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LendingTests.swift; sourceTree = "<group>"; };
 		B5125DB3495BBECED9AFA8D3 /* PutAway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAway.swift; sourceTree = "<group>"; };
+		B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfPhotoTests.swift; sourceTree = "<group>"; };
 		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
 		CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoDeletionToast.swift; sourceTree = "<group>"; };
 		DB1A82975351814180D15AAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DBCC79A8C661311C9C70A285 /* ProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProView.swift; sourceTree = "<group>"; };
+		DD8870DF501521F78C26C26D /* ShelfPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfPhoto.swift; sourceTree = "<group>"; };
 		DE95939E5941898426B7EBDF /* DateRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRules.swift; sourceTree = "<group>"; };
 		E25EBA641962B55EE0850C76 /* DueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueView.swift; sourceTree = "<group>"; };
 		E4830CE7139FF6711AB1EFDA /* AppLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLinkTests.swift; sourceTree = "<group>"; };
@@ -274,6 +278,7 @@
 				0E29FE6FB9A6F892A2BEE1EE /* LendSheet.swift */,
 				B5125DB3495BBECED9AFA8D3 /* PutAway.swift */,
 				153312694358421F11F17E69 /* Search.swift */,
+				DD8870DF501521F78C26C26D /* ShelfPhoto.swift */,
 				CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */,
 			);
 			path = Find;
@@ -358,6 +363,7 @@
 				879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */,
 				3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */,
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
+				B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */,
 				746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */,
 			);
 			path = LocaliserTests;
@@ -593,6 +599,7 @@
 				3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */,
 				4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */,
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
+				00F23149788730C9B46F3D62 /* ShelfPhotoTests.swift in Sources */,
 				35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -654,6 +661,7 @@
 				AB142BE21D98D05934EECF72 /* ScanReader.swift in Sources */,
 				10DA8E3CFA9BEB7FCF65C4D2 /* ScanView.swift in Sources */,
 				BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */,
+				6D238D0A3848A3ADE503BD46 /* ShelfPhoto.swift in Sources */,
 				AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */,
 				8E221F011A35DF4EF41035F1 /* Support.swift in Sources */,
 				883F90525273EB06CDF36579 /* Tips.swift in Sources */,

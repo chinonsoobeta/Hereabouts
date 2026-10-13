@@ -279,6 +279,7 @@ struct ItemEditor: View {
     @State private var suggestion: ItemSearch.CaptureSuggestion?
     @State private var nameIdeas: [String] = []
     @State private var upgrade = false
+    @State private var several = false
     @FocusState private var nameFocused: Bool
     /// Photo-first capture: the camera opens before the name. The place starts at the last one used.
     private let photoFirst: Bool
@@ -336,6 +337,10 @@ struct ItemEditor: View {
                             }
                         }
                     }
+                }
+                if item == nil, photo != nil, ShelfReading.reader != nil {
+                    Button("Several things in this photo?", systemImage: "square.grid.2x2") { nameFocused = false; several = true }
+                        .font(.subheadline).accessibilityIdentifier("item.several")
                 }
                 if item == nil && name.split(separator: " ").count >= 3 && suggestion == nil {
                     Button("Split into name and place", systemImage: "wand.and.stars") {
@@ -400,6 +405,11 @@ struct ItemEditor: View {
             Task { nameIdeas = await NameSuggestions.read(new) }
         }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
+        .sheet(isPresented: $several) {
+            if let photo, let reader = ShelfReading.reader {
+                NavigationStack { ShelfNamesView(photo: photo, reader: reader, placeID: $placeID) { dismiss() } }
+            }
+        }
         .photosPicker(isPresented: $choosingPhoto, selection: $selectedPhoto, matching: .images)
         .fullScreenCover(isPresented: $takingPhoto) { CameraPicker { photo = PhotoResize.jpeg($0) }.ignoresSafeArea() }
         .onChange(of: selectedPhoto) { _, newValue in

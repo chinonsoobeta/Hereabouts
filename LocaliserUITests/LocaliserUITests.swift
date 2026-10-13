@@ -183,6 +183,45 @@ import XCTest
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
     }
 
+    func testSeveralThingsFromOnePhoto() throws {
+        #if targetEnvironment(simulator)
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--stand-in-shelf-reader"]
+        app.launch()
+        app.tabBars.buttons["Find"].tap()
+        app.buttons["Add a thing"].tap()
+        XCTAssertFalse(app.buttons["item.several"].exists, "Only offered once there's a photo")
+        app.buttons["Add photo"].tap()
+        app.buttons["Choose from library"].tap()
+        XCTAssertTrue(app.staticTexts["Loading..."].firstMatch.waitForNonExistence(timeout: 20))
+        let picker = app.navigationBars["Photos"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 10))
+        let onboardingClose = app.buttons["Close"].firstMatch
+        if onboardingClose.exists { onboardingClose.tap() }
+        let fixture = app.images["PXGGridLayout-Info"].firstMatch
+        XCTAssertTrue(fixture.waitForExistence(timeout: 10))
+        fixture.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(picker.waitForNonExistence(timeout: 10))
+        let several = app.buttons["item.several"]
+        XCTAssertTrue(several.waitForExistence(timeout: 5), app.debugDescription)
+        several.tap()
+        let save = app.buttons["shelf.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textFields["Tape measure"].waitForExistence(timeout: 5) || app.textFields.matching(NSPredicate(format: "value == 'Tape measure'")).firstMatch.exists, app.debugDescription)
+        XCTAssertEqual(save.label, "Write down 3 things")
+        app.switches["Include Tape measure"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertEqual(save.label, "Write down 2 things")
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        save.tap()
+        XCTAssertTrue(save.waitForNonExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["item.save"].exists, "The new-thing sheet closes too")
+        XCTAssertTrue(app.staticTexts["Drill"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Spirit level"].exists)
+        XCTAssertFalse(app.staticTexts["Tape measure"].exists)
+        #endif
+    }
+
     func testAppLinksOpenWritingDownAndDue() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
