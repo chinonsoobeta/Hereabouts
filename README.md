@@ -50,6 +50,7 @@ The test turns reminders on before the first shot, so Due shows no warning. The 
 ## Where things are
 
 - `Docs/AUDIT_AND_LAUNCH_PLAN.md` holds the plan being implemented.
+- `Docs/FEATURE_PLAN.md` plans the subscription and the features agreed on 12 October 2026.
 - `Docs/BUILD_STATUS.md` records what was built and verified.
 - `Docs/HUMAN_BLOCKED.md` lists what only the owner can do.
 - `Docs/BETA_AND_RELEASE.md` has the beta script and listing drafts.
