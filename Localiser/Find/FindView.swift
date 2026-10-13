@@ -323,12 +323,15 @@ struct ItemEditor: View {
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
-            Button(item == nil ? "Write it down" : "Save changes") { save() }
-                .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier("item.save")
-                .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .padding(.horizontal, 20).padding(.vertical, 12)
-                .background(Theme.ground)
+            VStack(spacing: 8) {
+                if let left = freeLeft { Text(left).font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity, alignment: .leading) }
+                Button(item == nil ? "Write it down" : "Save changes") { save() }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .accessibilityIdentifier("item.save")
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding(.horizontal, 20).padding(.vertical, 12)
+            .background(Theme.ground)
         }
         .navigationTitle(item == nil ? "New thing" : "Edit thing").navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -360,6 +363,18 @@ struct ItemEditor: View {
             }
         }
         .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    /// A quiet note when three or fewer things are left on the free plan.
+    private var freeLeft: String? {
+        guard item == nil, !pro.unlocked else { return nil }
+        let left = CreationKind.item.freeLimit - store.activeItemCount
+        switch left {
+        case ...0: return "The free plan is full. Archive something, or get Pro to keep adding."
+        case 1: return "1 more thing fits on the free plan."
+        case 2...3: return "\(left) more things fit on the free plan."
+        default: return nil
+        }
     }
 
     private func counter(_ text: String, _ limit: Int) -> some View {

@@ -11,6 +11,7 @@ settings:
     # Public website and support address. Replace once hereabouts.app (or another domain) is live.
     HEREABOUTS_SITE_URL: https://hereabouts.app
     HEREABOUTS_SUPPORT_EMAIL: support@hereabouts.app
+    HEREABOUTS_FREE_THINGS: '20'
 targets:
   Localiser:
     type: application
@@ -31,8 +32,8 @@ targets:
           - "AtkinsonHyperlegible-Regular.ttf"
           - "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"
           - "Fraunces[SOFT,WONK,opsz,wght].ttf"
-        # True during the 8-week Founder's launch price; shows the regular price struck through.
-        HereaboutsFoundersPricing: true
+        # Things the free plan holds. Builds installed straight onto a phone pass HEREABOUTS_FREE_THINGS=200.
+        HereaboutsFreeThings: $(HEREABOUTS_FREE_THINGS)
         NSUserActivityTypes: [com.apple.corespotlightitem]
         CFBundleURLTypes:
           - CFBundleURLName: dev.localiser.app

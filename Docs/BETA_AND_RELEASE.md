@@ -16,7 +16,7 @@ Start with a small consented group of household organisers, frequent shoppers an
 | Complete a packing cycle | Plan a trip from a kit, pack, tick tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
 | Recover a library | Back up with selected files, restore into a fresh install | Record counts, attachments, trip progress |
 
-Ask whether they opened Hereabouts again without prompting, which problem it solved, whether $9.99 once feels fair, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
+Ask whether they opened Hereabouts again without prompting, which problem it solved, whether US$2.99 a month, US$19.99 a year or US$49.99 once feels fair, and which they'd pick, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
 
 ## Frozen quality check
 
@@ -55,14 +55,14 @@ No public launch with an open data-loss defect, a silently accepted wrong date o
 | Primary category | Productivity | |
 | Secondary category | Utilities | |
 | Age rating | 4+ | |
-| Price | Free with a US$4.99 in-app Founder's price, then US$9.99 | |
+| Price | Free, with Hereabouts Pro at US$2.99 a month or US$19.99 a year (two weeks free), or US$49.99 once | |
 | Keywords | `where,find,belongings,inventory,home,organizer,receipt,return,warranty,packing,list,storage,lost` | 100 |
 
 The keywords leave out "Hereabouts", plurals and category names because the App Store already indexes those.
 
 **Promotional text** (170 characters, editable without review):
 
-> Founder's price: unlock everything for US$4.99, once. No subscription, no account. Free for up to 200 things.
+> Free for up to 20 things. Try Pro free for two weeks, or buy it once for life. No account, no ads, no tracking.
 
 **Description:**
 
@@ -86,7 +86,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > "Where is my passport?" Hereabouts answers from your notebook. Add things and hear what's due, hands-free.
 >
 > FAIR PRICE
-> Free for up to 200 things, 2 kits and 5 scans a month. Hereabouts Pro removes the limits for a single payment, shared with your family. No subscription, ever. Every feature is in the free version.
+> Free for up to 20 things, 2 kits and 5 scans a month. Hereabouts Pro removes the limits, shared with your family: US$2.99 a month or US$19.99 a year after a two-week free trial, or US$49.99 once. If Pro ends, nothing you wrote down is locked away. Every feature is in the free version.
 
 Before publishing, check each sentence against the shipped build. Do not claim sync, sharing between people or guaranteed reminders.
 
@@ -98,7 +98,7 @@ Use the demo library with the Debug-only launch argument `--demo-library` on a 6
 2. **Scan review** with a confirmed "Return by" date. Caption: "Scan a receipt. Never miss a return".
 3. **Due soon** with return and warranty sections. Caption: "Every deadline in one place".
 4. **Trip detail** with packing progress. Caption: "Pack once, reuse forever".
-5. **Pro screen** or a plain caption card. Caption: "No account. No subscription. Export anytime".
+5. **Pro screen** or a plain caption card. Caption: "No account. Nothing locked away. Export anytime".
 
 Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remove any real names or numbers from documents shown on screen.
 

@@ -45,7 +45,7 @@ The test turns reminders on before the first shot, so Due shows no warning. The 
 
 ## Purchases
 
-`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines `dev.localiser.pro.lifetime` at the US$4.99 Founder's price with Family Sharing. The real product must be created in App Store Connect before release.
+`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.localiser.pro.monthly` at US$2.99 and `dev.localiser.pro.yearly` at US$19.99, each with a two-week free trial) and `dev.localiser.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 20 things, set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
 
 ## Where things are
 

@@ -15,6 +15,7 @@
 		2A50FFFFB8829E8AE690F13F /* LibrarySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */; };
 		2C92F7BEA31894EE1AAF9BED /* ProAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A30538423261835CD54AD5A /* ProAccess.swift */; };
 		320D35A448C990008ED39806 /* Localiser.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */; };
+		35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */; };
 		3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688EA727718F4AD230A48BBB /* LocaliserStore.swift */; };
 		3DBEA5A3D85A8BD5737A186E /* DueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25EBA641962B55EE0850C76 /* DueView.swift */; };
 		4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */; };
@@ -108,6 +109,7 @@
 		69C7E4D9B7BFE1016E67E998 /* fraunces-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fraunces-OFL.txt"; sourceTree = "<group>"; };
 		6A479972608E485C29556D57 /* LocaliserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserApp.swift; sourceTree = "<group>"; };
 		6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoLibrary.swift; sourceTree = "<group>"; };
+		746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTests.swift; sourceTree = "<group>"; };
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		796960A07F97C020E62944E3 /* IntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentsTests.swift; sourceTree = "<group>"; };
 		838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Bold.ttf"; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
+				746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */,
 			);
 			path = LocaliserTests;
 			sourceTree = "<group>";
@@ -472,6 +475,7 @@
 				77FB78B5D6ABB46495F54672 /* IntentsTests.swift in Sources */,
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
+				35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,6 +588,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEREABOUTS_FREE_THINGS = 20;
 				HEREABOUTS_SITE_URL = "https://hereabouts.app";
 				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -711,6 +716,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEREABOUTS_FREE_THINGS = 20;
 				HEREABOUTS_SITE_URL = "https://hereabouts.app";
 				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

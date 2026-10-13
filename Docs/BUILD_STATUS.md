@@ -80,7 +80,7 @@ The user connected an iPhone 16 Pro Max on iOS 27.0.1 and authorized testing wit
 
 ```sh
 python3 -c 'import plistlib; plistlib.dump({}, open("/private/tmp/localiser-personal.entitlements", "wb"))'
-xcodebuild -project Localiser.xcodeproj -scheme Localiser -configuration Debug -destination 'platform=iOS,id=00008140-000659260A84801C' -derivedDataPath DerivedData/PersonalDeviceLocal -jobs 10 -allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=BRLCAAM57K CODE_SIGN_STYLE=Automatic CODE_SIGN_ENTITLEMENTS=/private/tmp/localiser-personal.entitlements LOCALISER_CLOUD_CONTAINER= build
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -configuration Debug -destination 'platform=iOS,id=00008140-000659260A84801C' -derivedDataPath DerivedData/PersonalDeviceLocal -jobs 10 -allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=BRLCAAM57K CODE_SIGN_STYLE=Automatic CODE_SIGN_ENTITLEMENTS=/private/tmp/localiser-personal.entitlements LOCALISER_CLOUD_CONTAINER= HEREABOUTS_FREE_THINGS=200 build
 xcrun devicectl device install app --device 00008140-000659260A84801C DerivedData/PersonalDeviceLocal/Build/Products/Debug-iphoneos/Localiser.app
 xcrun devicectl device process launch --device 00008140-000659260A84801C dev.localiser.app
 ```
@@ -196,7 +196,7 @@ Result: `DerivedData/SmallScreen/Logs/Test/Test-Localiser-2026.10.07_23-09-06--0
 The unsigned Release rebuild including the final scan Done and warning-colour adjustments succeeded (`/private/tmp/localiser-release-final-reviewed-build.log`). Final signed Release compilation then reached code signing using the existing Personal Team:
 
 ```sh
-xcodebuild -project Localiser.xcodeproj -scheme Localiser -configuration Release -destination 'platform=iOS,id=00008140-000659260A84801C' -derivedDataPath DerivedData/PersonalDeviceFinal -jobs 10 -allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=BRLCAAM57K CODE_SIGN_STYLE=Automatic CODE_SIGN_ENTITLEMENTS=/private/tmp/localiser-personal.entitlements LOCALISER_CLOUD_CONTAINER= build
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -configuration Release -destination 'platform=iOS,id=00008140-000659260A84801C' -derivedDataPath DerivedData/PersonalDeviceFinal -jobs 10 -allowProvisioningUpdates -allowProvisioningDeviceRegistration DEVELOPMENT_TEAM=BRLCAAM57K CODE_SIGN_STYLE=Automatic CODE_SIGN_ENTITLEMENTS=/private/tmp/localiser-personal.entitlements LOCALISER_CLOUD_CONTAINER= HEREABOUTS_FREE_THINGS=200 build
 ```
 
 The live codesign process and macOS SecurityAgent waited while computer-use inspection explicitly reported the Mac locked. The signing process was stopped; the command therefore finished **failed at CodeSign**, not successfully signed. Log: `/private/tmp/localiser-final-signed-release.log`. No lock protection was bypassed and no password was obtained. Unlock/native signing authorization is saved in HUMAN_BLOCKED.md. Do not install the partially signed output. The latest reviewed build has not yet been delivered.

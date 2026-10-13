@@ -15,8 +15,24 @@ import XCTest
         app.buttons["Settings"].tap()
         let pro = app.buttons["Hereabouts Pro"]
         XCTAssertTrue(pro.waitForExistence(timeout: 5)); pro.tap()
+        // Three plans, yearly chosen first, and the trial button, from the local StoreKit configuration.
+        // iOS 26.5's local StoreKit service doesn't serve products, so the plan checks run on iOS 27.
+        let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
+        if yearly.waitForExistence(timeout: 10) {
+            XCTAssertTrue(yearly.isSelected)
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch.exists)
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
+            app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Lifetime'")).firstMatch.tap()
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Buy once for'")).firstMatch.waitForExistence(timeout: 3))
+        } else {
+            XCTAssertTrue(app.staticTexts["Pro isn't available to buy right now. Try again later."].exists)
+        }
+        for link in ["Privacy Policy", "Terms of Use"] {
+            let element = app.links[link].exists ? app.links[link] : app.buttons[link]
+            reveal(element, in: app); XCTAssertTrue(element.exists, "\(link) link is missing")
+        }
         let restorePurchase = app.buttons["Restore purchases"]
-        for _ in 0..<8 { if restorePurchase.isHittable { break }; app.swipeUp() }
+        reveal(restorePurchase, in: app)
         XCTAssertTrue(restorePurchase.isHittable)
         let paywall = XCTAttachment(screenshot: app.screenshot()); paywall.name = "Lifetime Pro"; paywall.lifetime = .keepAlways; add(paywall)
         try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
@@ -260,7 +276,7 @@ import XCTest
         app.buttons["Settings"].tap()
         let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
-        recordTypography(app, labels: ["Pay once. Keep it forever."], name: "Pro")
+        recordTypography(app, labels: ["Hereabouts Pro"], name: "Pro")
         reveal(app.buttons["Restore purchases"], in: app)
         let paywall = XCTAttachment(screenshot: app.screenshot())
         paywall.name = "Typography audit Pro"; paywall.lifetime = .keepAlways; add(paywall)
@@ -289,7 +305,7 @@ import XCTest
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
                 if ["Packing kits", "Pro isn't available to buy right now. Try again later.", "Restore purchases"].contains(element.label) { return true }
-                if element.label.hasSuffix("One payment, shared with your family. No subscription, ever.") { return true }
+                if element.label == "No limit on what you write down. Shared with your family." { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,
             // yet the contrast audit samples the card's soft shadow edge and reports a failure.

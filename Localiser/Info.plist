@@ -29,8 +29,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>HereaboutsFoundersPricing</key>
-	<true/>
+	<key>HereaboutsFreeThings</key>
+	<string>$(HEREABOUTS_FREE_THINGS)</string>
 	<key>HereaboutsSiteURL</key>
 	<string>$(HEREABOUTS_SITE_URL)</string>
 	<key>HereaboutsSupportEmail</key>

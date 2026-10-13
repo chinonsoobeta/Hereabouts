@@ -3,11 +3,11 @@
   "nonRenewingSubscriptions" : [],
   "products" : [
     {
-      "displayPrice" : "4.99",
+      "displayPrice" : "49.99",
       "familyShareable" : true,
       "internalID" : "6422170010",
       "localizations" : [
-        { "description" : "Unlimited things, kits and scans. Pay once.", "displayName" : "Hereabouts Pro", "locale" : "en_US" }
+        { "description" : "Unlimited things, kits and scans. Pay once.", "displayName" : "Hereabouts Pro Lifetime", "locale" : "en_US" }
       ],
       "productID" : "dev.localiser.pro.lifetime",
       "referenceName" : "Hereabouts Pro Lifetime (local testing)",
@@ -15,6 +15,50 @@
     }
   ],
   "settings" : { "_failTransactionsEnabled" : false, "_locale" : "en_US", "_storefront" : "USA" },
-  "subscriptionGroups" : [],
+  "subscriptionGroups" : [
+    {
+      "id" : "21500001",
+      "localizations" : [],
+      "name" : "Hereabouts Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "19.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "6422170012",
+          "introductoryOffer" : { "internalID" : "6422170022", "numberOfPeriods" : 1, "paymentMode" : "free", "subscriptionPeriod" : "P2W" },
+          "localizations" : [
+            { "description" : "Unlimited things, kits and scans, billed yearly.", "displayName" : "Hereabouts Pro Yearly", "locale" : "en_US" }
+          ],
+          "productID" : "dev.localiser.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Hereabouts Pro Yearly (local testing)",
+          "subscriptionGroupID" : "21500001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : []
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "2.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "6422170011",
+          "introductoryOffer" : { "internalID" : "6422170021", "numberOfPeriods" : 1, "paymentMode" : "free", "subscriptionPeriod" : "P2W" },
+          "localizations" : [
+            { "description" : "Unlimited things, kits and scans, billed monthly.", "displayName" : "Hereabouts Pro Monthly", "locale" : "en_US" }
+          ],
+          "productID" : "dev.localiser.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Hereabouts Pro Monthly (local testing)",
+          "subscriptionGroupID" : "21500001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : []
+        }
+      ]
+    }
+  ],
   "version" : { "major" : 3, "minor" : 0 }
 }

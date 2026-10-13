@@ -27,8 +27,8 @@ struct LibrarySettingsView: View {
         SheetList {
             Section {
                 NavigationLink { ProView(showsClose: false) } label: {
-                    NotebookLine(name: "Hereabouts Pro", detail: pro.unlocked ? "Unlocked. Thank you." : "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
-                }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.unlocked ? "Unlocked" : "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
+                    NotebookLine(name: "Hereabouts Pro", detail: pro.standing?.summary ?? "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
+                }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.standing?.summary ?? "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
             }
             Section {
                 TextField(Home.defaultName, text: $homeName).font(.wbItem).accessibilityLabel("Name of your home")
