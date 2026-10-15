@@ -70,7 +70,7 @@ Three word choices are yours:
 - The expiry kind says "Expires" rather than "Goes off", because its 180-day lead fits passports and licences.
 - British and American English are mixed: "The flat" and "Don't have it any more", but "canceled" and "Winter tires". The launch plan makes en-GB primary; tell me which way to go and I'll make it consistent.
 
-One design item: the app icon is still the pin-and-box mark, with no dark or tinted version. It works, but it predates the notebook look.
+The app icon is now B1, "Circled stamp", from the design canvas (`2c171f5`): a purple HERE stamp circled in marigold on paper, with a dark version for dark mode. iOS makes the tinted and clear looks from these.
 
 Last runs, after every fix above:
 

@@ -580,7 +580,7 @@ Word choices for the owner, not changed:
 - The expiry kind says "Expires" rather than the guide's "Goes off". The 180-day default lead suggests passports and licences, which expire rather than go off.
 - The copy mixes British words ("The flat", "Mum's house", "What shall we call home?", "Don't have it any more", "the shop's terms") with American spellings ("canceled", "Recognized text", "Winter tires"). The launch plan makes en-GB primary, with en-US alongside, so both were left for that pass.
 
-Design, for the owner: the app icon is still the pin-and-box mark from the Localiser days, with no dark or tinted version. It works, but it predates the notebook look.
+Design: the app icon was the pin-and-box mark from the Localiser days. It was replaced on 14 October; see "App icon" below.
 
 Results, with everything above included:
 - **iOS 26.5, iPhone 17 simulator, light, from a clean install** (`/private/tmp/hb-lightfinal.log`): unit tests **54**, 52 passed, 2 skipped (the purchase tests, whose local StoreKit service needs iOS 27), 0 failures. UI tests **11**: 9 passed, the screenshot test skipped itself as designed, and the backup restore test failed. Its picker opened on On My iPhone, where earlier runs had left enough backups to push the new one out of view. The test now searches for its backup, as the PDF test does. A first rerun still failed: it tapped a copy of the file in the folder underneath the search results, where it can't be tapped. Both tests now take the file from the search results, and rerun together, both passed (`/private/tmp/hb-pickerfix.log`). The only audit line was the exempt Pro pricing sentence.
@@ -615,3 +615,9 @@ Tests changed along the way:
 - The accessibility audit helper exempts contrast reports on text starting within 24 points under a hittable bar, where the audit samples the bar's blurred edge. This was checked by screenshot.
 - The order-email test also accepts a contrast report with no element: about half its runs report that same header without resolving it.
 - UI test launches clear the home name and current home, so one run's home doesn't name the next run's notebook.
+
+## App icon (Claude, 14 October)
+
+- `2c171f5` **B1, "Circled stamp".** A purple HERE stamp tilted 8 degrees, circled by a marigold pen loop, on paper. In dark mode the ground is night and the stamp lilac. `Docs/Design/icon/render-app-icon.swift` draws both 1024 px PNGs from the design canvas's geometry and the app's Atkinson Hyperlegible Bold. There's no tinted or clear image; iOS makes those from the icon.
+- Unit tests, iPhone 17 simulator, iOS 26.5: 114 run, 6 skipped, 0 failures. The built `Assets.car` holds the icon in light and dark.
+- Your iPhone 16 Pro Max: a Release build of `2c171f5` (`HEREABOUTS_FREE_THINGS=200`, with the Control Centre extension, `DerivedData/ControlSigning`) was installed over Wi-Fi at 20:11 PDT and opened. Fresh free-team profiles for the app and the extension run to Wed 21 Oct, 20:07 PDT. Angela's phone wasn't available, so her copy still stops on Sat 17 Oct, 12:11 PDT.
