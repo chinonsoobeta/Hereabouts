@@ -127,6 +127,23 @@ import CoreData
         XCTAssertTrue(fresh.places.allSatisfy { $0.home == fresh.currentHome })
     }
 
+    func testOlderRestoreOverANotebookSavesOnce() throws {
+        let source = try LocaliserStore(inMemory: true)
+        try source.addItem(name: "Kettle", place: try source.addPlace(name: "Kitchen"))
+        var older = try source.backup()
+        older.version = 2
+        older.records.removeAll { $0.entity == "Home" }
+        for index in older.records.indices { older.records[index].relationships["home"] = nil; older.records[index].attributes["by"] = nil }
+        let target = try LocaliserStore(inMemory: true)
+        try target.addHome(name: "The boat")
+        try target.addItem(name: "Rope")
+        try target.restore(try LibraryBackup.decoded(older.encoded()), replacingExisting: true)
+        XCTAssertEqual(target.homes.count, 1)
+        XCTAssertEqual(target.items.map(\.name), ["Kettle"])
+        XCTAssertTrue(target.items.allSatisfy { $0.home == target.currentHome })
+        XCTAssertFalse(target.context.hasChanges, "Nothing is left unsaved")
+    }
+
     func testEraseLeavesOneEmptyHome() throws {
         let store = try LocaliserStore(inMemory: true)
         try store.addHome(name: "The boat")

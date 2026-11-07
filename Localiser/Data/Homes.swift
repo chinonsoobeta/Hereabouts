@@ -68,7 +68,7 @@ import CoreData
 
     /// Notebooks from before homes, and restored older backups, get one home named as before.
     /// Anything without a home joins its place's home, or the first home.
-    func ensureHomes() throws {
+    func ensureHomes(saving: Bool = true) throws {
         let request = NSFetchRequest<HomeRecord>(entityName: "Home")
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
         let first = try context.fetch(request).first ?? insertHome(named: Home.name)
@@ -85,6 +85,6 @@ import CoreData
         for item in try orphans("Belonging") as [Belonging] { item.home = item.place?.home ?? first }
         for kit in try orphans("Kit") as [Kit] { kit.home = first }
         for trip in try orphans("TripRecord") as [TripRecord] { trip.home = first }
-        if context.hasChanges { try context.save() }
+        if saving, context.hasChanges { try context.save() }
     }
 }

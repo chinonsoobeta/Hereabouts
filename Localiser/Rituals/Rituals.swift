@@ -51,7 +51,7 @@ enum Rituals {
 
     @MainActor static func stale(_ items: [Belonging], now: Date = .now, calendar: Calendar = .current) -> [Belonging] {
         guard let cutoff = calendar.date(byAdding: .month, value: -staleMonths, to: now) else { return [] }
-        return items.filter { !$0.archived && !$0.isDeleted && !$0.isMissing && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
+        return items.filter { !$0.archived && !$0.isDeleted && !$0.isMissing && !$0.isLent && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
     }
 
     /// Up to five things to ask about this month, oldest confirmation first.
@@ -92,6 +92,11 @@ enum Rituals {
         return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
     }
 
+    /// The read week to use: a first launch counts the recap on offer as read, so day one shows no banner.
+    static func seededReadWeek(_ readWeek: String, now: Date = .now, calendar: Calendar = .current) -> String {
+        readWeek.isEmpty ? recapWeekKey(now: now, calendar: calendar) : readWeek
+    }
+
     struct Recap {
         var added: [String]
         var moved: Int
@@ -127,12 +132,12 @@ enum Rituals {
 
     // MARK: Trips
 
-    /// Trips still being packed that leave tomorrow or later, with at least one thing not yet in the bag.
+    /// Trips still being packed that leave tomorrow or later, with at least one thing not yet in the bag. Soonest first.
     @MainActor static func tripsNeedingEveReminder(_ trips: [TripRecord], now: Date = .now, calendar: Calendar = .current) -> [TripRecord] {
         let today = CalendarDay(now, calendar: calendar)
         return trips.filter { trip in
             guard trip.state == .packing, let start = CalendarDay(stored: trip.startDay), start > today else { return false }
             return trip.entries.contains { $0.packedCount < Int64($0.requiredCount) }
-        }
+        }.sorted { $0.startDay < $1.startDay }
     }
 }

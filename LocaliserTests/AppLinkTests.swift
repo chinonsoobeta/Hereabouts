@@ -32,4 +32,14 @@ final class AppLinkTests: XCTestCase {
         XCTAssertEqual(drill.whereItIsSentence, "Drill is with Sam.")
         XCTAssertNil(try store.addItem(name: "Torch").whereItIsSentence)
     }
+    func testMissingThingIsReportedAsMissing() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drawer = try store.addPlace(name: "Drawer")
+        let item = try store.addItem(name: "Passport", place: drawer)
+        try store.markMissing(item)
+        XCTAssertEqual(item.whereItIsSentence, "Passport is marked missing. It was last in Drawer.")
+        item.place = nil
+        XCTAssertEqual(item.whereItIsSentence, "Passport is marked missing.")
+    }
+
 }

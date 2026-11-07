@@ -807,4 +807,13 @@ final class LocaliserTests: XCTestCase {
         XCTAssertNil(kit.entries.first?.item)
         XCTAssertFalse(try store.backup().records.contains { ["Belonging", "Deadline", "Movement", "ScanRecord"].contains($0.entity) })
     }
+
+    func testReplayingTheIntroductionAtTheLimitSaysWhy() {
+        let free = ProAccess()
+        let atLimit = free.allows(.item, count: CreationKind.item.freeLimit)
+        XCTAssertEqual(OnboardingView.refusal(rewriting: false, allowed: atLimit), ItemEditor.freePlanFull)
+        XCTAssertNil(OnboardingView.refusal(rewriting: true, allowed: atLimit), "Rewriting the thing it just wrote is fine")
+        XCTAssertNil(OnboardingView.refusal(rewriting: false, allowed: free.allows(.item, count: CreationKind.item.freeLimit - 1)))
+        XCTAssertNil(OnboardingView.refusal(rewriting: false, allowed: true), "Pro allows any number")
+    }
 }

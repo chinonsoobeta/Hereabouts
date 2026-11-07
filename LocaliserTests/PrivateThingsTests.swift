@@ -24,6 +24,17 @@ final class PrivateThingsTests: XCTestCase {
         XCTAssertEqual(ThingEntity(passport).path, "Private")
     }
 
+    func testShortcutsPickerFindsAPrivateThingOnlyByName() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drawer = try store.addPlace(name: "Drawer")
+        let passport = try store.addItem(name: "Passport", place: drawer, notes: "drawer", isPrivate: true)
+        let kettle = try store.addItem(name: "Kettle", place: drawer)
+        XCTAssertEqual(ThingQuery.matches("drawer", in: store).map(\.id), [kettle.id])
+        let found = ThingQuery.matches("passport", in: store)
+        XCTAssertEqual(found.map(\.id), [passport.id])
+        XCTAssertEqual(found.map(ThingEntity.init).first?.path, "Private")
+    }
+
     func testRemindersLeaveThePrivateNameOut() throws {
         let store = try LocaliserStore(inMemory: true)
         let ring = try store.addItem(name: "Ring", isPrivate: true)

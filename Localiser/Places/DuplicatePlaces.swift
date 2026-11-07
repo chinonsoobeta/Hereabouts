@@ -22,6 +22,8 @@ import Foundation
             let group = places.filter { duplicateKey($0) == duplicateKey(spare) }
             let keeper = keeper(of: group)
             for child in spare.children { child.parent = keeper }
+            // A packed thing's return place moves across too, so coming home still knows where it goes.
+            for entry in trips.flatMap(\.entries) where entry.homePlace == spare { entry.homePlace = keeper }
             context.delete(spare)
             try save()
         }

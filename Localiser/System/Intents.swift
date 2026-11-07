@@ -48,8 +48,13 @@ struct ThingQuery: EntityStringQuery {
         return store.items.filter { identifiers.contains($0.id) && !$0.isDeleted }.map(ThingEntity.init)
     }
     @MainActor func entities(matching string: String) async throws -> [ThingEntity] {
-        let store = try IntentLibrary.open()
-        return ItemSearch.results(query: string, entries: store.searchIndex, archived: false).prefix(12).map(ThingEntity.init)
+        Self.matches(string, in: try IntentLibrary.open()).map(ThingEntity.init)
+    }
+    /// A private thing is only found by its name or another name, so a place or note doesn't give it away.
+    @MainActor static func matches(_ string: String, in store: LocaliserStore) -> [Belonging] {
+        ItemSearch.results(query: string, entries: store.searchIndex, archived: false)
+            .filter { !$0.isPrivate || ItemSearch.score(query: string, name: $0.name, aliases: $0.aliases, place: "", notes: "") != nil }
+            .prefix(12).map { $0 }
     }
     @MainActor func suggestedEntities() async throws -> [ThingEntity] {
         let store = try IntentLibrary.open()
@@ -62,22 +67,31 @@ struct PlaceEntity: AppEntity {
     static var defaultQuery: PlaceQuery { PlaceQuery() }
     var id: UUID
     var path: String
-    var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(path)") }
+    /// With several homes, the home leads: "Mum's house · Hall › Drawer".
+    var title: String
+    var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(title)") }
+    @MainActor init(_ place: Place, severalHomes: Bool) {
+        id = place.id; path = place.path
+        title = severalHomes ? place.home.map { "\($0.name) · \(place.path)" } ?? place.path : place.path
+    }
 }
 
 struct PlaceQuery: EntityStringQuery {
     @MainActor func entities(for identifiers: [UUID]) async throws -> [PlaceEntity] {
-        try IntentLibrary.open().places.filter { identifiers.contains($0.id) }.map { PlaceEntity(id: $0.id, path: $0.path) }
+        let store = try IntentLibrary.open()
+        return store.places.filter { identifiers.contains($0.id) }.map { PlaceEntity($0, severalHomes: store.hasSeveralHomes) }
     }
     @MainActor func entities(matching string: String) async throws -> [PlaceEntity] {
         let needle = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        return try IntentLibrary.open().places
+        let store = try IntentLibrary.open()
+        return store.places
             .filter { needle.isEmpty || $0.path.localizedStandardContains(needle) }
             .sorted { $0.path.count < $1.path.count }
-            .prefix(12).map { PlaceEntity(id: $0.id, path: $0.path) }
+            .prefix(12).map { PlaceEntity($0, severalHomes: store.hasSeveralHomes) }
     }
     @MainActor func suggestedEntities() async throws -> [PlaceEntity] {
-        try IntentLibrary.open().places.sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }.prefix(20).map { PlaceEntity(id: $0.id, path: $0.path) }
+        let store = try IntentLibrary.open()
+        return store.places.sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }.prefix(20).map { PlaceEntity($0, severalHomes: store.hasSeveralHomes) }
     }
 }
 
@@ -98,6 +112,7 @@ struct FindThingIntent: AppIntent {
         if item.isPrivate { return "That one's private. Open Hereabouts to see it." }
         let path = item.place?.path
         if item.archived { return path.map { "\(item.name) is archived. It was last in \($0)." } ?? "\(item.name) is archived." }
+        if item.isMissing { return path.map { "\(item.name) is marked missing. It was last in \($0)." } ?? "\(item.name) is marked missing." }
         if item.isLent { return item.lentAt.map { "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide)))." } ?? "\(item.name) is with \(item.lentTo)." }
         if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). It lives in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
         guard let path else { return "\(item.name) is written down, but without a place yet." }

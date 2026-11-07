@@ -107,20 +107,20 @@ struct LibraryBackup: Codable, Sendable {
     func restore(_ file: LibraryBackup, replacingExisting: Bool = false) throws {
         try validateBackup(file)
         forgetUndo()
-        if replacingExisting {
-            for entity in container.managedObjectModel.entities {
-                if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
-            }
-        } else {
-            // A new notebook already has its first, empty home. It gives way to the backup's homes.
-            for entity in container.managedObjectModel.entities where entity.name != "Home" {
-                if let name = entity.name, try context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: name)) > 0 { throw LocaliserError.libraryNotEmpty }
-            }
-            for home in try context.fetch(NSFetchRequest<HomeRecord>(entityName: "Home")) { context.delete(home) }
-        }
         let staging = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         staging.parent = context
         do {
+            if replacingExisting {
+                for entity in container.managedObjectModel.entities {
+                    if let name = entity.name { for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) { context.delete(object) } }
+                }
+            } else {
+                // A new notebook already has its first, empty home. It gives way to the backup's homes.
+                for entity in container.managedObjectModel.entities where entity.name != "Home" {
+                    if let name = entity.name, try context.count(for: NSFetchRequest<NSFetchRequestResult>(entityName: name)) > 0 { throw LocaliserError.libraryNotEmpty }
+                }
+                for home in try context.fetch(NSFetchRequest<HomeRecord>(entityName: "Home")) { context.delete(home) }
+            }
             var objects: [UUID: NSManagedObject] = [:]
             for record in file.records {
                 let object = NSEntityDescription.insertNewObject(forEntityName: record.entity, into: staging)
@@ -137,8 +137,9 @@ struct LibraryBackup: Codable, Sendable {
                 }
                 try object.validateForInsert()
             }
-            try staging.save(); try save()
-            try ensureHomes(); try refresh()
+            // One save: the restored records and any home they need land together.
+            try staging.save(); try ensureHomes(saving: false); try save()
+            try refresh()
         } catch { staging.rollback(); context.rollback(); try? refresh(); throw error }
     }
 

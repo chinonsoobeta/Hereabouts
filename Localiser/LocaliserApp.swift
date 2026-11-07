@@ -20,7 +20,7 @@ struct LocaliserApp: App {
                 url = directory.appendingPathComponent("UITests/\(id.uuidString)/Localiser.sqlite")
                 UserDefaults.standard.set(true, forKey: OnboardingView.seenKey)
                 UserDefaults.standard.removeObject(forKey: Rituals.stocktakeDoneKey)
-                UserDefaults.standard.removeObject(forKey: Rituals.recapReadKey)
+                UserDefaults.standard.set("2000-01-01", forKey: Rituals.recapReadKey) // An old read week, so the recap is on offer.
                 UserDefaults.standard.removeObject(forKey: ItemEditor.lastPlaceKey)
                 UserDefaults.standard.removeObject(forKey: Home.nameKey)
                 UserDefaults.standard.removeObject(forKey: LocaliserStore.currentHomeKey)
@@ -76,7 +76,7 @@ struct RootView: View {
         .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {
-            OnboardingView { seenOnboarding = true }
+            OnboardingView { seenOnboarding = true }.environment(pro)
         }
         .task { await pro.observeTransactions() }
         .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }
@@ -137,7 +137,7 @@ struct StoreFailureView: View {
                     Text("Nothing has been deleted. Restarting your phone often fixes this. If it keeps happening, save a copy of the notebook file and send it to us.").font(.wbBody).foregroundStyle(Theme.secondary)
                     if let reason { Text(reason).font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
                     if !files.isEmpty {
-                        ShareLink(items: files) { Label("Save a copy of the notebook file", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
+                        ShareLink(items: files) { Label("Save the notebook file (photos stay on this iPhone)", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
                     }
                     Link(destination: Support.mail(subject: "Notebook won't open", body: reason ?? "")) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
                 }

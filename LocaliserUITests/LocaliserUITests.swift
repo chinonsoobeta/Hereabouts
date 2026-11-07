@@ -24,6 +24,8 @@ import XCTest
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
             app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Lifetime'")).firstMatch.tap()
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Buy once for'")).firstMatch.waitForExistence(timeout: 3))
+        } else if #available(iOS 27, *) {
+            XCTFail("The plans should load on iOS 27 and later")
         } else {
             XCTAssertTrue(app.staticTexts["Pro isn't available to buy right now. Try again later."].exists)
         }
@@ -219,6 +221,11 @@ import XCTest
         XCTAssertTrue(app.staticTexts["Where do you keep things?"].exists, "The new home starts empty")
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "Homes switcher"; shot.lifetime = .keepAlways; self.add(shot)
+        app.tabBars.buttons["Trips"].tap()
+        let tripsSwitcher = app.buttons["home.switcher"]
+        XCTAssertTrue(tripsSwitcher.waitForExistence(timeout: 5), "Trips shows the chosen home")
+        XCTAssertEqual(tripsSwitcher.value as? String, "Mum's house")
+        app.tabBars.buttons["Places"].tap()
         switcher.tap()
         app.buttons.matching(NSPredicate(format: "label == 'Home' AND identifier != 'home.switcher'")).firstMatch.tap()
         XCTAssertTrue(app.staticTexts["Where do you keep things?"].waitForNonExistence(timeout: 5), app.debugDescription)

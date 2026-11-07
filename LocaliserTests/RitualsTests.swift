@@ -133,6 +133,19 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(Rituals.tripsNeedingEveReminder(store.trips).map(\.id), [ahead.id])
     }
 
+    func testTripEveRemindersGoToTheNearestTrips() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let today = CalendarDay(.now)
+        let item = try store.addItem(name: "Goggles", place: nil)
+        let kit = try store.addKit(name: "Ski")
+        _ = try store.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
+        for offset in (2...7).reversed() {
+            _ = try store.addTrip(TripDetails(name: "In \(offset)", start: today.adding(days: offset)!, end: today.adding(days: offset + 2)!), kit: kit)
+        }
+        let reminded = Rituals.tripsNeedingEveReminder(store.trips).prefix(5).map(\.name)
+        XCTAssertEqual(reminded, ["In 2", "In 3", "In 4", "In 5", "In 6"])
+    }
+
     func testV5LibrariesMigrateAndBackfillLastConfirmed() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -193,6 +206,25 @@ final class RitualsTests: XCTestCase {
         let clocksBack = calendar.date(from: DateComponents(year: 2026, month: 10, day: 25, hour: 17, minute: 30))!
         XCTAssertEqual(Rituals.recapWeekKey(now: clocksBack, calendar: calendar), "2026-10-18")
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 25, 18), calendar: calendar), "2026-10-25")
+    }
+
+    func testNoRecapBannerOnTheFirstDay() {
+        // First launch on Wednesday 7 October 2026: the recap on offer then counts as read.
+        let seeded = Rituals.seededReadWeek("", now: date(2026, 10, 7), calendar: calendar)
+        XCTAssertEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 7), calendar: calendar))
+        XCTAssertEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 11, 17), calendar: calendar), "No banner before the first Sunday 18:00")
+        XCTAssertNotEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 11, 18), calendar: calendar), "The first Sunday's recap is offered")
+        XCTAssertEqual(Rituals.seededReadWeek("2026-10-04", now: date(2026, 10, 11, 18), calendar: calendar), "2026-10-04")
+    }
+
+    func testStocktakeLeavesLentThingsOut() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let now = date(2026, 10, 10)
+        let drill = try store.addItem(name: "Drill", place: nil)
+        let saw = try store.addItem(name: "Saw", place: nil)
+        try store.confirm(drill, on: date(2026, 1, 1)); try store.confirm(saw, on: date(2026, 1, 1))
+        drill.lentTo = "Sam"
+        XCTAssertEqual(Rituals.stale(store.items, now: now, calendar: calendar).map(\.name), ["Saw"])
     }
 
     func testHomeNameReadsNaturallyMidSentence() {
