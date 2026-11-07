@@ -124,6 +124,21 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 
 Replace both links if the domain changes.
 
+## Reviewer walkthrough
+
+Ten steps from a fresh install to the paywall and back, for the review notes' reader and for the owner's own rehearsal (M45):
+
+1. Install the build on a clean phone and open Hereabouts. The introduction appears.
+2. Page through the introduction and tap through to the Find tab. No account or permission is asked for.
+3. Add a first thing by name, for example "Spare key", and save it.
+4. Add a place for it, for example "Hall shelf", and put the thing there.
+5. Go back to Find and search "key". The thing appears with its place.
+6. Open the Settings tab (bottom right) and check the four tabs: Find, Places, Trips, Settings.
+7. In Settings, tap Hereabouts Pro. The paywall shows the plans with the price from the App Store, the trial terms, that it renews automatically, Restore purchases, and the Privacy Policy and Terms of Use links.
+8. In the sandbox, buy a plan (or tap Restore purchases). The screen says Pro is on.
+9. Go back to Find and add things until the free limit would have been reached. With Pro on there is no limit. On a fresh install without Pro, the 16th thing opens the same paywall instead.
+10. Close the paywall and return to Find. Everything saved is still there.
+
 ## App Privacy label
 
 - **Data collection:** "Data Not Collected". Hereabouts has no server, analytics, advertising or tracking SDK.
