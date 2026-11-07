@@ -5,7 +5,7 @@ import WidgetKit
 /// Home screen and Lock Screen buttons. They only open the app and read nothing from the notebook.
 @main
 struct HereaboutsWidgets: WidgetBundle {
-    var body: some Widget { FindButtonsWidget() }
+    var body: some Widget { FindButtonsWidget(); LentOutWidget() }
 }
 
 struct ButtonsEntry: TimelineEntry { let date: Date }

@@ -91,19 +91,22 @@ targets:
         CURRENT_PROJECT_VERSION: '1'
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) HEREABOUTS_CONTROLS
         GENERATE_INFOPLIST_FILE: YES
-  # Home screen and Lock Screen buttons: Find and Say it. They only open the app and read nothing from the notebook.
+  # Home screen and Lock Screen buttons (Find and Say it), and the lent-out widget. The buttons read nothing from the
+  # notebook; the lent-out widget reads it read-only from the App Group.
   HereaboutsWidget:
     type: app-extension
     platform: iOS
     sources:
       - HereaboutsWidget
       - Localiser/System/WidgetButtons.swift
+      - Localiser/System/LentOutRows.swift
     info:
       path: HereaboutsWidget/Info.plist
       properties:
         CFBundleDisplayName: Hereabouts
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        HereaboutsAppGroup: $(HEREABOUTS_APP_GROUP)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
