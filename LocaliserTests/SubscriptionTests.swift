@@ -29,6 +29,9 @@ final class SubscriptionTests: XCTestCase {
         let pro = ProAccess()
         await pro.loadProduct(); await pro.refresh()
         XCTAssertEqual(Set(pro.products.keys), Set(ProPlan.allCases))
+        XCTAssertEqual(pro.trial(.monthly), "2 weeks", "Each plan is asked about its own trial")
+        XCTAssertEqual(pro.trial(.yearly), "2 weeks")
+        XCTAssertNil(pro.trial(.lifetime))
 
         await pro.purchase(.monthly)
         XCTAssertTrue(pro.unlocked, pro.message ?? "No purchase message")
@@ -37,6 +40,7 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertTrue(pro.message?.hasPrefix("Your free trial has started.") == true, pro.message ?? "")
         try await eventually(pro) { !pro.trialEligible }
         XCTAssertFalse(pro.trialEligible, "The trial is once per Apple Account")
+        XCTAssertNil(pro.trial(.yearly), "Used on monthly, so yearly no longer offers it either")
 
         let store = try LocaliserStore(inMemory: true)
         for index in 0..<(CreationKind.item.freeLimit + 2) {
@@ -110,11 +114,16 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(ProPricing.saving(yearly: Decimal(string: "19.99")!, monthly: Decimal(string: "2.99")!), 44)
         XCTAssertNil(ProPricing.saving(yearly: 40, monthly: 2.99))
         XCTAssertEqual(ProPricing.monthly(Decimal(string: "19.99")!), Decimal(string: "1.67")!)
-        XCTAssertEqual(ProPricing.terms(plan: .yearly, price: "$19.99", period: "a year", trial: true),
+        XCTAssertEqual(ProPricing.terms(plan: .yearly, price: "$19.99", period: "a year", trial: "2 weeks"),
                        "Free for 2 weeks, then $19.99 a year. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
-        XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: false),
+        XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: nil),
                        "$2.99 a month. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
-        XCTAssertEqual(ProPricing.terms(plan: .lifetime, price: "$49.99", period: "", trial: true), "One payment, shared with your family. Nothing renews.")
+        XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: "1 month"),
+                       "Free for 1 month, then $2.99 a month. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
+        XCTAssertEqual(ProPricing.trialLength(value: 2, unit: .week), "2 weeks")
+        XCTAssertEqual(ProPricing.trialLength(value: 1, unit: .month), "1 month")
+        XCTAssertEqual(ProPricing.trialLength(value: 3, unit: .day), "3 days")
+        XCTAssertEqual(ProPricing.terms(plan: .lifetime, price: "$49.99", period: "", trial: "2 weeks"), "One payment, shared with your family. Nothing renews.")
     }
 
     func testStandingSummaries() throws {

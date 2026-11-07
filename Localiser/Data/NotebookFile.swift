@@ -28,10 +28,18 @@ enum NotebookFile {
     /// notebook stays where it was.
     @MainActor static func location(legacy: URL, group: URL? = groupStoreURL(), defaults: UserDefaults = .standard) -> URL {
         guard let group else { return legacy }
+        let files = FileManager.default
         if defaults.bool(forKey: movedKey) {
+            // The copy is in use, so its counts may rightly differ from the original now. Only check it
+            // still opens; if it's gone or damaged, go back to the original and keep it.
+            guard files.fileExists(atPath: group.path), opens(group) else {
+                return files.fileExists(atPath: legacy.path) ? legacy : group
+            }
             try? removeOriginal(at: legacy)
             return group
         }
+        // Without the flag, a copy already there is left from a move that failed before it was used.
+        if files.fileExists(atPath: group.path), files.fileExists(atPath: legacy.path) { removeFiles(at: group) }
         do {
             switch try move(from: legacy, to: group) {
             case .moved, .alreadyThere, .nothingToMove: defaults.set(true, forKey: movedKey); return group
@@ -67,16 +75,27 @@ enum NotebookFile {
         return .moved
     }
 
+    /// Whether the notebook at `url` opens and can be read.
+    @MainActor private static func opens(_ url: URL) -> Bool {
+        guard let model = LocaliserModel.shared else { return false }
+        return (try? counts(at: url, model: model)) != nil
+    }
+
+    /// Deletes a notebook's files and its photo folder without opening it, so a damaged copy goes too.
+    private static func removeFiles(at url: URL) {
+        let name = url.deletingPathExtension().lastPathComponent
+        let folder = url.deletingLastPathComponent()
+        for leftover in [url.path, url.path + "-wal", url.path + "-shm", folder.appendingPathComponent(".\(name)_SUPPORT").path] {
+            try? FileManager.default.removeItem(atPath: leftover)
+        }
+    }
+
     /// On the launch after a move, once the copy has opened, the original goes.
     @MainActor static func removeOriginal(at source: URL) throws {
         guard FileManager.default.fileExists(atPath: source.path), let model = LocaliserModel.shared else { return }
         try NSPersistentStoreCoordinator(managedObjectModel: model).destroyPersistentStore(at: source, type: .sqlite, options: options)
         // Destroying empties the database but leaves its files, and the folder of photos beside it.
-        let name = source.deletingPathExtension().lastPathComponent
-        let folder = source.deletingLastPathComponent()
-        for leftover in [source.path, source.path + "-wal", source.path + "-shm", folder.appendingPathComponent(".\(name)_SUPPORT").path] {
-            try? FileManager.default.removeItem(atPath: leftover)
-        }
+        removeFiles(at: source)
     }
 
     private static var options: [String: NSObject] {

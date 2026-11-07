@@ -61,6 +61,7 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.
         INFOPLIST_KEY_NSCameraUsageDescription: Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: Hereabouts listens only while you hold the microphone button, to write down where something is. Nothing is recorded.
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         MARKETING_VERSION: '1.0'
         CURRENT_PROJECT_VERSION: '1'

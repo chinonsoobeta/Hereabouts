@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00F23149788730C9B46F3D62 /* ShelfPhotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */; };
+		0C2D38C52E116788EF8CC193 /* VoiceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276117AD1674424E9142CC40 /* VoiceSheet.swift */; };
 		0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E822257E4E7F4DD2DD6454C /* Finding.swift */; };
 		17A3067D0A104EFF1BCC30D7 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */; };
 		1B49871AFDAA83DEE0936687 /* PutAway.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5125DB3495BBECED9AFA8D3 /* PutAway.swift */; };
@@ -24,9 +25,11 @@
 		3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */; };
 		3B502E6540534A84813DEFBE /* LendingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49010154C3398D4E23CF9AF /* LendingTests.swift */; };
 		3D3B662F4D2A9E84F06CF5DF /* LocaliserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688EA727718F4AD230A48BBB /* LocaliserStore.swift */; };
+		3ED44C80869373BAD08B0F76 /* VoiceLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08736CC2D21059FCBDB48415 /* VoiceLanguage.swift */; };
 		4149945EE1D07DA374A62CD8 /* PackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E123C0DEC5FB1F25FDAD553 /* PackingView.swift */; };
 		4496C2275EC30A39C7CF26AB /* PutAwayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */; };
 		4636EB3F5C930EA1A8B0DFF0 /* AppLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4830CE7139FF6711AB1EFDA /* AppLinkTests.swift */; };
+		4BB333867A9FC6198EF5C0F8 /* VoiceParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53976165762FCEC9D3335C16 /* VoiceParser.swift */; };
 		4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9129D1892BAA558D32EE09BC /* OnboardingView.swift */; };
 		55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A961609BF5723FD7F58316C /* LocaliserUITests.swift */; };
 		5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4437E05350A4892C18DA9522 /* ReminderService.swift */; };
@@ -52,10 +55,12 @@
 		93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A645341D05015908431977CC /* HereaboutsControls.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
 		9CD309E6883093FB8EA60265 /* DuplicatePlacesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BABBA14900028F94ABED25B /* DuplicatePlacesTests.swift */; };
+		A90CE0C6C94033A8D4A072B4 /* VoiceCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C34E1BC09BA900E79CB537 /* VoiceCapture.swift */; };
 		A9EEAFF0C7CD07C937642857 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */; };
 		AC9DC82B90C504286CD85442 /* Spotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = A73C34594A1DA3A80DA79A05 /* Spotlight.swift */; };
 		AE2CA3E64FE2044260D54BF0 /* Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEF6DC9D14F261BA2BE55D1 /* Intents.swift */; };
 		AFCCE7204D1ED840AA374C37 /* AtkinsonHyperlegible-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */; };
+		B0C19AAE667BEC07335DDF7A /* voice-practice.json in Resources */ = {isa = PBXBuildFile; fileRef = 75DDE3C8E7DC3DA0FC2DCD97 /* voice-practice.json */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
 		B42F800692ECF35B8454455B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */; };
 		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
@@ -67,11 +72,13 @@
 		CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE95939E5941898426B7EBDF /* DateRules.swift */; };
 		D00D6178D45D745553B8D9F0 /* NotebookFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */; };
 		DA5241E3C47C879709AC49C8 /* PackingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7F5CCF93C2DB57E2F788EF /* PackingStore.swift */; };
+		DB9BF93333DFAE742EE4B74C /* VoiceParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04631309D5BE939A6EEBEFD /* VoiceParserTests.swift */; };
 		DECAE7BE29593113FC7716CA /* DemoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */; };
 		DFAC0D3F3D4C343CC54022BB /* PutAwayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003E9E7FE31DDC61B9EB4CD2 /* PutAwayIntent.swift */; };
 		E7E36B97B6E5232E78BE6B24 /* DuplicatePlaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CBA3966D5474BD1C5AF970 /* DuplicatePlaces.swift */; };
 		E8AE97C2BAA802D7C9553DF2 /* PhotoText.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFAD989528D4021251CA3D9 /* PhotoText.swift */; };
 		EB966890C60DC9CA8A89420C /* HereaboutsControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840994DA311385611BD55A2F /* HereaboutsControls.swift */; };
+		EC1C8276592EA592B773B9DA /* VoiceUnderstanding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51943CA585B0EBA05BE0334 /* VoiceUnderstanding.swift */; };
 		F0B1C83EBB9EB2928A914AC0 /* RitualViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22648BF6C6BEC527A3DBC941 /* RitualViews.swift */; };
 		F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9726FE13405A4AB0E8976F20 /* Localiser.xcdatamodeld */; };
 		F51008C9D776CF6895283174 /* PlaceChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */; };
@@ -126,6 +133,7 @@
 		02C11FBF78BD6877C6EF37AD /* Tips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tips.swift; sourceTree = "<group>"; };
 		06F18AE850904C71580C25A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0807D105D68201D35D8DF977 /* Localiser.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Localiser.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		08736CC2D21059FCBDB48415 /* VoiceLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLanguage.swift; sourceTree = "<group>"; };
 		0BEF6DC9D14F261BA2BE55D1 /* Intents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intents.swift; sourceTree = "<group>"; };
 		0C30326A9D8477F13CAF1061 /* LocaliserV5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV5.xcdatamodel; sourceTree = "<group>"; };
 		0E29FE6FB9A6F892A2BEE1EE /* LendSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LendSheet.swift; sourceTree = "<group>"; };
@@ -137,6 +145,7 @@
 		1DBDAF69D2B56A78628707D4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		22648BF6C6BEC527A3DBC941 /* RitualViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualViews.swift; sourceTree = "<group>"; };
 		25D5B7D5AD105BA2E4455706 /* LocaliserV2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV2.xcdatamodel; sourceTree = "<group>"; };
+		276117AD1674424E9142CC40 /* VoiceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSheet.swift; sourceTree = "<group>"; };
 		2863FFD39C6F0B33AEEE6EE4 /* FindingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindingTests.swift; sourceTree = "<group>"; };
 		2BE993F1CE374783F6D1BB8F /* BoxLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxLabelTests.swift; sourceTree = "<group>"; };
 		2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */ = {isa = PBXFileReference; path = Localiser.storekit; sourceTree = "<group>"; };
@@ -157,6 +166,7 @@
 		501CA93C23A339C49D35AA3D /* Localiser.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Localiser.entitlements; sourceTree = "<group>"; };
 		5069E12580E69C9EE6901EAC /* LocaliserV8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV8.xcdatamodel; sourceTree = "<group>"; };
 		530F7A4D14101BD22267E581 /* LocaliserV1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV1.xcdatamodel; sourceTree = "<group>"; };
+		53976165762FCEC9D3335C16 /* VoiceParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceParser.swift; sourceTree = "<group>"; };
 		5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySettingsView.swift; sourceTree = "<group>"; };
 		5E822257E4E7F4DD2DD6454C /* Finding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finding.swift; sourceTree = "<group>"; };
 		60A697438CB089D0830D4DC2 /* FindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindView.swift; sourceTree = "<group>"; };
@@ -168,6 +178,7 @@
 		6EE4809D10B04BE9A39FB756 /* HomesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomesView.swift; sourceTree = "<group>"; };
 		71CBA3966D5474BD1C5AF970 /* DuplicatePlaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicatePlaces.swift; sourceTree = "<group>"; };
 		746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTests.swift; sourceTree = "<group>"; };
+		75DDE3C8E7DC3DA0FC2DCD97 /* voice-practice.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "voice-practice.json"; sourceTree = "<group>"; };
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		785940DE809D3794AA488637 /* Homes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homes.swift; sourceTree = "<group>"; };
 		796960A07F97C020E62944E3 /* IntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentsTests.swift; sourceTree = "<group>"; };
@@ -177,14 +188,17 @@
 		8A961609BF5723FD7F58316C /* LocaliserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserUITests.swift; sourceTree = "<group>"; };
 		8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Italic.ttf"; sourceTree = "<group>"; };
 		9129D1892BAA558D32EE09BC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		94C34E1BC09BA900E79CB537 /* VoiceCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCapture.swift; sourceTree = "<group>"; };
 		953F8AF34B27D0E23E6ACBDF /* PlacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesView.swift; sourceTree = "<group>"; };
 		A316507F8C41471891D6BC80 /* LocaliserUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LocaliserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A645341D05015908431977CC /* HereaboutsControls.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = HereaboutsControls.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A73C34594A1DA3A80DA79A05 /* Spotlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotlight.swift; sourceTree = "<group>"; };
 		AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualsTests.swift; sourceTree = "<group>"; };
+		B04631309D5BE939A6EEBEFD /* VoiceParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceParserTests.swift; sourceTree = "<group>"; };
 		B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-BoldItalic.ttf"; sourceTree = "<group>"; };
 		B49010154C3398D4E23CF9AF /* LendingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LendingTests.swift; sourceTree = "<group>"; };
 		B5125DB3495BBECED9AFA8D3 /* PutAway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAway.swift; sourceTree = "<group>"; };
+		B51943CA585B0EBA05BE0334 /* VoiceUnderstanding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceUnderstanding.swift; sourceTree = "<group>"; };
 		B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfPhotoTests.swift; sourceTree = "<group>"; };
 		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
@@ -312,6 +326,14 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		666E2290E27E71294499CB1D /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				75DDE3C8E7DC3DA0FC2DCD97 /* voice-practice.json */,
+			);
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
 		675B25DED9A59CCD220E0A20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -353,6 +375,7 @@
 				E75609382D95EBC196AC56AD /* Rituals */,
 				21A74C7AD769A50343918F59 /* Support */,
 				01730CDC7B8CC5DFF40E454D /* System */,
+				E0373B3D277DD051B37FE834 /* Voice */,
 			);
 			path = Localiser;
 			sourceTree = "<group>";
@@ -376,6 +399,8 @@
 				AB8FEE6CF4B9E311B0218A5D /* RitualsTests.swift */,
 				B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */,
 				746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */,
+				B04631309D5BE939A6EEBEFD /* VoiceParserTests.swift */,
+				666E2290E27E71294499CB1D /* Fixtures */,
 			);
 			path = LocaliserTests;
 			sourceTree = "<group>";
@@ -413,6 +438,18 @@
 				028E66C2B29C2D4C913E61B7 /* Fraunces[SOFT,WONK,opsz,wght].ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		E0373B3D277DD051B37FE834 /* Voice */ = {
+			isa = PBXGroup;
+			children = (
+				94C34E1BC09BA900E79CB537 /* VoiceCapture.swift */,
+				08736CC2D21059FCBDB48415 /* VoiceLanguage.swift */,
+				53976165762FCEC9D3335C16 /* VoiceParser.swift */,
+				276117AD1674424E9142CC40 /* VoiceSheet.swift */,
+				B51943CA585B0EBA05BE0334 /* VoiceUnderstanding.swift */,
+			);
+			path = Voice;
 			sourceTree = "<group>";
 		};
 		E75609382D95EBC196AC56AD /* Rituals */ = {
@@ -564,6 +601,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				320D35A448C990008ED39806 /* Localiser.storekit in Resources */,
+				B0C19AAE667BEC07335DDF7A /* voice-practice.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,6 +652,7 @@
 				7994BC8657F1829B124F88EF /* RitualsTests.swift in Sources */,
 				00F23149788730C9B46F3D62 /* ShelfPhotoTests.swift in Sources */,
 				35D63E9B701ABD5CB1CA18B4 /* SubscriptionTests.swift in Sources */,
+				DB9BF93333DFAE742EE4B74C /* VoiceParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,6 +718,11 @@
 				8E221F011A35DF4EF41035F1 /* Support.swift in Sources */,
 				883F90525273EB06CDF36579 /* Tips.swift in Sources */,
 				B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */,
+				A90CE0C6C94033A8D4A072B4 /* VoiceCapture.swift in Sources */,
+				3ED44C80869373BAD08B0F76 /* VoiceLanguage.swift in Sources */,
+				4BB333867A9FC6198EF5C0F8 /* VoiceParser.swift in Sources */,
+				0C2D38C52E116788EF8CC193 /* VoiceSheet.swift in Sources */,
+				EC1C8276592EA592B773B9DA /* VoiceUnderstanding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,6 +840,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hereabouts listens only while you hold the microphone button, to write down where something is. Nothing is recorded.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -979,6 +1024,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hereabouts listens only while you hold the microphone button, to write down where something is. Nothing is recorded.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
