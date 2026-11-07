@@ -24,6 +24,8 @@ import XCTest
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
             app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Lifetime'")).firstMatch.tap()
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Buy once for'")).firstMatch.waitForExistence(timeout: 3))
+        } else if #available(iOS 27, *) {
+            XCTFail("The plans should load on iOS 27 and later")
         } else {
             XCTAssertTrue(app.staticTexts["Pro isn't available to buy right now. Try again later."].exists)
         }
