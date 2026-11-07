@@ -36,7 +36,7 @@ enum LentOutRows {
                        title: record.isPrivate || record.name.isEmpty ? privateName : record.name,
                        person: record.person,
                        sinceText: "Since \(written(record.since))",
-                       askBackText: askBackDate(record.askBackDay, calendar: calendar).map { "Ask back \(written($0))" })
+                       askBackText: askBackDate(record.askBackDay, calendar: calendar).map { "Ask for it back \(written($0))" })
         }
     }
 

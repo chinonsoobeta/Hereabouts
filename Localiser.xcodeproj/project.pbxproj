@@ -979,9 +979,9 @@
 				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hereabouts listens only while you hold the microphone button, to write down where something is. Nothing is recorded.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -1182,9 +1182,9 @@
 				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Hereabouts listens only while you hold the microphone button, to write down where something is. Nothing is recorded.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;

@@ -16,6 +16,6 @@ struct PutAwayControl: ControlWidget {
             }
         }
         .displayName("Put something away")
-        .description("Opens Hereabouts on the camera.")
+        .description("Open the camera in Hereabouts.")
     }
 }

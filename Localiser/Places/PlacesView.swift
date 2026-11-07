@@ -9,7 +9,7 @@ struct PlacesView: View {
     @State private var labelled: Place?
     @State private var unknownLabel = false
     @State private var tidying = false
-    private let starters = ["Kitchen", "Bedroom", "Garage", "Hall cupboard", "Office", "Loft"]
+    private let starters = ["Kitchen", "Bedroom", "Garage", "Hall closet", "Office", "Attic"]
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -20,14 +20,14 @@ struct PlacesView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text(spares.count == 1 ? "\u{201C}\(spares[0].path)\u{201D} is an empty copy of another place." : "\(spares.count) empty places are copies of others, like \u{201C}\(spares[0].path)\u{201D}.")
                                 .font(.wbBody).foregroundStyle(Theme.ink)
-                            Button("Tidy up") { tidying = true }.buttonStyle(SoftButtonStyle()).accessibilityIdentifier("places.tidy")
+                            Button("Remove empty copies") { tidying = true }.buttonStyle(SoftButtonStyle()).accessibilityIdentifier("places.tidy")
                         }
                     }
-                    .confirmationDialog("Fold the empty copies into the places they copy?", isPresented: $tidying, titleVisibility: .visible) {
-                        Button(spares.count == 1 ? "Fold in 1 place" : "Fold in \(spares.count) places") {
+                    .confirmationDialog("Remove empty copies of places?", isPresented: $tidying, titleVisibility: .visible) {
+                        Button(spares.count == 1 ? "Remove 1 copy" : "Remove \(spares.count) copies") {
                             do { try store.mergeSparePlaces() } catch { self.error = error.localizedDescription }
                         }
-                    } message: { Text("Only places with nothing written down in them are folded in. Anything inside them moves across.") }
+                    } message: { Text("Only empty copies are removed. Places inside them move into the place you're keeping.") }
                 }
                 if store.placesHere.isEmpty {
                     LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
@@ -60,7 +60,7 @@ struct PlacesView: View {
                     if LabelScanner.isAvailable { Button("Scan a label", systemImage: "qrcode.viewfinder") { scanning = true } }
                 } label: { Image(systemName: "qrcode") }.accessibilityLabel("Box labels")
             }
-            Button("Add place", systemImage: "plus") { adding = true }
+            Button("Add a place", systemImage: "plus") { adding = true }
         }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor() } }
         .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: []) } }
@@ -161,7 +161,7 @@ struct PlaceEditor: View {
             }
             Section {
                 PlacePicker(selection: $parentID, excluded: place, title: "Inside", noneTitle: "None", home: place?.home)
-            } footer: { Text("Choose None for a room or other top-level place.").foregroundStyle(Theme.secondary) }
+            } footer: { Text("Choose None if this place isn't inside another place.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
         .navigationTitle(place == nil ? "New place" : "Edit place").navigationBarTitleDisplayMode(.inline)
@@ -217,7 +217,7 @@ struct PlaceDetailView: View {
                     }
                     HStack(spacing: 10) {
                         Button("Add a thing", systemImage: "plus") { addingItem = true }.buttonStyle(SoftButtonStyle(compact: true))
-                        Button("Add place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true))
+                        Button("Add a place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true))
                     }.plainRow()
                 }
                 if !place.children.isEmpty {
@@ -237,13 +237,13 @@ struct PlaceDetailView: View {
                         NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item) }
                     }
                 } header: { Text("Things here").foregroundStyle(Theme.secondary) }
-                  footer: { if !place.children.isEmpty && !nestedItems.isEmpty { Text("Includes things in the places inside.").foregroundStyle(Theme.secondary) } }
+                  footer: { if !place.children.isEmpty && !nestedItems.isEmpty { Text("You also see things in the places inside.").foregroundStyle(Theme.secondary) } }
                 if store.hasSeveralHomes {
                     Section { Button("Move to another home", systemImage: "house") { movingHome = true }.buttonStyle(SoftButtonStyle()) }
                         .listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
                 Section { Button("Delete place", role: .destructive) { deleting = true } }
-            } else { ContentUnavailableView("Place deleted", systemImage: "trash") }
+            } else { ContentUnavailableView("This place was deleted", systemImage: "trash") }
         }
         .groundBackground()
         .navigationTitle(available ? place.name : "").navigationBarTitleDisplayMode(.inline)
@@ -265,7 +265,7 @@ struct PlaceDetailView: View {
             }
         } message: {
             Text(place.parent.map { "Everything inside moves to \u{201C}\($0.name)\u{201D}. Nothing else is deleted." }
-                 ?? "Things stored directly here will have no place set. Places inside become rooms of their own. Nothing else is deleted.")
+                 ?? "Things directly here will have no place set. Places inside it move to the top level. Nothing else is deleted.")
         }
         .alert("Couldn't delete", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }

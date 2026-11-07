@@ -4,7 +4,7 @@ Updated 7 November 2026. Nothing has been invited, uploaded, created in App Stor
 
 ## Beta workflow
 
-Start with a small consented group of household organisers, frequent shoppers and travellers. Grow to fifteen to twenty households once obvious defects are fixed. Ask people to use their own belongings.
+Start with a small consented group of household organizers, frequent shoppers and travelers. Grow to fifteen to twenty households once obvious defects are fixed. Ask people to use their own belongings.
 
 | Task | Success to observe | Record |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Start with a small consented group of household organisers, frequent shoppers an
 | Find after moving | Move an item or a box and find its new place | Wrong or ambiguous suggestions, corrections |
 | Say it | Hold the microphone (if voice memos ship), say where a thing is, check the name and place, save | Wrong names or places, corrections, whether a place was ever filled in unseen |
 | Lend and get it back | Lend a thing with an ask-back date, get the reminder, mark it back | Reminder timing, wrong names, accidental archiving |
-| Complete a packing cycle | Plan a trip from a kit, pack, tick tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
+| Complete a packing cycle | Plan a trip from a kit, pack, check off tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
 | Recover a library | Back up with selected files, restore into a fresh install | Record counts, attachments, trip progress |
 
 Ask whether they opened Hereabouts again without prompting, which problem it solved, whether the monthly, yearly or Lifetime price shown in the paywall feels fair, and which they'd pick, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
@@ -30,7 +30,7 @@ These are targets, not results. If one is missed, keep the failed run, fix the d
 
 ## Physical-device checks before launch
 
-These match O39 in `RELEASE_PLAN.md`; tick them there.
+These match O39 in `RELEASE_PLAN.md`; check them off there.
 
 - Test iOS 26 on the smallest supported phone you can borrow, and on phones with and without Apple Intelligence.
 - Use airplane mode with no iCloud account: create, edit, move, search, a voice memo and relaunch without loss.
@@ -53,7 +53,7 @@ No public launch with an open data-loss defect, a place filled in without the pe
 | Field | Value | Limit |
 | --- | --- | --- |
 | Name | Hereabouts | 30 |
-| Subtitle | Find things at home | 30 |
+| Subtitle | Find your things | 30 |
 | Primary category | Productivity | |
 | Secondary category | Utilities | |
 | Age rating | 4+ | |
@@ -64,39 +64,39 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 
 **Promotional text** (170 characters, editable without review):
 
-> Free for up to 15 things. Try Pro free for two weeks, or buy it once for life. No account, no ads, no tracking.
+> Keep up to 15 things for free. Try Pro free for two weeks or buy Lifetime once. No account, ads or tracking.
 
 **Description:**
 
-> Where did you put it? Hereabouts remembers.
+> Write down where you put things. Find them later.
 >
-> Save a thing with just its name. Add where it lives, like "Garage › Shelf 4", and find it again in seconds by name, nickname or place.
+> Save a thing by name. Add its place, like "Garage › Shelf 4". Find it in seconds by name, other name or place.
 >
 > HOMES AND PLACES
-> Keep more than one home in the same notebook, and move things or whole places between them. Mark a thing private and its place stays out of Spotlight and Siri's spoken answers.
+> Keep more than one home in your notebook. Move things or whole places between them. Mark a thing private to keep its place out of Spotlight and Siri's spoken answers.
 >
-> LEND IT, GET IT BACK
-> Note who has your drill. Choose a date to ask for it back, and Hereabouts reminds you.
+> LEND A THING
+> Write down who has your drill. Choose a date to ask for it back. Get a reminder that day.
 >
-> SAY IT (IF VOICE MEMOS SHIP)
-> Hold the microphone, or tap Say it on the widget, and say "the spare key's in the blue tin on the hall shelf". Hereabouts turns it into a thing and a place for you to check. It's heard on your iPhone, the recording isn't kept, and nothing is saved until you tap. English only for now.
+> SAY WHERE (IF VOICE MEMOS SHIP)
+> Hold the microphone or tap Say where on the widget. Say "the spare key's in the blue tin on the hall shelf". Check the thing and place before you save. Hereabouts hears you on your iPhone. It doesn't keep the recording. Nothing is saved until you tap. English only for now.
 >
-> PACK ONCE
-> Make a kit for trips you take often. Plan a trip, tick things off by where they live, and get a checklist for putting everything back when you're home.
+> PACK FOR A TRIP
+> Save a kit for trips you take often. Plan a trip. Check off things by place as you pack. Use your checklist to put them away when you're home.
 >
-> YOURS, ON YOUR PHONE
-> No account. No ads. No tracking. Everything stays on your iPhone and in your device backup. Export a backup or a spreadsheet whenever you like.
+> YOUR PRIVATE NOTEBOOK
+> You don't need an account. There are no ads or tracking. Your notebook is saved on your iPhone and in your device backup. Copies you save and Pro's weekly backups go to places you control. Export a backup or spreadsheet anytime.
 >
-> KEEPS ITSELF HONEST
-> One quiet recap on Sunday evenings. Once a month, a few "Still there?" questions about things you haven't looked at in a while. Both can be turned off.
+> CHECK YOUR THINGS
+> Get one quiet recap on Sunday evenings. Once a month, check a few things you haven't looked at lately. You can turn off both reminders.
 >
 > ASK SIRI
-> "Where is my passport?" Hereabouts answers from your notebook. Write things down and put them away hands-free.
+> Ask "Where is my passport?" to get an answer from your notebook. Write things down and put them away hands-free.
 >
 > FREE, OR PRO
-> Free for 15 things, 1 packing kit and 2 homes. Hereabouts Pro removes the limits and backs up your notebook every week to your own iCloud Drive. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, nothing you wrote down is locked away.
+> Save 15 things, 1 kit and 2 homes for free. Pro removes the limits. Weekly notebook backups to your own iCloud Drive are on by default. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, you can still see, edit and export everything you saved.
 >
-> Subscriptions renew automatically unless canceled at least 24 hours before the period ends, and you can manage or cancel them in the Settings app under your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereabouts.app/privacy.
+> Your subscription renews automatically unless you cancel at least 24 hours before the period ends. To manage or cancel it, open the Settings app. Tap your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereabouts.app/privacy.
 
 Leave the voice paragraph out if voice memos don't ship (voice rule, `RELEASE_PLAN.md` section 1). The listing carries no price, because prices differ by country. Description and subtitle are for the owner to approve in O7, after the wording pass.
 
@@ -106,11 +106,11 @@ Before publishing, check each sentence against the shipped build. Do not claim s
 
 Use the demo library with the Debug-only launch argument `--demo-library` on a 6.9-inch and a 6.5-inch iPhone simulator. Light mode, default text size, status bar at 9:41.
 
-1. **Find** showing "Running shoes" and its place path. Caption: "Find anything by where it lives".
-2. **Voice memo** with the heard sentence and the filled-in Put away screen (if voice memos ship). Caption: "Say it. Check it. Save it".
-3. **Lending** showing a lent thing with its ask-back date. Caption: "Know who has it, and ask for it back".
-4. **Trip detail** with packing progress. Caption: "Pack once, reuse forever".
-5. **Pro screen** (Settings tab, Hereabouts Pro), with no price visible that isn't the App Store's. Caption: "No account. Nothing locked away. Export anytime".
+1. **Find** showing "Running shoes" and its place path. Caption: "Find your things by place".
+2. **Voice memo** with the heard sentence and the filled-in Put away screen (if voice memos ship). Caption: "Say where it is. Check it. Save it."
+3. **Lending** showing a lent thing with its ask-back date. Caption: "Know who to ask for it back".
+4. **Trip detail** with packing progress. Caption: "Reuse your packing list".
+5. **Pro screen** (Settings tab, Hereabouts Pro), with no price visible that isn't the App Store's. Caption: "No account. Always yours to export".
 
 If voice memos don't ship, drop shot 2 and keep four.
 
@@ -120,19 +120,19 @@ Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remov
 
 Paste into App Store Connect, App Review Information. These notes carry no prices, because they differ by country; the paywall shows each country's price from the App Store.
 
-> Hereabouts has no account or login. Everything is stored on the device.
+> Hereabouts needs no account or login. The notebook is stored on the device.
 >
-> The free plan allows 15 things in total, 1 packing kit and 2 homes. Hereabouts Pro removes those limits. It is sold as a monthly subscription, a yearly subscription (both with a two-week free trial) and a one-time Lifetime purchase, all in the group "Hereabouts Pro" (dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly, dev.hereabouts.pro.lifetime). Lifetime has Family Sharing on. Lifetime is offered for people who don't want a subscription.
+> The free plan allows 15 things, 1 kit and 2 homes. Pro removes those limits. There are monthly and yearly subscriptions, each with a two-week free trial, and a one-time Lifetime purchase. The products are dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly and dev.hereabouts.pro.lifetime in the group "Hereabouts Pro". Lifetime supports Family Sharing for people who prefer a one-time purchase.
 >
-> What the subscriptions keep giving: automatic weekly backups of the whole notebook to the person's own iCloud Drive (or to the phone if iCloud Drive is off), keeping the last five; regular updates; and household sharing, planned for version 1.1. Nothing saved is ever locked if Pro ends, and existing data stays visible, editable and exportable.
+> Pro includes automatic weekly backups of the whole notebook. They're on by default and go to the person's own iCloud Drive, or the device if iCloud Drive is off. The newest five are kept. Subscriptions also include regular updates. Household sharing is planned for version 1.1. If Pro ends, saved data remains visible, editable and exportable.
 >
-> To reach the paywall: open the Settings tab (bottom right), then tap Hereabouts Pro. "Restore purchases", the Privacy Policy and the Terms of Use are on the same screen. The purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
+> To reach the paywall, open Settings at the bottom right, then tap Hereabouts Pro. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
 >
-> Shelf photos and voice understanding use Apple's on-device model, so they appear only on iPhones that support Apple Intelligence. On other iPhones the app uses simpler rules and still works. Voice memos are transcribed on the phone with Apple's Speech framework, the recording is not kept, and nothing is saved without the person tapping Save. (Include the voice-memo sentences only if voice memos ship.)
+> Shelf photos and voice understanding use Apple's on-device model on iPhones that support Apple Intelligence. On other iPhones, the app uses simpler rules. Voice memos are transcribed on the device with Apple's Speech framework. The recording isn't kept. Nothing is saved until the person taps Save. (Include the voice-memo sentences only if voice memos ship.)
 >
-> Reminders are local notifications. The app does not use the calendar.
+> Reminders are local notifications. Hereabouts doesn't use the calendar.
 >
-> The app is designed for iPhone. On iPad it runs in iPhone compatibility mode.
+> Hereabouts is designed for iPhone. On iPad, it runs in iPhone compatibility mode.
 >
 > Privacy policy: https://hereabouts.app/privacy. Support: https://hereabouts.app/support.
 

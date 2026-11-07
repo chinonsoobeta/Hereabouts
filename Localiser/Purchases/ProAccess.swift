@@ -145,10 +145,10 @@ struct ProStanding: Equatable, Sendable {
                 await refresh(); await transaction.finish()
                 if !unlocked { message = "The App Store hasn't confirmed Pro yet. Try Restore purchases in a moment." }
                 else if standing?.inTrial == true, let end = standing?.periodEnd { message = "Your free trial has started. It ends on \(end.formatted(.dateTime.day().month(.wide)))." }
-                else { message = "Hereabouts Pro is unlocked." }
-            case .userCancelled: message = "Purchase canceled. Nothing was charged."
-            case .pending: message = "Waiting for approval. Everything free still works."
-            @unknown default: message = "The App Store didn't say what happened. Try Restore purchases."
+                else { message = "You have Hereabouts Pro." }
+            case .userCancelled: message = "Purchase canceled. You weren't charged."
+            case .pending: message = "Waiting for approval. You can still use your free plan."
+            @unknown default: message = "Couldn't confirm what happened. Try Restore purchases."
             }
         } catch { message = error.localizedDescription }
     }
@@ -192,7 +192,7 @@ enum TrialReminder {
         guard let standing, standing.inTrial, standing.willRenew, let end = standing.periodEnd, let fire = fireDate(trialEnd: end) else { return }
         let content = UNMutableNotificationContent()
         content.title = "Your free trial ends \(end.formatted(.dateTime.weekday(.wide)))"
-        content.body = "Keep Pro and the \(standing.plan.name.lowercased()) plan starts then. To stop it, cancel in Settings before then."
+        content.body = "Your \(standing.plan.name.lowercased()) plan starts then. Cancel in Settings before then if you do not want to pay."
         let parts = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fire)
         center.add(UNNotificationRequest(identifier: id, content: content, trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)))
     }

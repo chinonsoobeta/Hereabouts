@@ -24,8 +24,8 @@ struct FindButtonsWidget: Widget {
         StaticConfiguration(kind: "dev.hereabouts.app.widget.buttons", provider: ButtonsProvider()) { _ in
             ButtonsView().containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Find and say it")
-        .description("Search for something, or say where you put it.")
+        .configurationDisplayName("Find and say where")
+        .description("Find a thing or say where you put it.")
         .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
     }
 }
@@ -43,12 +43,12 @@ struct ButtonsView: View {
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 4) {
                 ButtonRow(title: "Find", symbol: "magnifyingglass", url: WidgetButtons.find)
-                if voice { ButtonRow(title: "Say it", symbol: "mic", url: WidgetButtons.say) }
+                if voice { ButtonRow(title: "Say where", symbol: "mic", url: WidgetButtons.say) }
             }
         default:
             VStack(spacing: 8) {
                 ButtonRow(title: "Find", symbol: "magnifyingglass", url: WidgetButtons.find, prominent: true)
-                if voice { ButtonRow(title: "Say it", symbol: "mic", url: WidgetButtons.say, prominent: true) }
+                if voice { ButtonRow(title: "Say where", symbol: "mic", url: WidgetButtons.say, prominent: true) }
             }
         }
     }

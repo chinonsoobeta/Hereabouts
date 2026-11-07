@@ -34,7 +34,7 @@ struct LentOutWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Lent out")
-        .description("Who has what, since when, and when to ask for it back.")
+        .description("See who has it, since when, and when to ask for it back.")
         .supportedFamilies([.systemMedium])
     }
 }
@@ -48,7 +48,7 @@ struct LentOutView: View {
             if entry.rows.isEmpty {
                 Spacer()
                 Text("Nothing is lent out.").font(.headline)
-                Text("Things you lend show up here.").font(.caption).foregroundStyle(.secondary)
+                Text("You'll see things you lend here.").font(.caption).foregroundStyle(.secondary)
                 Spacer()
             } else {
                 ForEach(entry.rows) { row in

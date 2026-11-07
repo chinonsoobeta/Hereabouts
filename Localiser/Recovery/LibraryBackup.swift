@@ -57,7 +57,7 @@ struct LibraryBackup: Codable, Sendable {
     /// Return, warranty and expiry dates from before 1.0 still restore, kept as they are but not shown.
     static let deadlineKinds: Set<String> = ["askBack", "returns", "warranty", "expiry"]
     static let decisions: Set<String> = ["open", "returned", "keeping", "returning"]
-    static let newerVersion = "This backup is from a newer Hereabouts. Update the app, then try again."
+    static let newerVersion = "You need a newer version of Hereabouts for this backup. Update the app and try again."
     static let damaged = "This backup is damaged. Choose another one."
     static let notABackup = "This file isn't a Hereabouts backup. Choose one made with Back up everything."
 }

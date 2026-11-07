@@ -63,22 +63,22 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--show-onboarding"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["This is your house's notebook."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Your notebook for things at home."].waitForExistence(timeout: 5))
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
-        app.buttons["The flat"].tap()
-        app.buttons["Open it"].tap()
-        XCTAssertTrue(app.staticTexts["What do you always lose?"].waitForExistence(timeout: 5))
+        app.buttons["My apartment"].tap()
+        app.buttons["Open your notebook"].tap()
+        XCTAssertTrue(app.staticTexts["What do you often look for?"].waitForExistence(timeout: 5))
         app.buttons["Passport"].tap()
-        let room = app.textFields["Where does it live?"]
+        let room = app.textFields["Where do you keep it?"]
         room.tap(); room.typeText("Hall closet\n")
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         app.buttons["Write it down"].tap()
-        XCTAssertTrue(app.staticTexts["A nudge before it's too late."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Reminders when you need them."].waitForExistence(timeout: 5))
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         app.buttons["Not now"].tap()
         XCTAssertTrue(app.staticTexts["Passport"].waitForExistence(timeout: 5), app.debugDescription)
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "The flat ·")).firstMatch.exists, app.debugDescription)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "My apartment ·")).firstMatch.exists, app.debugDescription)
     }
 
     func testRecapStocktakeAndStillThere() throws {
@@ -105,20 +105,20 @@ import XCTest
         XCTAssertTrue(app.navigationBars["Recap"].waitForExistence(timeout: 5))
         let recap = XCTAttachment(screenshot: app.screenshot()); recap.name = "Recap"; recap.lifetime = .keepAlways; add(recap)
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
-        let start = app.buttons["Start the stocktake"]
+        let start = app.buttons["Start monthly check"]
         reveal(start, in: app); start.tap()
 
         XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5), app.debugDescription)
-        let card = XCTAttachment(screenshot: app.screenshot()); card.name = "Stocktake"; card.lifetime = .keepAlways; add(card)
+        let card = XCTAttachment(screenshot: app.screenshot()); card.name = "Monthly check"; card.lifetime = .keepAlways; add(card)
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         app.buttons["Still there"].tap()
-        app.buttons["Don't have it any more"].tap()
+        app.buttons["Don't have it anymore"].tap()
         let undo = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Undo: keep")).firstMatch
         XCTAssertTrue(undo.waitForExistence(timeout: 5))
         undo.tap()
-        XCTAssertTrue(app.staticTexts["All checked. The notebook's up to date. See you next month."].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["All checked. Your notebook's up to date."].waitForExistence(timeout: 5), app.debugDescription)
         app.buttons["Done"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Keeping up."].waitForExistence(timeout: 5), "Once read, Find keeps only the keeping-up stamp")
+        XCTAssertTrue(app.staticTexts["You're keeping up."].waitForExistence(timeout: 5), "Once read, Find keeps only the keeping-up stamp")
         XCTAssertFalse(readIt.exists, "The recap is offered once a week")
         XCTAssertFalse(app.buttons["Start"].exists, "The stocktake is done for the month")
     }
@@ -305,17 +305,17 @@ import XCTest
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Places"].tap()
-        app.buttons["Loft"].firstMatch.tap()
-        app.navigationBars["Places"].buttons["Add place"].tap()
+        app.buttons["Attic"].firstMatch.tap()
+        app.navigationBars["Places"].buttons["Add a place"].tap()
         let name = app.textFields["place.name"]
         XCTAssertTrue(name.waitForExistence(timeout: 5))
-        name.tap(); name.typeText("Loft")
+        name.tap(); name.typeText("Attic")
         app.buttons["Save"].tap()
         let tidy = app.buttons["places.tidy"]
         XCTAssertTrue(tidy.waitForExistence(timeout: 5), app.debugDescription)
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         tidy.tap()
-        app.buttons["Fold in 1 place"].tap()
+        app.buttons["Remove 1 copy"].tap()
         XCTAssertTrue(tidy.waitForNonExistence(timeout: 5))
     }
 
@@ -406,7 +406,7 @@ import XCTest
         readIt.tap()
         XCTAssertTrue(app.navigationBars["Recap"].waitForExistence(timeout: 5))
         try shot("6-recap")
-        let start = app.buttons["Start the stocktake"]
+        let start = app.buttons["Start monthly check"]
         reveal(start, in: app); start.tap()
         XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5))
         try shot("7-stocktake")
@@ -495,7 +495,7 @@ import XCTest
             let labels: [String]
             switch tab {
             case "Find": labels = ["Add your first thing"]
-            case "Trips": labels = ["Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home."]
+            case "Trips": labels = ["Make a checklist for a trip. Check off things as you pack. Put them away when you're home."]
             default: labels = []
             }
             recordTypography(app, labels: labels, name: tab)
@@ -544,7 +544,7 @@ import XCTest
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
                 if ["Packing kits", "Pro isn't available to buy right now. Try again later.", "Restore purchases"].contains(element.label) { return true }
-                if element.label == "No limit on what you write down." { return true }
+                if element.label == "Write down as many things as you need." { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,
             // yet the contrast audit samples the card's soft shadow edge and reports a failure.

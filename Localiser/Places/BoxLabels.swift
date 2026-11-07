@@ -88,7 +88,7 @@ enum BoxLabels {
                 write(shown, .systemFont(ofSize: 10), .darkGray, in: CGRect(x: column.minX, y: y, width: column.width, height: column.maxY - y), lines: 7)
             }
         }
-        let note = "Scan with the iPhone Camera to open in Hereabouts."
+        let note = "Scan with your iPhone camera to open in Hereabouts."
         (note as NSString).draw(in: CGRect(x: inset.minX, y: inset.maxY - noteFont.lineHeight, width: inset.width, height: noteFont.lineHeight), withAttributes: [.font: noteFont, .foregroundColor: UIColor.gray])
     }
 
@@ -134,7 +134,7 @@ struct LabelSheetView: View {
                 Picker("Paper", selection: $paper) { ForEach(BoxLabels.Paper.allCases) { Text($0.title).tag($0) } }
                 Toggle("List what's inside", isOn: $listContents)
             } footer: {
-                Text(listContents ? "Printed lists go out of date as things move. Private things are left off." : "Eight labels to a page. The code opens the place in Hereabouts.")
+                Text(listContents ? "If you move things, print a new list. Private things aren't included." : "Print eight labels per page. Scan a code to see the place in Hereabouts.")
                     .foregroundStyle(Theme.secondary)
             }
         }

@@ -35,27 +35,27 @@ struct RecapView: View {
                 .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
                 SectionHeading(title: "Next week").padding(.top, 6)
                 VStack(spacing: 0) {
-                    if recap.due.isEmpty { line("Nothing to ask back", "") }
+                    if recap.due.isEmpty { line("Nothing due back", "") }
                     ForEach(recap.due.prefix(5)) { deadline in
                         line(deadline.item?.name ?? "A saved thing", dueDetail(deadline))
                     }
                     if recap.due.count > 5 { line("And \(recap.due.count - 5) more", "") }
                     if recap.stocktakeCount > 0 {
-                        line("Stocktake", recap.stocktakeCount == 1 ? "1 quick question" : "\(recap.stocktakeCount) quick questions")
+                        line("Monthly check", recap.stocktakeCount == 1 ? "1 quick question" : "\(recap.stocktakeCount) quick questions")
                     }
                 }
                 if !recap.drifting.isEmpty {
-                    SectionHeading(title: "Drifting").padding(.top, 6)
+                    SectionHeading(title: "Not checked lately").padding(.top, 6)
                     VStack(spacing: 0) {
                         ForEach(recap.drifting) { item in line(item.name, "not checked since \(item.lastConfirmed.formatted(.dateTime.month(.wide).year()))") }
                     }
                 }
                 VStack(spacing: 10) {
                     if recap.stocktakeCount > 0 {
-                        Button { dismiss(); startStocktake() } label: { Text("Start the stocktake").fixedSize(horizontal: false, vertical: true) }.buttonStyle(PrimaryButtonStyle())
+                        Button { dismiss(); startStocktake() } label: { Text("Start monthly check").fixedSize(horizontal: false, vertical: true) }.buttonStyle(PrimaryButtonStyle())
                     }
                 }.padding(.top, 8)
-                Text("Recaps can be turned off in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity)
+                Text("You can turn off recaps in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity)
             }
             .padding(20)
         }
@@ -77,9 +77,9 @@ struct RecapView: View {
 
     private func keepingUpSentence(_ weeks: Int) -> String {
         switch weeks {
-        case 0: "Write one thing down this week to start keeping up."
-        case 1: "Keeping up: something written down this week."
-        default: "Keeping up: \(weeks) weeks in a row with something written down."
+        case 0: "Write down a thing this week to get started."
+        case 1: "You've written down a thing this week."
+        default: "You've written down things for \(weeks) weeks in a row."
         }
     }
 
@@ -121,7 +121,7 @@ struct StocktakeView: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text("Still there?").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
                 if let item = queue.first {
-                    Text("A few quick questions once a month keep the notebook honest. Nothing changes unless you say so.").font(.wbBody).foregroundStyle(Theme.ink)
+                    Text("Check a few things once a month. Nothing changes unless you say so.").font(.wbBody).foregroundStyle(Theme.ink)
                     progress
                     card(item)
                     HStack(spacing: 10) {
@@ -132,10 +132,10 @@ struct StocktakeView: View {
                     }
                     Button("Can't find it") { answer { try store.markMissing(item) } }
                         .font(.wbBody).foregroundStyle(Theme.purpleInk).frame(maxWidth: .infinity, minHeight: 44)
-                    Button("Don't have it any more") { answer { try store.setArchived(item, true); lastArchived = item } }
+                    Button("Don't have it anymore") { answer { try store.setArchived(item, true); lastArchived = item } }
                         .font(.wbBody).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity, minHeight: 44)
                 } else {
-                    Text(total == 0 ? "Everything has been checked recently. Nothing to ask this month." : "All checked. The notebook's up to date. See you next month.")
+                    Text(total == 0 ? "You've checked everything recently. Nothing to check this month." : "All checked. Your notebook's up to date.")
                         .font(.wbBody).foregroundStyle(Theme.ink)
                     Button("Done") { dismiss() }.buttonStyle(PrimaryButtonStyle())
                 }
@@ -148,7 +148,7 @@ struct StocktakeView: View {
             .padding(20)
         }
         .background(Theme.lilacPaper)
-        .navigationTitle("Stocktake · \(Date.now.formatted(.dateTime.month(.wide)))").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("\(Date.now.formatted(.dateTime.month(.wide))) check").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Later") { dismiss() } } }
         .onAppear {
             guard total == 0 else { return }
@@ -185,7 +185,7 @@ struct StocktakeView: View {
             Stamp(text: monthsAgo(item.lastConfirmed), tone: .due)
             Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("lives in").font(.wbBody).foregroundStyle(Theme.pencil)
+                Text("is in").font(.wbBody).foregroundStyle(Theme.pencil)
                 PlaceBreadcrumb(path: item.place?.path)
             }
             Text("Last checked \(item.lastConfirmed.dayAndMonth). Is it still there?").font(.wbCaption).foregroundStyle(Theme.ink)
@@ -232,16 +232,16 @@ struct RitualBanners: View {
         let stocktake = Rituals.stocktakeDue(store.items, doneMonth: doneMonth)
         VStack(alignment: .leading, spacing: 10) {
             if recapReady {
-                banner(stamp: stamp, text: weeks > 0 ? "Keeping up. Sunday's recap is ready." : "Sunday's recap is ready.", action: "Read it") { open(.recap) }
+                banner(stamp: stamp, text: weeks > 0 ? "You're keeping up. Your Sunday recap is ready." : "Your Sunday recap is ready.", action: "Read it") { open(.recap) }
             } else if let stamp {
                 HStack(spacing: 12) {
                     Stamp(text: stamp, tone: .purple)
-                    Text("Keeping up.").font(.wbBody).foregroundStyle(Theme.ink)
+                    Text("You're keeping up.").font(.wbBody).foregroundStyle(Theme.ink)
                 }
                 .padding(.vertical, 4).accessibilityElement(children: .combine)
             }
             if stocktake {
-                banner(stamp: nil, text: "Still there? A few things haven't been checked in a while.", action: "Start") { open(.stocktake) }
+                banner(stamp: nil, text: "Still there? You haven't checked a few things lately.", action: "Start") { open(.stocktake) }
             }
         }
         .onAppear { readWeek = Rituals.seededReadWeek(readWeek) }

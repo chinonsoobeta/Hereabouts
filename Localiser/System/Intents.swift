@@ -17,9 +17,9 @@ enum HereaboutsIntentError: Error, CustomLocalizedStringResourceConvertible {
     case notFound, freeLimit, emptyName
     var localizedStringResource: LocalizedStringResource {
         switch self {
-        case .notFound: "That thing isn't in the notebook any more."
-        case .freeLimit: "The free notebook holds \(CreationKind.item.freeLimit) things. Open Hereabouts to get Pro, or archive something first."
-        case .emptyName: "A thing needs a name."
+        case .notFound: "That thing isn't in your notebook anymore."
+        case .freeLimit: "You can save \(CreationKind.item.freeLimit) things for free. Open Hereabouts to get Pro, or archive a thing first."
+        case .emptyName: "Give your thing a name."
         }
     }
 }
@@ -99,7 +99,7 @@ struct PlaceQuery: EntityStringQuery {
 
 struct FindThingIntent: AppIntent {
     static var title: LocalizedStringResource { "Where is it?" }
-    static var description: IntentDescription { IntentDescription("Says where a thing lives, from your notebook.") }
+    static var description: IntentDescription { IntentDescription("Find where you keep a thing in your notebook.") }
     @Parameter(title: "Thing", requestValueDialog: "Which thing?") var thing: ThingEntity
 
     @MainActor func perform() async throws -> some IntentResult & ProvidesDialog {
@@ -114,17 +114,17 @@ struct FindThingIntent: AppIntent {
         if item.archived { return path.map { "\(item.name) is archived. It was last in \($0)." } ?? "\(item.name) is archived." }
         if item.isMissing { return path.map { "\(item.name) is marked missing. It was last in \($0)." } ?? "\(item.name) is marked missing." }
         if item.isLent { return item.lentAt.map { "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide)))." } ?? "\(item.name) is with \(item.lentTo)." }
-        if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). It lives in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
-        guard let path else { return "\(item.name) is written down, but without a place yet." }
+        if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). You keep it in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
+        guard let path else { return "You've saved \(item.name), but haven't added a place yet." }
         return "\(item.name) is in \(path)."
     }
 }
 
 struct AddThingIntent: AppIntent {
     static var title: LocalizedStringResource { "Write a thing down" }
-    static var description: IntentDescription { IntentDescription("Adds a thing to the notebook, and where it lives.") }
+    static var description: IntentDescription { IntentDescription("Add a thing and its place to your notebook.") }
     @Parameter(title: "Thing", requestValueDialog: "What are you writing down?") var name: String
-    @Parameter(title: "Place", requestValueDialog: "Where does it live?") var place: PlaceEntity?
+    @Parameter(title: "Place", requestValueDialog: "Where do you keep it?") var place: PlaceEntity?
 
     static var parameterSummary: some ParameterSummary { Summary("Write \(\.$name) down in \(\.$place)") }
 
@@ -142,7 +142,7 @@ struct AddThingIntent: AppIntent {
 
 struct FoundThingIntent: AppIntent {
     static var title: LocalizedStringResource { "I found it" }
-    static var description: IntentDescription { IntentDescription("Notes where a lost thing turned up. Without a place, it was where it should be.") }
+    static var description: IntentDescription { IntentDescription("Save where you found a thing. Leave the place blank if you found it where you keep it.") }
     @Parameter(title: "Thing", requestValueDialog: "What did you find?") var thing: ThingEntity
     @Parameter(title: "Place", requestValueDialog: "Where was it?") var place: PlaceEntity?
 
@@ -160,9 +160,9 @@ struct FoundThingIntent: AppIntent {
 struct HereaboutsShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: FindThingIntent(), phrases: [
+            "Ask \(.applicationName) where something is",
             "Where is \(\.$thing) in \(.applicationName)",
             "Find \(\.$thing) in \(.applicationName)",
-            "Ask \(.applicationName) where something is",
         ], shortTitle: "Where is it?", systemImageName: "magnifyingglass")
         AppShortcut(intent: AddThingIntent(), phrases: [
             "Write something down in \(.applicationName)",
@@ -173,8 +173,8 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
             "\(.applicationName) put away",
         ], shortTitle: "Put away", systemImageName: "tray.and.arrow.down")
         AppShortcut(intent: FoundThingIntent(), phrases: [
-            "I found \(\.$thing) in \(.applicationName)",
             "Tell \(.applicationName) I found something",
+            "I found \(\.$thing) in \(.applicationName)",
         ], shortTitle: "I found it", systemImageName: "sparkle.magnifyingglass")
     }
 }

@@ -10,7 +10,7 @@ enum LocaliserError: LocalizedError, Equatable {
         switch self {
         case .nameRequired: "Enter a name."
         case .tooLong(let field, let limit): "\(field) can be up to \(limit.formatted()) characters."
-        case .placeCycle: "A place can't go inside itself, or inside anything it holds."
+        case .placeCycle: "You can't put a place inside itself or anything inside it."
         case .occupiedPlace: "Move what's inside somewhere else first."
         case .schemaUnavailable: "Hereabouts couldn't open your notebook. Nothing has been deleted."
         case .dateNotConfirmed: "Review and confirm the final date before saving it."
@@ -18,8 +18,8 @@ enum LocaliserError: LocalizedError, Equatable {
         case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
         case .invalidTripDates: "Come home on or after the day you leave."
         case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
-        case .incompleteDeparture: "Finish packing and the departure checklist before marking yourself away."
-        case .unresolvedHome: "Say where the rest of the things went before finishing coming home."
+        case .incompleteDeparture: "Finish packing and your checklist before you leave."
+        case .unresolvedHome: "Say where you put everything before you finish the trip."
         case .invalidBackup(let reason): reason
         case .homeNotEmpty: "Move or delete what's in this home first."
         case .lastHome: "The notebook needs at least one home."

@@ -57,6 +57,6 @@ extension Movement {
 
     /// What the app says after a find: "Noted. Next time, look in Hall › Drawer."
     static func foundSentence(_ place: Place?) -> String {
-        place.map { "Noted. Next time, look in \($0.path)." } ?? "Noted. Give it a place when you know where it lives."
+        place.map { "Noted. Next time, look in \($0.path)." } ?? "Noted. Add a place when you know where you keep it."
     }
 }

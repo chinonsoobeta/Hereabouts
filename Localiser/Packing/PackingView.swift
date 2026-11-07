@@ -17,13 +17,13 @@ struct PackingView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(alignment: .top) {
                             Image(systemName: "suitcase.rolling").foregroundStyle(Theme.purple).accessibilityHidden(true)
-                            Text("Pack once, never forget the charger").fixedSize(horizontal: false, vertical: true)
+                            Text("What do you need for your trip?").fixedSize(horizontal: false, vertical: true)
                         }.font(.wbTitle)
-                        Text("Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home.")
+                        Text("Make a checklist for a trip. Check off things as you pack. Put them away when you're home.")
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         Button("Plan a trip") { newTrip = true }.buttonStyle(PrimaryButtonStyle())
                         HStack(spacing: 12) {
-                            Text("Going away often? Save what you always take as a kit.").font(.wbCaption).foregroundStyle(Theme.secondary)
+                            Text("Take the same things each time? Save them as a kit.").font(.wbCaption).foregroundStyle(Theme.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                             Spacer(minLength: 0)
                             Button { newKit = true } label: { Label("New kit", systemImage: "plus").font(.wbItem) }
@@ -48,7 +48,7 @@ struct PackingView: View {
                     }
                     SectionHeading(title: "Kits").padding(.top, 8)
                     if store.kitsHere.isEmpty {
-                        Text("A kit is a list you reuse, like \u{201C}Weekend away\u{201D}. New trips can start from it.").font(.wbCaption).foregroundStyle(Theme.secondary)
+                        Text("Save a kit to reuse a list, like \u{201C}Weekend away\u{201D}. Use it to plan a trip.").font(.wbCaption).foregroundStyle(Theme.secondary)
                     }
                     ForEach(store.kitsHere) { kit in
                         NavigationLink { KitDetailView(kit: kit) } label: {
@@ -148,7 +148,7 @@ struct KitEditor: View {
                     do { if let kit { try store.editKit(kit, name: name) } else { try store.addKit(name: name) }; dismiss() } catch { self.error = error.localizedDescription }
                 }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.save") }
             }
-            .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+            .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
             .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
     }
 }
@@ -176,8 +176,8 @@ struct KitDetailView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(entry.title).font(.wbItem).foregroundStyle(Theme.ink)
                             Text(entry.ruleSummary).font(.wbCaption).foregroundStyle(Theme.secondary)
-                            if entry.unlinked && entry.item == nil { Text("The thing was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
-                            if entry.item?.archived == true { Text("Archived, so new trips leave it out.").font(.wbCaption).foregroundStyle(Theme.warning) }
+                            if entry.unlinked && entry.item == nil { Text("You deleted this thing. Its name stays on the list.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                            if entry.item?.archived == true { Text("You archived this thing. It won't be added to new trips.").font(.wbCaption).foregroundStyle(Theme.warning) }
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
                 }
@@ -187,7 +187,7 @@ struct KitDetailView: View {
                 ForEach(kit.tasks.sorted { $0.title < $1.title }) { task in Text(task.title).swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitTask(task) } } } }
                 AddTaskField(title: $taskTitle) { attempt { try store.addKitTask(kit, title: taskTitle); taskTitle = "" } }
             } header: { Text("Before you leave").foregroundStyle(Theme.secondary) }
-              footer: { Text("Trips copy this kit when you plan them. Changing the kit later doesn't change trips you've already planned.").foregroundStyle(Theme.secondary) }
+              footer: { Text("Use this kit when you plan a trip. Later edits to the kit won't change that trip.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground().navigationTitle(kit.name).navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -248,7 +248,7 @@ struct KitEntryEditor: View {
     }
     private var scaleHint: String {
         switch scale {
-        case .once: "Pack \(quantity) whatever the trip length."
+        case .once: "Pack \(quantity) for any trip length."
         case .perDay: "\(quantity) for each day away, counting travel days. A day trip needs \(quantity); a weekend away needs \(quantity * 3)."
         case .perNight: "\(quantity) for each night away. A day trip needs none; a weekend away needs \(quantity * 2)."
         }
@@ -261,7 +261,7 @@ struct KitEntryEditor: View {
             Picker("Amount", selection: $scale) { ForEach(PackingScale.allCases) { Text($0.title).tag($0) } }
             Text(scaleHint).font(.caption).foregroundStyle(Theme.secondary)
             Picker("Include for", selection: $condition) { ForEach(PackingCondition.allCases) { Text($0.title).tag($0) } }
-            Text("Linking a thing groups it by where it lives, so you can pack room by room.").font(.caption).foregroundStyle(Theme.secondary)
+            Text("Choose a thing from your notebook to pack by place.").font(.caption).foregroundStyle(Theme.secondary)
         }
         .groundBackground().navigationTitle(entry == nil ? "Add to kit" : "Edit").navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -270,7 +270,7 @@ struct KitEntryEditor: View {
                 do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.entry.save") }
         }
-        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -299,7 +299,7 @@ struct TripEditor: View {
         SheetForm {
             Section("Trip") {
                 TextField("Trip name", text: $name).accessibilityIdentifier("trip.name")
-                DatePicker("Depart", selection: $start, displayedComponents: .date)
+                DatePicker("Leave", selection: $start, displayedComponents: .date)
                 DatePicker("Come home", selection: $end, displayedComponents: .date)
                 if details.end < details.start { Text("Come home on or after the day you leave.").foregroundStyle(Theme.warning) }
                 else { Text(details.nightsLabel) }
@@ -309,7 +309,7 @@ struct TripEditor: View {
             if let trip {
                 Section("Quantity changes") {
                     ForEach(trip.entries.filter { $0.required(for: details) != $0.requiredCount }.sorted { $0.title < $1.title }) { entry in Text("\(entry.title): \(entry.requiredCount) → \(entry.required(for: details)); \(entry.packedCount) already packed") }
-                    Text("Packed counts and manual quantity overrides will be kept. Check for extra or missing things after saving.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("You keep your packed counts and quantities you've set. Check the list after you save.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }
@@ -320,7 +320,7 @@ struct TripEditor: View {
                 do { if let trip { try store.editTrip(trip, details: details) } else { try store.addTrip(details, kit: store.kits.first { $0.id == kitID }) }; dismiss() } catch { self.error = error.localizedDescription }
             }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || details.end < details.start).accessibilityIdentifier("trip.save") }
         }
-        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 }
 
@@ -386,7 +386,7 @@ struct TripDetailView: View {
             if trip.state == .comingHome {
                 Section {
                     let left = trip.unresolvedEntries.count
-                    Text(left == 0 ? "Everything's sorted. You can finish the trip." : left == 1 ? "1 thing still needs putting away. Tap it to say where it went." : "\(left) things still need putting away. Tap each one to say where it went.")
+                    Text(left == 0 ? "You're done unpacking. You can finish the trip." : left == 1 ? "Put away 1 more thing. Tap it to say where it went." : "Put away \(left) more things. Tap each one to say where it went.")
                         .foregroundStyle(Theme.secondary)
                 } header: { Text("Unpacking").foregroundStyle(Theme.secondary) }
             }
@@ -406,8 +406,8 @@ struct TripDetailView: View {
         }
         .sheet(isPresented: $edit) { NavigationStack { TripEditor(trip: trip) } }
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
-        .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("Its packing list is kept for reference. Where your things live doesn't change.") }
-        .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("The trip and its lists go. Your things and their places are kept.") }
+        .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("You keep its packing list. Your things stay in their places.") }
+        .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("You delete the trip and its lists. You keep your things and their places.") }
         .confirmationDialog("\(lentPacking?.title ?? "It") is with \(lentPacking?.item?.lentTo ?? "someone")", isPresented: Binding(get: { lentPacking != nil }, set: { if !$0 { lentPacking = nil } }), titleVisibility: .visible, presenting: lentPacking) { entry in
             Button("Pack it anyway") { attempt { try store.pack(entry, count: entry.requiredCount) } }
             if let item = entry.item { Button("It's back, pack it") { attempt { try store.gotBack(item); try store.pack(entry, count: entry.requiredCount) } } }
@@ -415,7 +415,7 @@ struct TripDetailView: View {
         .alert("Not quite ready", isPresented: Binding(get: { notReady != nil }, set: { if !$0 { notReady = nil } })) {
             Button("Keep packing", role: .cancel) { notReady = nil }
             Button("Leave anyway") { notReady = nil; attempt { try store.changeTripState(trip, to: .comingHome) } }
-        } message: { Text((notReady ?? "") + "\n\nLeave anyway skips the packing checks and goes straight to unpacking when you're back.") }
+        } message: { Text((notReady ?? "") + "\n\nChoose Leave anyway to skip packing checks and go to unpacking when you're back.") }
         .alert("Couldn't update the trip", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
@@ -455,7 +455,7 @@ struct TripDetailView: View {
                     NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed")
                     if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
                     if let item = entry.item, item.isLent { Text("With \(item.lentTo)").font(.wbCaption).foregroundStyle(Theme.warning) }
-                    if entry.unlinked && entry.item == nil { Text("The thing was deleted. Kept by name.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                    if entry.unlinked && entry.item == nil { Text("You deleted this thing. Its name stays on the list.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                     if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
                 }
             }
@@ -513,9 +513,9 @@ struct TripEntryDetailView: View {
                     Button("Pack all") { attempt { try store.pack(entry, count: entry.requiredCount); packed = Int(entry.packedCount) } }
                     Button("Unpack") { attempt { try store.pack(entry, count: 0); packed = 0 } }
                 }
-                Section("Quantity override") {
+                Section("Set quantity") {
                     Stepper("Needed: \(quantity)", value: $quantity, in: 0...9999)
-                    Button("Use manual quantity") { attempt { try store.setTripQuantity(entry, override: quantity) } }
+                    Button("Use this quantity") { attempt { try store.setTripQuantity(entry, override: quantity) } }
                     Button("Use kit rule") { attempt { try store.setTripQuantity(entry, override: nil); quantity = entry.requiredCount } }
                     Text("Changing how many are needed doesn't unpack anything.").font(.caption).foregroundStyle(Theme.secondary)
                 }
@@ -525,7 +525,7 @@ struct TripEntryDetailView: View {
                 Section("Coming home") {
                     Text(entry.resolution?.title ?? "")
                     if entry.item?.archived == true {
-                        Button("Confirm already returned / archived") { attempt { try store.resolveHome(entry, resolution: .noLongerHere) } }
+                        Button("Confirm returned or archived") { attempt { try store.resolveHome(entry, resolution: .noLongerHere) } }
                     } else {
                         Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? "no place yet")") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
                         if entry.item != nil {
@@ -534,7 +534,7 @@ struct TripEntryDetailView: View {
                         }
                     }
                     Button("Leave unresolved for now") { attempt { try store.resolveHome(entry, resolution: .unresolved) } }
-                    Text("Anything left for later stays on this list. Sort it before you finish the trip.").font(.caption).foregroundStyle(Theme.secondary)
+                    Text("You can leave things on this list for later. Put them away before you finish the trip.").font(.caption).foregroundStyle(Theme.secondary)
                 }
             }
         }

@@ -15,19 +15,19 @@ enum HereaboutsTips {
 
 struct PutAwayTip: Tip {
     @Parameter static var itemCount: Int = 0
-    var title: Text { Text("Putting lots away?") }
-    var message: Text? { Text("Turn on Put-away mode here to move several things to one place quickly.") }
+    var title: Text { Text("Putting things away?") }
+    var message: Text? { Text("Turn on Put-away mode here to move several things to one place.") }
     var rules: [Rule] { #Rule(Self.$itemCount) { $0 >= 5 } }
 }
 
 struct MoveTip: Tip {
     var title: Text { Text("Moved it?") }
-    var message: Text? { Text("Tap Move whenever you put it somewhere new, so you'll find it next time.") }
+    var message: Text? { Text("Tap Move when you put it somewhere new. You'll know where to look next time.") }
 }
 
 struct LeavingTip: Tip {
-    var title: Text { Text("Tick things off as you pack") }
-    var message: Text? { Text("When you tap I'm leaving, Hereabouts tells you if anything's still missing.") }
+    var title: Text { Text("Check off things as you pack") }
+    var message: Text? { Text("Tap I'm leaving to check if you still need to pack anything.") }
 }
 
 /// The Siri tips on the Find tab, one per phrase. Each is shown until it is dismissed, then stays gone.
