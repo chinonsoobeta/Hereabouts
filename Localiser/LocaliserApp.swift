@@ -118,7 +118,7 @@ extension RootView {
     /// Pro's weekly backup, when a week has passed. It runs when the app opens.
     func backUpIfDue() async {
         guard pro.unlocked else { return }
-        _ = AutomaticBackups(folder: await AutomaticBackups.resolveFolder(), isPro: pro.unlocked).runIfDue(store: store)
+        _ = await AutomaticBackups(folder: await AutomaticBackups.resolveFolder(), isPro: pro.unlocked).runIfDue(store: store)
     }
 
     func open(_ link: AppLink) {
