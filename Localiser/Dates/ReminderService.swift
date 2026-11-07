@@ -101,7 +101,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         let calendar = Calendar.current
         var requests: [(id: String, title: String, body: String, ritual: String, when: DateComponents, repeats: Bool)] = []
         if Rituals.recapEnabled && !store.items.isEmpty {
-            requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's due this week and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
+            requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's lent out and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
         }
         if Rituals.stocktakeEnabled, let date = Rituals.nextStocktakeDate(after: now, calendar: calendar) {
             let count = min(Rituals.stale(store.items, now: date, calendar: calendar).count, Rituals.stocktakeSize)

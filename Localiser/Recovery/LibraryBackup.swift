@@ -47,12 +47,25 @@ struct LibraryBackup: Codable, Sendable {
     static func decoded(_ data: Data) throws -> Self {
         guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup("Choose a Hereabouts backup under 200 MB.") }
         struct Header: Decodable { var version: Int }
-        do { return try JSONDecoder().decode(Self.self, from: data) } catch {
+        do { return try JSONDecoder().decode(Self.self, from: data).withoutRemovedKinds() } catch {
             // Say which problem it is. A newer app's backup gives its version. Every backup this app writes starts
             // with its date, because the keys are sorted, so a cut-off one is damaged. Anything else was never a backup.
             if let header = try? JSONDecoder().decode(Header.self, from: data), header.version > currentVersion { throw LocaliserError.invalidBackup(newerVersion) }
             throw LocaliserError.invalidBackup(data.starts(with: Data(#"{"createdAt":"#.utf8)) ? damaged : notABackup)
         }
+    }
+    /// Return, warranty and expiry dates and receipt scans left Hereabouts in 1.0. Older backups still
+    /// restore, without them; ask-back dates stay.
+    func withoutRemovedKinds() -> LibraryBackup {
+        let removed = Set(records.filter { $0.entity == "ScanRecord" || ($0.entity == "Deadline" && $0.string("kindRaw") != DeadlineKind.askBack.rawValue) }.map(\.id))
+        guard !removed.isEmpty else { return self }
+        var copy = self
+        copy.records = records.filter { !removed.contains($0.id) }.map { record in
+            var record = record
+            for (key, ids) in record.relationships { record.relationships[key] = ids.filter { !removed.contains($0) } }
+            return record
+        }
+        return copy
     }
     static let newerVersion = "This backup is from a newer Hereabouts. Update the app, then try again."
     static let damaged = "This backup is damaged. Choose another one."
@@ -64,7 +77,8 @@ struct LibraryBackup: Codable, Sendable {
         var records: [BackupRecord] = []
         var binaryBytes = 0
         for entity in container.managedObjectModel.entities {
-            guard let name = entity.name else { continue }
+            // Receipt scans are no longer kept.
+            guard let name = entity.name, name != "ScanRecord" else { continue }
             for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) {
                 guard let id = object.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup("Something in this notebook couldn't be backed up. Nothing has changed.") }
                 var attributes: [String: BackupValue] = [:]
@@ -86,7 +100,7 @@ struct LibraryBackup: Codable, Sendable {
                 var relationships: [String: [UUID]] = [:]
                 for (key, relationship) in entity.relationshipsByName {
                     let related = relationship.isToMany ? (object.value(forKey: key) as? NSSet)?.allObjects.compactMap { $0 as? NSManagedObject } ?? [] : (object.value(forKey: key) as? NSManagedObject).map { [$0] } ?? []
-                    relationships[key] = try related.map { value in
+                    relationships[key] = try related.filter { $0.entity.name != "ScanRecord" }.map { value in
                         guard let id = value.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup("Something in this notebook couldn't be backed up. Nothing has changed.") }
                         return id
                     }.sorted { $0.uuidString < $1.uuidString }
@@ -102,6 +116,7 @@ struct LibraryBackup: Codable, Sendable {
     /// Restores a backup. With `replacingExisting`, the current library is erased in the same save,
     /// so a failure leaves it exactly as it was.
     func restore(_ file: LibraryBackup, replacingExisting: Bool = false) throws {
+        let file = file.withoutRemovedKinds()
         try validateBackup(file)
         forgetUndo()
         if replacingExisting {
@@ -144,6 +159,7 @@ struct LibraryBackup: Codable, Sendable {
     static var laterRelationships: Set<String> { ["home"] }
 
     func validateBackup(_ file: LibraryBackup) throws {
+        let file = file.withoutRemovedKinds()
         guard file.version <= LibraryBackup.currentVersion else { throw LocaliserError.invalidBackup(LibraryBackup.newerVersion) }
         guard file.version >= 1 else { throw LocaliserError.invalidBackup(LibraryBackup.notABackup) }
         guard file.records.count <= 100_000 else { throw LocaliserError.invalidBackup("This backup is too big to restore.") }

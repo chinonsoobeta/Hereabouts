@@ -25,12 +25,6 @@ struct MoveTip: Tip {
     var message: Text? { Text("Tap Move whenever you put it somewhere new, so you'll find it next time.") }
 }
 
-struct CalendarTip: Tip {
-    var title: Text { Text("Add dates to Calendar") }
-    var message: Text? { Text("Touch and hold a date to add it, or use the menu to add them all.") }
-    var image: Image? { Image(systemName: "calendar.badge.plus") }
-}
-
 struct LeavingTip: Tip {
     var title: Text { Text("Tick things off as you pack") }
     var message: Text? { Text("When you tap I'm leaving, Hereabouts tells you if anything's still missing.") }

@@ -12,7 +12,7 @@ final class Belonging: NSManagedObject, Identifiable {
     /// When someone last said this is where it lives: added, moved, put away or "Still there".
     @NSManaged var confirmedAt: Date?
     @NSManaged var photo: Data?
-    /// Kept out of Spotlight, Siri, notifications, widgets and the calendar. Still in backups and exports.
+    /// Kept out of Spotlight, Siri, notifications and widgets. Still in backups and exports.
     @NSManaged var isPrivate: Bool
     /// Set by "Not there"; cleared when it's found.
     @NSManaged var missingSince: Date?

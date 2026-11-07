@@ -470,12 +470,12 @@ import XCTest
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
                 if ["Packing kits", "Pro isn't available to buy right now. Try again later.", "Restore purchases"].contains(element.label) { return true }
-                if element.label == "No limit on what you write down. Shared with your family." { return true }
+                if element.label == "No limit on what you write down." { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,
             // yet the contrast audit samples the card's soft shadow edge and reports a failure.
             // The Packing empty card sentence is the same ink-on-white case, checked by eye the same day.
-            if issue.auditType == .contrast && (element.label.hasPrefix("Add a return, warranty or expiry date") || element.label.hasPrefix("Make a checklist for a trip")) { return true }
+            if issue.auditType == .contrast && element.label.hasPrefix("Make a checklist for a trip") { return true }
             // Measured on 2026-10-10 in dark mode: the system search field's placeholder is #9F9EA9 on #2E2B36,
             // 5.24:1 on flat glyph pixels. The audit samples the anti-aliased edges and reports only a near miss.
             if issue.auditType == .contrast, element.elementType == .searchField, issue.compactDescription == "Contrast nearly passed" { return true }

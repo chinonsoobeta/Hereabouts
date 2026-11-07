@@ -783,9 +783,8 @@
 				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Hereabouts adds your return, warranty and expiry dates to your calendar. It never reads your existing events.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or scan a receipt. Photos stay on this iPhone.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like or to read a date from a receipt. Only the photos you choose are used.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -966,9 +965,8 @@
 				INFOPLIST_FILE = Localiser/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Hereabouts;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCalendarsWriteOnlyAccessUsageDescription = "Hereabouts adds your return, warranty and expiry dates to your calendar. It never reads your existing events.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or scan a receipt. Photos stay on this iPhone.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like or to read a date from a receipt. Only the photos you choose are used.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

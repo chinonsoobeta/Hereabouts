@@ -12,11 +12,12 @@ struct ProView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 Text("Hereabouts Pro").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
-                Text("No limit on what you write down. Shared with your family.").font(.wbBody).foregroundStyle(Theme.pencil)
+                Text("No limit on what you write down.").font(.wbBody).foregroundStyle(Theme.pencil)
                 VStack(spacing: 0) {
                     allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
                     allowance("Packing kits", free: CreationKind.kit.freeLimit.description)
                     allowance("Homes", free: CreationKind.home.freeLimit.description)
+                    NotebookLine(name: "Sharing with your household", detail: "Coming later", strongDetail: true).card()
                     NotebookLine(name: "Everything else", detail: "Already free", strongDetail: true).card()
                 }
                 if let standing = pro.standing {
@@ -31,7 +32,7 @@ struct ProView: View {
                 if pro.busy { ProgressView() }
                 if let message = pro.message { Text(message).font(.wbCaption).foregroundStyle(Theme.ink) }
                 StickyNote {
-                    Text("Reminders, calendar, backups, Siri and Spotlight are free for everyone. Pro only takes the limits off. If you never hit them, you never need it.")
+                    Text("Reminders, backups, Siri and Spotlight are free for everyone. Pro only takes the limits off. If you never hit them, you never need it.")
                         .font(.wbBody).foregroundStyle(Theme.ink)
                 }
                 Text("Limits only apply to adding new things. If Pro ends or a purchase is refunded, everything you've saved stays visible, editable and exportable.").font(.wbCaption).foregroundStyle(Theme.pencil)

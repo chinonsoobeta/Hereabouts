@@ -35,7 +35,7 @@ struct RecapView: View {
                 .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
                 SectionHeading(title: "Next week").padding(.top, 6)
                 VStack(spacing: 0) {
-                    if recap.due.isEmpty { line("Nothing due", "") }
+                    if recap.due.isEmpty { line("Nothing to ask back", "") }
                     ForEach(recap.due.prefix(5)) { deadline in
                         line(deadline.item?.name ?? "A saved thing", dueDetail(deadline))
                     }

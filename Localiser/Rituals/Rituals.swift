@@ -103,7 +103,7 @@ enum Rituals {
         var keepingUp: Int
     }
 
-    /// The last seven days, and the seven ahead.
+    /// The last seven days, and the seven ahead. Only ask-back dates come up; other dates left in 1.0.
     @MainActor static func recap(items: [Belonging], deadlines: [Deadline], now: Date = .now, calendar: Calendar = .current) -> Recap {
         let since = calendar.date(byAdding: .day, value: -7, to: now) ?? now
         let live = items.filter { !$0.isDeleted }
@@ -117,7 +117,7 @@ enum Rituals {
         let confirmed = live.filter { item in (item.confirmedAt ?? .distantPast) > since && item.createdAt <= since && !movedThisWeek.contains(item.objectID) }.count
         let horizon = CalendarDay(now, calendar: calendar).adding(days: 7, calendar: calendar)
         let due = deadlines.filter { deadline in
-            guard deadline.active, let day = deadline.day, let horizon else { return false }
+            guard deadline.kind == .askBack, deadline.active, let day = deadline.day, let horizon else { return false }
             return day >= CalendarDay(now, calendar: calendar) && day <= horizon
         }.sorted { $0.dayString < $1.dayString }
         let stale = stale(live, now: now, calendar: calendar)

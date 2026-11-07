@@ -89,6 +89,7 @@ final class LocaliserStore {
         context.transactionAuthor = Self.appAuthor
         try backfillConfirmation()
         try ensureHomes()
+        try removeCutDates()
         // A failed trim only costs disk space.
         if !inMemory { try? trimHistory() }
         try refresh()
@@ -110,6 +111,17 @@ final class LocaliserStore {
         let items = try context.fetch(request)
         guard !items.isEmpty else { return }
         for item in items { item.confirmedAt = item.movements.map(\.date).max() ?? item.createdAt }
+        try context.save()
+    }
+
+    /// Return, warranty and expiry dates and receipt scans left Hereabouts in 1.0. The first launch after the
+    /// update deletes them from the notebook; ask-back dates stay. The ScanRecord entity stays in the model, empty.
+    func removeCutDates() throws {
+        let dates = NSFetchRequest<NSManagedObject>(entityName: "Deadline")
+        dates.predicate = NSPredicate(format: "kindRaw != %@", DeadlineKind.askBack.rawValue)
+        let removed = try context.fetch(dates) + context.fetch(NSFetchRequest<NSManagedObject>(entityName: "ScanRecord"))
+        guard !removed.isEmpty else { return }
+        for object in removed { context.delete(object) }
         try context.save()
     }
 
