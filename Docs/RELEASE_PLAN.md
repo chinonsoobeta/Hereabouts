@@ -165,7 +165,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - [ ] Tips appear once and in order.
   - [ ] Notifications: deny, revoke, an ask-back reminder, force-quit, idle for days, change time zone. The Settings tab's warning shows when notifications are off.
   - [ ] Purchases, done as O35.
-  - [ ] Voice: microphone denied, then allowed; a long sentence; a place the notebook doesn't know is left blank.
+  - [ ] Voice: microphone denied, then allowed; a long sentence; a place the notebook doesn't know is left blank; live speech from the microphone (the simulator only tried typed and stand-in text); the first memo downloads the speech model, and after that one works in airplane mode (part 4 of the voice rule).
   - [ ] Siri: "Where is <thing> in Hereabouts", "Write something down in Hereabouts", locked and unlocked. The 16th free thing is refused politely. A private thing's place is never spoken. A missing thing is reported as missing.
   - [ ] Sunday recap, first-Saturday stocktake and trip-eve reminder arrive, open the right sheet, and stop when turned off.
   - [ ] Automatic backups: one arrives in iCloud Drive, a restore from it brings everything back, and turning Pro off keeps the saved ones.
@@ -189,10 +189,10 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### Stage 1, part A: the cut, the Settings tab and the free limits (P0, 3.25 sessions)
 
-- [ ] **M1 Keep a starting point for the receipts app.** Tag the current `main` as `receipts-spinoff-base` (local only). Add `Docs/RECEIPTS_SPINOFF.md` listing what a separate app would start from: `Scanning/`, `Dates/DateRules.swift`, `Dates/ReminderService.swift`, `Dates/CalendarExport.swift`, `Dates/DueView.swift`, their tests, and the release-plan findings about them (section 9). · D
-- [ ] **M2 Remove receipt scanning.** Delete `Scanning/ScanReader.swift`, `ScanView.swift`, `OrderEmail.swift` and `ShareImport.swift`, and every button that opens them. `Recovery/LibraryBackup.swift:162` uses `ScanReader.maximumBytes` for the 20 MB photo check; move that constant into `LibraryBackup` before deleting `ScanReader`. Remove `CreationKind.scan` (`Purchases/ProAccess.swift:6`) and the scan count from `LocaliserStore`. Keep the `ScanRecord` entity in the data model, unused, so no migration is needed. **Check:** the app builds with no reference to the deleted files; `OrderEmailTests` and `ShareImportTests` are deleted; scan cases leave `LocaliserTests`. · D
-- [ ] **M3 Remove return, warranty and expiry dates.** Remove the Due tab (`LocaliserApp.swift:71`) and `Dates/DueView.swift`, `Dates/CalendarExport.swift`, the "What's due?" intent and its phrases (`System/Intents.swift:145` and `:204`), the `hereabouts://due` link, and the Returning it and Keeping it notification buttons (`Dates/ReminderService.swift:32` to `:34`). Shrink `DeadlineKind` (`Dates/DateRules.swift:43`) to `askBack`. The thing page shows the ask-back date as "Ask for it back · <when>", which also fixes the old "Expires" label. The 50-reminder queue stays for ask-back dates. **Check:** `LendingTests` cover setting, reminding and clearing an ask-back date; no test refers to the removed kinds. · D, X2
-- [ ] **M4 Follow the cut through.** Every place that mentioned dates or scans:
+- [x] **M1 Keep a starting point for the receipts app.** Tag the current `main` as `receipts-spinoff-base` (local only). Add `Docs/RECEIPTS_SPINOFF.md` listing what a separate app would start from: `Scanning/`, `Dates/DateRules.swift`, `Dates/ReminderService.swift`, `Dates/CalendarExport.swift`, `Dates/DueView.swift`, their tests, and the release-plan findings about them (section 9). · D
+- [x] **M2 Remove receipt scanning.** Delete `Scanning/ScanReader.swift`, `ScanView.swift`, `OrderEmail.swift` and `ShareImport.swift`, and every button that opens them. `Recovery/LibraryBackup.swift:162` uses `ScanReader.maximumBytes` for the 20 MB photo check; move that constant into `LibraryBackup` before deleting `ScanReader`. Remove `CreationKind.scan` (`Purchases/ProAccess.swift:6`) and the scan count from `LocaliserStore`. Keep the `ScanRecord` entity in the data model, unused, so no migration is needed. **Check:** the app builds with no reference to the deleted files; `OrderEmailTests` and `ShareImportTests` are deleted; scan cases leave `LocaliserTests`. · D
+- [x] **M3 Remove return, warranty and expiry dates.** Remove the Due tab (`LocaliserApp.swift:71`) and `Dates/DueView.swift`, `Dates/CalendarExport.swift`, the "What's due?" intent and its phrases (`System/Intents.swift:145` and `:204`), the `hereabouts://due` link, and the Returning it and Keeping it notification buttons (`Dates/ReminderService.swift:32` to `:34`). Shrink `DeadlineKind` (`Dates/DateRules.swift:43`) to `askBack`. The thing page shows the ask-back date as "Ask for it back · <when>", which also fixes the old "Expires" label. The 50-reminder queue stays for ask-back dates. **Check:** `LendingTests` cover setting, reminding and clearing an ask-back date; no test refers to the removed kinds. · D, X2
+- [x] **M4 Follow the cut through.** Every place that mentioned dates or scans:
   - The introduction's reminders page: list the ask-back reminder, the trip-eve reminder, the Sunday recap and the stocktake.
   - The Sunday recap (`Rituals/Rituals.swift:107`): drop dates due this week, keep ask-backs.
   - Tips: remove the Scan and Add to Calendar tips.
@@ -203,33 +203,33 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - **Check:** a restore test with a format-3 backup that holds all four kinds keeps only the ask-back date; a search of the code finds no "receipt", "warranty", "expiry" or "Due" left in visible wording. · D
 - [ ] **M5 Settings becomes a tab, bottom right.** Add `AppTab.settings` (`LocaliserApp.swift:58`) as the last tab, labelled Settings with the gear symbol, showing `LibrarySettingsView` in its own navigation stack. Remove the gear buttons (`Find/FindView.swift:83` and `:106`, and the `SettingsButton` modifier at `Recovery/LibrarySettingsView.swift:235`). The three `dismiss()` calls in Settings go, since it's no longer a sheet; "Show the introduction again" switches to the Find tab. The notification warning badge moves from the Due tab to the Settings tab. **Check:** UI tests reach Settings and Pro through the tab; the review notes' route becomes "Settings tab, Hereabouts Pro". · D
 
-- [ ] **M60 New free limits: 15 things and 1 kit** (owner, 7 November). Numbered last but done with this part. Things count in total across all homes, as now. Set `HEREABOUTS_FREE_THINGS` to 15 at `project.yml:14` and the fallback at `Purchases/ProAccess.swift:14` (and its comment at line 10). Set the kit limit to 1 at `ProAccess.swift:8`. Homes stay at 2. Over-limit notebooks keep everything; only adding is blocked, and archiving frees a space. Free-team phone builds keep 200. **Check:** `LocaliserTests.swift:24` expects 15; a kit test refuses the second kit; `ShelfPhotoTests` still pass with their own limit. · D
+- [x] **M60 New free limits: 15 things and 1 kit** (owner, 7 November). Numbered last but done with this part. Things count in total across all homes, as now. Set `HEREABOUTS_FREE_THINGS` to 15 at `project.yml:14` and the fallback at `Purchases/ProAccess.swift:14` (and its comment at line 10). Set the kit limit to 1 at `ProAccess.swift:8`. Homes stay at 2. Over-limit notebooks keep everything; only adding is blocked, and archiving frees a space. Free-team phone builds keep 200. **Check:** `LocaliserTests.swift:24` expects 15; a kit test refuses the second kit; `ShelfPhotoTests` still pass with their own limit. · D
 
-- [ ] **M61 Move to the Hereabouts identifiers** (owner, 7 November). Numbered last but done with this part. Change every `dev.localiser` identifier to `dev.hereabouts`: the bundle IDs in `project.yml` (and regenerate the project), `ProPlan.prefix` at `Purchases/ProAccess.swift:22` so products become `dev.hereabouts.pro.monthly`, `.yearly` and `.lifetime`, the three products in `LocaliserTests/Localiser.storekit`, `SubscriptionTests`, the Spotlight domain at `System/Spotlight.swift:7`, and the control kind at `HereaboutsControls/HereaboutsControls.swift:13`. Folder and target names stay as they are. A new bundle ID installs as a different app, so the old Hereabouts on your phone and Angela's keeps its notebook: before O31, make "Back up everything" in the old app, restore it in the new one, check it, then delete the old app. **Check:** a search finds no `dev.localiser` outside the docs' history; unit and UI tests pass; a signed device build installs. · D
+- [x] **M61 Move to the Hereabouts identifiers** (owner, 7 November). Numbered last but done with this part. Change every `dev.localiser` identifier to `dev.hereabouts`: the bundle IDs in `project.yml` (and regenerate the project), `ProPlan.prefix` at `Purchases/ProAccess.swift:22` so products become `dev.hereabouts.pro.monthly`, `.yearly` and `.lifetime`, the three products in `LocaliserTests/Localiser.storekit`, `SubscriptionTests`, the Spotlight domain at `System/Spotlight.swift:7`, and the control kind at `HereaboutsControls/HereaboutsControls.swift:13`. Folder and target names stay as they are. A new bundle ID installs as a different app, so the old Hereabouts on your phone and Angela's keeps its notebook: before O31, make "Back up everything" in the old app, restore it in the new one, check it, then delete the old app. **Check:** a search finds no `dev.localiser` outside the docs' history; unit and UI tests pass; a signed device build installs. · D
 
 ### Stage 1, part B: wrong answers and privacy leaks (P0, 1 session)
 
-- [ ] **M6 A missing thing is reported as missing.** `System/Intents.swift:97` and `System/AppLinks.swift:75` give the recorded place for a thing marked Not there. After the private and archived checks, say "<name> is marked missing. It was last in <path>." **Check:** `IntentsTests` and `AppLinkTests`. · X2
-- [ ] **M7 The Shortcuts picker doesn't find private things by place or notes.** `System/Intents.swift:50` searches the full index. Keep a private thing only when the query matches its name or another name. **Check:** in `PrivateThingsTests`, a private passport in a drawer isn't found by "drawer", and is found by "passport" with the path "Private". · X2
-- [ ] **M8 "Several things in this photo?" keeps Keep private.** Add `isPrivate` to `addItems` (`Find/ShelfPhoto.swift:83`) and `ShelfNamesView` (line 89), passed from `Find/FindView.swift:411`. **Check:** `ShelfPhotoTests`. · X2
-- [ ] **M9 Found it keeps a thing in the right home.** `Find/Finding.swift:15` sets the place but not the home. Set the home as `recordMove` does (`Data/LocaliserStore.swift:193`), and limit `foundSuggestions` (line 27) to the thing's home. **Check:** `FindingTests` with two homes. · X2
-- [ ] **M10 Trips shows the chosen home.** `Packing/PackingView.swift:9`, `:10` and `:15` read `store.trips`. Use `store.tripsHere` and add `HomeSwitcher()` as Find does (`Find/FindView.swift:125`). **Check:** extend `testAddingAndSwitchingHomes`. · X2
-- [ ] **M11 Trip-eve reminders go to the nearest trips.** `Dates/ReminderService.swift:119` takes five trips sorted latest first. Sort earliest first in `Rituals.tripsNeedingEveReminder` (`Rituals/Rituals.swift:131`). **Check:** `RitualsTests` with six trips. · X2
+- [x] **M6 A missing thing is reported as missing.** `System/Intents.swift:97` and `System/AppLinks.swift:75` give the recorded place for a thing marked Not there. After the private and archived checks, say "<name> is marked missing. It was last in <path>." **Check:** `IntentsTests` and `AppLinkTests`. · X2
+- [x] **M7 The Shortcuts picker doesn't find private things by place or notes.** `System/Intents.swift:50` searches the full index. Keep a private thing only when the query matches its name or another name. **Check:** in `PrivateThingsTests`, a private passport in a drawer isn't found by "drawer", and is found by "passport" with the path "Private". · X2
+- [x] **M8 "Several things in this photo?" keeps Keep private.** Add `isPrivate` to `addItems` (`Find/ShelfPhoto.swift:83`) and `ShelfNamesView` (line 89), passed from `Find/FindView.swift:411`. **Check:** `ShelfPhotoTests`. · X2
+- [x] **M9 Found it keeps a thing in the right home.** `Find/Finding.swift:15` sets the place but not the home. Set the home as `recordMove` does (`Data/LocaliserStore.swift:193`), and limit `foundSuggestions` (line 27) to the thing's home. **Check:** `FindingTests` with two homes. · X2
+- [x] **M10 Trips shows the chosen home.** `Packing/PackingView.swift:9`, `:10` and `:15` read `store.trips`. Use `store.tripsHere` and add `HomeSwitcher()` as Find does (`Find/FindView.swift:125`). **Check:** extend `testAddingAndSwitchingHomes`. · X2
+- [x] **M11 Trip-eve reminders go to the nearest trips.** `Dates/ReminderService.swift:119` takes five trips sorted latest first. Sort earliest first in `Rituals.tripsNeedingEveReminder` (`Rituals/Rituals.swift:131`). **Check:** `RitualsTests` with six trips. · X2
 
 ### Stage 1, part C: smaller defects (P1, 1.25 sessions)
 
-- [ ] **M12 The stocktake leaves lent things out.** Add `!$0.isLent` to `stale` (`Rituals/Rituals.swift:54`). **Check:** `RitualsTests`. · X2
-- [ ] **M13 No recap banner on the first day.** `Rituals/RitualViews.swift:243` treats an empty read-week key as unread. Seed it with the current week on first appearance. **Check:** a `RitualsTests` case before and after the first Sunday 18:00. · X2
-- [ ] **M14 Tidying duplicate places keeps packing return places.** `Places/DuplicatePlaces.swift:25` deletes a spare without moving its `tripHomes`. Point them at the keeper first. **Check:** `DuplicatePlacesTests`. · X2
-- [ ] **M15 Restore saves once.** `Recovery/LibraryBackup.swift:104` saves, then `ensureHomes` (`Data/Homes.swift:71`) saves again. Move the delete loop inside `do` and make one save. **Check:** a format-2 restore over an existing notebook leaves one home and no unsaved changes. · X2
-- [ ] **M16 The failure screen's copy includes photos.** `LocaliserApp.swift:130` leaves out the `.Localiser_SUPPORT` folder. Add it, or rename the button to say photos stay on the phone. · X2
-- [ ] **M17 Replaying the introduction at the limit says why.** `Onboarding/OnboardingView.swift:168` ignores Pro. Use `pro.allows(.item, count:)` and show the editor's message (`Find/FindView.swift:434`). **Check:** a unit test for Pro and free. · X2
-- [ ] **M18 Siri's place choices name the home.** `System/Intents.swift:60` to `:79`: with several homes, title a place "<home> · <path>". **Check:** `IntentsTests`. · X2
-- [ ] **M19 The paywall UI test on iOS 27.** `LocaliserUITests/LocaliserUITests.swift:28` accepts "Pro isn't available" on any iOS. Accept it only below iOS 27. · X2
+- [x] **M12 The stocktake leaves lent things out.** Add `!$0.isLent` to `stale` (`Rituals/Rituals.swift:54`). **Check:** `RitualsTests`. · X2
+- [x] **M13 No recap banner on the first day.** `Rituals/RitualViews.swift:243` treats an empty read-week key as unread. Seed it with the current week on first appearance. **Check:** a `RitualsTests` case before and after the first Sunday 18:00. · X2
+- [x] **M14 Tidying duplicate places keeps packing return places.** `Places/DuplicatePlaces.swift:25` deletes a spare without moving its `tripHomes`. Point them at the keeper first. **Check:** `DuplicatePlacesTests`. · X2
+- [x] **M15 Restore saves once.** `Recovery/LibraryBackup.swift:104` saves, then `ensureHomes` (`Data/Homes.swift:71`) saves again. Move the delete loop inside `do` and make one save. **Check:** a format-2 restore over an existing notebook leaves one home and no unsaved changes. · X2
+- [x] **M16 The failure screen's copy includes photos.** `LocaliserApp.swift:130` leaves out the `.Localiser_SUPPORT` folder. Add it, or rename the button to say photos stay on the phone. · X2
+- [x] **M17 Replaying the introduction at the limit says why.** `Onboarding/OnboardingView.swift:168` ignores Pro. Use `pro.allows(.item, count:)` and show the editor's message (`Find/FindView.swift:434`). **Check:** a unit test for Pro and free. · X2
+- [x] **M18 Siri's place choices name the home.** `System/Intents.swift:60` to `:79`: with several homes, title a place "<home> · <path>". **Check:** `IntentsTests`. · X2
+- [x] **M19 The paywall UI test on iOS 27.** `LocaliserUITests/LocaliserUITests.swift:28` accepts "Pro isn't available" on any iOS. Accept it only below iOS 27. · X2
 
 ### Stage 1, part D: new features (P0, 6.5 sessions)
 
-- [ ] **M20 Voice memos, time-boxed to three sessions.** Hold the microphone button on Find, or tap Say it on the widget, and say something like "the spare key's in the blue tin on the hall shelf".
+- [x] **M20 Voice memos, time-boxed to three sessions.** Hold the microphone button on Find, or tap Say it on the widget, and say something like "the spare key's in the blue tin on the hall shelf".
   - **Hearing:** transcribe on the phone with the Speech framework's on-device transcriber (iOS 26), English only. Download the speech model on first use and say so if there's no network then. Keep no recording.
   - **Understanding:** first, rules that split the sentence at words like in, on, under, behind and inside, and match the place half against existing places, other names and path parts. On iPhones with Apple Intelligence, use the on-device Foundation Models framework to pull out the thing and the place when the rules can't.
   - **Saving:** open the existing Put away screen with the name and place filled in. A place the notebook doesn't know stays blank, with a "New place: <words>" suggestion to tap. Nothing saves without a tap. The free limit applies.
@@ -244,29 +244,29 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### Stage 1, part E: release hygiene (P0, 1 session)
 
-- [ ] **M23 Portrait only** (O1). Set iPhone orientations to portrait at `project.yml:63`; leave iPad as it is for compatibility mode. **Check:** rotating the simulator leaves every screen upright. · P, X1
-- [ ] **M24 No build warnings.** `Places/BoxLabels.swift:183`, `Support/Support.swift:26`, `Data/NotebookFile.swift:95`. **Check:** zero warnings in Debug and Release. · P
-- [ ] **M25 Privacy manifest for the Control Centre extension.** Add `HereaboutsControls/PrivacyInfo.xcprivacy`. · P
+- [x] **M23 Portrait only** (O1). Set iPhone orientations to portrait at `project.yml:63`; leave iPad as it is for compatibility mode. **Check:** rotating the simulator leaves every screen upright. · P, X1
+- [x] **M24 No build warnings.** `Places/BoxLabels.swift:183`, `Support/Support.swift:26`, `Data/NotebookFile.swift:95`. **Check:** zero warnings in Debug and Release. · P
+- [x] **M25 Privacy manifest for the Control Centre extension.** Add `HereaboutsControls/PrivacyInfo.xcprivacy`. · P
 - [ ] **M26 Acknowledgements in Settings**, naming both typefaces with their licences. · P, C2
-- [ ] **M27 No badge permission.** `Dates/ReminderService.swift:38`: ask for alerts and sounds only. · C2
-- [ ] **M28 A stale comment** at `Onboarding/OnboardingView.swift:3`. · C2
-- [ ] **M29 Release check script.** `scripts/check-release.sh` fails unless the free limit is 15 and the kit limit 1, the App Group is as intended, every target has a privacy manifest and both licence texts are present. · P
-- [ ] **M30 Trial shown per product** `Purchases/ProAccess.swift:83` and `:119` read one trial flag for both plans. · P, X1
-- [ ] **M31 Signing.** Set `DEVELOPMENT_TEAM` to `BRLCAAM57K` at `project.yml:10`, regenerate, and check a signed device build and an archive succeed. · P
+- [x] **M27 No badge permission.** `Dates/ReminderService.swift:38`: ask for alerts and sounds only. · C2
+- [x] **M28 A stale comment** at `Onboarding/OnboardingView.swift:3`. · C2
+- [x] **M29 Release check script.** `scripts/check-release.sh` fails unless the free limit is 15 and the kit limit 1, the App Group is as intended, every target has a privacy manifest and both licence texts are present. · P
+- [x] **M30 Trial shown per product** `Purchases/ProAccess.swift:83` and `:119` read one trial flag for both plans. · P, X1
+- [x] **M31 Signing.** Set `DEVELOPMENT_TEAM` to `BRLCAAM57K` at `project.yml:10`, regenerate, and check a signed device build and an archive succeed. · P
 
 ### Stage 1, part F: the facts in the docs (P0, 1 session)
 
 These set what's true. Codex's pass then makes it read well.
 
-- [ ] **M32 Support page.** The free plan becomes "15 things, 1 packing kit and 2 homes". Remove receipt answers. Say "Back up everything" carries only the photos you tick. Say a restore replaces the whole notebook. Add how to cancel a subscription. · P, X2, D
-- [ ] **M33 Privacy page.** Remove receipts and calendar. Add homes, lending and the contact picker, private things, shelf-photo names, box labels, voice memos (transcribed on the phone, recording not kept), automatic backups to your own iCloud Drive, the widget, the trial reminder, what StoreKit tells the app, deleting your data, and support emails. · P, X1, C2, D
-- [ ] **M34 Review notes.** No account; the free plan; Pro per O4 and what it keeps giving (no limits, weekly automatic backups, household sharing coming in 1.1); the route to the paywall through the Settings tab; sandbox testing; shelf photos and voice understanding on supported iPhones; iPad compatibility mode; the final URLs. · P, X1, D
-- [ ] **M35 Reviewer walkthrough.** Ten steps from a fresh install to the paywall and back. · P, X1
-- [ ] **M36 Description and subtitle.** A draft without receipts or returns, with Homes, lending, private things and voice memos (if they ship), and the Terms of Use line. For the owner to approve in O7. · P, X1, D
-- [ ] **M37 Screenshot list.** Drop the Due shot. Add voice memos (if they ship), lending and Pro. · merge, D
-- [ ] **M38 Beta doc.** In `BETA_AND_RELEASE.md`: the release gate at line 47 and the safety rule at line 26 (keep "never fill in an unknown place", drop the date half); the 201st free thing at line 43 becomes the 16th; the checks at lines 34 to 45 match O39; "Owner inputs" (line 131) points here. · X2, D
-- [ ] **M39 Feature plan.** In `FEATURE_PLAN.md`: A9 and B3 cut, B2 redefined, voice memos added, the receipts app noted for later. · D
-- [ ] **M40 One owner list.** Replace `HUMAN_BLOCKED.md` with a pointer to checklist A. Mark `CODEX_HANDOFF.md` and `AUDIT_AND_LAUNCH_PLAN.md` as history. · P, merge
+- [x] **M32 Support page.** The free plan becomes "15 things, 1 packing kit and 2 homes". Remove receipt answers. Say "Back up everything" carries only the photos you tick. Say a restore replaces the whole notebook. Add how to cancel a subscription. · P, X2, D
+- [x] **M33 Privacy page.** Remove receipts and calendar. Add homes, lending and the contact picker, private things, shelf-photo names, box labels, voice memos (transcribed on the phone, recording not kept), automatic backups to your own iCloud Drive, the widget, the trial reminder, what StoreKit tells the app, deleting your data, and support emails. · P, X1, C2, D
+- [x] **M34 Review notes.** No account; the free plan; Pro per O4 and what it keeps giving (no limits, weekly automatic backups, household sharing coming in 1.1); the route to the paywall through the Settings tab; sandbox testing; shelf photos and voice understanding on supported iPhones; iPad compatibility mode; the final URLs. · P, X1, D
+- [x] **M35 Reviewer walkthrough.** Ten steps from a fresh install to the paywall and back. · P, X1
+- [x] **M36 Description and subtitle.** A draft without receipts or returns, with Homes, lending, private things and voice memos (if they ship), and the Terms of Use line. For the owner to approve in O7. · P, X1, D
+- [x] **M37 Screenshot list.** Drop the Due shot. Add voice memos (if they ship), lending and Pro. · merge, D
+- [x] **M38 Beta doc.** In `BETA_AND_RELEASE.md`: the release gate at line 47 and the safety rule at line 26 (keep "never fill in an unknown place", drop the date half); the 201st free thing at line 43 becomes the 16th; the checks at lines 34 to 45 match O39; "Owner inputs" (line 131) points here. · X2, D
+- [x] **M39 Feature plan.** In `FEATURE_PLAN.md`: A9 and B3 cut, B2 redefined, voice memos added, the receipts app noted for later. · D
+- [x] **M40 One owner list.** Replace `HUMAN_BLOCKED.md` with a pointer to checklist A. Mark `CODEX_HANDOFF.md` and `AUDIT_AND_LAUNCH_PLAN.md` as history. · P, merge
 
 ### Stage 1, part G: wording that sounds human (Codex)
 
@@ -331,7 +331,7 @@ These set what's true. Codex's pass then makes it read well.
 
 - [ ] **M48 Builds for both phones** (after M31). Development builds, or TestFlight once O42 is given. · P
 - [ ] **M49 Final site address and email** (after O17). `project.yml:12` and `:13`, both pages, the review notes. Then open every Help link from a phone. · P
-- [ ] **M50 Safe notebook move** (before the App Group is switched on). `Data/NotebookFile.swift:31` removes the original as soon as a flag is set, and line 54 trusts any existing copy. Remove the original only after the group copy opens and its record counts match; otherwise fall back. **Check:** `NotebookFileTests` for a missing, damaged and short copy. · X2
+- [x] **M50 Safe notebook move** (before the App Group is switched on). `Data/NotebookFile.swift:31` removes the original as soon as a flag is set, and line 54 trusts any existing copy. Remove the original only after the group copy opens and its record counts match; otherwise fall back. **Check:** `NotebookFileTests` for a missing, damaged and short copy. · X2
 - [ ] **M51 Switch on the App Group** (after O15 and M50). `project.yml:16`, the entitlements for the app and the widget, and the 1C8F.1 reason in the privacy manifests. Write the O32 steps. · P, X1
 - [ ] **M52 The lent-out widget** (after M51). Medium size: who has what, since when, and the ask-back date. Private things show as "A private thing". The app reloads it after saves. · D
 - [ ] **M53 Ship or cut** the shared notebook and the lent-out widget, by the cut rule, and record the result here. · merge
@@ -346,6 +346,9 @@ These set what's true. Codex's pass then makes it read well.
 
 Blocked items found while building. Each waits for a talk with the owner.
 
+- **Voice rule, parts 1 to 3 pass** (7 November): M20 merged within its time box; 48 of the 50 practice sentences right (96%; 47 on the first run, before a plural rule for "shelves"); a place the notebook doesn't know is never filled in; nothing saves without a tap. Part 4, working offline on iOS 26, and live microphone capture need a phone (O39). Voice stays on until then.
+- **Family Sharing for the monthly and yearly plans.** O21 turns it on for Lifetime. The test StoreKit file shares all three products, and the support page now says only Lifetime is shared. Decide in O21; it can't be turned off later.
+- **Signed builds.** An archive signed with the Apple Development certificate for team BRLCAAM57K built and verified on the Mac (M31). Installing on a phone waits for M48.
 - **Pushing.** Decided 7 November: everything stays local until the app is ready for submission. Then the owner creates a new Git repository, and I add it as the remote and push `main` with its history. Until then nothing is pushed.
 
 ## 6. Recommendations
