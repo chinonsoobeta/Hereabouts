@@ -28,10 +28,10 @@ enum AppLink: Equatable {
 
     var url: URL {
         switch self {
-        case .find: URL(string: "hereabouts://find")!
+        case .find: WidgetButtons.find
         case .new: URL(string: "hereabouts://new")!
         case .putAway: URL(string: "hereabouts://putaway")!
-        case .say: URL(string: "hereabouts://say")!
+        case .say: WidgetButtons.say
         case .item(let id): URL(string: "hereabouts://item/\(id.uuidString)")!
         case .place(let id): URL(string: "hereabouts://place/\(id.uuidString)")!
         }
