@@ -148,7 +148,7 @@ struct StocktakeView: View {
             .padding(20)
         }
         .background(Theme.lilacPaper)
-        .navigationTitle("Monthly check · \(Date.now.formatted(.dateTime.month(.wide)))").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("\(Date.now.formatted(.dateTime.month(.wide))) check").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Later") { dismiss() } } }
         .onAppear {
             guard total == 0 else { return }

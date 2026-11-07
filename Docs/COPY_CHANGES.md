@@ -45,7 +45,7 @@ Line numbers refer to the revised files. Each changed occurrence is recorded, in
 | Find | Localiser/Rituals/RitualViews.swift | 124 | "A few quick questions once a month keep the notebook honest. Nothing changes unless you say so." | "Check a few things once a month. Nothing changes unless you say so." |
 | Find | Localiser/Rituals/RitualViews.swift | 135 | "Don't have it any more" | "Don't have it anymore" |
 | Find | Localiser/Rituals/RitualViews.swift | 138 | "Everything has been checked recently. Nothing to ask this month." · "All checked. The notebook's up to date. See you next month." | "You've checked everything recently. Nothing to check this month." · "All checked. Your notebook's up to date." |
-| Find | Localiser/Rituals/RitualViews.swift | 151 | "Stocktake · \(Date.now.formatted(.dateTime.month(.wide)))" | "Monthly check · \(Date.now.formatted(.dateTime.month(.wide)))" |
+| Find | Localiser/Rituals/RitualViews.swift | 151 | "Stocktake · \(Date.now.formatted(.dateTime.month(.wide)))" | "\(Date.now.formatted(.dateTime.month(.wide))) check" |
 | Find | Localiser/Rituals/RitualViews.swift | 188 | "lives in" | "is in" |
 | Find | Localiser/Rituals/RitualViews.swift | 235 | "Keeping up. Sunday's recap is ready." · "Sunday's recap is ready." | "You're keeping up. Your Sunday recap is ready." · "Your Sunday recap is ready." |
 | Find | Localiser/Rituals/RitualViews.swift | 239 | "Keeping up." | "You're keeping up." |
