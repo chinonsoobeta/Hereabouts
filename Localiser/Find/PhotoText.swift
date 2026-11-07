@@ -7,7 +7,7 @@ enum PhotoError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .tooLarge: "Choose a photo under 20 MB or 25 megapixels."
-        case .unreadable: "This photo couldn't be read."
+        case .unreadable: "Couldn't read this photo."
         }
     }
 }

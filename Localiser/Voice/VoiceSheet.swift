@@ -28,7 +28,7 @@ struct VoiceSheet: View {
                 if let message = capture.message { Text(message).font(.wbCaption).foregroundStyle(Theme.warning) }
                 if noSplit { Text("Say what it is and where, such as \u{201C}the drill's in the garage\u{201D}.").font(.wbCaption).foregroundStyle(Theme.secondary) }
             } header: { Text("What did you put away?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
-              footer: { Text("Hold the button and talk, or tap it to start and stop. Nothing is recorded.").foregroundStyle(Theme.secondary) }
+              footer: { Text("Hold the button to talk, or tap to start and stop. Nothing is recorded.").foregroundStyle(Theme.secondary) }
             Section { microphone.frame(maxWidth: .infinity) }.listRowBackground(Color.clear)
         }
         .groundBackground()

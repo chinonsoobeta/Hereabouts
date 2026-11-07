@@ -25,7 +25,7 @@ struct LendSheet: View {
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading).contentShape(Rectangle())
                 }
                 .buttonStyle(.plain).accessibilityLabel("Choose from Contacts")
-            } footer: { Text("Only the name is kept. Hereabouts doesn't read your contacts.").foregroundStyle(Theme.secondary) }
+            } footer: { Text("Hereabouts keeps only the name. It doesn't read your contacts.").foregroundStyle(Theme.secondary) }
             Section {
                 Toggle("Remind me to ask for it back", isOn: $askBack)
                 if askBack { DatePicker("Ask on", selection: $day, in: Date.now..., displayedComponents: .date) }

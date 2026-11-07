@@ -116,9 +116,9 @@ struct ShelfNamesView: View {
             }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
             Section {
                 if reading {
-                    ProgressView("Looking at the photo on this iPhone…")
+                    ProgressView("Reading your photo on this iPhone…")
                 } else if rows.isEmpty {
-                    Text(failed ? "That photo couldn't be read. Write the things down one at a time instead." : "Nothing to name in that photo. Try one closer up.")
+                    Text(failed ? "Couldn't read that photo. Write down one thing at a time." : "Couldn't see anything to name. Try a closer photo.")
                         .foregroundStyle(Theme.secondary).accessibilityIdentifier("shelf.none")
                 }
                 ForEach($rows) { $row in
@@ -128,16 +128,16 @@ struct ShelfNamesView: View {
                     }
                 }
             } header: { Text("What's there?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
-              footer: { if !rows.isEmpty { Text("Untick anything that isn't yours to keep track of, or fix a name.").foregroundStyle(Theme.secondary) } }
+              footer: { if !rows.isEmpty { Text("Uncheck things you don't want to save. You can edit the names.").foregroundStyle(Theme.secondary) } }
             Section {
                 PlacePicker(selection: $placeID, recent: store.recentPlaces())
-            } header: { Text("Where do they live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
+            } header: { Text("Where do you keep them?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
                 if !pro.unlocked, fits < chosen.count {
-                    Text(fits == 0 ? "The free plan is full. Get Pro to keep adding." : "\(fits) of these fit on the free plan.")
+                    Text(fits == 0 ? "Your free plan is full. Get Pro to add more." : "You can save \(fits) of these for free.")
                         .font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity, alignment: .leading).accessibilityIdentifier("shelf.freeLeft")
                 }
                 Button(saveTitle) { save() }
@@ -154,7 +154,7 @@ struct ShelfNamesView: View {
             reading = false
         }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
-        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private var saveTitle: String {

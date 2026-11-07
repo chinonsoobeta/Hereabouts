@@ -32,14 +32,14 @@ struct FindView: View {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
-                    LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "The first thing is the hardest to lose.")
+                    LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "Write down a thing and where you keep it.")
                     Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
                     dashboard
                 } else {
                     if putAway {
-                        Label("Choose a thing, then say where you put it.", systemImage: "tray.and.arrow.down")
+                        Label("Choose a thing. Say where you put it.", systemImage: "tray.and.arrow.down")
                             .font(.wbBody).foregroundStyle(.white)
                             .padding(16).frame(maxWidth: .infinity, alignment: .leading)
                             .background(Theme.purpleFill, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -47,7 +47,7 @@ struct FindView: View {
                     if results.isEmpty {
                         ContentUnavailableView.search(text: query)
                         if !putAway {
-                            Button("Found it? Write down where") { newThing = NewThing(name: query.trimmingCharacters(in: .whitespacesAndNewlines)) }
+                            Button("Write down where it is") { newThing = NewThing(name: query.trimmingCharacters(in: .whitespacesAndNewlines)) }
                                 .buttonStyle(SoftButtonStyle()).accessibilityIdentifier("find.writeDown")
                         }
                     }
@@ -142,7 +142,7 @@ struct FindView: View {
             }
             NewPlaceTile { addingPlace = true }
         }
-        SectionHeading(title: "Put away lately").padding(.top, 8)
+        SectionHeading(title: "Recently put away").padding(.top, 8)
         let lately = results.filter { !store.hasSeveralHomes || $0.home == store.currentHome }.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
         ForEach(lately) { item in itemCard(item) }
     }
@@ -204,8 +204,8 @@ struct ItemRow: View {
         HStack(spacing: 14) {
             IconTile(systemImage: "shippingbox", photo: item.photo, size: 48)
             VStack(alignment: .leading, spacing: 3) {
-                NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { "lives in " + $0.path } ?? "Place not written down", query: query)
-                if item.isLent, let home = item.place { Text("Lives in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { "is in " + $0.path } ?? "No place yet", query: query)
+                if item.isLent, let home = item.place { Text("Usually in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if store.hasSeveralHomes, let home = item.home, home != store.currentHome { Text("At \(home.name)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }
@@ -318,17 +318,17 @@ struct ItemEditor: View {
             Section {
                 PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [], home: item?.home)
                 if let spokenPlace, placeID == nil { NewPlaceSuggestion(spoken: spokenPlace) { placeID = $0 } }
-            } header: { Text("Where does it live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
+            } header: { Text("Where do you keep it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
                 TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
                 if notes.count > TextLimit.notes - 500 { counter(notes, TextLimit.notes) }
                 TextField("Other names, one per line", text: $aliases, axis: .vertical).lineLimit(1...6)
                 if aliases.count > TextLimit.aliases - 200 { counter(aliases, TextLimit.aliases) }
             } header: { Text("Optional details").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
-              footer: { Text("Other names help search. Add what you might type later, like \u{201C}ID\u{201D} for a passport.").foregroundStyle(Theme.secondary) }
+              footer: { Text("Add names you might search for, like \u{201C}ID\u{201D} for a passport.").foregroundStyle(Theme.secondary) }
             Section {
                 Toggle("Keep private", isOn: $isPrivate).accessibilityIdentifier("item.private")
-            } footer: { Text("Stays out of Spotlight, Siri, notifications and widgets. Still in backups and exports.").foregroundStyle(Theme.secondary) }
+            } footer: { Text("Hidden from Spotlight, Siri, notifications and widgets. Included in backups and exports.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
         .safeAreaInset(edge: .bottom) {
@@ -376,14 +376,14 @@ struct ItemEditor: View {
                 do {
                     guard let data = try await newValue.loadTransferable(type: Data.self), let image = UIImage(data: data) else { throw CocoaError(.fileReadCorruptFile) }
                     photo = PhotoResize.jpeg(image)
-                } catch { self.error = "That photo couldn't be opened. Try another one." }
+                } catch { self.error = "Couldn't open that photo. Try another one." }
                 selectedPhoto = nil
             }
         }
-        .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    static let freePlanFull = "The free plan is full. Archive something, or get Pro to keep adding."
+    static let freePlanFull = "Your free plan is full. Archive a thing or get Pro to add more."
 
     /// A quiet note when three or fewer things are left on the free plan.
     private var freeLeft: String? {
@@ -391,8 +391,8 @@ struct ItemEditor: View {
         let left = CreationKind.item.freeLimit - store.activeItemCount
         switch left {
         case ...0: return Self.freePlanFull
-        case 1: return "1 more thing fits on the free plan."
-        case 2...3: return "\(left) more things fit on the free plan."
+        case 1: return "You can add 1 more thing for free."
+        case 2...3: return "You can add \(left) more things for free."
         default: return nil
         }
     }
@@ -472,7 +472,7 @@ struct ItemDetailView: View {
                             }
                             .accessibilityElement(children: .combine)
                             HStack(spacing: 10) {
-                                Button(item.place == nil ? "Set place…" : "Move…") { moving = true }
+                                Button(item.place == nil ? "Choose a place…" : "Move…") { moving = true }
                                     .buttonStyle(SoftButtonStyle(compact: true))
                                     .accessibilityIdentifier("item.move")
                                     .popoverTip(MoveTip())
@@ -526,7 +526,7 @@ struct ItemDetailView: View {
                     Button(item.archived ? "Restore this thing" : "Archive this thing", systemImage: item.archived ? "tray.and.arrow.up" : "archivebox") { toggleArchive() }
                         .buttonStyle(SoftButtonStyle())
                 } footer: {
-                    Text(item.archived ? "Restored things show up in search again." : "Archive things you've given away or no longer own. They leave search and don't count toward the free plan, but their history is kept.")
+                    Text(item.archived ? "Restored things show up in search again." : "Archive things you no longer own. They're hidden from search and don't count toward your free plan. You keep their history.")
                         .foregroundStyle(Theme.secondary)
                 }
                 .listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -538,7 +538,7 @@ struct ItemDetailView: View {
             if available {
                 if let sentence = item.whereItIsSentence {
                     ToolbarItem(placement: .topBarTrailing) {
-                        ShareLink(item: sentence) { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Send where it is")
+                        ShareLink(item: sentence) { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Share where it is")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) { Button("Edit") { editing = true } }
@@ -578,7 +578,7 @@ struct ItemDetailView: View {
                 PlaceChooser(selection: Binding(get: { nil }, set: { id in
                     let place = store.places.first { $0.id == id }
                     do { try store.found(item, at: place); foundNote = Movement.foundSentence(place) } catch { self.error = error.localizedDescription }
-                }), noneTitle: "Somewhere without a place", suggested: store.foundSuggestions(for: item), title: "Where was it?", home: item.home)
+                }), noneTitle: "No place yet", suggested: store.foundSuggestions(for: item), title: "Where was it?", home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finding = false } } }
             }
         }
@@ -591,7 +591,7 @@ struct ItemDetailView: View {
             }
             if !item.archived { Button("Archive instead") { toggleArchive() } }
         } message: {
-            Text("Its dates and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
+            Text("You also delete its dates and history. You can undo for a few seconds. Its name stays in packing lists.")
         }
         .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
