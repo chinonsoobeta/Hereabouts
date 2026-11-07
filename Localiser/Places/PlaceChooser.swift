@@ -126,7 +126,7 @@ struct PlaceChooser: View {
                 }
             }
             Section {
-                row(title: noneTitle, detail: noneTitle == "None" ? "A room or other top-level place" : "Not sure yet", id: nil)
+                row(title: noneTitle, detail: noneTitle == "None" || noneTitle == "Top level" ? "A room or other top-level place" : "Not sure yet", id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
             } footer: {
                 if scope.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }

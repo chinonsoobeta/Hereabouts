@@ -190,6 +190,7 @@ struct PlaceDetailView: View {
     @State private var adding = false
     @State private var addingItem = false
     @State private var deleting = false
+    @State private var movingHome = false
     @State private var error: String?
     private var available: Bool { place.managedObjectContext != nil && !place.isDeleted }
 
@@ -237,6 +238,10 @@ struct PlaceDetailView: View {
                     }
                 } header: { Text("Things here").foregroundStyle(Theme.secondary) }
                   footer: { if !place.children.isEmpty && !nestedItems.isEmpty { Text("Includes things in the places inside.").foregroundStyle(Theme.secondary) } }
+                if store.hasSeveralHomes {
+                    Section { Button("Move to another home", systemImage: "house") { movingHome = true }.buttonStyle(SoftButtonStyle()) }
+                        .listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                }
                 Section { Button("Delete place", role: .destructive) { deleting = true } }
             } else { ContentUnavailableView("Place deleted", systemImage: "trash") }
         }
@@ -252,6 +257,7 @@ struct PlaceDetailView: View {
         .sheet(isPresented: $editing) { NavigationStack { PlaceEditor(place: place) } }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor(parent: place) } }
         .sheet(isPresented: $addingItem) { NavigationStack { ItemEditor(place: place) } }
+        .sheet(isPresented: $movingHome) { NavigationStack { MoveToHomeSheet(subject: .place(place)) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? place.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete place", role: .destructive) {

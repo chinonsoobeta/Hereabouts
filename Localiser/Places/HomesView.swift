@@ -110,3 +110,55 @@ struct HomesView: View {
         do { try work() } catch { self.error = error.localizedDescription }
     }
 }
+
+/// "Move to another home": pick a home, then a place in it or its top level. Moves a thing, or a place with
+/// everything inside it.
+struct MoveToHomeSheet: View {
+    enum Subject { case thing(Belonging), place(Place) }
+    @Environment(LocaliserStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    let subject: Subject
+    @State private var error: String?
+
+    private var currentHome: HomeRecord? {
+        switch subject { case .thing(let item): item.home; case .place(let place): place.home }
+    }
+
+    var body: some View {
+        let _ = store.revision
+        SheetList {
+            Section {
+                ForEach(store.homes.filter { $0 != currentHome }) { home in
+                    NavigationLink {
+                        PlaceChooser(selection: Binding(get: { nil }, set: { id in move(to: home, place: store.places.first { $0.id == id }) }),
+                                     noneTitle: "Top level", title: "Where in \(home.name)?", home: home)
+                    } label: { NotebookLine(name: home.name, detail: "") }
+                }
+            } footer: {
+                Text(footer).font(.wbCaption).foregroundStyle(Theme.pencil)
+            }
+        }
+        .listStyle(.plain)
+        .font(.wbBody).tint(Theme.purpleInk).groundBackground()
+        .navigationTitle("Move to another home").navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .alert("Couldn't move that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+
+    private var footer: String {
+        switch subject {
+        case .thing: "Pick a home, then where it goes there."
+        case .place: "Everything inside moves too: places inside it and their things."
+        }
+    }
+
+    private func move(to home: HomeRecord, place: Place?) {
+        do {
+            switch subject {
+            case .thing(let item): try store.moveThing(item, toHome: home, place: place)
+            case .place(let moving): try store.movePlace(moving, toHome: home, under: place)
+            }
+            dismiss()
+        } catch { self.error = error.localizedDescription }
+    }
+}

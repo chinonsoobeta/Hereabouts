@@ -1,0 +1,29 @@
+{
+ "note": "Example search pairs for the harness (M47). The owner's examples (O40) replace the pairs; keep the format. A pair is a hit when the expected thing is among the first topN results.",
+ "threshold": 0.8,
+ "topN": 3,
+ "things": [
+  {"name": "Passport", "aliases": "travel document", "place": "Study › Filing cabinet", "notes": ""},
+  {"name": "Spare house key", "aliases": "", "place": "Porch", "notes": "Under the plant pot"},
+  {"name": "Cordless drill", "aliases": "power drill", "place": "Basement › Workbench", "notes": ""},
+  {"name": "Winter coat", "aliases": "parka", "place": "Attic › Trunk", "notes": ""},
+  {"name": "Tent", "aliases": "", "place": "Garden shed", "notes": "Two person"},
+  {"name": "Birth certificate", "aliases": "", "place": "Study › Filing cabinet › Bottom drawer", "notes": ""},
+  {"name": "Flour", "aliases": "", "place": "Pantry › Top shelf", "notes": ""},
+  {"name": "Phone charger", "aliases": "usb cable", "place": "Study", "notes": ""},
+  {"name": "Café mugs", "aliases": "", "place": "Pantry", "notes": ""},
+  {"name": "Lawn mower", "aliases": "", "place": "Garden shed", "notes": ""}
+ ],
+ "pairs": [
+  {"query": "passport", "expect": "Passport"},
+  {"query": "travel document", "expect": "Passport"},
+  {"query": "house key", "expect": "Spare house key"},
+  {"query": "power drill", "expect": "Cordless drill"},
+  {"query": "parka", "expect": "Winter coat"},
+  {"query": "tnet", "expect": "Tent"},
+  {"query": "cafe mugs", "expect": "Café mugs"},
+  {"query": "mower", "expect": "Lawn mower"},
+  {"query": "usb cable", "expect": "Phone charger"},
+  {"query": "bottom drawer", "expect": "Birth certificate"}
+ ]
+}

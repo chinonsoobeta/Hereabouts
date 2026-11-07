@@ -176,10 +176,10 @@ import CoreData
         }
         let shed = insert("Place", ["name": "Shed"])
         let shelf = insert("Place", ["name": "Shelf", "parent": shed])
-        insert("Belonging", ["name": "Saw", "createdAt": Date(), "place": shelf])
-        insert("Belonging", ["name": "Loose", "createdAt": Date()])
-        insert("Kit", ["name": "Camping"])
-        insert("TripRecord", ["name": "Coast", "startDay": "2026-10-01", "endDay": "2026-10-03"])
+        _ = insert("Belonging", ["name": "Saw", "createdAt": Date(), "place": shelf])
+        _ = insert("Belonging", ["name": "Loose", "createdAt": Date()])
+        _ = insert("Kit", ["name": "Camping"])
+        _ = insert("TripRecord", ["name": "Coast", "startDay": "2026-10-01", "endDay": "2026-10-03"])
         let move = insert("Movement", ["date": Date(), "toPath": "Shed"])
         _ = move
         try context.save()
@@ -198,5 +198,137 @@ import CoreData
         XCTAssertEqual(migrated.trips.first?.home, home)
         let movements = try migrated.context.fetch(NSFetchRequest<Movement>(entityName: "Movement"))
         XCTAssertEqual(movements.first?.by, "")
+    }
+
+    // MARK: Moving between homes (M62)
+
+    func testAThingMovesToAnotherHomeAndKeepsItsHistory() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let flat = try XCTUnwrap(store.currentHome)
+        let shelf = try store.addPlace(name: "Shelf")
+        let passport = try store.addItem(name: "Passport", place: shelf, isPrivate: true)
+        let mums = try store.addHome(name: "Mum's house")
+        let drawer = try store.addPlace(name: "Drawer")
+        try store.moveThing(passport, toHome: mums, place: drawer)
+        XCTAssertEqual(passport.home, mums)
+        XCTAssertEqual(passport.place, drawer)
+        XCTAssertTrue(passport.isPrivate, "Private things stay private")
+        XCTAssertEqual(passport.movements.count, 1)
+        XCTAssertFalse(store.context.hasChanges)
+        // Top level of the other home: no place, but the home still changes.
+        try store.moveThing(passport, toHome: flat, place: nil)
+        XCTAssertEqual(passport.home, flat)
+        XCTAssertNil(passport.place)
+        // A place from a different home is refused.
+        XCTAssertThrowsError(try store.moveThing(passport, toHome: flat, place: drawer)) { XCTAssertEqual($0 as? LocaliserError, .wrongHome) }
+        XCTAssertEqual(passport.home, flat)
+    }
+
+    func testAMovedThingFollowsTheNewHomeInSearchSiriAndFoundIt() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let flat = try XCTUnwrap(store.currentHome)
+        let hall = try store.addPlace(name: "Hall")
+        let lamp = try store.addItem(name: "Lamp", place: hall)
+        let mums = try store.addHome(name: "Mum's house")
+        let loft = try store.addPlace(name: "Loft")
+        try store.moveThing(lamp, toHome: mums, place: loft)
+        store.switchHome(to: mums)
+        XCTAssertEqual(store.itemsHere.map(\.name), ["Lamp"])
+        XCTAssertEqual(ItemSearch.results(query: "lamp", entries: store.searchIndex, archived: false).first?.home, mums)
+        store.switchHome(to: flat)
+        XCTAssertTrue(store.itemsHere.isEmpty)
+        XCTAssertEqual(lamp.place?.path, "Loft")
+        XCTAssertEqual(PlaceEntity(loft, severalHomes: true).title, "Mum's house \u{B7} Loft")
+        XCTAssertEqual(store.foundSuggestions(for: lamp), [loft], "Found it only offers the new home's places")
+    }
+
+    func testAPlaceMovesWithItsSubPlacesAndEveryThingInside() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let flat = try XCTUnwrap(store.currentHome)
+        let cupboard = try store.addPlace(name: "Cupboard")
+        let box = try store.addPlace(name: "Box", parent: cupboard)
+        let bag = try store.addPlace(name: "Bag", parent: box)
+        let lamp = try store.addItem(name: "Lamp", place: bag)
+        let secret = try store.addItem(name: "Diary", place: box, isPrivate: true)
+        let old = try store.addItem(name: "Radio", place: bag)
+        try store.setArchived(old, true)
+        let stay = try store.addItem(name: "Mug", place: cupboard)
+        let mums = try store.addHome(name: "Mum's house")
+        let garage = try store.addPlace(name: "Garage")
+        try store.movePlace(box, toHome: mums, under: garage)
+        XCTAssertEqual([box.home, bag.home, lamp.home, secret.home, old.home], [mums, mums, mums, mums, mums])
+        XCTAssertEqual(box.parent, garage)
+        XCTAssertEqual(bag.parent, box)
+        XCTAssertEqual(bag.path, "Garage \u{203A} Box \u{203A} Bag")
+        XCTAssertTrue(secret.isPrivate)
+        XCTAssertEqual([cupboard.home, stay.home], [flat, flat])
+        XCTAssertFalse(store.context.hasChanges)
+        // Top level
+        try store.movePlace(box, toHome: flat, under: nil)
+        XCTAssertNil(box.parent)
+        XCTAssertEqual(bag.path, "Box \u{203A} Bag")
+        XCTAssertEqual([box.home, bag.home, lamp.home, old.home], [flat, flat, flat, flat])
+        // Moving into the home it's already in does nothing.
+        try store.movePlace(box, toHome: flat, under: cupboard)
+        XCTAssertNil(box.parent)
+    }
+
+    func testMovingAPlaceNeverMergesWithASamePathInTheNewHome() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let hall = try store.addPlace(name: "Hall")
+        let mums = try store.addHome(name: "Mum's house")
+        let mumsHall = try store.addPlace(name: "Hall")
+        try store.movePlace(hall, toHome: mums, under: nil)
+        XCTAssertEqual(store.places.filter { $0.home == mums && $0.path == "Hall" }.count, 2)
+        XCTAssertNotEqual(hall, mumsHall)
+        XCTAssertEqual(store.sparePlaces.count, 1, "Tidy duplicate places can merge them later")
+    }
+
+    func testPlacesCannotMoveIntoThemselvesOrAnotherHomesTree() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let flat = try XCTUnwrap(store.currentHome)
+        let box = try store.addPlace(name: "Box")
+        let bag = try store.addPlace(name: "Bag", parent: box)
+        let mums = try store.addHome(name: "Mum's house")
+        let garage = try store.addPlace(name: "Garage")
+        XCTAssertThrowsError(try store.movePlace(box, toHome: mums, under: bag)) { XCTAssertEqual($0 as? LocaliserError, .wrongHome) }
+        XCTAssertThrowsError(try store.movePlace(box, toHome: flat, under: garage)) { XCTAssertEqual($0 as? LocaliserError, .wrongHome) }
+        XCTAssertEqual([box.home, bag.home], [flat, flat])
+    }
+
+    func testKitsAndTripsKeepPointingAtAMovedPlace() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let bag = try store.addPlace(name: "Bag")
+        let tent = try store.addItem(name: "Tent", place: bag)
+        let kit = try store.addKit(name: "Camping")
+        let entry = try store.setKitEntry(kit: kit, name: "Tent", item: tent, unit: 1, perNight: false, condition: .always)
+        let trip = try store.addTrip(TripDetails(name: "Coast", start: try XCTUnwrap(CalendarDay(stored: "2030-06-01")), end: try XCTUnwrap(CalendarDay(stored: "2030-06-03"))), kit: kit)
+        let tripEntry = try XCTUnwrap(trip.entries.first)
+        try store.pack(tripEntry, count: 1)
+        XCTAssertEqual(tripEntry.homePlace, bag, "Coming home returns it to the bag")
+        let mums = try store.addHome(name: "Mum's house")
+        try store.movePlace(bag, toHome: mums, under: nil)
+        XCTAssertEqual(tripEntry.homePlace, bag)
+        XCTAssertEqual(entry.item, tent)
+        XCTAssertEqual(tent.home, mums)
+        XCTAssertEqual(tripEntry.homePlace?.home, mums)
+        XCTAssertEqual(store.kits.count, 1)
+        XCTAssertEqual(store.trips.count, 1)
+    }
+
+    func testAMoveIntoAHomeAtTheFreeLimitIsAllowed() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let flat = try XCTUnwrap(store.currentHome)
+        let mums = try store.addHome(name: "Mum's house")
+        let loft = try store.addPlace(name: "Loft")
+        for number in 0..<CreationKind.item.freeLimit { try store.addItem(name: "Thing \(number)", place: loft) }
+        let shed = try store.addPlace(name: "Shed", home: flat)
+        let spare = try store.addItem(name: "Spare", place: shed)
+        XCTAssertFalse(ProAccess().allows(.item, count: store.activeItemCount - 1), "The notebook is past the free limit")
+        let count = store.activeItemCount
+        try store.moveThing(spare, toHome: mums, place: loft)
+        try store.movePlace(shed, toHome: mums, under: nil)
+        XCTAssertEqual(store.activeItemCount, count, "A move isn't a new thing")
+        XCTAssertEqual(spare.home, mums)
     }
 }

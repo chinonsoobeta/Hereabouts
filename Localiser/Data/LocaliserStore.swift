@@ -5,7 +5,7 @@ import WidgetKit
 enum LocaliserError: LocalizedError, Equatable {
     case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder
     case invalidPackingEntry, invalidTripDates, packingConflict(String), incompleteDeparture, unresolvedHome
-    case invalidBackup(String), libraryNotEmpty, tooLong(String, Int), homeNotEmpty, lastHome
+    case invalidBackup(String), libraryNotEmpty, tooLong(String, Int), homeNotEmpty, lastHome, wrongHome
     var errorDescription: String? {
         switch self {
         case .nameRequired: "Enter a name."
@@ -23,6 +23,7 @@ enum LocaliserError: LocalizedError, Equatable {
         case .invalidBackup(let reason): reason
         case .homeNotEmpty: "Move or delete what's in this home first."
         case .lastHome: "The notebook needs at least one home."
+        case .wrongHome: "That place is in a different home."
         case .libraryNotEmpty: "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first."
         }
     }
