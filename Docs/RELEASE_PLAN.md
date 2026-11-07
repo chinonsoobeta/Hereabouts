@@ -340,6 +340,13 @@ These set what's true. Codex's pass then makes it read well.
 - [ ] **M56 Each archive** (after O42 or O44). Raise `CURRENT_PROJECT_VERSION` at `project.yml:69` and `:92`, archive with Xcode 27.2, run `scripts/check-release.sh`, upload only on the go-ahead. · P, X1
 - [ ] **M57 Sync week** (only if B4 is tried for 1.0). · P
 - [ ] **M58 CloudKit schema** to production, for a release with sync. · P, X1
+- [ ] **M65 Adversarial check of the late changes** (owner, 7 November), just before the submission archive (M56 for O45). Code that lands after M64 because it waits on an owner step (M50 to M54, and any beta fixes) gets the same treatment as M64, limited to the diff since M64: I try to break it, each finding needs a failing test, fixes are checked, and all tests run again. · D
+
+### Set aside for the owner
+
+Blocked items found while building. Each waits for a talk with the owner.
+
+- **Pushing.** The repository has no remote, so there's nothing to push to. Everything is committed locally on `main`. Say where it should live (a private GitHub repository, for example) and I'll add the remote and push.
 
 ## 6. Recommendations
 
