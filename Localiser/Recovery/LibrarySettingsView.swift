@@ -75,6 +75,7 @@ struct LibrarySettingsView: View {
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
                 Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
                 Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
+                NavigationLink { AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar) } label: { Label("Acknowledgements", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
             } header: { Text("Help") }
             Section {} footer: { Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.pencil) }
         }
@@ -229,5 +230,37 @@ struct BackupFilesView: View {
     }
     private func toggle(_ id: UUID, title: String) -> some View {
         Toggle(title, isOn: Binding(get: { selectedFiles.contains(id) }, set: { if $0 { selectedFiles.insert(id) } else { selectedFiles.remove(id) } }))
+    }
+}
+
+/// A typeface the app ships, with the licence file bundled next to it.
+struct Typeface: Identifiable {
+    let name: String
+    let file: String
+    var id: String { name }
+    static let all = [Typeface(name: "Atkinson Hyperlegible", file: "atkinsonhyperlegible-OFL"), Typeface(name: "Fraunces", file: "fraunces-OFL")]
+
+    func licence(in bundle: Bundle = .main) -> String? {
+        bundle.url(forResource: file, withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) }
+    }
+    /// The first line of the licence file.
+    var copyright: String { licence()?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "" }
+}
+
+struct AcknowledgementsView: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Hereabouts is set in two typefaces, both free to use under the SIL Open Font License.").font(.wbBody).foregroundStyle(Theme.ink)
+                ForEach(Typeface.all) { face in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(face.name).font(.wbItem).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
+                        Text(face.copyright).font(.wbCaption).foregroundStyle(Theme.pencil)
+                        Text(face.licence() ?? "The licence text isn't available.").font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
+                    }
+                }
+            }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Theme.paper).navigationTitle("Acknowledgements").navigationBarTitleDisplayMode(.inline)
     }
 }
