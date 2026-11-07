@@ -32,6 +32,7 @@ Nothing in this plan authorises an upload, a purchase, a message to anyone, an i
 - Settings as the fourth tab, bottom right. The tabs become Find, Places, Trips and Settings.
 - The widget's two buttons, Find and Say it, at small size and on the Lock Screen.
 - Voice memos, if they pass the voice rule below.
+- Five languages (owner, 7 November): English (US), English (UK), French, Spanish and Portuguese (M63).
 - The lent-out widget and the shared notebook file (B1), if they pass the cut rule below.
 
 **Out of 1.0**
@@ -88,13 +89,15 @@ Nothing has been uploaded, published, purchased or sent to anyone.
 | Stage | Who | Items | Done when | Effort |
 | --- | --- | --- | --- | --- |
 | 0. Decisions | Owner | O1 to O7 | Each answer is written down in this conversation. O3 and O4 are answered | — |
-| 1. Build 1.0 | Mac, Codex | M1 to M47, in order | All merged. Unit tests pass on iOS 26.5 and 27.0, all UI tests pass, no warnings. The voice rule is decided | About 14.5 sessions, plus Codex's pass |
+| 1. Build 1.0 | Mac, Codex (M41 only) | M1 to M47 and M63, in order | All merged. Unit tests pass on iOS 26.5 and 27.0, all UI tests pass, no warnings. The voice rule is decided | About 14.5 sessions, plus Codex's pass |
 | 2. Business, identifiers, site | Owner | O8 to O19 | Paid Apps Agreement active, App Group registered, pages live | CRA and Apple checks take days |
 | 3. After those steps | Mac, then owner | M48 to M53, O20 to O33 | Signed device builds on both phones. The cut rule is decided | 1.5 sessions |
 | 4. Beta | Owner, then Mac | O34 to O44, M54 to M56 | A week of real use. The physical checks and the quality check pass | At least one week |
 | 5. Submission | Owner | O20 to O30 finished, section 7, O45, O46 | The pre-submit check is all ticked | — |
 
 Stages 1 and 2 run side by side. Inside Stage 1, the cut and the Settings tab go first, because most later items touch the same screens. Each M item is its own local commit on `main`, with tests green (the owner agreed to local commits on 7 November; nothing is pushed), except Codex's pass, which uses its own branch (M41). Nothing is pushed or uploaded.
+
+Codex's usage is limited, so it does only the wording pass (M41) and the fixes from its review (M42), run once after the feature work is merged. Claude builders do every other M item (owner, 7 November).
 
 ## 4. Checklist A: owner-blocked
 
@@ -170,6 +173,9 @@ Stages 1 and 2 run side by side. Inside Stage 1, the cut and the Settings tab go
   - [ ] iPad in compatibility mode, all four tabs.
 - [ ] **O40 Quality-check examples.** 200 capture sentences, written as people would say them, and 100 search pairs, from people who didn't write the code. I freeze the commit and score them (M47).
 - [ ] **O41 Ask Angela** whether she'll be the second tester.
+- [ ] **O47 Voice memos in other languages.** The voice parser reads English sentences. Recommended: in 1.0, the microphone and Say it buttons show only when the phone's language is English, and French, Spanish and Portuguese voice memos come in 1.1. Otherwise each language needs its own practice sentences and has to pass the voice rule. Undecided; M63 builds the recommended version unless you say otherwise.
+- [ ] **O48 A fluent reader for each language.** Have someone who speaks French, Spanish, Portuguese and British English read the app in that language (the screenshots from M63 are enough to start), and mark anything that sounds machine-made. Defaults chosen for you, change any: international French (serves France and Canada), one neutral Spanish (Spain and Latin America), Brazilian Portuguese (Portugal falls back to it).
+- [ ] **O49 Listing languages in App Store Connect.** Add English (U.K.), French, French (Canada), Spanish (Spain), Spanish (Mexico) and Portuguese (Brazil) to the listing, and paste the text from `Docs/Localization/LISTING.md` (M63). Screenshots can stay English at first; App Store Connect uses them for every language that has none.
 
 ### Go-aheads (each one separately, at the time)
 
@@ -286,6 +292,17 @@ These set what's true. Codex's pass then makes it read well.
 >
 > **Deliverable:** commits per area (Find, Places, Trips, Settings and Pro, introduction and tips, notifications and Siri, widget and Control Centre, usage strings, website, listing). Add `Docs/COPY_CHANGES.md`, a table of every change with file, line, before and after. All unit and UI tests pass.
 
+### Stage 1, part G2: languages (P1, 2.5 sessions)
+
+- [ ] **M63 Five languages** (owner, 7 November), after M42, so the translations start from the final English. A Claude builder does it. English (US) stays the source language; the app adds English (UK), French, Spanish and Portuguese. · P, X1
+  - **Groundwork.** The app has no localization yet: no string catalogs and no `String(localized:)`. Set `developmentLanguage: en` and the known regions in `project.yml`, turn on `LOCALIZATION_PREFERS_STRING_CATALOGS` and `SWIFT_EMIT_LOC_STRINGS`, and add string catalogs for the app and `HereaboutsControls`: `Localizable.xcstrings`, `InfoPlist.xcstrings` (usage strings; the display name stays Hereabouts) and `AppShortcuts.xcstrings` (Siri phrases, each keeping the app name).
+  - **Make every string localizable.** Text built as a plain `String` (alerts, errors, notification titles and bodies, App Intents dialogs, widget and control text, VoiceOver labels, tips) moves to `String(localized:)` or `LocalizedStringResource`. Counts use plural variations ("1 thing", "2 things"). Dates, numbers and prices go through formatters and StoreKit's `displayPrice`, never hand-built.
+  - **Translate.** Use `xcodebuild -exportLocalizations` and `-importLocalizations`, or edit the catalogs directly. Write the way the English does: second person, short, warm, no marketing tone. French uses "vous", Spanish "tú", Portuguese "você". `Docs/Localization/GLOSSARY.md` fixes one word per language for thing, place, home, kit, trip, notebook, lend, ask for it back, put away and Found it; "Pro" and "Hereabouts" stay as they are. English (UK) changes only spelling and the odd word (colour, favourite, organise, cancelled). The paywall keeps every fact in every language: price, period, trial, automatic renewal, Restore purchases and both links.
+  - **Search** ignores accents, so "cafe" finds "Café".
+  - **Voice** as decided in O47 (default: English only in 1.0).
+  - **Listing.** `Docs/Localization/LISTING.md`: the subtitle (30 characters at most), promotional text, description, keywords (100 characters at most) and the review notes' first line, for each App Store language in O49. Nothing is uploaded. The website pages stay English for 1.0.
+  - **Check:** a unit test that every catalog entry is translated in every language, that format specifiers match the English, and that every Siri phrase keeps the app name; the UI tests pin English so they stay stable; a screenshot tour of every tab, Settings, Pro and the introduction in each language, at the default and the largest text size, saved to `Docs/Verification/Languages` for O48, with nothing clipped or overlapping.
+
 ### Stage 1, part H: verification (P0, 1 session)
 
 - [ ] **M43 Unit tests** on iOS 26.5 and iOS 27.0, recorded in `BUILD_STATUS.md`. · P, X1
@@ -303,7 +320,7 @@ These set what's true. Codex's pass then makes it read well.
 - [ ] **M52 The lent-out widget** (after M51). Medium size: who has what, since when, and the ask-back date. Private things show as "A private thing". The app reloads it after saves. · D
 - [ ] **M53 Ship or cut** the shared notebook and the lent-out widget, by the cut rule, and record the result here. · merge
 - [ ] **M54 Purchase wording** (after O35). Fix anything that read wrong in the sandbox. · P
-- [ ] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings before the first build. · P
+- [ ] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings in the source before the first build; British spellings belong only in the English (UK) catalog (M63). · P
 - [ ] **M56 Each archive** (after O42 or O44). Raise `CURRENT_PROJECT_VERSION` at `project.yml:69` and `:92`, archive with Xcode 27.2, run `scripts/check-release.sh`, upload only on the go-ahead. · P, X1
 - [ ] **M57 Sync week** (only if B4 is tried for 1.0). · P
 - [ ] **M58 CloudKit schema** to production, for a release with sync. · P, X1
