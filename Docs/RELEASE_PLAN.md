@@ -150,7 +150,13 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 ### Hands-on checks
 
 - [ ] **O31 Reinstall** on your iPhone and Angela's from the paid team, moving each notebook across with a backup first (M61). Never seed a personal phone with the demo library.
-- [ ] **O32 Real-notebook move** (only if the shared notebook ships). Install the current build, then the App Group build, open it twice, and check every thing, place and photo is still there. I write the steps when M51 is done.
+- [ ] **O32 Real-notebook move** (only if the shared notebook ships). Install the current build, then the App Group build, open it twice, and check every thing, place and photo is still there. The steps (written with M51):
+  1. Before anything else, make a backup in Settings and send it to yourself. Note how many things, places and photos you have (the Find and Places tabs; open three things that have photos).
+  2. Build the commit before M51 onto your iPhone, open it, and check the notebook is as you noted. Close it.
+  3. Build the App Group commit over the top (don't delete the app). Open it once and check the same counts, and the same three photos. The old notebook is kept on this first launch.
+  4. Force-close it and open it a second time. Check the counts and photos again. The old notebook is removed on this launch.
+  5. Add a thing with a photo, lend one out, close and open the app once more. All of it should still be there.
+  6. If anything is missing at any step, stop, don't delete the app, and send me the backup from step 1. The move falls back to the old notebook when the new one doesn't open or its counts don't match.
 - [ ] **O33 Shelf photo** on the iPhone 16 Pro Max with Apple Intelligence on. Is it worth keeping? Try it once with Keep private on.
 - [ ] **O34 Voice memos in your own words.** Say 20 sentences the way you'd really say them, in a quiet room and a noisy one, with and without Wi-Fi. Note each one it got wrong. This feeds the voice rule.
 - [ ] **O35 Sandbox purchases.** Buy each product; start both trials and cancel; restore on a second device; a failed purchase; Ask to Buy; a refund; Family Sharing. After the refund, check everything is still visible, editable and exportable.

@@ -189,6 +189,7 @@
 		688EA727718F4AD230A48BBB /* LocaliserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserStore.swift; sourceTree = "<group>"; };
 		69C7E4D9B7BFE1016E67E998 /* fraunces-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fraunces-OFL.txt"; sourceTree = "<group>"; };
 		6A479972608E485C29556D57 /* LocaliserApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserApp.swift; sourceTree = "<group>"; };
+		6BE3FDEC1213B8A4D9BF995A /* HereaboutsWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HereaboutsWidget.entitlements; sourceTree = "<group>"; };
 		6C101FE2F48901A66BFDB648 /* DemoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoLibrary.swift; sourceTree = "<group>"; };
 		6EE4809D10B04BE9A39FB756 /* HomesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomesView.swift; sourceTree = "<group>"; };
 		70B378AA2E10BB6111B24369 /* HereaboutsWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = HereaboutsWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -403,6 +404,7 @@
 		B7F8DE7BB70D3830FEA83FD8 /* HereaboutsWidget */ = {
 			isa = PBXGroup;
 			children = (
+				6BE3FDEC1213B8A4D9BF995A /* HereaboutsWidget.entitlements */,
 				6843AB0FCD31C2E3589A39E5 /* HereaboutsWidget.swift */,
 				07F900D4D476A98F3BB5CD7B /* Info.plist */,
 				8EC2ACA1E5BF76EDB17BB709 /* PrivacyInfo.xcprivacy */,
@@ -846,6 +848,7 @@
 		0F6E8B42717D045CEDE8984F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HereaboutsWidget/HereaboutsWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HereaboutsWidget/Info.plist;
@@ -907,7 +910,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEREABOUTS_APP_GROUP = "";
+				HEREABOUTS_APP_GROUP = group.dev.hereabouts.app;
 				HEREABOUTS_FREE_THINGS = 15;
 				HEREABOUTS_SITE_URL = "https://hereabouts.app";
 				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
@@ -1037,7 +1040,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEREABOUTS_APP_GROUP = "";
+				HEREABOUTS_APP_GROUP = group.dev.hereabouts.app;
 				HEREABOUTS_FREE_THINGS = 15;
 				HEREABOUTS_SITE_URL = "https://hereabouts.app";
 				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
@@ -1074,6 +1077,7 @@
 		65A780143A5791406FB7E669 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HereaboutsWidget/HereaboutsWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HereaboutsWidget/Info.plist;

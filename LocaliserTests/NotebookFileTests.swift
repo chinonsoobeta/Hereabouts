@@ -3,7 +3,7 @@ import CoreData
 @testable import Localiser
 
 @MainActor final class NotebookFileTests: XCTestCase {
-    private var folder: URL!
+    private nonisolated(unsafe) var folder: URL!
     override func setUpWithError() throws {
         folder = FileManager.default.temporaryDirectory.appendingPathComponent("NotebookFile-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
