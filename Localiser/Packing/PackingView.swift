@@ -100,9 +100,31 @@ struct TripStageStrip: View {
     }
 }
 
+/// One checklist row. It reads the store's revision itself: the task is a Core Data object, so SwiftUI can't see
+/// `checked` change, and on iOS 27 a row whose inputs look unchanged was left showing the old tick.
+struct TripTaskRow: View {
+    @Environment(LocaliserStore.self) private var store
+    let task: TripTask
+    let toggle: () -> Void
+    let delete: () -> Void
+    var body: some View {
+        let _ = store.revision
+        Button(action: toggle) {
+            Label { Text(task.title).foregroundStyle(Theme.ink).strikethrough(task.checked, color: Theme.secondary) } icon: {
+                PenCheckbox(checked: task.checked)
+            }
+        }
+        .accessibilityLabel(task.title).accessibilityAddTraits(task.checked ? .isSelected : [])
+        .accessibilityIdentifier("task.\(task.title)")
+        .swipeActions { Button("Delete", role: .destructive, action: delete) }
+    }
+}
+
 struct TripProgressCard: View {
+    @Environment(LocaliserStore.self) private var store
     let trip: TripRecord
     var body: some View {
+        let _ = store.revision
         let needed = trip.entries.reduce(0) { $0 + $1.requiredCount }
         let packed = trip.entries.reduce(0) { $0 + min(Int($1.packedCount), $1.requiredCount) }
         let fraction = needed == 0 ? 0 : Double(packed) / Double(needed)
@@ -371,14 +393,7 @@ struct TripDetailView: View {
             if trip.state == .packing {
                 Section {
                     ForEach(trip.tasks.sorted { $0.title < $1.title }) { task in
-                        Button { attempt { try store.checkTask(task, checked: !task.checked) } } label: {
-                            Label { Text(task.title).foregroundStyle(Theme.ink).strikethrough(task.checked, color: Theme.secondary) } icon: {
-                                PenCheckbox(checked: task.checked)
-                            }
-                        }
-                        .accessibilityLabel(task.title).accessibilityAddTraits(task.checked ? .isSelected : [])
-                        .accessibilityIdentifier("task.\(task.title)")
-                        .swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteTripTask(task) } } }
+                        TripTaskRow(task: task, toggle: { attempt { try store.checkTask(task, checked: !task.checked) } }, delete: { attempt { try store.deleteTripTask(task) } })
                     }
                     AddTaskField(title: $taskTitle) { attempt { try store.addTripTask(trip, title: taskTitle); taskTitle = "" } }
                 } header: { Text("Before you leave").foregroundStyle(Theme.secondary) }
