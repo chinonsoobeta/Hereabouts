@@ -51,18 +51,18 @@ No public launch with an open data-loss defect, a silently accepted wrong date o
 | Field | Value | Limit |
 | --- | --- | --- |
 | Name | Hereabouts | 30 |
-| Subtitle | Find things, track returns | 30 |
+| Subtitle | Find things at home | 30 |
 | Primary category | Productivity | |
 | Secondary category | Utilities | |
 | Age rating | 4+ | |
-| Price | Free, with Hereabouts Pro at US$2.99 a month or US$19.99 a year (two weeks free), or US$49.99 once | |
-| Keywords | `where,find,belongings,inventory,home,organizer,receipt,return,warranty,packing,list,storage,lost` | 100 |
+| Price | Free, with Hereabouts Pro as a monthly or yearly plan (two weeks free) or Lifetime. No price is written in the listing; the App Store shows each country's | |
+| Keywords | `where,find,belongings,inventory,home,organizer,packing,list,storage,lost,lend,borrow,keys,notebook` | 100 |
 
 The keywords leave out "Hereabouts", plurals and category names because the App Store already indexes those.
 
 **Promotional text** (170 characters, editable without review):
 
-> Free for up to 20 things. Try Pro free for two weeks, or buy it once for life. No account, no ads, no tracking.
+> Free for up to 15 things. Try Pro free for two weeks, or buy it once for life. No account, no ads, no tracking.
 
 **Description:**
 
@@ -70,8 +70,14 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 >
 > Save a thing with just its name. Add where it lives, like "Garage › Shelf 4", and find it again in seconds by name, nickname or place.
 >
-> NEVER MISS A RETURN
-> Scan a receipt or label. Hereabouts reads the dates on your iPhone and asks you to confirm them. It reminds you before the return window closes, a warranty ends or something expires. Add any date to your calendar with one tap.
+> HOMES AND PLACES
+> Keep more than one home in the same notebook, and move things or whole places between them. Mark a thing private and its place stays out of Spotlight and Siri's spoken answers.
+>
+> LEND IT, GET IT BACK
+> Note who has your drill. Choose a date to ask for it back, and Hereabouts reminds you.
+>
+> SAY IT (IF VOICE MEMOS SHIP)
+> Hold the microphone, or tap Say it on the widget, and say "the spare key's in the blue tin on the hall shelf". Hereabouts turns it into a thing and a place for you to check. It's heard on your iPhone, the recording isn't kept, and nothing is saved until you tap. English only for now.
 >
 > PACK ONCE
 > Make a kit for trips you take often. Plan a trip, tick things off by where they live, and get a checklist for putting everything back when you're home.
@@ -83,10 +89,14 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > One quiet recap on Sunday evenings. Once a month, a few "Still there?" questions about things you haven't looked at in a while. Both can be turned off.
 >
 > ASK SIRI
-> "Where is my passport?" Hereabouts answers from your notebook. Add things and hear what's due, hands-free.
+> "Where is my passport?" Hereabouts answers from your notebook. Write things down and put them away hands-free.
 >
-> FAIR PRICE
-> Free for up to 20 things, 2 kits and 5 scans a month. Hereabouts Pro removes the limits, shared with your family: US$2.99 a month or US$19.99 a year after a two-week free trial, or US$49.99 once. If Pro ends, nothing you wrote down is locked away. Every feature is in the free version.
+> FREE, OR PRO
+> Free for 15 things, 1 packing kit and 2 homes. Hereabouts Pro removes the limits and backs up your notebook every week to your own iCloud Drive. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, nothing you wrote down is locked away.
+>
+> Subscriptions renew automatically unless canceled at least 24 hours before the period ends, and you can manage or cancel them in the Settings app under your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereabouts.app/privacy.
+
+Leave the voice paragraph out if voice memos don't ship (voice rule, `RELEASE_PLAN.md` section 1). The listing carries no price, because prices differ by country. Description and subtitle are for the owner to approve in O7, after the wording pass.
 
 Before publishing, check each sentence against the shipped build. Do not claim sync, sharing between people or guaranteed reminders.
 
