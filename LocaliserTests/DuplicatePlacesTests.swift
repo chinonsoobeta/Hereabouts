@@ -20,6 +20,25 @@ import XCTest
         XCTAssertEqual(drawer.items.map(\.name), ["Scissors"])
     }
 
+    func testFoldingKeepsPackingReturnPlaces() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let kitchen = try store.addPlace(name: "Kitchen")
+        try store.addItem(name: "Kettle", place: kitchen)
+        let copy = try store.addPlace(name: "Kitchen")
+        let flask = try store.addItem(name: "Flask", place: copy)
+        let kit = try store.addKit(name: "Picnic")
+        _ = try store.setKitEntry(kit: kit, name: "", item: flask, unit: 1, perNight: false, condition: .always)
+        let today = CalendarDay(.now)
+        let trip = try store.addTrip(TripDetails(name: "Beach", start: today.adding(days: 3)!, end: today.adding(days: 4)!), kit: kit)
+        let entry = try XCTUnwrap(trip.entries.first)
+        try store.pack(entry, count: entry.requiredCount)
+        XCTAssertEqual(entry.homePlace, copy)
+        store.recordMove(flask, to: kitchen)
+        XCTAssertEqual(store.sparePlaces, [copy])
+        try store.mergeSparePlaces()
+        XCTAssertEqual(entry.homePlace, kitchen)
+    }
+
     func testPlacesWithThingsAreNeverMergedAndOtherLevelsAreLeftAlone() throws {
         let store = try LocaliserStore(inMemory: true)
         let a = try store.addPlace(name: "Garage")
