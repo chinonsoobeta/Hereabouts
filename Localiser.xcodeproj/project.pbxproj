@@ -823,7 +823,8 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or scan a receipt. Photos stay on this iPhone.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like or to read a date from a receipt. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1006,7 +1007,8 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or scan a receipt. Photos stay on this iPhone.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like or to read a date from a receipt. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
