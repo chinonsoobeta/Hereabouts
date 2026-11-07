@@ -184,6 +184,27 @@ import XCTest
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait], unresolvedContrast: true)
     }
 
+    func testSayingWhereFillsTheNewThing() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library", "--voice-transcript", "the spare charger is in the blue tin on the garage back wall"]
+        app.launch()
+        app.tabBars.buttons["Find"].tap()
+        let say = app.buttons["find.say"]
+        XCTAssertTrue(say.waitForExistence(timeout: 5))
+        say.tap()
+        app.buttons["voice.microphone"].tap()
+        let next = app.buttons["voice.continue"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textViews["voice.text"].waitForExistence(timeout: 5) || app.textFields["voice.text"].exists)
+        next.tap()
+        let name = app.textFields["item.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertEqual(name.value as? String, "Spare charger")
+        let newPlace = app.buttons["voice.newPlace"]
+        XCTAssertTrue(newPlace.waitForExistence(timeout: 5))
+        XCTAssertEqual(newPlace.label, "New place: Blue tin in Back wall")
+    }
+
     func testSeveralThingsFromOnePhoto() throws {
         #if targetEnvironment(simulator)
         continueAfterFailure = false

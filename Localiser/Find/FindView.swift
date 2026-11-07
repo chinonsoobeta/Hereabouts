@@ -16,6 +16,8 @@ struct FindView: View {
     @Environment(ReminderService.self) private var reminders
     @State private var ritual: Ritual?
     @State private var showDue = false
+    @State private var speaking = false
+    @State private var spoken: NewThing?
 
     private var results: [Belonging] {
         _ = store.revision
@@ -75,6 +77,7 @@ struct FindView: View {
             case .find?: searchFocused = true
             case .new?: newThing = NewThing()
             case .putAway?: newThing = NewThing(photoFirst: true)
+            case .say?: speaking = VoiceCapture.isAvailable()
             default: return
             }
             store.findRequest = nil
@@ -90,6 +93,9 @@ struct FindView: View {
                 .popoverTip(PutAwayTip())
             }
             ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true }.popoverTip(ScanTip()) }
+            if VoiceCapture.isAvailable() {
+                ToolbarItem(placement: .topBarTrailing) { Button("Say where", systemImage: "mic") { speaking = true }.accessibilityIdentifier("find.say") }
+            }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -101,7 +107,8 @@ struct FindView: View {
             }
         }
         .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
-        .sheet(item: $newThing) { new in NavigationStack { ItemEditor(name: new.name, photoFirst: new.photoFirst) } }
+        .sheet(item: $newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
+        .sheet(isPresented: $speaking, onDismiss: { if let spoken { newThing = spoken; self.spoken = nil } }) { NavigationStack { VoiceSheet { spoken = $0 } } }
         .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
@@ -169,6 +176,8 @@ struct NewThing: Identifiable {
     let id = UUID()
     var name = ""
     var photoFirst = false
+    var placeID: UUID?
+    var spokenPlace: SpokenPlace?
 }
 
 struct PlaceTile: View {
@@ -284,14 +293,17 @@ struct ItemEditor: View {
     @FocusState private var nameFocused: Bool
     /// Photo-first capture: the camera opens before the name. The place starts at the last one used.
     private let photoFirst: Bool
+    /// A place said aloud that the notebook doesn't have yet.
+    private let spokenPlace: SpokenPlace?
     static let lastPlaceKey = "lastPlaceID"
     static let lastPlaceTimeKey = "lastPlaceSavedAt"
     /// Only a run of additions reuses the place, so yesterday's room isn't quietly carried over.
     static let lastPlaceWindow: TimeInterval = 10 * 60
 
-    init(item: Belonging? = nil, place: Place? = nil, name: String = "", photoFirst: Bool = false) {
+    init(item: Belonging? = nil, place: Place? = nil, name: String = "", photoFirst: Bool = false, spokenPlace: SpokenPlace? = nil) {
         self.item = item
         self.photoFirst = photoFirst
+        self.spokenPlace = spokenPlace
         _name = State(initialValue: item?.name ?? name); _notes = State(initialValue: item?.notes ?? "")
         _aliases = State(initialValue: item?.aliases ?? ""); _placeID = State(initialValue: item?.place?.id ?? place?.id)
         _photo = State(initialValue: item?.photo)
@@ -361,6 +373,7 @@ struct ItemEditor: View {
             } header: { Text("What is it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
                 PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [], home: item?.home)
+                if let spokenPlace, placeID == nil { NewPlaceSuggestion(spoken: spokenPlace) { placeID = $0 } }
             } header: { Text("Where does it live?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
             Section {
                 TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
@@ -392,7 +405,7 @@ struct ItemEditor: View {
         }
         .onAppear {
             let savedAt = UserDefaults.standard.object(forKey: Self.lastPlaceTimeKey) as? Date ?? .distantPast
-            if item == nil, placeID == nil, Date.now.timeIntervalSince(savedAt) < Self.lastPlaceWindow,
+            if item == nil, placeID == nil, spokenPlace == nil, Date.now.timeIntervalSince(savedAt) < Self.lastPlaceWindow,
                let raw = UserDefaults.standard.string(forKey: Self.lastPlaceKey), let id = UUID(uuidString: raw), store.placesHere.contains(where: { $0.id == id }) {
                 placeID = id
             }

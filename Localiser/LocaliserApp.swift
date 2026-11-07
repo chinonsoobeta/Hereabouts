@@ -119,7 +119,7 @@ extension RootView {
         case .item(let id): store.openedItem = id
         case .place(let id): tab = .places; store.openedPlace = id
         case .due: tab = .due
-        case .find, .new, .putAway: tab = .find; store.findRequest = link
+        case .find, .new, .putAway, .say: tab = .find; store.findRequest = link
         }
     }
 }

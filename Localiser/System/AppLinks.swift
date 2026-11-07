@@ -1,11 +1,11 @@
 import SwiftUI
 import UIKit
 
-/// The app's own links: hereabouts://find, hereabouts://new, hereabouts://putaway, hereabouts://due and
+/// The app's own links: hereabouts://find, hereabouts://new, hereabouts://putaway, hereabouts://due, hereabouts://say and
 /// hereabouts://item/<id>. Used by app icon shortcuts, the widget and the controls. Box labels carry
 /// hereabouts://place/<id>.
 enum AppLink: Equatable {
-    case find, new, putAway, due
+    case find, new, putAway, due, say
     case item(UUID)
     case place(UUID)
 
@@ -16,6 +16,7 @@ enum AppLink: Equatable {
         case "new": self = .new
         case "putaway": self = .putAway
         case "due": self = .due
+        case "say": self = .say
         case "item":
             guard let id = UUID(uuidString: url.lastPathComponent) else { return nil }
             self = .item(id)
@@ -32,6 +33,7 @@ enum AppLink: Equatable {
         case .new: URL(string: "hereabouts://new")!
         case .putAway: URL(string: "hereabouts://putaway")!
         case .due: URL(string: "hereabouts://due")!
+        case .say: URL(string: "hereabouts://say")!
         case .item(let id): URL(string: "hereabouts://item/\(id.uuidString)")!
         case .place(let id): URL(string: "hereabouts://place/\(id.uuidString)")!
         }

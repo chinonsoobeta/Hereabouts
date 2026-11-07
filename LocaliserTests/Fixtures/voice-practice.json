@@ -1,0 +1,284 @@
+{
+ "note": "Practice sentences written for M20 before the parser was run on them. Not the owner's holdout. place is the path, or null when the notebook has no such place (or it's ambiguous).",
+ "places": [
+  "Hall",
+  "Hall › Shelf",
+  "Hall › Shelf › Blue tin",
+  "Hall › Cupboard",
+  "Hall › Closet under the stairs",
+  "Kitchen",
+  "Kitchen › Drawer",
+  "Kitchen › Sink cupboard",
+  "Bedroom",
+  "Bedroom › Bed",
+  "Bedroom › Bedside table",
+  "Bedroom › Wardrobe",
+  "Bedroom › Wardrobe › Top shelf",
+  "Garage",
+  "Garage › Shelf",
+  "Garage › Toolbox",
+  "Car",
+  "Car › Glovebox",
+  "Car › Trunk",
+  "Office",
+  "Office › Desk",
+  "Office › Desk › Top drawer",
+  "Office › Filing cabinet",
+  "Living room",
+  "Living room › Bookcase",
+  "Bathroom",
+  "Bathroom › Medicine cabinet"
+ ],
+ "sentences": [
+  {
+   "text": "the spare key's in the blue tin on the hall shelf",
+   "name": "Spare key",
+   "place": "Hall › Shelf › Blue tin"
+  },
+  {
+   "text": "I put my passport in the top drawer of my desk",
+   "name": "Passport",
+   "place": "Office › Desk › Top drawer"
+  },
+  {
+   "text": "the batteries are in the kitchen drawer",
+   "name": "Batteries",
+   "place": "Kitchen › Drawer"
+  },
+  {
+   "text": "put the drill in the toolbox",
+   "name": "Drill",
+   "place": "Garage › Toolbox"
+  },
+  {
+   "text": "my sunglasses are in my car's glovebox",
+   "name": "Sunglasses",
+   "place": "Car › Glovebox"
+  },
+  {
+   "text": "the winter blankets are under the bed",
+   "name": "Winter blankets",
+   "place": "Bedroom › Bed"
+  },
+  {
+   "text": "I left the umbrella in the hall cupboard",
+   "name": "Umbrella",
+   "place": "Hall › Cupboard"
+  },
+  {
+   "text": "birth certificates are in the filing cabinet",
+   "name": "Birth certificates",
+   "place": "Office › Filing cabinet"
+  },
+  {
+   "text": "the tape measure's on the garage shelf",
+   "name": "Tape measure",
+   "place": "Garage › Shelf"
+  },
+  {
+   "text": "the first aid kit is in the medicine cabinet",
+   "name": "First aid kit",
+   "place": "Bathroom › Medicine cabinet"
+  },
+  {
+   "text": "the Christmas lights are in the attic",
+   "name": "Christmas lights",
+   "place": null
+  },
+  {
+   "text": "I put the old phone chargers in the red box on the garage shelf",
+   "name": "Old phone chargers",
+   "place": null
+  },
+  {
+   "text": "the camping stove is behind the boxes in the basement",
+   "name": "Camping stove",
+   "place": null
+  },
+  {
+   "text": "the spare bulbs are in the cupboard under the sink",
+   "name": "Spare bulbs",
+   "place": "Kitchen › Sink cupboard"
+  },
+  {
+   "text": "the HDMI cable is in the TV cabinet",
+   "name": "HDMI cable",
+   "place": null
+  },
+  {
+   "text": "my reading glasses are on the bedside table",
+   "name": "Reading glasses",
+   "place": "Bedroom › Bedside table"
+  },
+  {
+   "text": "the cookbooks are on the bookcase in the living room",
+   "name": "Cookbooks",
+   "place": "Living room › Bookcase"
+  },
+  {
+   "text": "the wrapping paper's behind the wardrobe",
+   "name": "Wrapping paper",
+   "place": "Bedroom › Wardrobe"
+  },
+  {
+   "text": "I've put the scarves on the top shelf of the wardrobe",
+   "name": "Scarves",
+   "place": "Bedroom › Wardrobe › Top shelf"
+  },
+  {
+   "text": "the jump leads are in the trunk of the car",
+   "name": "Jump leads",
+   "place": "Car › Trunk"
+  },
+  {
+   "text": "the ice scraper's in the glovebox",
+   "name": "Ice scraper",
+   "place": "Car › Glovebox"
+  },
+  {
+   "text": "the screwdrivers are in the toolbox in the garage",
+   "name": "Screwdrivers",
+   "place": "Garage › Toolbox"
+  },
+  {
+   "text": "the stamps are in the desk drawer",
+   "name": "Stamps",
+   "place": "Office › Desk › Top drawer"
+  },
+  {
+   "text": "the vacuum cleaner bags are in the closet under the stairs",
+   "name": "Vacuum cleaner bags",
+   "place": "Hall › Closet under the stairs"
+  },
+  {
+   "text": "my passport is in the safe",
+   "name": "Passport",
+   "place": null
+  },
+  {
+   "text": "the bike pump is next to the toolbox",
+   "name": "Bike pump",
+   "place": "Garage › Toolbox"
+  },
+  {
+   "text": "the extension cord's by the desk",
+   "name": "Extension cord",
+   "place": "Office › Desk"
+  },
+  {
+   "text": "car keys in the bedroom",
+   "name": "Car keys",
+   "place": "Bedroom"
+  },
+  {
+   "text": "the guest towels are in the linen closet",
+   "name": "Guest towels",
+   "place": null
+  },
+  {
+   "text": "I put the receipts in the blue tin",
+   "name": "Receipts",
+   "place": "Hall › Shelf › Blue tin"
+  },
+  {
+   "text": "the charger's on the kitchen counter",
+   "name": "Charger",
+   "place": null
+  },
+  {
+   "text": "the knitting needles are in the basket by the sofa",
+   "name": "Knitting needles",
+   "place": null
+  },
+  {
+   "text": "um the scissors are in the kitchen drawer for now",
+   "name": "Scissors",
+   "place": "Kitchen › Drawer"
+  },
+  {
+   "text": "the tent is in the garage",
+   "name": "Tent",
+   "place": "Garage"
+  },
+  {
+   "text": "the measuring cups are in the kitchen drawers",
+   "name": "Measuring cups",
+   "place": "Kitchen › Drawer"
+  },
+  {
+   "text": "the paintbrushes are on the garage shelves",
+   "name": "Paintbrushes",
+   "place": "Garage › Shelf"
+  },
+  {
+   "text": "the dog's lead is in the hall cupboard",
+   "name": "Dog's lead",
+   "place": "Hall › Cupboard"
+  },
+  {
+   "text": "the ski gloves are inside the wardrobe",
+   "name": "Ski gloves",
+   "place": "Bedroom › Wardrobe"
+  },
+  {
+   "text": "I left my wallet on my desk",
+   "name": "Wallet",
+   "place": "Office › Desk"
+  },
+  {
+   "text": "the tax papers are in the filing cabinet in the office",
+   "name": "Tax papers",
+   "place": "Office › Filing cabinet"
+  },
+  {
+   "text": "the rain boots are under the stairs",
+   "name": "Rain boots",
+   "place": null
+  },
+  {
+   "text": "the cotton buds are in the medicine cabinet in the bathroom",
+   "name": "Cotton buds",
+   "place": "Bathroom › Medicine cabinet"
+  },
+  {
+   "text": "the spare SIM card is in the blue tin on the shelf in the hall",
+   "name": "Spare SIM card",
+   "place": "Hall › Shelf › Blue tin"
+  },
+  {
+   "text": "my headphones are in the bedside table",
+   "name": "Headphones",
+   "place": "Bedroom › Bedside table"
+  },
+  {
+   "text": "the hammer's in the toolbox",
+   "name": "Hammer",
+   "place": "Garage › Toolbox"
+  },
+  {
+   "text": "the light bulbs are on the top shelf",
+   "name": "Light bulbs",
+   "place": "Bedroom › Wardrobe › Top shelf"
+  },
+  {
+   "text": "the sewing kit is on the shelf",
+   "name": "Sewing kit",
+   "place": null
+  },
+  {
+   "text": "the board games are in the cupboard",
+   "name": "Board games",
+   "place": "Hall › Cupboard"
+  },
+  {
+   "text": "the passports are in the drawer in the office",
+   "name": "Passports",
+   "place": "Office › Desk › Top drawer"
+  },
+  {
+   "text": "put the snorkel in the beach bag in the garage",
+   "name": "Snorkel",
+   "place": null
+  }
+ ]
+}
