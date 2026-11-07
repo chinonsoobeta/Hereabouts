@@ -2,6 +2,25 @@
 
 Written 12 October 2026. None of this is built yet. It covers the subscription the owner chose and the features agreed the same day. The work splits at enrolment in the Apple Developer Program: Phase A can be built and tested now with the free team, and Phase B needs the paid account.
 
+## Changes of 7 November 2026
+
+`RELEASE_PLAN.md` is the plan for 1.0 now. This document stays the record of what each feature is. Where the two differ, the release plan wins. The owner's decisions of 7 November change this plan like so:
+
+| Item | Change |
+| --- | --- |
+| **A9** Paste an order email | Cut from 1.0 with receipt scanning, return/warranty/expiry dates and the Due tab (M1 to M4). |
+| **B3** Share sheet | Cut from 1.0. The share sheet and the "What's due?" Siri phrase go with the receipts. |
+| **B2** Due widget | Redefined. It is now two quick buttons, Find and Say it, at small size and on the Lock Screen, reading nothing from the notebook (M21). A medium "lent out" widget, listing who has what and the ask-back date, ships only if the shared notebook (B1) passes the cut rule (M52). |
+| **Voice memos** | Added (M20). Hold the microphone on Find, or tap Say it on the widget. Transcribed on the phone with the Speech framework, English only in 1.0, recording not kept, nothing saved without a tap, and an unknown place is never filled in. Ships only if it passes the voice rule in `RELEASE_PLAN.md` section 1. |
+| **A6** Ask-back dates | Stay, with their reminder. The thing page shows "Ask for it back". |
+| **A1** Free plan | 15 things in total, 1 packing kit, 2 homes (M60). Scans are gone. Pro also gets automatic weekly backups (M59). |
+| **B5** Homes | Built, with moving things and places between homes (M62). The free plan has 2 homes. |
+| **B4**, **B6** | Sync and household sharing are 1.1. |
+| **Settings** | A fourth tab, bottom right (M5). |
+| **Receipts app** | Receipt scanning, return/warranty/expiry dates, the Due tab and the share sheet may become a separate app later, starting from the `receipts-spinoff-base` tag. See `RECEIPTS_SPINOFF.md`. |
+
+The sections below are as written on 12 October. Read them with that table beside them.
+
 Effort is in working sessions, as in `AUDIT_AND_LAUNCH_PLAN.md`. Each step is committed in small pieces with the tests green, and nothing is pushed or uploaded.
 
 ## What the owner decided
@@ -233,6 +252,8 @@ Save takes one tap. The same screen opens from:
 
 ### A9. Paste an order email
 
+**Cut from 1.0 (7 November).** Kept here for the receipts app.
+
 The return-date editor gets "Paste order email". It reads the text on the clipboard with the date reading `ScanReader` already uses, and offers the dates it finds to confirm, exactly as a receipt scan does. This is the share sheet's reading step built early: B3 reuses it, and it works today.
 
 **Tests:** sample order-email text in US and UK date styles gives the right candidates. Text without a date says so.
@@ -271,6 +292,8 @@ The widget, share sheet and controls run outside the app, so the notebook file m
 
 ### B2. Due widget
 
+**Redefined (7 November).** The widget is now Find and Say it buttons, plus a lent-out list if the shared notebook ships (M21, M52). There is no Due tab or date to show. What follows is the 12 October design.
+
 As planned in `AUDIT_AND_LAUNCH_PLAN.md` section 4.3 and `HUMAN_BLOCKED.md`:
 - Sizes: small (the next date), medium (the next three) and the Lock Screen.
 - It reads the notebook and doesn't write to it. Taps open `hereabouts://item/<id>` or `hereabouts://due`; both links already work.
@@ -278,6 +301,8 @@ As planned in `AUDIT_AND_LAUNCH_PLAN.md` section 4.3 and `HUMAN_BLOCKED.md`:
 - The app reloads the widget after saves, at most once every few seconds.
 
 ### B3. Share sheet
+
+**Cut from 1.0 (7 November).** Kept here for the receipts app.
 
 "Save to Hereabouts" appears in the share sheet for PDFs, images and text. It reads the dates with the A9 code, then asks:
 - which date it is (return-by first);
