@@ -31,7 +31,7 @@ final class LentOutRowTests: XCTestCase {
     func testSinceAndAskBackDatesAreWrittenForThePhone() {
         let row = LentOutRows.rows([record("Drill", since: date(10, 3), askBack: "2026-11-12")], locale: locale, calendar: calendar)[0]
         XCTAssertEqual(row.sinceText, "Since Oct 3")
-        XCTAssertEqual(row.askBackText, "Ask back Nov 12")
+        XCTAssertEqual(row.askBackText, "Ask for it back Nov 12")
         let none = LentOutRows.rows([record("Drill", since: date(10, 3))], locale: locale, calendar: calendar)[0]
         XCTAssertNil(none.askBackText)
         let bad = LentOutRows.rows([record("Drill", since: date(10, 3), askBack: "not a day")], locale: locale, calendar: calendar)[0]
