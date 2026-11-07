@@ -80,8 +80,8 @@ struct OnDeviceShelfReader: ShelfReader {
 
 @MainActor extension LocaliserStore {
     /// Writes down several things in one place. Stops at the first failure; what was saved stays.
-    @discardableResult func addItems(named names: [String], place: Place?) throws -> [Belonging] {
-        try names.map { try addItem(name: $0, place: place) }
+    @discardableResult func addItems(named names: [String], place: Place?, isPrivate: Bool = false) throws -> [Belonging] {
+        try names.map { try addItem(name: $0, place: place, isPrivate: isPrivate) }
     }
 }
 
@@ -93,6 +93,7 @@ struct ShelfNamesView: View {
     let photo: Data
     let reader: any ShelfReader
     @Binding var placeID: UUID?
+    var isPrivate = false
     var onSaved: () -> Void
     @State private var rows: [Row] = []
     @State private var reading = true
@@ -165,7 +166,7 @@ struct ShelfNamesView: View {
         guard fits > 0 else { upgrade = true; return }
         do {
             let place = store.places.first { $0.id == placeID }
-            try store.addItems(named: Array(chosen.prefix(fits)), place: place)
+            try store.addItems(named: Array(chosen.prefix(fits)), place: place, isPrivate: isPrivate)
             UserDefaults.standard.set(place?.id.uuidString, forKey: ItemEditor.lastPlaceKey)
             UserDefaults.standard.set(Date.now, forKey: ItemEditor.lastPlaceTimeKey)
             dismiss()

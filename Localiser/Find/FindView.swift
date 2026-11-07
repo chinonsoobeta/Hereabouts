@@ -408,7 +408,7 @@ struct ItemEditor: View {
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .sheet(isPresented: $several) {
             if let photo, let reader = ShelfReading.reader {
-                NavigationStack { ShelfNamesView(photo: photo, reader: reader, placeID: $placeID) { dismiss() } }
+                NavigationStack { ShelfNamesView(photo: photo, reader: reader, placeID: $placeID, isPrivate: isPrivate) { dismiss() } }
             }
         }
         .photosPicker(isPresented: $choosingPhoto, selection: $selectedPhoto, matching: .images)

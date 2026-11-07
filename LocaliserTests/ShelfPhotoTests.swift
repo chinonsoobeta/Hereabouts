@@ -23,6 +23,13 @@ import XCTest
         XCTAssertEqual(store.items.filter { $0.place == shed }.map(\.name).sorted(), ["Drill", "Saw"])
     }
 
+    func testSavingTogetherKeepsPrivate() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let saved = try store.addItems(named: ["Ring", "Watch"], place: nil, isPrivate: true)
+        XCTAssertEqual(saved.map(\.isPrivate), [true, true])
+        XCTAssertEqual(try store.addItems(named: ["Mug"], place: nil).map(\.isPrivate), [false])
+    }
+
     func testReaderFailureIsThrown() async {
         do {
             _ = try await StandInShelfReader(failure: ScanError.unreadable).names(in: Data())
