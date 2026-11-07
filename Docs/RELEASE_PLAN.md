@@ -109,7 +109,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [x] **O4 How Pro is sold in 1.0.** Option B, decided 7 November: US$2.99 a month, US$19.99 a year with a two-week trial, and US$49.99 Lifetime, as planned on 12 October. **Prices by country** (owner, 7 November): the US prices are the base, and every other country gets Apple's automatic equivalent of them, except Canada, which is set by hand to the same numbers in Canadian dollars: CA$2.99, CA$19.99 and CA$49.99. Canadian prices on the App Store are shown before tax, with GST/HST added at checkout, and a price set by hand doesn't follow exchange rates. M30 and O23 apply, and the review notes make the case for ongoing value (M34). If App Review rejects the subscriptions under guideline 3.1.2(a), the fallback is to detach them and ship Lifetime only (Option A), with the subscriptions returning in 1.1 alongside household sharing.
 - [x] **O5 Two product gaps.** Decided 7 November: moving a thing or place to another home is in 1.0 (M62); explaining Lifetime while subscribed waits for 1.1.
 - [x] **O6 The phone for the speed check.** The iPhone 16 Pro Max, decided 7 November; results are labelled "slowest phone tested". Original wording: The quality check times search over 5,000 records on the slowest supported phone. Say which phone; if only the iPhone 16 Pro Max is available, the result is labelled "slowest phone tested".
-- [ ] **O7 The listing's subtitle and wording.** The subtitle "Find things, track returns" has to change. Approve the new subtitle, description and captions after Codex's pass (M36, M41).
+- [x] **O7 The listing's subtitle and wording.** The subtitle "Find things, track returns" has to change. Approve the new subtitle, description and captions after Codex's pass (M36, M41). *Approved 7 November with the rest of the wording (O38): subtitle "Find your things", the description and the captions as in `Docs/BETA_AND_RELEASE.md`.*
 
 ### Business and accounts
 
@@ -162,7 +162,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O35 Sandbox purchases.** Buy each product; start both trials and cancel; restore on a second device; a failed purchase; Ask to Buy; a refund; Family Sharing. After the refund, check everything is still visible, editable and exportable.
 - [ ] **O36 First run on a clean phone.** Introduction, first thing, first place, a voice memo, lending with an ask-back date, a kit, the Sunday recap preview, erase.
 - [ ] **O37 Screenshots.** Approve the set from M46.
-- [ ] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you.
+- [x] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you. *Approved 7 November: "I'm happy with the wording."*
 - [ ] **O39 Physical-device checks**, one tick each:
   - [ ] iOS 26 on the smallest supported phone you can borrow, and phones with and without Apple Intelligence.
   - [ ] Airplane mode with no iCloud account: create, edit, move, search, a voice memo and relaunch, with nothing lost.
@@ -276,8 +276,8 @@ These set what's true. Codex's pass then makes it read well.
 
 ### Stage 1, part G: wording that sounds human (Codex)
 
-- [ ] **M41 Codex rewrites every piece of wording**, after parts A to F are merged and, ideally, after O3. The brief below is complete, because Codex can't see this conversation. Codex works on a local branch `copy-rewrite`, one commit per area, and pushes nothing. · D
-- [ ] **M42 Review and merge.** I read every change against the brief, run all tests, and fix layouts that no longer fit. The owner signs off in O38. Then merge into `main`. · D
+- [x] **M41 Codex rewrites every piece of wording**, after parts A to F are merged and, ideally, after O3. The brief below is complete, because Codex can't see this conversation. Codex works on a local branch `copy-rewrite`, one commit per area, and pushes nothing. · D *Done 7 November: about 280 changes in `Docs/COPY_CHANGES.md`. Codex stopped once at its usage limit and resumed in the same session; its sandbox couldn't write to git, so I made the per-area commits.*
+- [x] **M42 Review and merge.** I read every change against the brief, run all tests, and fix layouts that no longer fit. The owner signs off in O38. Then merge into `main`. · D *Done 7 November (merge fbcb38c). Ten review notes applied, including "Call off trip" (next to the system Cancel button), the privacy line for Pro's default-on backups, and Siri shortcut phrases without a parameter listed first so Siri tips don't show a placeholder. One layout fix: the monthly check's title is now "November check" (the longer one clipped). Unit tests 152 on iOS 26.5 (6 skipped) and on iOS 27; no new UI failures on either.*
 
 **Brief for Codex**
 
@@ -343,7 +343,7 @@ These set what's true. Codex's pass then makes it read well.
 - [x] **M52 The lent-out widget** (after M51). Medium size: who has what, since when, and the ask-back date. Private things show as "A private thing". The app reloads it after saves. · D
 - [ ] **M53 Ship or cut** the shared notebook and the lent-out widget, by the cut rule, and record the result here. · merge
 - [ ] **M54 Purchase wording** (after O35). Fix anything that read wrong in the sandbox. · P
-- [ ] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings in the source before the first build; British spellings belong only in the English (UK) catalog (M63). · P
+- [x] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings in the source before the first build; British spellings belong only in the English (UK) catalog (M63). · P *Checked 7 November after M42: the only British spellings left are in code comments, identifiers and test data. Re-run the search in M65.*
 - [ ] **M56 Each archive** (after O42 or O44). Raise `CURRENT_PROJECT_VERSION` at `project.yml:69` and `:92`, archive with Xcode 27.2, run `scripts/check-release.sh`, upload only on the go-ahead. · P, X1
 - [ ] **M57 Sync week** (only if B4 is tried for 1.0). · P
 - [ ] **M58 CloudKit schema** to production, for a release with sync. · P, X1
