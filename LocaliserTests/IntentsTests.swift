@@ -16,7 +16,7 @@ final class IntentsTests: XCTestCase {
         let passport = try store.addItem(name: "Passport", place: shelf)
         let loose = try store.addItem(name: "Torch", place: nil)
         XCTAssertEqual(FindThingIntent.answer(for: passport), "Passport is in Hall closet › Top shelf.")
-        XCTAssertEqual(FindThingIntent.answer(for: loose), "Torch is written down, but without a place yet.")
+        XCTAssertEqual(FindThingIntent.answer(for: loose), "You've saved Torch, but haven't added a place yet.")
         try store.setArchived(passport, true)
         XCTAssertEqual(FindThingIntent.answer(for: passport), "Passport is archived. It was last in Hall closet › Top shelf.")
         try store.setArchived(loose, true)
