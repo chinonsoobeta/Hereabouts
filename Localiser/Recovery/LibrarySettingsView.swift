@@ -126,16 +126,16 @@ struct LeavingView: View {
                 SectionHeading(title: String(localized: "Keep a copy"))
                 VStack(spacing: 0) {
                     Button { prepareBackup() } label: {
-                        optionLabel(String(localized: "Back up everything"), String(localized: "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts."), String(localized: "arrow.down.doc"))
+                        optionLabel(String(localized: "Back up everything"), String(localized: "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts."), "arrow.down.doc")
                     }.accessibilityLabel("Back up everything")
                     Button { prepareCSV() } label: {
-                        optionLabel(String(localized: "Export a spreadsheet"), String(localized: "Save a list of things and places. Open it in Numbers, Excel or another app."), String(localized: "tablecells"))
+                        optionLabel(String(localized: "Export a spreadsheet"), String(localized: "Save a list of things and places. Open it in Numbers, Excel or another app."), "tablecells")
                     }.accessibilityLabel("Export a spreadsheet")
                     NavigationLink { BackupFilesView(selectedFiles: $selectedFiles) } label: {
-                        optionLabel(String(localized: "Photos and documents to include"), selectedFiles.isEmpty ? String(localized: "None selected") : String(localized: "\(selectedFiles.count) of \(retainedFileCount) selected"), String(localized: "photo.on.rectangle"))
+                        optionLabel(String(localized: "Photos and documents to include"), selectedFiles.isEmpty ? String(localized: "None selected") : String(localized: "\(selectedFiles.count) of \(retainedFileCount) selected"), "photo.on.rectangle")
                     }.accessibilityLabel("Photos and documents to include")
                     Button { importing = true } label: {
-                        optionLabel(String(localized: "Restore from a backup"), String(localized: "Restore your notebook from a saved copy."), String(localized: "arrow.counterclockwise"))
+                        optionLabel(String(localized: "Restore from a backup"), String(localized: "Restore your notebook from a saved copy."), "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
                 }.buttonStyle(.plain)
                 if !savedBackups.isEmpty {
@@ -143,7 +143,7 @@ struct LeavingView: View {
                     VStack(spacing: 0) {
                         ForEach(savedBackups) { backup in
                             Button { Task { await chooseSaved(backup) } } label: {
-                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), String(localized: "Restore this backup."), String(localized: "clock.arrow.circlepath"))
+                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), String(localized: "Restore this backup."), "clock.arrow.circlepath")
                             }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
                         }
                     }.buttonStyle(.plain)
@@ -152,7 +152,7 @@ struct LeavingView: View {
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
                 SectionHeading(title: String(localized: "Erase your notebook"))
                 Button(role: .destructive) { confirmErase = true } label: {
-                    optionLabel(String(localized: "Erase this notebook"), String(localized: "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."), String(localized: "trash"))
+                    optionLabel(String(localized: "Erase this notebook"), String(localized: "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."), "trash")
                 }.buttonStyle(.plain).foregroundStyle(Theme.amber).accessibilityLabel("Erase this notebook")
                 if let notice { Label(notice, systemImage: "checkmark.circle").font(.wbBody).foregroundStyle(Theme.green) }
                 StickyNote {

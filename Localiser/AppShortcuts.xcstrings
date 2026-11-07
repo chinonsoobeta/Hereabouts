@@ -1,8 +1,26 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "${applicationName} put away" : {},
-    "Add a thing to ${applicationName}" : {},
+    "${applicationName} put away" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} put away"
+          }
+        }
+      }
+    },
+    "Add a thing to ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a thing to ${applicationName}"
+          }
+        }
+      }
+    },
     "Ask ${applicationName} where something is" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -15,11 +33,35 @@
               "Find ${thing} in ${applicationName}"
             ]
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask ${applicationName} where something is"
+          }
         }
       }
     },
-    "Find ${thing} in ${applicationName}" : {},
-    "I found ${thing} in ${applicationName}" : {},
+    "Find ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find ${thing} in ${applicationName}"
+          }
+        }
+      }
+    },
+    "I found ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I found ${thing} in ${applicationName}"
+          }
+        }
+      }
+    },
     "Put something away in ${applicationName}" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -30,6 +72,12 @@
               "Put something away in ${applicationName}",
               "${applicationName} put away"
             ]
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put something away in ${applicationName}"
           }
         }
       }
@@ -45,10 +93,25 @@
               "I found ${thing} in ${applicationName}"
             ]
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tell ${applicationName} I found something"
+          }
         }
       }
     },
-    "Where is ${thing} in ${applicationName}" : {},
+    "Where is ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where is ${thing} in ${applicationName}"
+          }
+        }
+      }
+    },
     "Write something down in ${applicationName}" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -59,6 +122,12 @@
               "Write something down in ${applicationName}",
               "Add a thing to ${applicationName}"
             ]
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write something down in ${applicationName}"
           }
         }
       }

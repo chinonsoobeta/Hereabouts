@@ -10,6 +10,12 @@
             "state" : "new",
             "value" : "Hereabouts"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts"
+          }
         }
       }
     },
@@ -22,11 +28,24 @@
             "state" : "new",
             "value" : "Localiser"
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localiser"
+          }
         }
       }
     },
     "Find something" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find something"
+          }
+        }
+      }
     },
     "NSCameraUsageDescription" : {
       "comment" : "Privacy - Camera Usage Description",
@@ -35,6 +54,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone."
           }
         }
@@ -49,6 +74,12 @@
             "state" : "new",
             "value" : "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded."
+          }
         }
       }
     },
@@ -61,11 +92,24 @@
             "state" : "new",
             "value" : "You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose."
           }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose."
+          }
         }
       }
     },
     "Put something away" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put something away"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

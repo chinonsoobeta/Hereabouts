@@ -2,16 +2,44 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Open the camera in Hereabouts." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the camera in Hereabouts."
+          }
+        }
+      }
     },
     "Put away" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put away"
+          }
+        }
+      }
     },
     "Put something away" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put something away"
+          }
+        }
+      }
     },
     "Take a photo to write down a thing and its place." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take a photo to write down a thing and its place."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

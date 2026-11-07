@@ -2,40 +2,124 @@
   "sourceLanguage" : "en",
   "strings" : {
     "A private thing" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A private thing"
+          }
+        }
+      }
     },
     "Ask for it back %@" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask for it back %@"
+          }
+        }
+      }
     },
     "Drill" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drill"
+          }
+        }
+      }
     },
     "Find" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find"
+          }
+        }
+      }
     },
     "Find a thing or say where you put it." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find a thing or say where you put it."
+          }
+        }
+      }
     },
     "Find and say where" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find and say where"
+          }
+        }
+      }
     },
     "Lent out" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lent out"
+          }
+        }
+      }
     },
     "Nothing is lent out." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing is lent out."
+          }
+        }
+      }
     },
     "Say where" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say where"
+          }
+        }
+      }
     },
     "See who has it, since when, and when to ask for it back." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See who has it, since when, and when to ask for it back."
+          }
+        }
+      }
     },
     "Since %@" : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since %@"
+          }
+        }
+      }
     },
     "You'll see things you lend here." : {
-
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You'll see things you lend here."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
