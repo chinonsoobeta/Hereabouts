@@ -180,7 +180,7 @@ struct LabelScanner: UIViewControllerRepresentable {
     func updateUIViewController(_ scanner: DataScannerViewController, context: Context) { context.coordinator.parent = self }
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
 
-    @MainActor final class Coordinator: NSObject, @preconcurrency DataScannerViewControllerDelegate {
+    @MainActor final class Coordinator: NSObject, DataScannerViewControllerDelegate {
         var parent: LabelScanner
         private var done = false
         init(parent: LabelScanner) { self.parent = parent }
