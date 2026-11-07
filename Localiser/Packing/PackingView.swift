@@ -6,13 +6,14 @@ struct PackingView: View {
     @State private var newTrip = false
     @State private var newKit = false
     @State private var showPast = false
-    private var active: [TripRecord] { store.trips.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay } }
-    private var past: [TripRecord] { store.trips.filter { $0.state == .finished || $0.state == .canceled }.sorted { $0.startDay > $1.startDay } }
+    private var active: [TripRecord] { store.tripsHere.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay } }
+    private var past: [TripRecord] { store.tripsHere.filter { $0.state == .finished || $0.state == .canceled }.sorted { $0.startDay > $1.startDay } }
     var body: some View {
         let _ = store.revision
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                if store.trips.isEmpty && store.kitsHere.isEmpty {
+                HomeSwitcher()
+                if store.tripsHere.isEmpty && store.kitsHere.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(alignment: .top) {
                             Image(systemName: "suitcase.rolling").foregroundStyle(Theme.purple).accessibilityHidden(true)
