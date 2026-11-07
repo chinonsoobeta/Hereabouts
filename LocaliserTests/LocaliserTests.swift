@@ -895,7 +895,7 @@ final class LocaliserTests: XCTestCase {
         let (maker, _, _) = try backupMaker()
         guard case .wrote = maker.runIfDue(store: store) else { return XCTFail() }
         let saved = try XCTUnwrap(maker.saved().first)
-        let file = try maker.load(saved)
+        let file = try AutomaticBackups.load(saved)
         let fresh = try LocaliserStore(inMemory: true)
         try fresh.validateBackup(file)
         try fresh.restore(file)

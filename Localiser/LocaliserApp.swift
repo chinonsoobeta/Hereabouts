@@ -81,6 +81,7 @@ struct RootView: View {
             OnboardingView { seenOnboarding = true }.environment(pro)
         }
         .task { await pro.observeTransactions() }
+        .task { await pro.refresh(); await backUpIfDue() }
         .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }
         .onChange(of: reminders.openedRitual) { _, ritual in
             switch ritual {
@@ -101,7 +102,7 @@ struct RootView: View {
             QuickActions.shared.link = nil
         }
         .onChange(of: scenePhase) { _, value in
-            if value == .active { do { try store.refresh() } catch { reminders.error = error.localizedDescription }; Task { await pro.refresh() } }
+            if value == .active { do { try store.refresh() } catch { reminders.error = error.localizedDescription }; Task { await pro.refresh(); await backUpIfDue() } }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             // Midnight or a time-zone change: regroup the dates and requeue reminders (the revision change does both).
@@ -114,6 +115,12 @@ struct RootView: View {
 }
 
 extension RootView {
+    /// Pro's weekly backup, when a week has passed. It runs when the app opens.
+    func backUpIfDue() async {
+        guard pro.unlocked else { return }
+        _ = AutomaticBackups(folder: await AutomaticBackups.resolveFolder(), isPro: pro.unlocked).runIfDue(store: store)
+    }
+
     func open(_ link: AppLink) {
         switch link {
         case .item(let id): store.openedItem = id

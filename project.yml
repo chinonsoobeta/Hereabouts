@@ -37,6 +37,12 @@ targets:
         # Things the free plan holds. Builds installed straight onto a phone pass HEREABOUTS_FREE_THINGS=200.
         HereaboutsFreeThings: $(HEREABOUTS_FREE_THINGS)
         HereaboutsAppGroup: $(HEREABOUTS_APP_GROUP)
+        # The app's iCloud Drive folder, which shows in Files as "Hereabouts". Automatic backups go here.
+        NSUbiquitousContainers:
+          iCloud.dev.hereabouts.app:
+            NSUbiquitousContainerIsDocumentScopePublic: true
+            NSUbiquitousContainerName: Hereabouts
+            NSUbiquitousContainerSupportedFolderLevels: Any
         NSUserActivityTypes: [com.apple.corespotlightitem]
         # Fixed app icon shortcuts. Each type is the link it opens; see System/AppLinks.swift.
         UIApplicationShortcutItems:
@@ -49,6 +55,12 @@ targets:
         CFBundleURLTypes:
           - CFBundleURLName: dev.hereabouts.app
             CFBundleURLSchemes: [hereabouts]
+    entitlements:
+      path: Localiser/Localiser.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers: [iCloud.dev.hereabouts.app]
+        com.apple.developer.ubiquity-container-identifiers: [iCloud.dev.hereabouts.app]
+        com.apple.developer.icloud-services: [CloudDocuments]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app

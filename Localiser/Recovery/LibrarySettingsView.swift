@@ -20,6 +20,8 @@ struct LibrarySettingsView: View {
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @AppStorage(Rituals.recapKey) private var recapOn = true
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
+    @AppStorage(AutomaticBackups.enabledKey) private var automaticBackups = true
+    @AppStorage(AutomaticBackups.lastKey) private var lastBackupTime = 0.0
 
     private var coverageSummary: String {
         switch reminders.permission {
@@ -64,6 +66,18 @@ struct LibrarySettingsView: View {
             } header: { Text("Reminders") }
               footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved thing” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {
+                if pro.unlocked {
+                    Toggle("Automatic backups", isOn: $automaticBackups)
+                    Text(lastBackupTime > 0 ? "Last one \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "The first one is made soon after you open the app.")
+                        .font(.wbCaption).foregroundStyle(Theme.pencil)
+                } else {
+                    NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
+                        NotebookLine(name: "Automatic backups", detail: "Pro saves a copy of your notebook every week.")
+                    }
+                }
+            } header: { Text("Backups") }
+              footer: { if pro.unlocked { Text("Saved to iCloud Drive, or to this iPhone if iCloud Drive is off. The newest five are kept.").font(.wbCaption).foregroundStyle(Theme.pencil) } }
+            Section {
                 NavigationLink("Take your notebook with you.") { LeavingView().toolbarVisibility(.hidden, for: .tabBar) }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
@@ -87,7 +101,8 @@ struct LibrarySettingsView: View {
 struct LeavingView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedFiles = Set<UUID>()
+    @State private var selectedFiles = AutomaticBackups.savedSelection()
+    @State private var savedBackups: [SavedBackup] = []
     @State private var document: LibraryExportDocument?
     @State private var exportType = UTType.json
     @State private var exporting = false
@@ -123,6 +138,16 @@ struct LeavingView: View {
                         optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
                 }.buttonStyle(.plain)
+                if !savedBackups.isEmpty {
+                    SectionHeading(title: "Saved automatically")
+                    VStack(spacing: 0) {
+                        ForEach(savedBackups) { backup in
+                            Button { chooseSaved(backup) } label: {
+                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this one.", "clock.arrow.circlepath")
+                            }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
+                        }
+                    }.buttonStyle(.plain)
+                }
                 Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups aren't encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
                 SectionHeading(title: "Then, if you like")
@@ -140,6 +165,8 @@ struct LeavingView: View {
             }.padding(20)
         }
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
+        .task { savedBackups = await AutomaticBackups.savedEverywhere() }
+        .onChange(of: selectedFiles) { _, ids in AutomaticBackups.saveSelection(ids) }
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts things") { result in
             switch result { case .success: notice = exportType == .json ? "Backup saved." : "Spreadsheet saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
@@ -194,6 +221,14 @@ struct LeavingView: View {
         defer { pendingRestore = nil }
         do {
             if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored." }
+        } catch { self.error = error.localizedDescription }
+    }
+    /// A saved backup goes through the same check and confirmation as one chosen from Files.
+    private func chooseSaved(_ backup: SavedBackup) {
+        do {
+            let file = try AutomaticBackups.load(backup)
+            try store.validateBackup(file)
+            pendingRestore = file; confirmingRestore = true
         } catch { self.error = error.localizedDescription }
     }
     private func prepareCSV() {
