@@ -29,7 +29,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func enable() async {
-        do { _ = try await center.requestAuthorization(options: [.alert, .sound, .badge]); error = nil }
+        do { _ = try await center.requestAuthorization(options: [.alert, .sound]); error = nil }
         catch { self.error = error.localizedDescription }
         if let store { refresh(store.deadlines); refreshRituals(store) }
     }
