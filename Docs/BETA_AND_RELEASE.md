@@ -105,10 +105,12 @@ Before publishing, check each sentence against the shipped build. Do not claim s
 Use the demo library with the Debug-only launch argument `--demo-library` on a 6.9-inch and a 6.5-inch iPhone simulator. Light mode, default text size, status bar at 9:41.
 
 1. **Find** showing "Running shoes" and its place path. Caption: "Find anything by where it lives".
-2. **Scan review** with a confirmed "Return by" date. Caption: "Scan a receipt. Never miss a return".
-3. **Due soon** with return and warranty sections. Caption: "Every deadline in one place".
+2. **Voice memo** with the heard sentence and the filled-in Put away screen (if voice memos ship). Caption: "Say it. Check it. Save it".
+3. **Lending** showing a lent thing with its ask-back date. Caption: "Know who has it, and ask for it back".
 4. **Trip detail** with packing progress. Caption: "Pack once, reuse forever".
-5. **Pro screen** or a plain caption card. Caption: "No account. Nothing locked away. Export anytime".
+5. **Pro screen** (Settings tab, Hereabouts Pro), with no price visible that isn't the App Store's. Caption: "No account. Nothing locked away. Export anytime".
+
+If voice memos don't ship, drop shot 2 and keep four.
 
 Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remove any real names or numbers from documents shown on screen.
 
