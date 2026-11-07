@@ -141,7 +141,7 @@ struct StoreFailureView: View {
                     Text("Nothing has been deleted. Restarting your phone often fixes this. If it keeps happening, save a copy of the notebook file and send it to us.").font(.wbBody).foregroundStyle(Theme.secondary)
                     if let reason { Text(reason).font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
                     if !files.isEmpty {
-                        ShareLink(items: files) { Label("Save a copy of the notebook file", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
+                        ShareLink(items: files) { Label("Save the notebook file (photos stay on this iPhone)", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
                     }
                     Link(destination: Support.mail(subject: "Notebook won't open", body: reason ?? "")) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
                 }
