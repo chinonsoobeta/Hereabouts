@@ -73,6 +73,7 @@ final class HereaboutsSceneDelegate: NSObject, UIWindowSceneDelegate {
 extension Belonging {
     /// What "Send where it is" sends: "Spare key is in Hall › Key bowl." Nil when there's nothing to say.
     var whereItIsSentence: String? {
+        if isMissing { return place.map { "\(name) is marked missing. It was last in \($0.path)." } ?? "\(name) is marked missing." }
         if isLent { return "\(name) is with \(lentTo)." }
         guard let place else { return nil }
         return "\(name) is in \(place.path)."

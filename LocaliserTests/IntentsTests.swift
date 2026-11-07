@@ -74,4 +74,18 @@ final class IntentsTests: XCTestCase {
         }
         XCTAssertEqual(store.activeItemCount, CreationKind.item.freeLimit)
     }
+    func testMissingAnswerAndPrivacyPrecedence() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drawer = try store.addPlace(name: "Drawer")
+        let item = try store.addItem(name: "Passport", place: drawer)
+        try store.markMissing(item)
+        XCTAssertEqual(FindThingIntent.answer(for: item), "Passport is marked missing. It was last in Drawer.")
+        item.place = nil
+        XCTAssertEqual(FindThingIntent.answer(for: item), "Passport is marked missing.")
+        item.archived = true
+        XCTAssertEqual(FindThingIntent.answer(for: item), "Passport is archived.")
+        item.isPrivate = true
+        XCTAssertEqual(FindThingIntent.answer(for: item), "That one's private. Open Hereabouts to see it.")
+    }
+
 }
