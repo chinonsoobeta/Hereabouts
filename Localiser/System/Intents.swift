@@ -48,8 +48,13 @@ struct ThingQuery: EntityStringQuery {
         return store.items.filter { identifiers.contains($0.id) && !$0.isDeleted }.map(ThingEntity.init)
     }
     @MainActor func entities(matching string: String) async throws -> [ThingEntity] {
-        let store = try IntentLibrary.open()
-        return ItemSearch.results(query: string, entries: store.searchIndex, archived: false).prefix(12).map(ThingEntity.init)
+        Self.matches(string, in: try IntentLibrary.open()).map(ThingEntity.init)
+    }
+    /// A private thing is only found by its name or another name, so a place or note doesn't give it away.
+    @MainActor static func matches(_ string: String, in store: LocaliserStore) -> [Belonging] {
+        ItemSearch.results(query: string, entries: store.searchIndex, archived: false)
+            .filter { !$0.isPrivate || ItemSearch.score(query: string, name: $0.name, aliases: $0.aliases, place: "", notes: "") != nil }
+            .prefix(12).map { $0 }
     }
     @MainActor func suggestedEntities() async throws -> [ThingEntity] {
         let store = try IntentLibrary.open()
