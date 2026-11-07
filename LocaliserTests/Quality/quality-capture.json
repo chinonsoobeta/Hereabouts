@@ -1,0 +1,29 @@
+{
+ "note": "Example capture sentences for the harness (M47). The owner's examples (O40) replace the sentences; keep the format. place is the path, or null when the notebook has no such place.",
+ "threshold": 0.8,
+ "places": [
+  "Attic",
+  "Attic › Trunk",
+  "Basement",
+  "Basement › Workbench",
+  "Study",
+  "Study › Filing cabinet",
+  "Study › Filing cabinet › Bottom drawer",
+  "Pantry",
+  "Pantry › Top shelf",
+  "Porch",
+  "Garden shed"
+ ],
+ "sentences": [
+  {"text": "my winter gloves are in the attic trunk", "name": "Winter gloves", "place": "Attic › Trunk"},
+  {"text": "the hammer is on the basement workbench", "name": "Hammer", "place": "Basement › Workbench"},
+  {"text": "I left the tax papers in the bottom drawer of the filing cabinet", "name": "Tax papers", "place": "Study › Filing cabinet › Bottom drawer"},
+  {"text": "flour is on the top shelf in the pantry", "name": "Flour", "place": "Pantry › Top shelf"},
+  {"text": "put the umbrella in the porch", "name": "Umbrella", "place": "Porch"},
+  {"text": "the lawn mower is in the garden shed", "name": "Lawn mower", "place": "Garden shed"},
+  {"text": "I stored the birth certificate in the filing cabinet", "name": "Birth certificate", "place": "Study › Filing cabinet"},
+  {"text": "the spare bulbs are in the cellar", "name": "Spare bulbs", "place": null},
+  {"text": "my headphones are on the study desk", "name": "Headphones", "place": null},
+  {"text": "the camping stove is in the basement", "name": "Camping stove", "place": "Basement"}
+ ]
+}
