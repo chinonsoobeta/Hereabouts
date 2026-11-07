@@ -18,6 +18,7 @@ import CoreData
         movement.fromPath = item.place?.path ?? Movement.noPlace
         movement.toPath = place?.path ?? Movement.noPlace
         item.place = place
+        if let home = place?.home { item.home = home }
         item.missingSince = nil
         item.confirmedAt = date
         try save()
@@ -25,7 +26,8 @@ import CoreData
 
     /// Where to look first: where it's meant to be, the last three places it has been, then places used lately.
     func foundSuggestions(for item: Belonging, limit: Int = 6) -> [Place] {
-        let byPath = Dictionary(places.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
+        let homePlaces = item.home.map { home in places.filter { $0.home == home } } ?? places
+        let byPath = Dictionary(homePlaces.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
         var chosen: [Place] = []
         func add(_ place: Place?) { if let place, !chosen.contains(place) { chosen.append(place) } }
         add(item.place)

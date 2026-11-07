@@ -60,4 +60,20 @@ final class FindingTests: XCTestCase {
         XCTAssertEqual(recap.moved, 0)
         XCTAssertEqual(recap.confirmed, 0)
     }
+
+    func testFindingKeepsTheThingInTheRightHome() throws {
+        let store = try LocaliserStore(inMemory: true)
+        try store.ensureHomes()
+        let flat = try XCTUnwrap(store.currentHome)
+        let cabin = try store.addHome(name: "Cabin")
+        let hall = try store.addPlace(name: "Hall", home: flat)
+        let shed = try store.addPlace(name: "Shed", home: cabin)
+        let keys = try store.addItem(name: "Keys", place: hall)
+        let axe = try store.addItem(name: "Axe", place: shed)
+        try store.found(axe, at: shed)
+        XCTAssertEqual(store.foundSuggestions(for: keys).map(\.id), [hall.id], "Only places in the thing's own home")
+        try store.markMissing(keys)
+        try store.found(keys, at: shed)
+        XCTAssertEqual(keys.home, cabin)
+    }
 }
