@@ -19,7 +19,7 @@ enum CreationKind {
 enum ProPlan: String, CaseIterable, Identifiable, Sendable {
     case yearly, monthly, lifetime
     /// Product IDs start with the bundle ID. Change this one prefix if the bundle ID changes before launch.
-    static let prefix = "dev.localiser.pro."
+    static let prefix = "dev.hereabouts.pro."
     var id: String { rawValue }
     var productID: String { Self.prefix + rawValue }
     init?(productID: String) {

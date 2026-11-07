@@ -9,7 +9,7 @@
       "localizations" : [
         { "description" : "Unlimited things, kits and scans. Pay once.", "displayName" : "Hereabouts Pro Lifetime", "locale" : "en_US" }
       ],
-      "productID" : "dev.localiser.pro.lifetime",
+      "productID" : "dev.hereabouts.pro.lifetime",
       "referenceName" : "Hereabouts Pro Lifetime (local testing)",
       "type" : "NonConsumable"
     }
@@ -32,7 +32,7 @@
           "localizations" : [
             { "description" : "Unlimited things, kits and scans, billed yearly.", "displayName" : "Hereabouts Pro Yearly", "locale" : "en_US" }
           ],
-          "productID" : "dev.localiser.pro.yearly",
+          "productID" : "dev.hereabouts.pro.yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Hereabouts Pro Yearly (local testing)",
           "subscriptionGroupID" : "21500001",
@@ -50,7 +50,7 @@
           "localizations" : [
             { "description" : "Unlimited things, kits and scans, billed monthly.", "displayName" : "Hereabouts Pro Monthly", "locale" : "en_US" }
           ],
-          "productID" : "dev.localiser.pro.monthly",
+          "productID" : "dev.hereabouts.pro.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Hereabouts Pro Monthly (local testing)",
           "subscriptionGroupID" : "21500001",

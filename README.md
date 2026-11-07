@@ -2,7 +2,7 @@
 
 Hereabouts remembers where you put things and when return windows, warranties and expiry dates run out. It also keeps reusable packing lists for trips. Everything stays on the iPhone. There is no account, server, analytics or advertising.
 
-The Xcode project and folders still use the working name Localiser. The bundle identifier stays `dev.localiser.app` so existing installs keep their data.
+The Xcode project and folders still use the working name Localiser. The bundle identifier is `dev.hereabouts.app`.
 
 ## Build
 
@@ -63,11 +63,11 @@ Launch arguments for manual checks:
 TEST_RUNNER_STORE_SHOTS=/path/to/folder xcodebuild -project Localiser.xcodeproj -scheme Localiser -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' -only-testing:LocaliserUITests/LocaliserUITests/testStoreScreenshots test
 ```
 
-The test turns reminders on before the first shot, so Due shows no warning. The name-only capture test (`testNameOnlyCaptureSurvivesRelaunchAndCanBeFound`) turns notifications off, and that lasts until the app is deleted. On a simulator that has run the full suite, first run `xcrun simctl uninstall <simulator-UUID> dev.localiser.app`. For the dark set, run `xcrun simctl ui <simulator-UUID> appearance dark`. `Docs/Store/README.md` has the sizes and captions.
+The test turns reminders on before the first shot, so Due shows no warning. The name-only capture test (`testNameOnlyCaptureSurvivesRelaunchAndCanBeFound`) turns notifications off, and that lasts until the app is deleted. On a simulator that has run the full suite, first run `xcrun simctl uninstall <simulator-UUID> dev.hereabouts.app`. For the dark set, run `xcrun simctl ui <simulator-UUID> appearance dark`. `Docs/Store/README.md` has the sizes and captions.
 
 ## Purchases
 
-`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.localiser.pro.monthly` at US$2.99 and `dev.localiser.pro.yearly` at US$19.99, each with a two-week free trial) and `dev.localiser.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 20 things, set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
+`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.hereabouts.pro.monthly` at US$2.99 and `dev.hereabouts.pro.yearly` at US$19.99, each with a two-week free trial) and `dev.hereabouts.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 20 things, set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
 
 ## Notebook data
 
