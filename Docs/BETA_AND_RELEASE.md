@@ -104,15 +104,19 @@ Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remov
 
 ## App Review notes
 
-Paste into App Store Connect, App Review Information:
+Paste into App Store Connect, App Review Information. These notes carry no prices, because they differ by country; the paywall shows each country's price from the App Store.
 
 > Hereabouts has no account or login. Everything is stored on the device.
 >
-> The free version allows 200 saved things, 2 packing kits and 5 successful receipt scans per calendar month. Pro is a single non-consumable in-app purchase, "Hereabouts Pro" (dev.localiser.pro.lifetime), with Family Sharing on. It removes those limits and nothing else. To see the paywall quickly, open Packing and create a third kit, or open Settings › Hereabouts Pro. The purchase can be tested in the sandbox. "Restore purchases" is on the same screen.
+> The free plan allows 15 things in total, 1 packing kit and 2 homes. Hereabouts Pro removes those limits. It is sold as a monthly subscription, a yearly subscription (both with a two-week free trial) and a one-time Lifetime purchase, all in the group "Hereabouts Pro" (dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly, dev.hereabouts.pro.lifetime). Lifetime has Family Sharing on. Lifetime is offered for people who don't want a subscription.
 >
-> Receipt scanning uses the camera, a photo or a PDF. Text is read on the device with Apple's Vision framework. Dates are never saved without the user confirming them.
+> What the subscriptions keep giving: automatic weekly backups of the whole notebook to the person's own iCloud Drive (or to the phone if iCloud Drive is off), keeping the last five; regular updates; and household sharing, planned for version 1.1. Nothing saved is ever locked if Pro ends, and existing data stays visible, editable and exportable.
 >
-> Reminders are local notifications. "Add to Calendar" uses write-only calendar access and adds events to the default calendar.
+> To reach the paywall: open the Settings tab (bottom right), then tap Hereabouts Pro. "Restore purchases", the Privacy Policy and the Terms of Use are on the same screen. The purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
+>
+> Shelf photos and voice understanding use Apple's on-device model, so they appear only on iPhones that support Apple Intelligence. On other iPhones the app uses simpler rules and still works. Voice memos are transcribed on the phone with Apple's Speech framework, the recording is not kept, and nothing is saved without the person tapping Save. (Include the voice-memo sentences only if voice memos ship.)
+>
+> Reminders are local notifications. The app does not use the calendar.
 >
 > The app is designed for iPhone. On iPad it runs in iPhone compatibility mode.
 >
