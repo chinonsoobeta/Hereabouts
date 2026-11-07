@@ -58,6 +58,7 @@
 		883F90525273EB06CDF36579 /* Tips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C11FBF78BD6877C6EF37AD /* Tips.swift */; };
 		8C0735201D95432946AEDD32 /* WidgetButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C16902FC2669FF699C9E6A /* WidgetButtons.swift */; };
 		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
+		8F27FE0DCC702603D0BC0683 /* AutomaticBackups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D64221B0D22A30DCE198F2 /* AutomaticBackups.swift */; };
 		93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A645341D05015908431977CC /* HereaboutsControls.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		937F30CAC8E7F939809C03B9 /* quality-capture.json in Resources */ = {isa = PBXBuildFile; fileRef = BBC11CC38AB66FCF8CCBA32A /* quality-capture.json */; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
@@ -161,6 +162,7 @@
 		0E29FE6FB9A6F892A2BEE1EE /* LendSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LendSheet.swift; sourceTree = "<group>"; };
 		0E9B4590CDB9EA9F56F6FABD /* atkinsonhyperlegible-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "atkinsonhyperlegible-OFL.txt"; sourceTree = "<group>"; };
 		10DA470CB66EEFBB09CE9709 /* LentOutRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LentOutRows.swift; sourceTree = "<group>"; };
+		13D64221B0D22A30DCE198F2 /* AutomaticBackups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticBackups.swift; sourceTree = "<group>"; };
 		153312694358421F11F17E69 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		18B25CD28C05FAF34B95F157 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		1A30538423261835CD54AD5A /* ProAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProAccess.swift; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 		27D9D3773E578B000776BAF6 /* Recovery */ = {
 			isa = PBXGroup;
 			children = (
+				13D64221B0D22A30DCE198F2 /* AutomaticBackups.swift */,
 				4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */,
 				5C85CABE55EDD863166B9632 /* LibrarySettingsView.swift */,
 			);
@@ -788,6 +791,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33D57CC89EC3AA3F9EA998F6 /* AppLinks.swift in Sources */,
+				8F27FE0DCC702603D0BC0683 /* AutomaticBackups.swift in Sources */,
 				67FB59F06A60287DEE855233 /* BoxLabels.swift in Sources */,
 				2244EB33A68408212C306A4D /* CameraPicker.swift in Sources */,
 				CE9B913D5BE3CA0BE5A03EB8 /* DateRules.swift in Sources */,

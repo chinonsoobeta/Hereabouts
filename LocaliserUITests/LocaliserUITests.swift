@@ -6,15 +6,16 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Trips"] {
+        for tab in ["Find", "Places", "Trips", "Settings"] {
             app.tabBars.buttons[tab].tap()
             let image = XCTAttachment(screenshot: app.screenshot()); image.name = "Tab \(tab)"; image.lifetime = .keepAlways; add(image)
             try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
         }
-        app.tabBars.buttons["Find"].tap()
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         let pro = app.buttons["Hereabouts Pro"]
-        XCTAssertTrue(pro.waitForExistence(timeout: 5)); pro.tap()
+        XCTAssertTrue(pro.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Reminders"].exists, "Settings explains reminders and offers to turn them on")
+        pro.tap()
         // Three plans, yearly chosen first, and the trial button, from the local StoreKit configuration.
         // iOS 26.5's local StoreKit service doesn't serve products, so the plan checks run on iOS 27.
         let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
@@ -222,7 +223,7 @@ import XCTest
         XCTAssertFalse(app.buttons["home.switcher"].exists, "One home needs no switcher")
         app.buttons["Kitchen"].firstMatch.tap()
         app.tabBars.buttons["Find"].tap()
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         app.buttons["settings.homes"].tap()
         let add = app.buttons["home.add"]
         XCTAssertTrue(add.waitForExistence(timeout: 5))
@@ -234,7 +235,6 @@ import XCTest
         app.alerts.buttons["Add"].tap()
         XCTAssertTrue(app.staticTexts["Mum's house"].waitForExistence(timeout: 5))
         app.navigationBars["Homes"].buttons["Settings"].tap()
-        app.buttons["Done"].tap()
         app.tabBars.buttons["Places"].tap()
         let switcher = app.buttons["home.switcher"]
         XCTAssertTrue(switcher.waitForExistence(timeout: 5), app.debugDescription)
@@ -267,7 +267,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts["Kettle"].waitForExistence(timeout: 5))
         app.staticTexts["Kettle"].tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         app.buttons["settings.homes"].tap()
         app.buttons["home.add"].tap()
         let homeName = app.alerts.textFields.firstMatch
@@ -276,7 +276,7 @@ import XCTest
         app.alerts.buttons["Add"].tap()
         XCTAssertTrue(app.staticTexts["Mum's house"].waitForExistence(timeout: 5))
         app.navigationBars["Homes"].buttons["Settings"].tap()
-        app.buttons["Done"].tap()
+        app.tabBars.buttons["Find"].tap()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         search.tap(); search.typeText("Kettle")
@@ -412,7 +412,7 @@ import XCTest
         for label in ["Close", "Cancel"] where app.navigationBars.buttons[label].exists || app.buttons[label].exists {
             app.buttons[label].firstMatch.tap()
         }
-        let settings = app.navigationBars["Hereabouts"].buttons["Settings"]
+        let settings = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 5), app.debugDescription)
         settings.tap()
         let pro = app.buttons["Hereabouts Pro"]
@@ -427,7 +427,7 @@ import XCTest
         XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
         try shot("review-leaving")
         app.navigationBars["Leaving"].buttons["Settings"].tap()
-        app.buttons["Done"].tap()
+        app.tabBars.buttons["Find"].tap()
         app.tabBars.buttons["Places"].tap()
         try shot("review-places")
         app.staticTexts["Garage"].firstMatch.tap()
@@ -468,7 +468,7 @@ import XCTest
             try audit(app, [.contrast, .textClipped])
         }
         app.tabBars.buttons["Find"].tap()
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         openLeaving(in: app)
         reveal(app.buttons["Restore from a backup"], in: app)
         let backup = XCTAttachment(screenshot: app.screenshot())
@@ -502,7 +502,7 @@ import XCTest
             try audit(app, [.contrast, .dynamicType, .textClipped])
         }
         app.tabBars.buttons["Find"].tap()
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
         recordTypography(app, labels: ["Hereabouts Pro"], name: "Pro")
@@ -672,7 +672,7 @@ import XCTest
         XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText(name)
         app.buttons["item.save"].tap()
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         openLeaving(in: app)
         let export = app.buttons["Back up everything"]
         reveal(export, in: app); export.tap()
@@ -690,7 +690,7 @@ import XCTest
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
         XCTAssertFalse(app.staticTexts[name].exists)
-        app.buttons["Settings"].tap()
+        app.tabBars.buttons["Settings"].tap()
         openLeaving(in: app)
         let chooseBackup = app.buttons["Restore from a backup"]
         reveal(chooseBackup, in: app); chooseBackup.tap()
@@ -702,7 +702,7 @@ import XCTest
         XCTAssertTrue(confirmation.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "1 thing, saved")).firstMatch.exists)
         confirmation.buttons["Restore"].tap()
         app.navigationBars["Leaving"].buttons["Settings"].tap()
-        app.buttons["Done"].tap()
+        app.tabBars.buttons["Find"].tap()
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5), app.debugDescription)
         app.terminate(); app.launch()
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))

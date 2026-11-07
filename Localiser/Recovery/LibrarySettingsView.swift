@@ -16,25 +16,47 @@ struct LibrarySettingsView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(ProAccess.self) private var pro
     @Environment(ReminderService.self) private var reminders
-    @Environment(\.dismiss) private var dismiss
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @AppStorage(Rituals.recapKey) private var recapOn = true
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
+    @AppStorage(AutomaticBackups.enabledKey) private var automaticBackups = true
+    @AppStorage(AutomaticBackups.lastKey) private var lastBackupTime = 0.0
+
+    private var coverageSummary: String {
+        switch reminders.permission {
+        case "Enabled", "Quiet delivery":
+            let count = reminders.scheduled.count
+            return count == 1 ? "1 reminder is queued on this iPhone." : "\(count) reminders are queued on this iPhone."
+        case "Disabled in Settings": return "Notifications are off for Hereabouts, so reminders can't reach you."
+        default: return "Turn on reminders so Hereabouts can tell you before a date passes."
+        }
+    }
 
     var body: some View {
         SheetList {
             Section {
-                NavigationLink { ProView(showsClose: false) } label: {
+                NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
                     NotebookLine(name: "Hereabouts Pro", detail: pro.standing?.summary ?? "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
                 }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.standing?.summary ?? "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
             }
             Section {
-                NavigationLink { HomesView() } label: {
+                NavigationLink { HomesView().toolbarVisibility(.hidden, for: .tabBar) } label: {
                     NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename, or add another home")
                 }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
             Section {
+                Label { Text(coverageSummary).fixedSize(horizontal: false, vertical: true) } icon: {
+                    Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk)
+                }
+                if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
+                    if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue.").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+                } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
+                    Button("Open notification settings", systemImage: "bell.slash") { UIApplication.shared.open(url) }
+                } else {
+                    Button("Turn on reminders", systemImage: "bell.badge") { Task { await reminders.enable() } }
+                }
+                if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
                 Toggle("Show names in reminders", isOn: $showItemNames)
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
                 Toggle("Sunday recap", isOn: $recapOn)
@@ -44,30 +66,43 @@ struct LibrarySettingsView: View {
             } header: { Text("Reminders") }
               footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved thing” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {
-                NavigationLink("Take your notebook with you.") { LeavingView() }.accessibilityIdentifier("settings.leaving")
+                if pro.unlocked {
+                    Toggle("Automatic backups", isOn: $automaticBackups)
+                    Text(lastBackupTime > 0 ? "Last one \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "The first one is made soon after you open the app.")
+                        .font(.wbCaption).foregroundStyle(Theme.pencil)
+                } else {
+                    NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
+                        NotebookLine(name: "Automatic backups", detail: "Pro saves a copy of your notebook every week.")
+                    }
+                }
+            } header: { Text("Backups") }
+              footer: { if pro.unlocked { Text("Saved to iCloud Drive, or to this iPhone if iCloud Drive is off. The newest five are kept.").font(.wbCaption).foregroundStyle(Theme.pencil) } }
+            Section {
+                NavigationLink("Take your notebook with you.") { LeavingView().toolbarVisibility(.hidden, for: .tabBar) }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
                 Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
             } header: { Text("Privacy") }
             Section {
-                Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
+                Button("Show the introduction again", systemImage: "play.rectangle") { seenOnboarding = false }
                 Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
                 Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
                 Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
+                NavigationLink { AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar) } label: { Label("Acknowledgements", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
             } header: { Text("Help") }
             Section {} footer: { Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.pencil) }
         }
         .listStyle(.plain)
         .font(.wbBody).tint(Theme.purpleInk).groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
     }
 }
 
 struct LeavingView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedFiles = Set<UUID>()
+    @State private var selectedFiles = AutomaticBackups.savedSelection()
+    @State private var savedBackups: [SavedBackup] = []
     @State private var document: LibraryExportDocument?
     @State private var exportType = UTType.json
     @State private var exporting = false
@@ -103,6 +138,16 @@ struct LeavingView: View {
                         optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
                 }.buttonStyle(.plain)
+                if !savedBackups.isEmpty {
+                    SectionHeading(title: "Saved automatically")
+                    VStack(spacing: 0) {
+                        ForEach(savedBackups) { backup in
+                            Button { chooseSaved(backup) } label: {
+                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this one.", "clock.arrow.circlepath")
+                            }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
+                        }
+                    }.buttonStyle(.plain)
+                }
                 Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups aren't encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
                 SectionHeading(title: "Then, if you like")
@@ -120,6 +165,8 @@ struct LeavingView: View {
             }.padding(20)
         }
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
+        .task { savedBackups = await AutomaticBackups.savedEverywhere() }
+        .onChange(of: selectedFiles) { _, ids in AutomaticBackups.saveSelection(ids) }
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts things") { result in
             switch result { case .success: notice = exportType == .json ? "Backup saved." : "Spreadsheet saved."; case .failure(let failure): error = failure.localizedDescription }
             document = nil
@@ -176,6 +223,14 @@ struct LeavingView: View {
             if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored." }
         } catch { self.error = error.localizedDescription }
     }
+    /// A saved backup goes through the same check and confirmation as one chosen from Files.
+    private func chooseSaved(_ backup: SavedBackup) {
+        do {
+            let file = try AutomaticBackups.load(backup)
+            try store.validateBackup(file)
+            pendingRestore = file; confirmingRestore = true
+        } catch { self.error = error.localizedDescription }
+    }
     private func prepareCSV() {
         exportType = .commaSeparatedText; document = LibraryExportDocument(data: Data(store.inventoryCSV().utf8)); exporting = true
     }
@@ -213,16 +268,34 @@ struct BackupFilesView: View {
     }
 }
 
-/// Gear button that opens Settings from any tab.
-private struct SettingsButton: ViewModifier {
-    @State private var open = false
-    func body(content: Content) -> some View {
-        content
-            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { open = true } } }
-            .sheet(isPresented: $open) { NavigationStack { LibrarySettingsView() } }
+/// A typeface the app ships, with the licence file bundled next to it.
+struct Typeface: Identifiable {
+    let name: String
+    let file: String
+    var id: String { name }
+    static let all = [Typeface(name: "Atkinson Hyperlegible", file: "atkinsonhyperlegible-OFL"), Typeface(name: "Fraunces", file: "fraunces-OFL")]
+
+    func licence(in bundle: Bundle = .main) -> String? {
+        bundle.url(forResource: file, withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) }
     }
+    /// The first line of the licence file.
+    var copyright: String { licence()?.split(whereSeparator: \.isNewline).first.map(String.init) ?? "" }
 }
 
-extension View {
-    func settingsButton() -> some View { modifier(SettingsButton()) }
+struct AcknowledgementsView: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text("Hereabouts is set in two typefaces, both free to use under the SIL Open Font License.").font(.wbBody).foregroundStyle(Theme.ink)
+                ForEach(Typeface.all) { face in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(face.name).font(.wbItem).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
+                        Text(face.copyright).font(.wbCaption).foregroundStyle(Theme.pencil)
+                        Text(face.licence() ?? "The licence text isn't available.").font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
+                    }
+                }
+            }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Theme.paper).navigationTitle("Acknowledgements").navigationBarTitleDisplayMode(.inline)
+    }
 }

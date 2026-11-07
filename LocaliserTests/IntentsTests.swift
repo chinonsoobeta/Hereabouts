@@ -85,4 +85,15 @@ final class IntentsTests: XCTestCase {
         XCTAssertEqual(entity.title, "The boat · Deck")
         XCTAssertEqual(entity.path, "Deck")
     }
+
+    func testSiriTipsAreShownOnceEach() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "SiriTipsTests.\(UUID().uuidString)"))
+        XCTAssertTrue(SiriTip.allCases.allSatisfy { $0.isShown(in: defaults) }, "Both start out showing")
+        SiriTip.whereIs.dismiss(in: defaults)
+        XCTAssertFalse(SiriTip.whereIs.isShown(in: defaults))
+        XCTAssertTrue(SiriTip.writeDown.isShown(in: defaults), "Dismissing one leaves the other")
+        SiriTip.writeDown.dismiss(in: defaults)
+        XCTAssertFalse(SiriTip.writeDown.isShown(in: defaults))
+        XCTAssertNotEqual(SiriTip.whereIs.key, SiriTip.writeDown.key)
+    }
 }

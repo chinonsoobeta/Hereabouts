@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import TipKit
+import AppIntents
 
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
@@ -9,13 +10,14 @@ struct FindView: View {
     @FocusState private var searchFocused: Bool
     @State private var showArchived = false
     @State private var putAway = false
-    @State private var settings = false
     @State private var addingPlace = false
     @State private var openedItem: Belonging?
     @Environment(ReminderService.self) private var reminders
     @State private var ritual: Ritual?
     @State private var speaking = false
     @State private var spoken: NewThing?
+    @AppStorage(SiriTip.whereIs.key) private var whereIsTipDismissed = false
+    @AppStorage(SiriTip.writeDown.key) private var writeDownTipDismissed = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -28,6 +30,7 @@ struct FindView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
+                if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
                     LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "The first thing is the hardest to lose.")
                     Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
@@ -76,7 +79,6 @@ struct FindView: View {
             store.findRequest = nil
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { settings = true } }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Toggle("Show archived things", systemImage: "archivebox", isOn: $showArchived)
@@ -101,7 +103,6 @@ struct FindView: View {
         .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
         .sheet(item: $newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
         .sheet(isPresented: $speaking, onDismiss: { if let spoken { newThing = spoken; self.spoken = nil } }) { NavigationStack { VoiceSheet { spoken = $0 } } }
-        .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
         .sheet(item: $ritual) { ritual in
             NavigationStack {
@@ -116,6 +117,11 @@ struct FindView: View {
             ritual = opened
             reminders.openedRitual = nil
         }
+    }
+
+    @ViewBuilder private var siriTips: some View {
+        if !whereIsTipDismissed { SiriTipView(intent: FindThingIntent(), isVisible: Binding(get: { !whereIsTipDismissed }, set: { whereIsTipDismissed = !$0 })) }
+        if !writeDownTipDismissed { SiriTipView(intent: AddThingIntent(), isVisible: Binding(get: { !writeDownTipDismissed }, set: { writeDownTipDismissed = !$0 })) }
     }
 
     @ViewBuilder private var dashboard: some View {
