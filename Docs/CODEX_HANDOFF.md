@@ -1,5 +1,7 @@
 # Prompt for Codex: finish the Hereabouts plan and the notebook restyle
 
+> **History.** Written 9 October 2026 and no longer current. The plan for 1.0 is `Docs/RELEASE_PLAN.md`. Don't work from this file.
+
 Paste everything below the line into Codex, run from the repo root.
 
 ---

@@ -1,5 +1,7 @@
 # Localiser: end-to-end audit and launch plan
 
+> **History.** Written 9 October 2026 and no longer current. The plan for 1.0 is `Docs/RELEASE_PLAN.md`, and `Docs/FEATURE_PLAN.md` records what each feature is. Some of what follows (the Due tab, receipt scanning, the gear-button Settings, the 200-thing free plan) has changed or been cut.
+
 Prepared 9 October 2026 against commit `99dc1dc`. This is a plan, not a change set: nothing below has been implemented.
 
 Evidence: full read of every source file, a run of the Debug build on the iPhone 17 simulator with the demo library, the unit and UI test results from today, and an App Store market review (sources listed in section 6).
