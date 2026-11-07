@@ -142,7 +142,7 @@ struct LeavingView: View {
                     SectionHeading(title: "Saved automatically")
                     VStack(spacing: 0) {
                         ForEach(savedBackups) { backup in
-                            Button { chooseSaved(backup) } label: {
+                            Button { Task { await chooseSaved(backup) } } label: {
                                 optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this one.", "clock.arrow.circlepath")
                             }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
                         }
@@ -224,9 +224,9 @@ struct LeavingView: View {
         } catch { self.error = error.localizedDescription }
     }
     /// A saved backup goes through the same check and confirmation as one chosen from Files.
-    private func chooseSaved(_ backup: SavedBackup) {
+    private func chooseSaved(_ backup: SavedBackup) async {
         do {
-            let file = try AutomaticBackups.load(backup)
+            let file = try await AutomaticBackups.load(backup)
             try store.validateBackup(file)
             pendingRestore = file; confirmingRestore = true
         } catch { self.error = error.localizedDescription }
