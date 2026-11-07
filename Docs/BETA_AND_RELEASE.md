@@ -1,29 +1,28 @@
 # Hereabouts: beta and release preparation
 
-Updated 9 October 2026. Nothing has been invited, uploaded, created in App Store Connect or submitted. `BUILD_STATUS.md` holds verification results and `HUMAN_BLOCKED.md` lists what needs the owner.
+Updated 7 November 2026. Nothing has been invited, uploaded, created in App Store Connect or submitted. `BUILD_STATUS.md` holds verification results, and the owner's list is checklist A in `RELEASE_PLAN.md` (section 4).
 
 ## Beta workflow
 
-Start with a small consented group of household organisers, frequent shoppers and travellers. Grow to fifteen to twenty households once obvious defects are fixed. Ask people to use their own belongings. Use synthetic receipts for the first expiry tests.
+Start with a small consented group of household organisers, frequent shoppers and travellers. Grow to fifteen to twenty households once obvious defects are fixed. Ask people to use their own belongings.
 
 | Task | Success to observe | Record |
 | --- | --- | --- |
 | Save one real item | Save by name, optionally choose a place, find it again after a restart | Time, search phrase, whether help was needed |
 | Find after moving | Move an item or a box and find its new place | Wrong or ambiguous suggestions, corrections |
-| Confirm a date | Scan a receipt, check the date, save it | Wrong suggestions, manual corrections, trust |
-| Decide a return | "I'm returning it", "I'm keeping it" or "It's been returned" without touching other dates | Reminder changes, accidental archiving |
-| Add to Calendar | Add one date and "Add all to Calendar" from Due soon | Calendar title, alert time, duplicates |
+| Say it | Hold the microphone (if voice memos ship), say where a thing is, check the name and place, save | Wrong names or places, corrections, whether a place was ever filled in unseen |
+| Lend and get it back | Lend a thing with an ask-back date, get the reminder, mark it back | Reminder timing, wrong names, accidental archiving |
 | Complete a packing cycle | Plan a trip from a kit, pack, tick tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
 | Recover a library | Back up with selected files, restore into a fresh install | Record counts, attachments, trip progress |
 
-Ask whether they opened Hereabouts again without prompting, which problem it solved, whether US$2.99 a month, US$19.99 a year or US$49.99 once feels fair, and which they'd pick, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
+Ask whether they opened Hereabouts again without prompting, which problem it solved, whether the monthly, yearly or Lifetime price shown in the paywall feels fair, and which they'd pick, and which tool it would replace. Record exact defects. Small-sample percentages do not show demand. Do not add analytics for the beta.
 
 ## Frozen quality check
 
 Freeze the app commit and expected answers before scoring 200 capture sentences and 100 search pairs. Use consented, de-identified examples from people who did not write the code. Keep every example in the denominator, including failures and corrections. Do not swap out hard examples after seeing results. Unit-test fixtures are not this holdout.
 
 - **Capture.** Record the intended name, the existing place or an explicit "unknown", the suggestion, corrections and time to save. A suggestion is correct only when both name and place match. Target: 90% of captures finished correctly within ten seconds, corrections included.
-- **Safety.** An unknown place must never be silently assigned, and a date must never be saved without confirmation. The allowed count for either is zero.
+- **Safety.** An unknown place must never be silently assigned, by typing or by voice. The allowed count is zero.
 - **Search.** Record the query and acceptable items first. A positive query passes when an acceptable item is in the top three. Target: 95%. Report false positives on negative queries separately.
 - **Speed.** Measure search over 5,000 records on the slowest supported phone. Target: 50 ms. Simulator timings do not count.
 
@@ -31,20 +30,23 @@ These are targets, not results. If one is missed, keep the failed run, fix the d
 
 ## Physical-device checks before launch
 
-- Test iOS 26 on the smallest supported phone and on a phone with and without Apple Intelligence.
-- Use airplane mode with no iCloud account: create, edit, move, search, scan and relaunch without loss.
-- Time name-only capture and search with 5,000 records.
-- Review every tab, scan confirmation, backup, Settings and Pro in light and dark mode, at the largest text size and with VoiceOver. Check focus order, error announcements and labels.
-- Check that tips appear once and in order: Scan after the first item, put-away after five items, Move, Add to Calendar, "I'm leaving".
-- Notifications: deny, revoke, act on a reminder, edit and delete dates, force-quit, leave the phone idle for days, change time zone, exceed 64 pending reminders. Compare the coverage card with the real pending queue. Check the item-name switch in Settings.
-- Calendar: add one date and all dates with write-only access, then with access denied.
-- Scanning: blurred receipt, several dates, no date, an expired document, camera, photo and PDF. A cancelled or failed scan must not use one of the 5 free monthly scans.
-- Purchases: StoreKit sandbox buy, restore on a second device, cancel, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
-- Siri: "Where is <thing> in Hereabouts", "Write something down in Hereabouts" and "What's due in Hereabouts", with the phone locked and unlocked. Check the thing picker understands nicknames, and that the 201st thing on the free plan is refused politely.
+These match O39 in `RELEASE_PLAN.md`; tick them there.
+
+- Test iOS 26 on the smallest supported phone you can borrow, and on phones with and without Apple Intelligence.
+- Use airplane mode with no iCloud account: create, edit, move, search, a voice memo and relaunch without loss.
+- Time name-only capture and search with 5,000 records, on the iPhone 16 Pro Max.
+- Review every tab, Settings and Pro in light and dark mode, at the largest text size and with VoiceOver. Check focus order, error announcements and labels.
+- Check that tips appear once and in order.
+- Notifications: deny, revoke, act on an ask-back reminder, force-quit, leave the phone idle for days, change time zone. The Settings tab's warning shows when notifications are off.
+- Purchases: StoreKit sandbox buy of each product, start both trials and cancel, restore on a second device, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
+- Voice: microphone denied, then allowed; a long sentence; a place the notebook doesn't know is left blank.
+- Siri: "Where is <thing> in Hereabouts" and "Write something down in Hereabouts", with the phone locked and unlocked. The 16th free thing is refused politely. A private thing's place is never spoken. A missing thing is reported as missing.
 - Sunday recap and stocktake: leave the phone through a Sunday 18:00 and a first Saturday with things not checked for three months. Tap each notification and check it opens the right sheet. Turn both off in Settings and check nothing more arrives. Check the trip-eve reminder the evening before a trip that isn't fully packed.
+- Automatic backups: one arrives in iCloud Drive, a restore from it brings everything back, and turning Pro off keeps the saved ones.
+- Widgets: both buttons at small size and on the Lock Screen; the lent-out widget if it ships.
 - iPad: install on an iPad and walk all four tabs. The app is iPhone-only and runs in compatibility mode.
 
-No public launch with an open data-loss defect, a silently accepted wrong date or missing proof that real reminders fire.
+No public launch with an open data-loss defect, a place filled in without the person seeing it, or missing proof that real reminders arrive.
 
 ## App Store listing
 
@@ -155,8 +157,8 @@ Ten steps from a fresh install to the paywall and back, for the review notes' re
 
 - **Data collection:** "Data Not Collected". Hereabouts has no server, analytics, advertising or tracking SDK.
 - **Privacy manifest:** `Localiser/PrivacyInfo.xcprivacy` declares app-private UserDefaults use, reason `CA92.1`. Check the final archive's privacy report before submitting.
-- **Policy text:** `Site/privacy.html`. It covers on-device storage, device backups, user-made export files, on-device text recognition, notifications, write-only calendar access and StoreKit.
+- **Policy text:** `Site/privacy.html`. It covers on-device storage, homes, lending and the contact picker, private things, shelf-photo names, box labels, voice memos, automatic backups to the person's iCloud Drive, the widget, notifications, StoreKit, deleting data and support emails.
 
 ## Owner inputs
 
-These live in `HUMAN_BLOCKED.md`: enrolment, domain and email, the App Store Connect product and price schedule, name clearance, TestFlight and the physical checks above. Uploading, inviting testers and submitting each need the owner's explicit go-ahead.
+These live in checklist A of `RELEASE_PLAN.md` (section 4): domain and email, the App Store Connect products and price schedule, name clearance, TestFlight and the physical checks above. Uploading, inviting testers and submitting each need the owner's explicit go-ahead.
