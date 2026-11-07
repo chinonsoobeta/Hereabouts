@@ -82,16 +82,15 @@ struct OnboardingView: View {
         headline("A nudge before it's too late.")
         Text("Hereabouts only speaks up about your own things. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
         VStack(spacing: 0) {
-            nudge("Return", "Three days before a return window closes, and on the day")
-            nudge("Warranty", "A month before a warranty ends")
+            nudge("Lent", "On the day you said you'd ask for it back")
             nudge("Trip", "The evening before you leave, if something's unpacked")
-            nudge("Sunday", "One recap. What you added, what's due, what's drifting.")
+            nudge("Sunday", "One recap. What you added, what's lent out, what's drifting.")
             nudge("Monthly", "Still there? A few quick questions on the first Saturday")
         }
         .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
         StickyNote {
             VStack(alignment: .leading, spacing: 6) {
-                Text("“Running shoes: last day to return is Sunday.”").font(.wbQuote).foregroundStyle(Theme.ink)
+                Text("“Ask Sam for Drill back.”").font(.wbQuote).foregroundStyle(Theme.ink)
                 Text("How a reminder reads. Names can be hidden in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
             }
         }
@@ -116,7 +115,7 @@ struct OnboardingView: View {
             Button { Task { await reminders.enable(); onFinish() } } label: { wrapping("Turn on nudges") }
                 .buttonStyle(PrimaryButtonStyle())
             Button("Not now") { onFinish() }.font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
-            Text("You can change this on the Due tab any time.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
+            Text("You can change this in Settings any time.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
         }
     }
 

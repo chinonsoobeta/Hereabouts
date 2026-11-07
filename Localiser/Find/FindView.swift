@@ -7,7 +7,6 @@ struct FindView: View {
     @State private var query = ""
     @State private var newThing: NewThing?
     @FocusState private var searchFocused: Bool
-    @State private var scanning = false
     @State private var showArchived = false
     @State private var putAway = false
     @State private var settings = false
@@ -15,7 +14,6 @@ struct FindView: View {
     @State private var openedItem: Belonging?
     @Environment(ReminderService.self) private var reminders
     @State private var ritual: Ritual?
-    @State private var showDue = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -23,11 +21,6 @@ struct FindView: View {
     }
 
     private var browsing: Bool { query.isEmpty && !putAway && !showArchived }
-
-    private var dueSoon: [Deadline] {
-        guard let horizon = CalendarDay(.now).adding(days: 30) else { return [] }
-        return store.deadlines.filter { $0.needsAttention && ($0.day.map { $0 <= horizon } ?? false) }.sorted { $0.dayString < $1.dayString }
-    }
 
 
     var body: some View {
@@ -89,8 +82,6 @@ struct FindView: View {
                 .accessibilityLabel("Find options")
                 .popoverTip(PutAwayTip())
             }
-            ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true }.popoverTip(ScanTip()) }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
@@ -100,20 +91,18 @@ struct FindView: View {
                 .accessibilityHint("Touch and hold to start with a photo")
             }
         }
-        .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
+        .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
         .sheet(item: $newThing) { new in NavigationStack { ItemEditor(name: new.name, photoFirst: new.photoFirst) } }
-        .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
         .sheet(item: $ritual) { ritual in
             NavigationStack {
                 switch ritual {
-                case .recap: RecapView(seeDue: { showDue = true }, startStocktake: { Task { @MainActor in self.ritual = .stocktake } })
+                case .recap: RecapView(startStocktake: { Task { @MainActor in self.ritual = .stocktake } })
                 case .stocktake: StocktakeView()
                 }
             }
         }
-        .navigationDestination(isPresented: $showDue) { DueView() }
         .onChange(of: reminders.openedRitual, initial: true) { _, value in
             guard let value, let opened = Ritual(rawValue: value) else { return }
             ritual = opened
@@ -127,16 +116,6 @@ struct FindView: View {
         if !store.missingItems.isEmpty {
             SectionHeading(title: "Looking for").padding(.top, 4)
             ForEach(store.missingItems) { item in itemCard(item) }
-        }
-        if !dueSoon.isEmpty {
-            HStack {
-                SectionHeading(title: "Due")
-                Spacer()
-                NavigationLink("All dates") { DueView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk)
-            }.padding(.top, 4)
-            ForEach(dueSoon.prefix(2)) { deadline in
-                NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DueCard(deadline: deadline) }.buttonStyle(.plain)
-            }
         }
         HStack {
             SectionHeading(title: "Places")
@@ -198,48 +177,6 @@ extension Place {
         }
         return count(self)
     }
-}
-
-struct DueCard: View {
-    let deadline: Deadline
-    var embedded = false
-    var body: some View {
-        let pill = deadline.group == .done ? settledStamp : DueLabel.pill(for: deadline.day)
-        HStack(spacing: 14) {
-            IconTile(systemImage: DueLabel.symbol(for: deadline.kind), photo: deadline.item?.photo, size: 48, tone: pill?.1 ?? .neutral)
-            VStack(alignment: .leading, spacing: 2) {
-                NotebookLine(name: deadline.item?.name ?? "Thing unavailable", detail: caption)
-            }
-            Spacer(minLength: 8)
-            if let pill { Stamp(text: pill.0, tone: pill.1) }
-        }
-        .modifier(EmbeddedCard(embedded: embedded))
-    }
-
-    /// Dates that need nothing more: a decided return, or a warranty or expiry that has passed.
-    private var settledStamp: (String, Stamp.Tone)? {
-        switch deadline.decision {
-        case .returned?: ("Returned", .done)
-        case .keeping?: ("Kept", .done)
-        default: deadline.item?.archived == true ? ("Archived", .neutral) : ("Passed", .neutral)
-        }
-    }
-
-    private var caption: String {
-        let day = deadline.day?.formatted ?? "Date unavailable"
-        switch deadline.kind {
-        case .returns: return deadline.decision == .returning ? "Returning · drop off by \(day)" : "Return by \(day)"
-        case .warranty: return "Warranty ends \(day)"
-        case .expiry: return "Expires \(day)"
-        case .askBack: return "Ask for it back \(day)"
-        case nil: return day
-        }
-    }
-}
-
-private struct EmbeddedCard: ViewModifier {
-    let embedded: Bool
-    func body(content: Content) -> some View { if embedded { content.contentShape(Rectangle()) } else { content.card() } }
 }
 
 struct ItemRow: View {
@@ -464,7 +401,6 @@ struct ItemDetailView: View {
     let item: Belonging
     var putAway = false
     @State private var editing = false
-    @State private var addingDate = false
     @State private var moving = false
     @State private var finding = false
     @State private var lending = false
@@ -493,9 +429,8 @@ struct ItemDetailView: View {
                             else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
                             else { Stamp(text: "At home", tone: .done) }
                             // The canvas leads with the next date when one is close.
-                            if let next = item.deadlines.filter(\.needsAttention).sorted(by: { $0.dayString < $1.dayString }).first,
-                               let days = DueLabel.days(until: next.day), days <= 30, let pill = DueLabel.pill(for: next.day) {
-                                Stamp(text: "\(next.kind == .returns ? "Return" : next.kind == .warranty ? "Warranty" : "Expires") · \(pill.0)", tone: pill.1)
+                            if let askBack = item.openAskBack, let days = DueLabel.days(until: askBack.day), days <= 30, let pill = DueLabel.pill(for: askBack.day) {
+                                Stamp(text: "Ask for it back · \(pill.0)", tone: pill.1)
                             }
                         }
                         Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
@@ -523,9 +458,17 @@ struct ItemDetailView: View {
                             }
                             if item.isLent, !item.archived {
                                 if let line = item.lentLine { Text(line).font(.wbCaption).foregroundStyle(Theme.ink) }
+                                if let askBack = item.openAskBack, let day = askBack.day {
+                                    Text("Ask for it back · \(day.formatted)").font(.wbCaption).foregroundStyle(Theme.ink).accessibilityIdentifier("item.askBack")
+                                }
                                 Button("It's back") {
                                     do { try store.gotBack(item) } catch { self.error = error.localizedDescription }
                                 }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.back")
+                                if let askBack = item.openAskBack {
+                                    Button("Ask again next week") {
+                                        do { try store.askAgainNextWeek(askBack) } catch { self.error = error.localizedDescription }
+                                    }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.askAgain")
+                                }
                             } else if item.isMissing, !item.archived {
                                 Text("Missing since \(item.missingSince?.dayAndMonth ?? "recently").").font(.wbCaption).foregroundStyle(Theme.ink)
                                 Button("Found it") { finding = true }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
@@ -541,21 +484,6 @@ struct ItemDetailView: View {
                 }
                 if !item.packedTrips.isEmpty {
                     Section("Packed trips") { ForEach(item.packedTrips) { trip in NavigationLink(trip.name) { TripDetailView(trip: trip) } } }
-                }
-                Section("Dates") {
-                    ForEach(item.deadlines.sorted { $0.dayString < $1.dayString }) { deadline in
-                        NavigationLink { DeadlineDetailView(deadline: deadline) } label: { DeadlineRow(deadline: deadline, showsItem: false) }
-                    }
-                    Button("Add date") { addingDate = true }
-                }
-                if !item.scans.isEmpty {
-                    Section("Scans") {
-                        ForEach(item.scans.sorted { $0.createdAt > $1.createdAt }) { scan in
-                            NavigationLink { StoredScanView(scan: scan) } label: {
-                                VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(Theme.secondary) }
-                            }
-                        }
-                    }
                 }
                 if !item.movements.isEmpty {
                     Section("Where it's been") {
@@ -591,7 +519,6 @@ struct ItemDetailView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button("Move…", systemImage: "arrow.right.circle") { moving = true }
-                        Button("Add date", systemImage: "calendar.badge.plus") { addingDate = true }
                         if !item.archived, !item.isLent { Button("Lend it…", systemImage: "person.badge.clock") { lending = true } }
                         if !item.archived {
                             Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { finding = true }
@@ -629,7 +556,6 @@ struct ItemDetailView: View {
         }
         .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
         .sheet(isPresented: $editing) { NavigationStack { ItemEditor(item: item) } }
-        .sheet(isPresented: $addingDate) { NavigationStack { DeadlineEditor(item: item) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? item.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
@@ -637,7 +563,7 @@ struct ItemDetailView: View {
             }
             if !item.archived { Button("Archive instead") { toggleArchive() } }
         } message: {
-            Text("Its dates, scans and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
+            Text("Its dates and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
         }
         .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }

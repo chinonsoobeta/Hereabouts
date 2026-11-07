@@ -24,6 +24,8 @@ struct LibraryBackup: Codable, Sendable {
     var createdAt = Date()
     var records: [BackupRecord]
     static let maximumBytes = 200 * 1024 * 1024
+    /// The largest single photo a backup can carry.
+    static let maximumFileBytes = 20 * 1024 * 1024
 
     func encoded() throws -> Data {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
@@ -52,6 +54,9 @@ struct LibraryBackup: Codable, Sendable {
             throw LocaliserError.invalidBackup(data.starts(with: Data(#"{"createdAt":"#.utf8)) ? damaged : notABackup)
         }
     }
+    /// Return, warranty and expiry dates from before 1.0 still restore, kept as they are but not shown.
+    static let deadlineKinds: Set<String> = ["askBack", "returns", "warranty", "expiry"]
+    static let decisions: Set<String> = ["open", "returned", "keeping", "returning"]
     static let newerVersion = "This backup is from a newer Hereabouts. Update the app, then try again."
     static let damaged = "This backup is damaged. Choose another one."
     static let notABackup = "This file isn't a Hereabouts backup. Choose one made with Back up everything."
@@ -159,12 +164,12 @@ struct LibraryBackup: Codable, Sendable {
                     guard value.count <= 500_000, !["name", "title"].contains(key) || !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw LocaliserError.invalidBackup("Something in this backup has no name, or too much text.") }
                 case (.booleanAttributeType, .boolean), (.dateAttributeType, .date), (.integer64AttributeType, .integer): break
                 case (.integer16AttributeType, .integer(let value)): guard Int16(exactly: value) != nil else { throw LocaliserError.invalidBackup("A number in this backup is too big.") }
-                case (.binaryDataAttributeType, .data(let value)): guard value.count <= ScanReader.maximumBytes else { throw LocaliserError.invalidBackup("A photo or document in this backup is over 20 MB.") }
+                case (.binaryDataAttributeType, .data(let value)): guard value.count <= LibraryBackup.maximumFileBytes else { throw LocaliserError.invalidBackup("A photo or document in this backup is over 20 MB.") }
                 default: throw LocaliserError.invalidBackup("Part of this backup is damaged.")
                 }
             }
             if record.entity == "Deadline" {
-                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, DeadlineKind(rawValue: record.string("kindRaw") ?? "") != nil, ReturnDecision(rawValue: record.string("decisionRaw") ?? "") != nil, (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup("A date in this backup is damaged.") }
+                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, LibraryBackup.deadlineKinds.contains(record.string("kindRaw") ?? ""), LibraryBackup.decisions.contains(record.string("decisionRaw") ?? ""), (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup("A date in this backup is damaged.") }
             }
             if record.entity == "TripRecord" {
                 guard let start = CalendarDay(stored: record.string("startDay") ?? ""), let end = CalendarDay(stored: record.string("endDay") ?? ""), end >= start, TripState(rawValue: record.string("stateRaw") ?? "") != nil else { throw LocaliserError.invalidBackup("A trip in this backup is damaged.") }
@@ -212,7 +217,7 @@ struct LibraryBackup: Codable, Sendable {
         }
         let heading = ["id", "name", "home", "place", "notes", "other names", "archived", "private", "dates"].map(escaped).joined(separator: ",")
         return ([heading] + items.map { item in
-            let dates = item.deadlines.sorted { $0.dayString < $1.dayString }.map { "\($0.kind?.title ?? "Date") \($0.dayString)" }
+            let dates = item.deadlines.filter { $0.kind == .askBack }.sorted { $0.dayString < $1.dayString }.map { "\($0.kind?.title ?? "Date") \($0.dayString)" }
             return [item.id.uuidString, item.name, item.home?.name ?? "", item.place?.path ?? "", item.notes, item.aliases, item.archived ? "yes" : "no", item.isPrivate ? "yes" : "no", dates.joined(separator: "; ")].map(escaped).joined(separator: ",")
         }).joined(separator: "\r\n") + "\r\n"
     }

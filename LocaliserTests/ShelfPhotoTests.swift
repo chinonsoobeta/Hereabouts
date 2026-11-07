@@ -25,7 +25,7 @@ import XCTest
 
     func testReaderFailureIsThrown() async {
         do {
-            _ = try await StandInShelfReader(failure: ScanError.unreadable).names(in: Data())
+            _ = try await StandInShelfReader(failure: PhotoError.unreadable).names(in: Data())
             XCTFail("Expected a failure")
         } catch {}
     }

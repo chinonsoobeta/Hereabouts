@@ -41,36 +41,16 @@ struct CalendarDay: Equatable, Comparable, Sendable {
 }
 
 enum DeadlineKind: String, CaseIterable, Identifiable, Sendable {
-    case returns, warranty, expiry
-    /// The day to ask for a lent thing back. Set from "Lend it…", not chosen in the date editor.
+    /// The day to ask for a lent thing back. Set from "Lend it…".
     case askBack
     var id: String { rawValue }
-    /// The kinds a person picks in the date editor.
-    static let chosen: [DeadlineKind] = [.returns, .warranty, .expiry]
-    var title: String { switch self { case .returns: "Return by"; case .warranty: "Warranty ends"; case .expiry: "Expires"; case .askBack: "Ask for it back" } }
-    /// The date in a sentence, like "Looks like a return date".
-    var noun: String { switch self { case .returns: "return date"; case .warranty: "warranty end date"; case .expiry: "expiry date"; case .askBack: "ask-back date" } }
-    var defaultLeadDays: Int { switch self { case .returns: 3; case .warranty: 30; case .expiry: 180; case .askBack: 0 } }
+    var title: String { "Ask for it back" }
+    var noun: String { "ask-back date" }
+    var defaultLeadDays: Int { 0 }
 }
 
-enum ReturnDecision: String, Sendable { case open, keeping, returning, returned }
-
-/// Where a date sits on the Due board.
-enum DueGroup: String, CaseIterable, Sendable {
-    case missed, thisWeek, later, done
-    var title: String { switch self { case .missed: "Missed"; case .thisWeek: "This week"; case .later: "Later"; case .done: "Done" } }
-
-    /// A return stays open after its day until someone says what happened. A warranty or expiry
-    /// that has passed needs nothing more, so it joins Done rather than piling up as missed.
-    static func of(kind: DeadlineKind?, active: Bool, day: CalendarDay?, today: CalendarDay, calendar: Calendar = .current) -> DueGroup {
-        guard active else { return .done }
-        guard let day else { return .later }
-        // A lent thing still out after its ask-back day waits, like a return, until it's back.
-        if day < today { return kind == .returns || kind == .askBack ? .missed : .done }
-        if let weekOut = today.adding(days: 7, calendar: calendar), day <= weekOut { return .thisWeek }
-        return .later
-    }
-}
+/// An ask-back date is open until the thing comes back.
+enum ReturnDecision: String, Sendable { case open, returned }
 
 struct ReminderInput: Sendable {
     var id: UUID
@@ -100,24 +80,15 @@ struct PlannedReminder: Equatable, Sendable {
 
     /// Notification wording. Item names appear unless the person turned them off in Settings.
     func content(showingNames: Bool) -> (title: String, body: String) {
-        let subject = showingNames && !itemName.isEmpty ? itemName : "A saved thing"
-        let when = daysBefore == 0 ? "today" : (daysBefore == 1 ? "tomorrow" : "in \(daysBefore) days")
-        let body: String = switch kind {
-        case .returns: "\(subject): last day to return is \(when)."
-        case .warranty: "\(subject): warranty ends \(when)."
-        case .expiry: "\(subject): expires \(when)."
-        case .askBack: showingNames && !itemName.isEmpty && !person.isEmpty ? "Ask \(person) for \(itemName) back." : "Ask for something back."
-        }
-        let title: String = switch kind { case .returns: "Return window closing"; case .warranty: "Warranty ending"; case .expiry: "Expiry coming up"; case .askBack: "Lent out" }
-        return (title, body)
+        let body = showingNames && !itemName.isEmpty && !person.isEmpty ? "Ask \(person) for \(itemName) back." : "Ask for something back."
+        return ("Lent out", body)
     }
 }
 
 enum ReminderPlan {
     static func candidates(_ inputs: [ReminderInput], now: Date = .now, calendar: Calendar = .current) -> [PlannedReminder] {
         inputs.flatMap { input -> [PlannedReminder] in
-            guard input.enabled, !input.archived,
-                  input.kind != .returns || [.open, .returning].contains(input.decision) else { return [] }
+            guard input.enabled, !input.archived, input.decision == .open else { return [] }
             let offsets = input.leadDays == 0 ? [0] : [input.leadDays, 0]
             return offsets.compactMap { offset in
                 guard let day = input.day.adding(days: -offset, calendar: calendar),

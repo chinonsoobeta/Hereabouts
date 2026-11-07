@@ -6,7 +6,7 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let image = XCTAttachment(screenshot: app.screenshot()); image.name = "Tab \(tab)"; image.lifetime = .keepAlways; add(image)
             try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
@@ -138,50 +138,17 @@ import XCTest
         let back = app.buttons["item.back"]
         XCTAssertTrue(back.waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["With Sam"].exists)
+        // The thing page shows when to ask for it back, and can push that a week.
+        let askBack = app.staticTexts["item.askBack"]
+        XCTAssertTrue(askBack.exists, app.debugDescription)
+        XCTAssertTrue(askBack.label.hasPrefix("Ask for it back · "), askBack.label)
+        let before = askBack.label
+        app.buttons["item.askAgain"].tap()
+        let moved = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label != %@", before), object: askBack)
+        XCTAssertEqual(XCTWaiter.wait(for: [moved], timeout: 5), .completed)
         back.tap()
         XCTAssertTrue(back.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Back from Sam"].exists, app.debugDescription)
-    }
-
-    func testPastingAnOrderEmailOffersItsDates() throws {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
-        app.launch()
-        let search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("Winter")
-        app.staticTexts["Winter tires"].firstMatch.tap()
-        reveal(app.buttons["Add date"], in: app)
-        app.buttons["Add date"].tap()
-        let paste = app.buttons["deadline.paste"]
-        XCTAssertTrue(paste.waitForExistence(timeout: 5), app.debugDescription)
-        UIPasteboard.general.string = "Thanks for your shopping.\nNo dates here."
-        paste.tap()
-        XCTAssertTrue(app.staticTexts["deadline.pasteNone"].waitForExistence(timeout: 5), app.debugDescription)
-        UIPasteboard.general.string = "Order placed: October 3, 2026\nArriving Oct 7, 2026\nYou can return this item until November 6, 2026."
-        paste.tap()
-        XCTAssertTrue(app.staticTexts["Looks like the last day to return"].waitForExistence(timeout: 5), app.debugDescription)
-        XCTAssertTrue(app.staticTexts["Looks like the delivery date"].exists)
-        XCTAssertFalse(app.staticTexts["deadline.pasteNone"].exists)
-        // The system's "pasted from" banner covers the toolbar for a few seconds; audit once it has gone.
-        let banner = XCUIApplication(bundleIdentifier: "com.apple.springboard").staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'Hereabouts pasted'")).firstMatch
-        _ = banner.waitForNonExistence(timeout: 8)
-        _ = XCTWaiter.wait(for: [XCTestExpectation(description: "banner fades")], timeout: 1)
-        let pastedShot = XCTAttachment(screenshot: app.screenshot()); pastedShot.name = "Pasted order email"; pastedShot.lifetime = .keepAlways; add(pastedShot)
-        // The return-by date became the final date, waiting to be checked.
-        XCTAssertFalse(app.buttons["deadline.save"].isEnabled)
-        let confirm = app.switches["deadline.confirm"]
-        reveal(confirm, in: app)
-        XCTAssertTrue(app.staticTexts["Final date, Nov 6, 2026"].exists, app.debugDescription)
-        confirm.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: app.buttons["deadline.save"])
-        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
-        // Back to the top, one drag at a time so the sheet isn't pulled down.
-        for _ in 0..<6 where !paste.isHittable {
-            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35)).press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75)))
-        }
-        // The "From an order email" header sits under the bar; about half the runs report it with no element.
-        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait], unresolvedContrast: true)
     }
 
     func testSeveralThingsFromOnePhoto() throws {
@@ -278,7 +245,7 @@ import XCTest
         XCTAssertTrue(tidy.waitForNonExistence(timeout: 5))
     }
 
-    func testAppLinksOpenWritingDownAndDue() {
+    func testAppLinksOpenWritingDownAndPuttingAway() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
@@ -291,9 +258,6 @@ import XCTest
         follow("hereabouts://new")
         XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), app.debugDescription)
         app.buttons["Cancel"].firstMatch.tap()
-        follow("hereabouts://due")
-        XCTAssertTrue(app.tabBars.buttons["Due"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.tabBars.buttons["Due"].isSelected, app.debugDescription)
         follow("hereabouts://putaway")
         XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), "Put away opens the capture screen, photo first")
     }
@@ -345,21 +309,6 @@ import XCTest
         app.launch()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
-        // Store shots show reminders on, as a real user would have them. Turn them on before the first shot: until
-        // then the Due tab carries a warning badge on every screen.
-        app.tabBars.buttons["Due"].tap()
-        let turnOn = app.buttons["Turn on reminders"]
-        if turnOn.waitForExistence(timeout: 2) {
-            turnOn.tap()
-            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
-            if allow.waitForExistence(timeout: 5) { allow.tap() }
-            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
-        }
-        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
-        guard queued.waitForExistence(timeout: 5) else {
-            XCTFail("Notifications are off for Hereabouts on this simulator, so Due would show a warning. The name-only capture test turns them off. Uninstall Hereabouts from the simulator, then run this test on its own.")
-            return
-        }
         app.tabBars.buttons["Find"].tap()
         try shot("1-find")
         search.tap(); search.typeText("pass\n")
@@ -372,8 +321,6 @@ import XCTest
         app.staticTexts["Running shoes"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
         try shot("3-thing")
-        app.tabBars.buttons["Due"].tap()
-        try shot("4-due")
         app.tabBars.buttons["Trips"].tap()
         try shot("5-trips")
         app.tabBars.buttons["Find"].tap()
@@ -442,7 +389,7 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let screenshot = XCTAttachment(screenshot: app.screenshot())
             screenshot.name = "Contrast and clipping audit \(tab)"
@@ -469,12 +416,11 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let labels: [String]
             switch tab {
             case "Find": labels = ["Add your first thing"]
-            case "Due": labels = ["Remember in time", "Add a return, warranty or expiry date to a thing. Hereabouts reminds you before it passes."]
             case "Trips": labels = ["Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home."]
             default: labels = []
             }
@@ -524,12 +470,12 @@ import XCTest
                 // starting within 24 points of the bar is exempt; it is ordinary text once scrolled back.
                 if element.frame.minY < app.navigationBars["Pro"].frame.maxY + 24 { return true }
                 if ["Packing kits", "Pro isn't available to buy right now. Try again later.", "Restore purchases"].contains(element.label) { return true }
-                if element.label == "No limit on what you write down. Shared with your family." { return true }
+                if element.label == "No limit on what you write down." { return true }
             }
             // Verified by hand on 2026-10-09: this sentence is ink (#2A2140) on a white card, about 15:1,
             // yet the contrast audit samples the card's soft shadow edge and reports a failure.
             // The Packing empty card sentence is the same ink-on-white case, checked by eye the same day.
-            if issue.auditType == .contrast && (element.label.hasPrefix("Add a return, warranty or expiry date") || element.label.hasPrefix("Make a checklist for a trip")) { return true }
+            if issue.auditType == .contrast && element.label.hasPrefix("Make a checklist for a trip") { return true }
             // Measured on 2026-10-10 in dark mode: the system search field's placeholder is #9F9EA9 on #2E2B36,
             // 5.24:1 on flat glyph pixels. The audit samples the anti-aliased edges and reports only a near miss.
             if issue.auditType == .contrast, element.elementType == .searchField, issue.compactDescription == "Contrast nearly passed" { return true }
@@ -574,58 +520,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "Saved item"; screenshot.lifetime = .keepAlways; add(screenshot)
         app.staticTexts[name].tap()
-        reveal(app.buttons["Add date"], in: app)
-        app.buttons["Add date"].tap()
-        let save = app.buttons["deadline.save"]
-        XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
-        let confirmationSwitch = app.switches["deadline.confirm"]
-        reveal(confirmationSwitch, in: app)
-        confirmationSwitch.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        XCTAssertEqual(confirmationSwitch.value as? String, "1")
-        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: save)
-        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
-        let confirmation = XCTAttachment(screenshot: app.screenshot()); confirmation.name = "Date after confirmation"; confirmation.lifetime = .keepAlways; add(confirmation)
-        save.tap()
-        XCTAssertTrue(save.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Return by"].waitForExistence(timeout: 5))
-        // The reminders card only shows once there is an active date.
-        app.tabBars.buttons["Due"].tap()
-        let disabled = app.descendants(matching: .any).matching(identifier: "Open notification settings").firstMatch
-        let turnOn = app.buttons["Turn on reminders"]
-        // Turning notifications off can only be checked until something allows them. After the store screenshots
-        // have, reminders are queued and there is no warning to see.
-        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
-        if !queued.waitForExistence(timeout: 2) {
-            if !disabled.exists && turnOn.exists {
-                reveal(turnOn, in: app)
-                turnOn.tap()
-                let deny = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Don’t Allow"]
-                XCTAssertTrue(deny.waitForExistence(timeout: 5), app.debugDescription)
-                deny.tap()
-            }
-            reveal(disabled, in: app)
-            XCTAssertTrue(disabled.waitForExistence(timeout: 5))
-            let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
-        }
-        app.tabBars.buttons["Find"].tap()
-        app.staticTexts["Return by"].tap()
-        reveal(app.buttons["Add to Calendar"], in: app)
-        app.buttons["Add to Calendar"].tap()
-        let calendarTitle = app.textFields.matching(NSPredicate(format: "identifier == %@ OR label == %@", "title-field", "Title")).firstMatch
-        XCTAssertTrue(calendarTitle.waitForExistence(timeout: 5), app.debugDescription)
-        XCTAssertEqual(calendarTitle.value as? String, "Return: \(name)")
-        let calendar = XCTAttachment(screenshot: app.screenshot()); calendar.name = "Calendar event preview"; calendar.lifetime = .keepAlways; add(calendar)
-        app.buttons["Cancel"].tap()
-        let discard = app.buttons["Discard Changes"]
-        if discard.waitForExistence(timeout: 2) { discard.tap() }
-        XCTAssertTrue(app.navigationBars["New Event"].waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Delete date"].firstMatch.exists || app.navigationBars[name].exists)
-        let deleteDate = app.buttons["Delete date"].firstMatch
-        for _ in 0..<5 { if deleteDate.isHittable { break }; app.swipeUp() }
-        XCTAssertTrue(deleteDate.isHittable); deleteDate.tap()
-        app.sheets.buttons["Delete date"].tap()
-        XCTAssertTrue(app.buttons["Add date"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["Return by"].exists)
+        XCTAssertFalse(app.buttons["Add date"].exists, "Things have no dates of their own")
         app.terminate(); app.launch()
         app.tabBars.buttons["Find"].tap()
         let search = app.searchFields.firstMatch
@@ -693,105 +588,6 @@ import XCTest
         app.buttons["Finish trip"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["Status: finished"].waitForExistence(timeout: 5))
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "Completed packing cycle"; screenshot.lifetime = .keepAlways; add(screenshot)
-    }
-
-    func testPhotoScanNeedsConfirmationAndKeepsDateOnlyRecord() throws {
-        #if targetEnvironment(simulator)
-        continueAfterFailure = false
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
-        app.launch()
-        app.buttons["Scan"].tap()
-        let choose = app.buttons["Choose a photo"]
-        XCTAssertTrue(choose.waitForExistence(timeout: 5)); choose.tap()
-        XCTAssertTrue(app.staticTexts["Loading..."].firstMatch.waitForNonExistence(timeout: 20))
-        let picker = app.navigationBars["Photos"]
-        XCTAssertTrue(picker.waitForExistence(timeout: 10))
-        let onboardingClose = app.buttons["Close"].firstMatch
-        if onboardingClose.exists { onboardingClose.tap() }
-        // Seed Printed-expiry.png last, as documented in README. The picker lists newest first.
-        let fixture = app.images["PXGGridLayout-Info"].firstMatch
-        XCTAssertTrue(fixture.waitForExistence(timeout: 10))
-        fixture.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-        XCTAssertTrue(picker.waitForNonExistence(timeout: 10))
-        let candidate = app.buttons.containing(.staticText, identifier: "2028-07-14").firstMatch
-        reveal(candidate, in: app)
-        XCTAssertTrue(candidate.waitForExistence(timeout: 5), app.debugDescription); candidate.tap()
-        let name = "Expiry document \(UUID().uuidString.prefix(6))"
-        let nameField = app.textFields["Or name a new thing"]
-        reveal(nameField, in: app); nameField.tap(); nameField.typeText(name + "\n")
-        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
-        reveal(app.buttons["Write it down"], in: app); app.buttons["Write it down"].tap()
-        reveal(app.buttons["Review and confirm date"], in: app)
-        app.buttons["Review and confirm date"].tap()
-        let save = app.buttons["deadline.save"]
-        XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
-        let original = app.switches["Keep original document"]
-        reveal(original, in: app); XCTAssertEqual(original.value as? String, "0")
-        let confirmation = app.switches["deadline.confirm"]
-        reveal(confirmation, in: app)
-        confirmation.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        XCTAssertEqual(confirmation.value as? String, "1"); XCTAssertTrue(save.isEnabled)
-        save.tap()
-        XCTAssertTrue(app.navigationBars["Hereabouts"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5)); app.staticTexts[name].tap()
-        reveal(app.staticTexts["Expires"], in: app)
-        XCTAssertTrue(app.staticTexts["Expires"].exists)
-        XCTAssertTrue(app.staticTexts["Jul 14, 2028"].exists, app.debugDescription)
-        reveal(app.staticTexts["Date-only scan"], in: app); app.staticTexts["Date-only scan"].tap()
-        XCTAssertTrue(app.staticTexts["The original wasn't kept. Your dates stay with the thing."].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["Remove original document"].exists)
-        let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "Confirmed date-only photo scan"; screenshot.lifetime = .keepAlways; add(screenshot)
-        #else
-        throw XCTSkip("This automated photo workflow uses the documented synthetic simulator fixture. Physical camera/photo verification requires owner interaction.")
-        #endif
-    }
-
-    func testPDFImportNeedsConfirmationAndRetainsOriginal() throws {
-        #if targetEnvironment(simulator)
-        continueAfterFailure = false
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
-        app.launch()
-        app.buttons["Scan"].tap()
-        app.buttons["Import PDF or image"].tap()
-        let browse = app.buttons["Browse"].firstMatch
-        if browse.waitForExistence(timeout: 5) { browse.tap() }
-        let local = app.staticTexts["On My iPhone"].firstMatch
-        if local.waitForExistence(timeout: 5) { local.tap() }
-        // Backup tests save into On My iPhone too, so the fixture can sort out of view. Search for it.
-        let document = searchFilesPicker(app, for: "Localiser-test-expiry")["Localiser-test-expiry, pdf"].firstMatch
-        XCTAssertTrue(document.waitForExistence(timeout: 10), app.debugDescription)
-        document.tap()
-        let candidate = app.buttons.containing(.staticText, identifier: "2028-07-14").firstMatch
-        reveal(candidate, in: app); candidate.tap()
-        let name = "PDF expiry \(UUID().uuidString.prefix(6))"
-        let field = app.textFields["Or name a new thing"]
-        reveal(field, in: app); field.tap(); field.typeText(name + "\n")
-        reveal(app.buttons["Write it down"], in: app); app.buttons["Write it down"].tap()
-        reveal(app.buttons["Review and confirm date"], in: app); app.buttons["Review and confirm date"].tap()
-        let save = app.buttons["deadline.save"]
-        XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
-        let retain = app.switches["Keep original document"]
-        reveal(retain, in: app); XCTAssertEqual(retain.value as? String, "0")
-        retain.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        XCTAssertEqual(retain.value as? String, "1")
-        let confirm = app.switches["deadline.confirm"]
-        reveal(confirm, in: app); confirm.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        XCTAssertEqual(confirm.value as? String, "1"); XCTAssertTrue(save.isEnabled); save.tap()
-        XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 10)); app.staticTexts[name].tap()
-        reveal(app.staticTexts["Jul 14, 2028"], in: app)
-        XCTAssertTrue(app.staticTexts["Jul 14, 2028"].exists)
-        XCTAssertTrue(app.staticTexts["Expires"].exists)
-        let retained = app.staticTexts["Localiser-test-expiry.pdf"]
-        reveal(retained, in: app); retained.tap()
-        XCTAssertTrue(app.buttons["Remove original document"].waitForExistence(timeout: 5))
-        let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "Retained imported PDF"; screenshot.lifetime = .keepAlways; add(screenshot)
-        #else
-        throw XCTSkip("This import check uses the documented synthetic simulator PDF. Physical Files-provider verification requires owner interaction.")
-        #endif
     }
 
     func testBackupExportsAndRestoresIntoFreshLibrary() throws {

@@ -3,15 +3,15 @@ import Observation
 import UserNotifications
 
 enum CreationKind {
-    case item, kit, scan, home
+    case item, kit, home
     /// Free-tier allowance. Pro removes every limit; nothing else is gated.
-    var freeLimit: Int { switch self { case .item: Self.freeThings; case .kit: 2; case .scan: 5; case .home: 2 } }
+    var freeLimit: Int { switch self { case .item: Self.freeThings; case .kit: 1; case .home: 2 } }
 
-    /// 20 in TestFlight and App Store builds. Builds installed straight onto a phone set `HEREABOUTS_FREE_THINGS=200`,
+    /// 15 in TestFlight and App Store builds. Builds installed straight onto a phone set `HEREABOUTS_FREE_THINGS=200`,
     /// because they can't buy Pro.
     static let freeThings: Int = {
         let raw = Bundle.main.object(forInfoDictionaryKey: "HereaboutsFreeThings") as? String ?? ""
-        return Int(raw).flatMap { $0 > 0 ? $0 : nil } ?? 20
+        return Int(raw).flatMap { $0 > 0 ? $0 : nil } ?? 15
     }()
 }
 

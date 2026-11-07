@@ -328,13 +328,7 @@ enum DueLabel {
     }
 
     static func symbol(for kind: DeadlineKind?) -> String {
-        switch kind {
-        case .returns: "arrow.uturn.backward"
-        case .warranty: "checkmark.shield"
-        case .expiry: "hourglass"
-        case .askBack: "person.crop.circle.badge.clock"
-        case nil: "calendar"
-        }
+        kind == .askBack ? "person.crop.circle.badge.clock" : "calendar"
     }
 }
 

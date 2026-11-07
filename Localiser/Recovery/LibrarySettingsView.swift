@@ -48,7 +48,6 @@ struct LibrarySettingsView: View {
             } header: { Text("Leaving") }
             Section {
                 Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
-                Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
             } header: { Text("Privacy") }
             Section {
                 Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
@@ -80,10 +79,9 @@ struct LeavingView: View {
     @State private var erasePhrase = ""
     @State private var error: String?
     @State private var notice: String?
-    @State private var addingDates = false
 
     private var libraryIsEmpty: Bool { store.items.isEmpty && store.places.isEmpty && store.deadlines.isEmpty && store.kits.isEmpty && store.trips.isEmpty }
-    private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count + store.items.flatMap(\.scans).filter { $0.data != nil }.count }
+    private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count }
 
     var body: some View {
         ScrollView {
@@ -104,18 +102,6 @@ struct LeavingView: View {
                     Button { importing = true } label: {
                         optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
-                    Button {
-                        addingDates = true
-                        Task {
-                            defer { addingDates = false }
-                            do {
-                                let result = try await CalendarExport.addAll(CalendarExport.upcoming(store.deadlines))
-                                notice = CalendarExport.summary(added: result.added, skipped: result.skipped)
-                            } catch { self.error = error.localizedDescription }
-                        }
-                    } label: {
-                        optionLabel("Put dates in your calendar", "Returns, warranties and expiry dates keep reminding you after the app is gone.", "calendar")
-                    }.accessibilityLabel("Put dates in your calendar").disabled(addingDates)
                 }.buttonStyle(.plain)
                 Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups aren't encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
@@ -187,7 +173,7 @@ struct LeavingView: View {
     private func restore(replacing: Bool) {
         defer { pendingRestore = nil }
         do {
-            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored. Check reminders are on in Due." }
+            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored." }
         } catch { self.error = error.localizedDescription }
     }
     private func prepareCSV() {
@@ -204,22 +190,18 @@ struct BackupFilesView: View {
     @Environment(LocaliserStore.self) private var store
     @Binding var selectedFiles: Set<UUID>
     private var photos: [Belonging] { store.items.filter { $0.photo != nil } }
-    private var documents: [ScanRecord] { store.items.flatMap { Array($0.scans) }.filter { $0.data != nil }.sorted { $0.createdAt < $1.createdAt } }
     var body: some View {
         SheetForm {
-            if photos.isEmpty && documents.isEmpty {
+            if photos.isEmpty {
                 Text("No photos or kept documents yet.").foregroundStyle(Theme.secondary)
             } else {
                 Section {
                     Button(selectedFiles.isEmpty ? "Include all" : "Include none") {
-                        selectedFiles = selectedFiles.isEmpty ? Set(photos.map(\.id) + documents.map(\.id)) : []
+                        selectedFiles = selectedFiles.isEmpty ? Set(photos.map(\.id)) : []
                     }
                 } footer: { Text("Files make a backup larger. A backup can be up to 200 MB.").foregroundStyle(Theme.secondary) }
                 if !photos.isEmpty {
                     Section { ForEach(photos) { toggle($0.id, title: $0.name) } } header: { Text("Photos of things").foregroundStyle(Theme.secondary) }
-                }
-                if !documents.isEmpty {
-                    Section { ForEach(documents) { toggle($0.id, title: "\($0.item?.name ?? "Document") · \($0.filename)") } } header: { Text("Kept documents").foregroundStyle(Theme.secondary) }
                 }
             }
         }

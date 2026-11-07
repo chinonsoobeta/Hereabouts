@@ -142,46 +142,6 @@ struct FoundThingIntent: AppIntent {
     }
 }
 
-struct WhatsDueIntent: AppIntent {
-    static var title: LocalizedStringResource { "What's due?" }
-    static var description: IntentDescription { IntentDescription("Reads the next return, warranty and expiry dates.") }
-
-    @MainActor func perform() async throws -> some IntentResult & ProvidesDialog {
-        let store = try IntentLibrary.open()
-        return .result(dialog: IntentDialog(stringLiteral: Self.answer(for: store.deadlines)))
-    }
-
-    /// The next month of dates, as Siri says them: "Kettle: warranty ends tomorrow."
-    @MainActor static func answer(for deadlines: [Deadline], today: CalendarDay = CalendarDay(.now)) -> String {
-        guard let horizon = today.adding(days: 30) else { return "Nothing is due in the next month." }
-        let due = deadlines.filter { $0.active && ($0.day.map { $0 >= today && $0 <= horizon } ?? false) }.sorted { $0.dayString < $1.dayString }
-        guard !due.isEmpty else { return "Nothing is due in the next month." }
-        let lines = due.prefix(3).map { deadline -> String in
-            let name = deadline.item.map(\.publicName).flatMap { $0.isEmpty ? nil : $0 } ?? "A saved thing"
-            let day = deadline.day?.spoken(today: today) ?? ""
-            switch deadline.kind {
-            case .returns: return "\(name): last day to return is \(day)"
-            case .warranty: return "\(name): warranty ends \(day)"
-            case .expiry: return "\(name): expires \(day)"
-            case .askBack: return "\(name): ask for it back \(day)"
-            case nil: return "\(name): \(day)"
-            }
-        }
-        let more = due.count > 3 ? " And \(due.count - 3) more in the app." : ""
-        return lines.joined(separator: ". ") + "." + more
-    }
-}
-
-extension CalendarDay {
-    /// A date to be read aloud: "today", "tomorrow", "Sunday 11 October".
-    func spoken(today: CalendarDay = CalendarDay(.now)) -> String {
-        if self == today { return "today" }
-        if today.adding(days: 1) == self { return "tomorrow" }
-        guard let date = date() else { return stored }
-        return date.isThisYear ? date.formatted(.dateTime.weekday(.wide).day().month(.wide)) : date.formatted(.dateTime.day().month(.wide).year())
-    }
-}
-
 struct HereaboutsShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: FindThingIntent(), phrases: [
@@ -201,9 +161,5 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
             "I found \(\.$thing) in \(.applicationName)",
             "Tell \(.applicationName) I found something",
         ], shortTitle: "I found it", systemImageName: "sparkle.magnifyingglass")
-        AppShortcut(intent: WhatsDueIntent(), phrases: [
-            "What's due in \(.applicationName)",
-            "Ask \(.applicationName) what's due",
-        ], shortTitle: "What's due", systemImageName: "calendar")
     }
 }

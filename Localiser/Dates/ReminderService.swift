@@ -13,8 +13,6 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     }
     /// Actions tapped on a notification before the library finished opening (cold launch).
     @ObservationIgnored private(set) var pendingActions: [(id: UUID, action: String)] = []
-    /// Deadline the person opened from a notification. The Due tab opens it, then clears this.
-    var openedDeadline: UUID?
     /// Ritual opened from a notification: "recap", "stocktake" or "trip".
     var openedRitual: String?
     @ObservationIgnored private var ritualTask: Task<Void, Never>?
@@ -28,14 +26,10 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     override init() {
         super.init()
         center.delegate = self
-        // The same answers as the Due screen, in the same order.
-        let returning = UNNotificationAction(identifier: "returning", title: "Returning it", options: [.foreground])
-        let keep = UNNotificationAction(identifier: "keep", title: "Keeping it", options: [.foreground])
-        center.setNotificationCategories([UNNotificationCategory(identifier: "localiser.return", actions: [returning, keep], intentIdentifiers: [])])
     }
 
     func enable() async {
-        do { _ = try await center.requestAuthorization(options: [.alert, .sound, .badge]); error = nil }
+        do { _ = try await center.requestAuthorization(options: [.alert, .sound]); error = nil }
         catch { self.error = error.localizedDescription }
         if let store { refresh(store.deadlines); refreshRituals(store) }
     }
@@ -80,7 +74,6 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
             content.interruptionLevel = .active
             if let itemID = reminder.itemID { content.threadIdentifier = itemID.uuidString }
             content.userInfo = ["deadlineID": reminder.deadlineID.uuidString]
-            if reminder.kind == .returns { content.categoryIdentifier = "localiser.return" }
             let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.fireDate)
             let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             do {
@@ -108,7 +101,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         let calendar = Calendar.current
         var requests: [(id: String, title: String, body: String, ritual: String, when: DateComponents, repeats: Bool)] = []
         if Rituals.recapEnabled && !store.items.isEmpty {
-            requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's due this week and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
+            requests.append(("localiser.ritual.recap", "Your Sunday recap", "What you added, what's lent out and what's drifting.", "recap", DateComponents(hour: 18, weekday: 1), true))
         }
         if Rituals.stocktakeEnabled, let date = Rituals.nextStocktakeDate(after: now, calendar: calendar) {
             let count = min(Rituals.stale(store.items, now: date, calendar: calendar).count, Rituals.stocktakeSize)
@@ -143,13 +136,9 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
 
     func handle(id: UUID, action: String) {
         guard let store else { pendingActions.append((id, action)); return }
-        if action == UNNotificationDefaultActionIdentifier { openedDeadline = id; return }
-        guard let deadline = store.deadlines.first(where: { $0.id == id }), deadline.kind == .returns, deadline.active else { return }
-        do {
-            if action == "keep" { try store.decide(deadline, .keeping) }
-            else if action == "returning" { try store.decide(deadline, .returning) }
-            refresh(store.deadlines)
-        } catch { self.error = error.localizedDescription }
+        // Tapping an ask-back reminder opens the thing it's about.
+        guard action == UNNotificationDefaultActionIdentifier, let item = store.deadlines.first(where: { $0.id == id })?.item else { return }
+        store.openedItem = item.id
     }
 
     private func replayPendingActions() {
