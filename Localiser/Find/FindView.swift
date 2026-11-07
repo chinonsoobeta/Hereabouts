@@ -411,6 +411,7 @@ struct ItemDetailView: View {
     @State private var upgrade = false
     @State private var error: String?
     @State private var deleting = false
+    @State private var movingHome = false
     @Environment(ProAccess.self) private var pro
     private var available: Bool { item.managedObjectContext != nil && !item.isDeleted }
 
@@ -441,6 +442,9 @@ struct ItemDetailView: View {
                                 Image(systemName: "mappin.and.ellipse").foregroundStyle(Theme.purple).accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 4) {
                                     PlaceBreadcrumb(path: item.place?.path)
+                                    if store.hasSeveralHomes, let home = item.home {
+                                        Text(home.name).font(.wbCaption).foregroundStyle(Theme.secondary).accessibilityIdentifier("item.home")
+                                    }
                                     if let moved = item.movements.map(\.date).max() {
                                         Text(Date.now.timeIntervalSince(moved) < 60 ? "Moved just now" : "Moved \(moved.formatted(.relative(presentation: .named)))").font(.wbCaption).foregroundStyle(Theme.secondary)
                                     }
@@ -521,6 +525,7 @@ struct ItemDetailView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button("Move…", systemImage: "arrow.right.circle") { moving = true }
+                        if store.hasSeveralHomes { Button("Move to another home", systemImage: "house") { movingHome = true } }
                         if !item.archived, !item.isLent { Button("Lend it…", systemImage: "person.badge.clock") { lending = true } }
                         if !item.archived {
                             Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { finding = true }
@@ -546,6 +551,7 @@ struct ItemDetailView: View {
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
             }
         }
+        .sheet(isPresented: $movingHome) { NavigationStack { MoveToHomeSheet(subject: .thing(item)) } }
         .sheet(isPresented: $lending) { NavigationStack { LendSheet(item: item) } }
         .sheet(isPresented: $finding) {
             NavigationStack {

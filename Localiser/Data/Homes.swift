@@ -54,6 +54,33 @@ import CoreData
         }
     }
 
+    /// Moves a thing to `home`, into `place` there or at the top level when nil. Recorded like any other move.
+    /// Private stays private, and a home at the free limit still takes it: a move isn't a new thing.
+    func moveThing(_ item: Belonging, toHome home: HomeRecord, place: Place?) throws {
+        if let place, place.home != home { throw LocaliserError.wrongHome }
+        recordMove(item, to: place)
+        item.home = home
+        try save()
+    }
+
+    /// Moves a place, its sub-places and everything in them (archived things too) to `home`, under `parent` there
+    /// or at the top level when nil. Sub-places keep their parents, so their paths below the place stay the same.
+    /// A place in the new home with the same path is kept beside it, not merged; tidying duplicates can do that later.
+    /// Kits and trips point at the same place objects, so they keep working.
+    func movePlace(_ place: Place, toHome home: HomeRecord, under parent: Place?) throws {
+        if let parent {
+            guard parent.home == home else { throw LocaliserError.wrongHome }
+            if parent.isWithin(place) { throw LocaliserError.placeCycle }
+        }
+        guard place.home != home else { return }
+        place.parent = parent
+        for node in place.subtree {
+            node.home = home
+            for item in node.items { item.home = home }
+        }
+        try save()
+    }
+
     private func homeName(_ name: String) throws -> String {
         let clean = try requiredName(name)
         guard clean.count <= Home.maxLength else { throw LocaliserError.tooLong("A home's name", Home.maxLength) }
