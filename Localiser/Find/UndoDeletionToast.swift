@@ -19,7 +19,7 @@ struct UndoDeletionToast: View {
             .padding(.bottom, 64)
             .transition(.move(edge: .bottom).combined(with: .opacity))
             .task(id: name) {
-                AccessibilityNotification.Announcement("Deleted \(name). Undo is available.").post()
+                AccessibilityNotification.Announcement(String(localized: "Deleted \(name). Undo is available.")).post()
                 try? await Task.sleep(for: .seconds(5))
                 if store.undoableDeletion == name { withAnimation { store.forgetUndo() } }
             }

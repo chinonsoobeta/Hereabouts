@@ -27,9 +27,9 @@ struct LibrarySettingsView: View {
         switch reminders.permission {
         case "Enabled", "Quiet delivery":
             let count = reminders.scheduled.count
-            return count == 1 ? "You have 1 reminder scheduled on this iPhone." : "You have \(count) reminders scheduled on this iPhone."
-        case "Disabled in Settings": return "Notifications are off for Hereabouts, so reminders can't reach you."
-        default: return "Turn on reminders so Hereabouts can tell you before a date passes."
+            return String(localized: "You have \(count) reminders scheduled on this iPhone.")
+        case "Disabled in Settings": return String(localized: "Notifications are off for Hereabouts, so reminders can't reach you.")
+        default: return String(localized: "Turn on reminders so Hereabouts can tell you before a date passes.")
         }
     }
 
@@ -37,12 +37,12 @@ struct LibrarySettingsView: View {
         SheetList {
             Section {
                 NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
-                    NotebookLine(name: "Hereabouts Pro", detail: pro.standing?.summary ?? "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
-                }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.standing?.summary ?? "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
+                    NotebookLine(name: String(localized: "Hereabouts Pro"), detail: pro.standing?.summary ?? String(localized: "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
+                }.accessibilityLabel(String(localized: "Hereabouts Pro")).accessibilityValue(pro.standing?.summary ?? String(localized: "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
             }
             Section {
                 NavigationLink { HomesView().toolbarVisibility(.hidden, for: .tabBar) } label: {
-                    NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename or add a home")
+                    NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? String(localized: "\(store.homes.count) homes") : String(localized: "Rename or add a home"))
                 }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
             Section {
@@ -72,7 +72,7 @@ struct LibrarySettingsView: View {
                         .font(.wbCaption).foregroundStyle(Theme.pencil)
                 } else {
                     NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
-                        NotebookLine(name: "Automatic backups", detail: "Pro saves a copy of your notebook every week.")
+                        NotebookLine(name: String(localized: "Automatic backups"), detail: String(localized: "Pro saves a copy of your notebook every week."))
                     }
                 }
             } header: { Text("Backups") }
@@ -123,36 +123,36 @@ struct LeavingView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Take your notebook with you.").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
                 Text("Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
-                SectionHeading(title: "Keep a copy")
+                SectionHeading(title: String(localized: "Keep a copy"))
                 VStack(spacing: 0) {
                     Button { prepareBackup() } label: {
-                        optionLabel("Back up everything", "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts.", "arrow.down.doc")
+                        optionLabel(String(localized: "Back up everything"), String(localized: "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts."), String(localized: "arrow.down.doc"))
                     }.accessibilityLabel("Back up everything")
                     Button { prepareCSV() } label: {
-                        optionLabel("Export a spreadsheet", "Save a list of things and places. Open it in Numbers, Excel or another app.", "tablecells")
+                        optionLabel(String(localized: "Export a spreadsheet"), String(localized: "Save a list of things and places. Open it in Numbers, Excel or another app."), String(localized: "tablecells"))
                     }.accessibilityLabel("Export a spreadsheet")
                     NavigationLink { BackupFilesView(selectedFiles: $selectedFiles) } label: {
-                        optionLabel("Photos and documents to include", selectedFiles.isEmpty ? "None selected" : "\(selectedFiles.count) of \(retainedFileCount) selected", "photo.on.rectangle")
+                        optionLabel(String(localized: "Photos and documents to include"), selectedFiles.isEmpty ? String(localized: "None selected") : String(localized: "\(selectedFiles.count) of \(retainedFileCount) selected"), String(localized: "photo.on.rectangle"))
                     }.accessibilityLabel("Photos and documents to include")
                     Button { importing = true } label: {
-                        optionLabel("Restore from a backup", "Restore your notebook from a saved copy.", "arrow.counterclockwise")
+                        optionLabel(String(localized: "Restore from a backup"), String(localized: "Restore your notebook from a saved copy."), String(localized: "arrow.counterclockwise"))
                     }.accessibilityLabel("Restore from a backup")
                 }.buttonStyle(.plain)
                 if !savedBackups.isEmpty {
-                    SectionHeading(title: "Saved automatically")
+                    SectionHeading(title: String(localized: "Saved automatically"))
                     VStack(spacing: 0) {
                         ForEach(savedBackups) { backup in
                             Button { Task { await chooseSaved(backup) } } label: {
-                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this backup.", "clock.arrow.circlepath")
+                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), String(localized: "Restore this backup."), String(localized: "clock.arrow.circlepath"))
                             }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
                         }
                     }.buttonStyle(.plain)
                 }
                 Text("A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
-                SectionHeading(title: "Erase your notebook")
+                SectionHeading(title: String(localized: "Erase your notebook"))
                 Button(role: .destructive) { confirmErase = true } label: {
-                    optionLabel("Erase this notebook", "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them.", "trash")
+                    optionLabel(String(localized: "Erase this notebook"), String(localized: "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."), String(localized: "trash"))
                 }.buttonStyle(.plain).foregroundStyle(Theme.amber).accessibilityLabel("Erase this notebook")
                 if let notice { Label(notice, systemImage: "checkmark.circle").font(.wbBody).foregroundStyle(Theme.green) }
                 StickyNote {
@@ -167,8 +167,8 @@ struct LeavingView: View {
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
         .task { savedBackups = await AutomaticBackups.savedEverywhere() }
         .onChange(of: selectedFiles) { _, ids in AutomaticBackups.saveSelection(ids) }
-        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))" : "Hereabouts things") { result in
-            switch result { case .success: notice = exportType == .json ? "Backup saved." : "Spreadsheet saved."; case .failure(let failure): error = failure.localizedDescription }
+        .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? String(localized: "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))") : String(localized: "Hereabouts things")) { result in
+            switch result { case .success: notice = exportType == .json ? String(localized: "Backup saved.") : String(localized: "Spreadsheet saved."); case .failure(let failure): error = failure.localizedDescription }
             document = nil
         }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
@@ -177,7 +177,7 @@ struct LeavingView: View {
                 let access = url.startAccessingSecurityScopedResource()
                 defer { if access { url.stopAccessingSecurityScopedResource() } }
                 let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                guard size <= LibraryBackup.maximumBytes else { throw LocaliserError.invalidBackup("Choose a backup under 200 MB.") }
+                guard size <= LibraryBackup.maximumBytes else { throw LocaliserError.invalidBackup(String(localized: "Choose a backup under 200 MB.")) }
                 let file = try LibraryBackup.decoded(Data(contentsOf: url))
                 try store.validateBackup(file)
                 pendingRestore = file; confirmingRestore = true
@@ -191,8 +191,8 @@ struct LeavingView: View {
                 Button("Erase and restore", role: .destructive) { restore(replacing: true) }
             }
         } message: {
-            let summary = "\(pendingRestore?.contents ?? "A backup"), saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "on an unknown date")."
-            Text(libraryIsEmpty ? summary : summary + " This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is.")
+            let summary = String(localized: "\(pendingRestore?.contents ?? String(localized: "A backup")), saved \(pendingRestore?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? String(localized: "on an unknown date")).")
+            Text(libraryIsEmpty ? summary : summary + " " + String(localized: "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is."))
         }
         .confirmationDialog("Erase this notebook?", isPresented: $confirmErase, titleVisibility: .visible) {
             Button("Continue to erase", role: .destructive) { erasePhrase = ""; erasing = true }
@@ -201,7 +201,7 @@ struct LeavingView: View {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
             Button("Erase", role: .destructive) {
-                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = "Notebook erased." } catch { self.error = error.localizedDescription }
+                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = String(localized: "Notebook erased.") } catch { self.error = error.localizedDescription }
             }.disabled(erasePhrase != "ERASE")
         } message: { Text("This can't be undone without a backup. Type ERASE to confirm.") }
         .alert("Couldn't finish that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -220,7 +220,7 @@ struct LeavingView: View {
     private func restore(replacing: Bool) {
         defer { pendingRestore = nil }
         do {
-            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = "Backup restored." }
+            if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = String(localized: "Backup restored.") }
         } catch { self.error = error.localizedDescription }
     }
     /// A saved backup goes through the same check and confirmation as one chosen from Files.
@@ -291,7 +291,7 @@ struct AcknowledgementsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(face.name).font(.wbItem).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
                         Text(face.copyright).font(.wbCaption).foregroundStyle(Theme.pencil)
-                        Text(face.licence() ?? "The license text isn't available.").font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
+                        Text(face.licence() ?? String(localized: "The license text isn't available.")).font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
                     }
                 }
             }.padding(20).frame(maxWidth: .infinity, alignment: .leading)

@@ -77,7 +77,7 @@ import Speech
             try await analyzer.start(inputSequence: stream)
             phase = .listening
         } catch {
-            message = (error as? VoiceError)?.text ?? "Couldn't start listening. \(error.localizedDescription)"
+            message = (error as? VoiceError)?.text ?? String(localized: "Couldn't start listening. \(error.localizedDescription)")
             teardown()
             phase = .idle
         }
@@ -147,9 +147,9 @@ import Speech
         case noMicrophone, unsupported, needsDownload
         var text: String {
             switch self {
-            case .noMicrophone: "Hereabouts needs the microphone to hear you. Allow access in Settings, or type instead."
-            case .unsupported: "Voice memos don't work on this iPhone. Type instead."
-            case .needsDownload: "Connect to the internet to download speech recognition once. Then try again, or type instead."
+            case .noMicrophone: String(localized: "Hereabouts needs the microphone to hear you. Allow access in Settings, or type instead.")
+            case .unsupported: String(localized: "Voice memos don't work on this iPhone. Type instead.")
+            case .needsDownload: String(localized: "Connect to the internet to download speech recognition once. Then try again, or type instead.")
             }
         }
     }

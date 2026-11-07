@@ -1,6 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "A private thing" : {
+
+    },
+    "Ask for it back %@" : {
+
+    },
+    "Drill" : {
+
+    },
     "Find" : {
 
     },
@@ -20,6 +29,9 @@
 
     },
     "See who has it, since when, and when to ask for it back." : {
+
+    },
+    "Since %@" : {
 
     },
     "You'll see things you lend here." : {

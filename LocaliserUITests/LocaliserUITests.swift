@@ -4,7 +4,7 @@ import XCTest
     func testSettingsExportsAndProAreReachable() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         for tab in ["Find", "Places", "Trips", "Settings"] {
             app.tabBars.buttons[tab].tap()
@@ -61,7 +61,7 @@ import XCTest
 
     func testOnboardingNamesHomeAndWritesFirstThing() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--show-onboarding"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--show-onboarding"]
         app.launch()
         XCTAssertTrue(app.staticTexts["Your notebook for things at home."].waitForExistence(timeout: 5))
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
@@ -83,7 +83,7 @@ import XCTest
 
     func testRecapStocktakeAndStillThere() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
 
         // A thing nobody has looked at for months asks on its own page.
@@ -125,7 +125,7 @@ import XCTest
 
     func testLendingAThingAndGettingItBack() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -156,7 +156,7 @@ import XCTest
 
     func testSayingWhereFillsTheNewThing() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library", "--voice-transcript", "the spare charger is in the blue tin on the garage back wall"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library", "--voice-transcript", "the spare charger is in the blue tin on the garage back wall"]
         app.launch()
         app.tabBars.buttons["Find"].tap()
         let say = app.buttons["find.say"]
@@ -179,7 +179,7 @@ import XCTest
         #if targetEnvironment(simulator)
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--stand-in-shelf-reader"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--stand-in-shelf-reader"]
         app.launch()
         app.tabBars.buttons["Find"].tap()
         app.buttons["Add a thing"].tap()
@@ -221,7 +221,7 @@ import XCTest
     func testAddingAndSwitchingHomes() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Places"].tap()
         XCTAssertFalse(app.buttons["home.switcher"].exists, "One home needs no switcher")
@@ -260,7 +260,7 @@ import XCTest
     func testMovingAThingToAnotherHome() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Find"].tap()
         app.buttons["Add a thing"].tap()
@@ -302,7 +302,7 @@ import XCTest
     func testEmptyCopiesOfAPlaceCanBeTidiedUp() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Places"].tap()
         app.buttons["Attic"].firstMatch.tap()
@@ -321,7 +321,7 @@ import XCTest
 
     func testAppLinksOpenWritingDownAndPuttingAway() {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
         XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5))
         func follow(_ link: String) {
@@ -338,7 +338,7 @@ import XCTest
 
     func testNotThereFoundItAndWriteDownFromAnEmptySearch() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
 
         let search = app.searchFields.firstMatch
@@ -379,7 +379,7 @@ import XCTest
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
-        app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -461,7 +461,7 @@ import XCTest
 
     func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
@@ -488,7 +488,7 @@ import XCTest
 
     func testTypographyAccessibilityOnLaunchTabs() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
@@ -582,7 +582,7 @@ import XCTest
     func testNameOnlyCaptureSurvivesRelaunchAndCanBeFound() {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Find"].tap()
         app.buttons["Add a thing"].tap()
@@ -613,7 +613,7 @@ import XCTest
     func testKitTripPackingAndComingHome() {
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.tabBars.buttons["Trips"].tap()
         reveal(app.buttons["New kit"], in: app)
@@ -668,7 +668,7 @@ import XCTest
         #if targetEnvironment(simulator)
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         app.buttons["Add a thing"].tap()
         let name = "Recovery item \(UUID().uuidString.prefix(8))"
@@ -691,7 +691,7 @@ import XCTest
         app.buttons["Save"].tap()
         XCTAssertTrue(app.buttons["Save"].waitForNonExistence(timeout: 10), app.debugDescription)
         app.terminate()
-        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
         XCTAssertFalse(app.staticTexts[name].exists)
         app.tabBars.buttons["Settings"].tap()

@@ -1,33 +1,85 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "!" : {
-
-    },
-    "“%@” already exists. You can still save another one." : {
-
-    },
-    "“%@” is an empty copy of another place." : {
-
-    },
-    "“Ask Sam for Drill back.”" : {
-
-    },
-    "%@" : {
-
-    },
-    "%@ · %@" : {
+    " Renews automatically until you cancel. Cancel in Settings at least a day before it renews." : {},
+    " Shared by your family." : {},
+    "!" : {},
+    "%@" : {},
+    "%@ a month" : {},
+    "%@ a year" : {},
+    "%@ and %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ · %2$@"
+            "value" : "%1$@ and %2$@"
           }
         }
       }
     },
-    "%@ check" : {
-
+    "%@ can be up to %@ characters." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ can be up to %2$@ characters."
+          }
+        }
+      }
+    },
+    "%@ check" : {},
+    "%@ free" : {},
+    "%@ is archived." : {},
+    "%@ is archived. It was last in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is archived. It was last in %2$@."
+          }
+        }
+      }
+    },
+    "%@ is in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is in %2$@."
+          }
+        }
+      }
+    },
+    "%@ is marked missing." : {},
+    "%@ is marked missing. It was last in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is marked missing. It was last in %2$@."
+          }
+        }
+      }
+    },
+    "%@ is packed for %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is packed for %2$@."
+          }
+        }
+      }
+    },
+    "%@ is packed for %@. You keep it in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is packed for %2$@. You keep it in %3$@."
+          }
+        }
+      }
     },
     "%@ is with %@" : {
       "localizations" : {
@@ -39,12 +91,75 @@
         }
       }
     },
+    "%@ is with %@, since %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is with %2$@, since %3$@."
+          }
+        }
+      }
+    },
+    "%@ is with %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is with %2$@."
+          }
+        }
+      }
+    },
+    "%@ label.pdf" : {},
     "%@ of %@ characters" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ of %2$@ characters"
+          }
+        }
+      }
+    },
+    "%@ once. Never renews." : {},
+    "%@ to %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ to %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ → No limit" : {},
+    "%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
+    "%@, saved %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, saved %2$@."
           }
         }
       }
@@ -59,16 +174,52 @@
         }
       }
     },
-    "%@%@" : {
+    "%@: some things aren't packed yet." : {},
+    "%lld dates" : {
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld date"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dates"
+                }
+              }
+            }
           }
         }
       }
     },
+    "%lld days" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days ago" : {},
     "%lld empty places are copies of others, like “%@”." : {
       "localizations" : {
         "en" : {
@@ -79,9 +230,75 @@
         }
       }
     },
-    "%lld matches" : {
-
+    "%lld for each day away, counting travel days. A day trip needs %lld; a weekend away needs %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld for each day away, counting travel days. A day trip needs %2$lld; a weekend away needs %3$lld."
+          }
+        }
+      }
     },
+    "%lld for each night away. A day trip needs none; a weekend away needs %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld for each night away. A day trip needs none; a weekend away needs %2$lld."
+          }
+        }
+      }
+    },
+    "%lld homes" : {},
+    "%lld kits" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld kit"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld kits"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld matches" : {},
+    "%lld months" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld month"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld months"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld months ago" : {},
+    "%lld more" : {},
+    "%lld nights" : {},
     "%lld of %lld" : {
       "localizations" : {
         "en" : {
@@ -102,570 +319,496 @@
         }
       }
     },
+    "%lld of %lld selected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld selected"
+          }
+        }
+      }
+    },
+    "%lld per day" : {},
+    "%lld per night" : {},
+    "%lld periods" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld period"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld periods"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld places" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld place"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld places"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld quick questions" : {},
+    "%lld rooms" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld room"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld rooms"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld things" : {
-
-    },
-    "1 match" : {
-
-    },
-    "1 thing" : {
-
-    },
-    "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone." : {
-
-    },
-    "A room is enough. Shelves and drawers can come later." : {
-
-    },
-    "Acknowledgments" : {
-
-    },
-    "Add" : {
-
-    },
-    "Add a home" : {
-
-    },
-    "Add a photo" : {
-
-    },
-    "Add a place" : {
-
-    },
-    "Add a task" : {
-
-    },
-    "Add a thing" : {
-
-    },
-    "Add a thing and its place to your notebook." : {
-
-    },
-    "Add any missing places along the way" : {
-
-    },
-    "Add names you might search for, like “ID” for a passport." : {
-
-    },
-    "Add photo" : {
-
-    },
-    "Add something to pack" : {
-
-    },
-    "Add to kit" : {
-
-    },
-    "Add your first thing" : {
-
-    },
-    "All checked. Your notebook's up to date." : {
-
-    },
-    "All places" : {
-
-    },
-    "Also called: %@" : {
-
-    },
-    "Amount" : {
-
-    },
-    "Anyone who sees your Lock Screen can read the thing's name." : {
-
-    },
-    "Archive instead" : {
-
-    },
-    "Archive things you no longer own. They're hidden from search and don't count toward your free plan. You keep their history." : {
-
-    },
-    "Archive this thing" : {
-
-    },
-    "Archived or returned. Remove it or mark it no longer here." : {
-
-    },
-    "Ask again next week" : {
-
-    },
-    "Ask for it back · %@" : {
-
-    },
-    "Ask on" : {
-
-    },
-    "At %@" : {
-
-    },
-    "Automatic backups" : {
-
-    },
-    "Back" : {
-
-    },
-    "Back to Settings" : {
-
-    },
-    "Back up everything" : {
-
-    },
-    "Backups" : {
-
-    },
-    "Before you leave" : {
-
-    },
-    "Box labels" : {
-
-    },
-    "Call off “%@”?" : {
-
-    },
-    "Call off trip" : {
-
-    },
-    "Can't find it" : {
-
-    },
-    "Cancel" : {
-
-    },
-    "Change" : {
-
-    },
-    "Change photo" : {
-
-    },
-    "Changing how many are needed doesn't unpack anything." : {
-
-    },
-    "Check a few things once a month. Nothing changes unless you say so." : {
-
-    },
-    "Check off things as you pack" : {
-
-    },
-    "Choose a place…" : {
-
-    },
-    "Choose a thing from your notebook to pack by place." : {
-
-    },
-    "Choose a thing or type your own. Add it to your notebook." : {
-
-    },
-    "Choose a thing. Say where you put it." : {
-
-    },
-    "Choose at least one place." : {
-
-    },
-    "Choose from Contacts" : {
-
-    },
-    "Choose from library" : {
-
-    },
-    "Choose None if this place isn't inside another place." : {
-
-    },
-    "Close" : {
-
-    },
-    "Close tip" : {
-
-    },
-    "Come home" : {
-
-    },
-    "Come home on or after the day you leave." : {
-
-    },
-    "Coming home" : {
-
-    },
-    "Confirm new place" : {
-
-    },
-    "Confirm returned or archived" : {
-
-    },
-    "Confirm unpacked" : {
-
-    },
-    "Contact support" : {
-
-    },
-    "Continue" : {
-
-    },
-    "Continue to erase" : {
-
-    },
-    "Couldn't add it" : {
-
-    },
-    "Couldn't add that place" : {
-
-    },
-    "Couldn't change that" : {
-
-    },
-    "Couldn't delete" : {
-
-    },
-    "Couldn't finish that" : {
-
-    },
-    "Couldn't lend it" : {
-
-    },
-    "Couldn't make the labels" : {
-
-    },
-    "Couldn't move that" : {
-
-    },
-    "Couldn't read that photo. Write down one thing at a time." : {
-
-    },
-    "Couldn't save" : {
-
-    },
-    "Couldn't see anything to name. Try a closer photo." : {
-
-    },
-    "Couldn't undo" : {
-
-    },
-    "Couldn't update" : {
-
-    },
-    "Couldn't update the kit" : {
-
-    },
-    "Couldn't update the trip" : {
-
-    },
-    "Couldn't write that down" : {
-
-    },
-    "Create “%@”" : {
-
-    },
-    "Delete" : {
-
-    },
-    "Delete “%@”?" : {
-
-    },
-    "Delete kit" : {
-
-    },
-    "Delete permanently" : {
-
-    },
-    "Delete place" : {
-
-    },
-    "Delete trip" : {
-
-    },
-    "Deleted “%@”" : {
-
-    },
-    "Don't have it anymore" : {
-
-    },
-    "Done" : {
-
-    },
-    "Edit" : {
-
-    },
-    "Edit kit" : {
-
-    },
-    "Edit place" : {
-
-    },
-    "Edit thing" : {
-
-    },
-    "Edit trip" : {
-
-    },
-    "Erase" : {
-
-    },
-    "Erase and restore" : {
-
-    },
-    "Erase this notebook" : {
-
-    },
-    "Erase this notebook?" : {
-
-    },
-    "Everything inside moves to “%@”. Nothing else is deleted." : {
-
-    },
-    "Export a spreadsheet" : {
-
-    },
-    "Export anytime" : {
-
-    },
-    "Files make a backup larger. A backup can be up to 200 MB." : {
-
-    },
-    "Files to include" : {
-
-    },
-    "Find" : {
-
-    },
-    "Find options" : {
-
-    },
-    "Find or add a place" : {
-
-    },
-    "Find where you keep a thing in your notebook." : {
-
-    },
-    "Finish trip" : {
-
-    },
-    "Flying" : {
-
-    },
-    "Found ${thing} in ${place}" : {
-
-    },
-    "Found it" : {
-
-    },
-    "Found it somewhere else…" : {
-
-    },
-    "Found it…" : {
-
-    },
-    "From the photo" : {
-
-    },
-    "Give your thing a name." : {
-
-    },
-    "Help" : {
-
-    },
-    "Help and support" : {
-
-    },
-    "Hereabouts" : {
-
-    },
-    "Hereabouts %@" : {
-
-    },
-    "Hereabouts couldn't open your notebook" : {
-
-    },
-    "Hereabouts keeps only the name. It doesn't read your contacts." : {
-
-    },
-    "Hereabouts Pro" : {
-
-    },
-    "Hereabouts uses two fonts. Both are free to use under the SIL Open Font License." : {
-
-    },
-    "Hidden from Spotlight, Siri, notifications and widgets. Included in backups and exports." : {
-
-    },
-    "Hold the button to talk, or tap to start and stop. Nothing is recorded." : {
-
-    },
-    "Home" : {
-
-    },
-    "Homes" : {
-
-    },
-    "I found it" : {
-
-    },
-    "I'll do this later" : {
-
-    },
-    "I'm coming home" : {
-
-    },
-    "I'm leaving" : {
-
-    },
-    "If you move things, print a new list. Private things aren't included." : {
-
-    },
-    "In Find, Places and Trips, you see your chosen home. Search, dates and reminders cover all homes. You can delete an empty home." : {
-
-    },
-    "Include" : {
-
-    },
-    "Include %@" : {
-
-    },
-    "Include all" : {
-
-    },
-    "Include for" : {
-
-    },
-    "Include none" : {
-
-    },
-    "International" : {
-
-    },
-    "is in" : {
-
-    },
-    "It may have been deleted, or the label was made on another phone." : {
-
-    },
-    "It's back" : {
-
-    },
-    "It's back, pack it" : {
-
-    },
-    "Keep packing" : {
-
-    },
-    "Keep private" : {
-
-    },
-    "Kit" : {
-
-    },
-    "Kit name" : {
-
-    },
-    "Kit options" : {
-
-    },
-    "Last backup %@" : {
-
-    },
-    "Last checked %@. Is it still there?" : {
-
-    },
-    "Later" : {
-
-    },
-    "Leave" : {
-
-    },
-    "Leave anyway" : {
-
-    },
-    "Leave unresolved for now" : {
-
-    },
-    "Leaving" : {
-
-    },
-    "Lend %@" : {
-
-    },
-    "Lend it" : {
-
-    },
-    "Lend it…" : {
-
-    },
-    "Limits only apply when you add things. If Pro ends or you get a refund, you can still see, edit and export everything you've saved." : {
-
-    },
-    "List what's inside" : {
-
-    },
-    "Make a checklist for a trip. Check off things as you pack. Put them away when you're home." : {
-
-    },
-    "Manage homes" : {
-
-    },
-    "Manage subscription" : {
-
-    },
-    "Manual backups, reminders, Siri and Spotlight are free. Pro removes the limits and adds weekly backups." : {
-
-    },
-    "Missing since %@" : {
-
-    },
-    "Missing since %@." : {
-
-    },
-    "Mom's house" : {
-
-    },
-    "Monthly check" : {
-
-    },
-    "More" : {
-
-    },
-    "Move to another home" : {
-
-    },
-    "Move…" : {
-
-    },
-    "Moved" : {
-
-    },
-    "Moved %@" : {
-
-    },
-    "Moved it?" : {
-
-    },
-    "Moved just now" : {
-
-    },
-    "Name" : {
-
-    },
-    "Name, like Kitchen or Top drawer" : {
-
-    },
-    "Name, like Phone charger" : {
-
-    },
-    "Name, like Sunglasses" : {
-
-    },
-    "Needed: %lld" : {
-
-    },
-    "New home" : {
-
-    },
-    "New kit" : {
-
-    },
-    "New place" : {
-
-    },
-    "New place: %@" : {
-
-    },
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld thing"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld things"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld trips" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld trip"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld trips"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld weeks" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld week"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weeks"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld years" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld year"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld years"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "1 match" : {},
+    "1 night" : {},
+    "1 quick question" : {},
+    "1 thing" : {},
+    "A backup" : {},
+    "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone." : {},
+    "A date in this backup is damaged." : {},
+    "A finished trip in this backup still has things to put away." : {},
+    "A home's name" : {},
+    "A number in this backup is too big." : {},
+    "A packing list in this backup is damaged." : {},
+    "A photo or document in this backup is over 20 MB." : {},
+    "A place that isn't inside another" : {},
+    "A private thing" : {},
+    "A room is enough. Shelves and drawers can come later." : {},
+    "A saved thing" : {},
+    "A trip in this backup is damaged." : {},
+    "A while ago" : {},
+    "A4" : {},
+    "Acknowledgments" : {},
+    "Add" : {},
+    "Add a home" : {},
+    "Add a photo" : {},
+    "Add a place" : {},
+    "Add a room, then the drawers, shelves and boxes inside it." : {},
+    "Add a task" : {},
+    "Add a thing" : {},
+    "Add a thing and its place to your notebook." : {},
+    "Add any missing places along the way" : {},
+    "Add names you might search for, like “ID” for a passport." : {},
+    "Add photo" : {},
+    "Add something to pack" : {},
+    "Add to kit" : {},
+    "Add your first thing" : {},
+    "All checked. Your notebook's up to date." : {},
+    "All places" : {},
+    "Already free" : {},
+    "Also called: %@" : {},
+    "Amount" : {},
+    "An empty notebook" : {},
+    "And %lld more" : {},
+    "Anyone who sees your Lock Screen can read the thing's name." : {},
+    "Anywhere" : {},
+    "Archive instead" : {},
+    "Archive things you no longer own. They're hidden from search and don't count toward your free plan. You keep their history." : {},
+    "Archive this thing" : {},
+    "Archived" : {},
+    "Archived or returned. Remove it or mark it no longer here." : {},
+    "Ask %@ for %@ back." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ask %1$@ for %2$@ back."
+          }
+        }
+      }
+    },
+    "Ask again next week" : {},
+    "Ask for it back" : {},
+    "Ask for it back %@" : {},
+    "Ask for it back · %@" : {},
+    "Ask for something back." : {},
+    "Ask on" : {},
+    "At %@" : {},
+    "At home" : {},
+    "Attic" : {},
+    "Automatic backups" : {},
+    "Away" : {},
+    "Back" : {},
+    "Back from %@" : {},
+    "Back to Settings" : {},
+    "Back up everything" : {},
+    "Backup restored." : {},
+    "Backup saved." : {},
+    "Backups" : {},
+    "Bedroom" : {},
+    "Before you leave" : {},
+    "Box labels" : {},
+    "Buy once for %@" : {},
+    "Call off trip" : {},
+    "Call off “%@”?" : {},
+    "Called off" : {},
+    "Can't find it" : {},
+    "Cancel" : {},
+    "Change" : {},
+    "Change photo" : {},
+    "Changing how many are needed doesn't unpack anything." : {},
+    "Charger" : {},
+    "Check a few things once a month. Nothing changes unless you say so." : {},
+    "Check appliances" : {},
+    "Check off things as you pack" : {},
+    "Check the thing, quantity and trip before changing this list." : {},
+    "Check where you keep %lld things." : {},
+    "Check where you keep one thing." : {},
+    "Choose Leave anyway to skip packing checks and go to unpacking when you're back." : {},
+    "Choose None if this place isn't inside another place." : {},
+    "Choose a Hereabouts backup under 200 MB." : {},
+    "Choose a backup under 200 MB." : {},
+    "Choose a home, then a place in it." : {},
+    "Choose a photo under 20 MB or 25 megapixels." : {},
+    "Choose a place" : {},
+    "Choose a place…" : {},
+    "Choose a thing from your notebook to pack by place." : {},
+    "Choose a thing or type your own. Add it to your notebook." : {},
+    "Choose a thing. Say where you put it." : {},
+    "Choose at least one place." : {},
+    "Choose fewer photos and documents. A backup can hold up to 200 MB." : {},
+    "Choose from Contacts" : {},
+    "Choose from library" : {},
+    "Choose when to be reminded." : {},
+    "Close" : {},
+    "Close tip" : {},
+    "Come home" : {},
+    "Come home on or after the day you leave." : {},
+    "Coming home" : {},
+    "Coming later" : {},
+    "Confirm a place: %@" : {},
+    "Confirm new place" : {},
+    "Confirm returned or archived" : {},
+    "Confirm unpacked" : {},
+    "Connect to the internet to download speech recognition once. Then try again, or type instead." : {},
+    "Contact support" : {},
+    "Continue" : {},
+    "Continue to erase" : {},
+    "Couldn't add it" : {},
+    "Couldn't add that place" : {},
+    "Couldn't change that" : {},
+    "Couldn't confirm what happened. Try Restore purchases." : {},
+    "Couldn't delete" : {},
+    "Couldn't finish that" : {},
+    "Couldn't lend it" : {},
+    "Couldn't make the labels" : {},
+    "Couldn't move that" : {},
+    "Couldn't open that photo. Try another one." : {},
+    "Couldn't read that photo. Write down one thing at a time." : {},
+    "Couldn't read this photo." : {},
+    "Couldn't save" : {},
+    "Couldn't see anything to name. Try a closer photo." : {},
+    "Couldn't start listening. %@" : {},
+    "Couldn't undo" : {},
+    "Couldn't update" : {},
+    "Couldn't update the kit" : {},
+    "Couldn't update the trip" : {},
+    "Couldn't write that down" : {},
+    "Create “%@”" : {},
+    "Day trip" : {},
+    "Delete" : {},
+    "Delete kit" : {},
+    "Delete permanently" : {},
+    "Delete place" : {},
+    "Delete trip" : {},
+    "Delete “%@”?" : {},
+    "Deleted" : {},
+    "Deleted %@. Undo is available." : {},
+    "Deleted “%@”" : {},
+    "Don't have it anymore" : {},
+    "Done" : {},
+    "Edit" : {},
+    "Edit kit" : {},
+    "Edit place" : {},
+    "Edit thing" : {},
+    "Edit trip" : {},
+    "Empty" : {},
+    "Enter a name." : {},
+    "Erase" : {},
+    "Erase and restore" : {},
+    "Erase this notebook" : {},
+    "Erase this notebook?" : {},
+    "Erase your notebook" : {},
+    "Every trip" : {},
+    "Everything else" : {},
+    "Everything inside moves to “%@”. Nothing else is deleted." : {},
+    "Export a spreadsheet" : {},
+    "Export anytime" : {},
+    "Files make a backup larger. A backup can be up to 200 MB." : {},
+    "Files to include" : {},
+    "Find" : {},
+    "Find options" : {},
+    "Find or add a place" : {},
+    "Find where you keep a thing in your notebook." : {},
+    "Finish packing and your checklist before you leave." : {},
+    "Finish trip" : {},
+    "Finished" : {},
+    "Flying" : {},
+    "Found ${thing} in ${place}" : {},
+    "Found in %@" : {},
+    "Found it" : {},
+    "Found it somewhere else…" : {},
+    "Found it…" : {},
+    "Found where it should be" : {},
+    "Free for %@, then %@ %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Free for %1$@, then %2$@ %3$@."
+          }
+        }
+      }
+    },
+    "Free plan · %lld of %lld things" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Free plan · %1$lld of %2$lld things"
+          }
+        }
+      }
+    },
+    "Free plan, %lld of %lld things" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Free plan, %1$lld of %2$lld things"
+          }
+        }
+      }
+    },
+    "Free trial until %@. It won't renew." : {},
+    "Free trial, ends %@" : {},
+    "From the photo" : {},
+    "Garage" : {},
+    "Give your thing a name." : {},
+    "Hall closet" : {},
+    "Help" : {},
+    "Help and support" : {},
+    "Hereabouts" : {},
+    "Hereabouts %@" : {},
+    "Hereabouts Pro" : {},
+    "Hereabouts Pro restored." : {},
+    "Hereabouts backup %@" : {},
+    "Hereabouts couldn't open your notebook" : {},
+    "Hereabouts couldn't open your notebook. Nothing has been deleted." : {},
+    "Hereabouts keeps only the name. It doesn't read your contacts." : {},
+    "Hereabouts labels.pdf" : {},
+    "Hereabouts needs the microphone to hear you. Allow access in Settings, or type instead." : {},
+    "Hereabouts things" : {},
+    "Hereabouts uses two fonts. Both are free to use under the SIL Open Font License." : {},
+    "Hidden from Spotlight, Siri, notifications and widgets. Included in backups and exports." : {},
+    "Hold the button to talk, or tap to start and stop. Nothing is recorded." : {},
+    "Home" : {},
+    "Homes" : {},
+    "I found it" : {},
+    "I'll do this later" : {},
+    "I'm coming home" : {},
+    "I'm leaving" : {},
+    "If you move things, print a new list. Private things aren't included." : {},
+    "In %lld days" : {},
+    "In Find, Places and Trips, you see your chosen home. Search, dates and reminders cover all homes. You can delete an empty home." : {},
+    "Include" : {},
+    "Include %@" : {},
+    "Include all" : {},
+    "Include for" : {},
+    "Include none" : {},
+    "Inside" : {},
+    "International" : {},
+    "It" : {},
+    "It may have been deleted, or the label was made on another phone." : {},
+    "It's back" : {},
+    "It's back, pack it" : {},
+    "Keep a copy" : {},
+    "Keep packing" : {},
+    "Keep private" : {},
+    "Kit" : {},
+    "Kit name" : {},
+    "Kit options" : {},
+    "Kitchen" : {},
+    "Kits" : {},
+    "Last backup %@" : {},
+    "Last checked %@. Is it still there?" : {},
+    "Later" : {},
+    "Leave" : {},
+    "Leave anyway" : {},
+    "Leave unresolved for now" : {},
+    "Leaving" : {},
+    "Leaving tomorrow" : {},
+    "Left for later" : {},
+    "Lend %@" : {},
+    "Lend it" : {},
+    "Lend it…" : {},
+    "Lent" : {},
+    "Lent out" : {},
+    "Lent to %@" : {},
+    "Lifetime" : {},
+    "Lifetime Pro." : {},
+    "Limits only apply when you add things. If Pro ends or you get a refund, you can still see, edit and export everything you've saved." : {},
+    "List what's inside" : {},
+    "Lock doors" : {},
+    "Looking for" : {},
+    "Make a checklist for a trip. Check off things as you pack. Put them away when you're home." : {},
+    "Manage homes" : {},
+    "Manage subscription" : {},
+    "Manual backups, reminders, Siri and Spotlight are free. Pro removes the limits and adds weekly backups." : {},
+    "Missing" : {},
+    "Missing since %@" : {},
+    "Missing since %@." : {},
+    "Mom's house" : {},
+    "Monthly" : {},
+    "Monthly check" : {},
+    "More" : {},
+    "Move or delete what's in this home first." : {},
+    "Move to another home" : {},
+    "Move what's inside somewhere else first." : {},
+    "Moved" : {},
+    "Moved %@" : {},
+    "Moved it?" : {},
+    "Moved just now" : {},
+    "Moved to a new place" : {},
+    "Move…" : {},
+    "My apartment" : {},
+    "Name" : {},
+    "Name, like Kitchen or Top drawer" : {},
+    "Name, like Phone charger" : {},
+    "Name, like Sunglasses" : {},
+    "Names" : {},
+    "Needed: %lld" : {},
+    "New home" : {},
+    "New kit" : {},
+    "New place" : {},
+    "New place: %@" : {},
     "New place: %@ in %@" : {
       "localizations" : {
         "en" : {
@@ -676,174 +819,121 @@
         }
       }
     },
-    "New thing" : {
-
-    },
-    "New trip" : {
-
-    },
-    "No photos or kept documents yet." : {
-
-    },
-    "No place yet" : {
-
-    },
-    "None, just a name" : {
-
-    },
-    "Not now" : {
-
-    },
-    "Not quite ready" : {
-
-    },
-    "Not there" : {
-
-    },
-    "Notes" : {
-
-    },
-    "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support." : {
-
-    },
-    "Nothing here yet." : {
-
-    },
-    "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere." : {
-
-    },
-    "OK" : {
-
-    },
-    "Only empty copies are removed. Places inside them move into the place you're keeping." : {
-
-    },
-    "Open %@" : {
-
-    },
-    "Open notification settings" : {
-
-    },
-    "Optional details" : {
-
-    },
-    "Optional, but it helps you spot it" : {
-
-    },
-    "Other names, one per line" : {
-
-    },
-    "Pack %@" : {
-
-    },
-    "Pack all" : {
-
-    },
-    "Pack it anyway" : {
-
-    },
-    "Packed for %@" : {
-
-    },
-    "Packed trips" : {
-
-    },
-    "Packed: %lld" : {
-
-    },
-    "Packing" : {
-
-    },
-    "Packing progress" : {
-
-    },
-    "Page %lld of 3" : {
-
-    },
-    "Paper" : {
-
-    },
-    "Past trips (%lld)" : {
-
-    },
-    "Photos and documents to include" : {
-
-    },
-    "Photos of things" : {
-
-    },
-    "Place" : {
-
-    },
-    "Places" : {
-
-    },
-    "Places inside" : {
-
-    },
-    "Plan a trip" : {
-
-    },
-    "Plan a trip with this kit" : {
-
-    },
-    "Print a label" : {
-
-    },
-    "Print eight labels per page. Scan a code to see the place in Hereabouts." : {
-
-    },
-    "Print labels" : {
-
-    },
-    "Privacy" : {
-
-    },
-    "Privacy Policy" : {
-
-    },
-    "Pro" : {
-
-    },
-    "Pro isn't available to buy right now. Try again later." : {
-
-    },
-    "Put away" : {
-
-    },
+    "New thing" : {},
+    "New trip" : {},
+    "Next week" : {},
+    "No Pro purchase was found for this Apple Account." : {},
+    "No longer here" : {},
+    "No photos or kept documents yet." : {},
+    "No place" : {},
+    "No place yet" : {},
+    "None" : {},
+    "None selected" : {},
+    "None, just a name" : {},
+    "Not checked lately" : {},
+    "Not needed for this trip" : {},
+    "Not now" : {},
+    "Not put away yet" : {},
+    "Not quite ready" : {},
+    "Not sure yet" : {},
+    "Not there" : {},
+    "Notebook erased." : {},
+    "Noted." : {},
+    "Noted. Add a place when you know where you keep it." : {},
+    "Noted. Next time, look in %@." : {},
+    "Notes" : {},
+    "Nothing due back" : {},
+    "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support." : {},
+    "Nothing here yet" : {},
+    "Nothing here yet." : {},
+    "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere." : {},
+    "Nothing new this week. That's fine." : {},
+    "Notifications are off for Hereabouts, so reminders can't reach you." : {},
+    "OK" : {},
+    "Office" : {},
+    "On the day you choose to ask for it back" : {},
+    "Only empty copies are removed. Places inside them move into the place you're keeping." : {},
+    "Open %@" : {},
+    "Open notification settings" : {},
+    "Open your notebook" : {},
+    "Optional details" : {},
+    "Optional, but it helps you spot it" : {},
+    "Other names" : {},
+    "Other names, one per line" : {},
+    "Pack %@" : {},
+    "Pack %lld for any trip length." : {},
+    "Pack all" : {},
+    "Pack it anyway" : {},
+    "Packed" : {},
+    "Packed for %@" : {},
+    "Packed trips" : {},
+    "Packed: %lld" : {},
+    "Packing" : {},
+    "Packing kits" : {},
+    "Packing progress" : {},
+    "Page %lld of 3" : {},
+    "Paper" : {},
+    "Part of this backup is damaged, or from a newer Hereabouts." : {},
+    "Part of this backup is damaged." : {},
+    "Passport" : {},
+    "Past trips (%lld)" : {},
+    "Pay once. Share with your family. No renewal." : {},
+    "Per day" : {},
+    "Per night" : {},
+    "Per trip" : {},
+    "Photos and documents to include" : {},
+    "Photos of things" : {},
+    "Place" : {},
+    "Places" : {},
+    "Places inside" : {},
+    "Plan a trip" : {},
+    "Plan a trip with this kit" : {},
+    "Print a label" : {},
+    "Print eight labels per page. Scan a code to see the place in Hereabouts." : {},
+    "Print labels" : {},
+    "Privacy" : {},
+    "Privacy Policy" : {},
+    "Private" : {},
+    "Pro" : {},
+    "Pro isn't available to buy right now. Try again later." : {},
+    "Pro saves a copy of your notebook every week." : {},
+    "Pro until %@. It won't renew." : {},
+    "Pro, renews %@" : {},
+    "Purchase canceled. You weren't charged." : {},
+    "Put away" : {},
     "Put away %lld more things. Tap each one to say where it went." : {
-
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Put away %lld more thing. Tap it to say where it went."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Put away %lld more things. Tap each one to say where it went."
+                }
+              }
+            }
+          }
+        }
+      }
     },
-    "Put away 1 more thing. Tap it to say where it went." : {
-
-    },
-    "Put away here" : {
-
-    },
-    "Put away." : {
-
-    },
-    "Put back: %@" : {
-
-    },
-    "Put something away" : {
-
-    },
-    "Put things in this box" : {
-
-    },
-    "Put-away mode" : {
-
-    },
-    "Putting things away?" : {
-
-    },
-    "Quantity changes" : {
-
-    },
-    "Quantity: %lld" : {
-
-    },
+    "Put away 1 more thing. Tap it to say where it went." : {},
+    "Put away here" : {},
+    "Put away." : {},
+    "Put back" : {},
+    "Put back: %@" : {},
+    "Put something away" : {},
+    "Put things in this box" : {},
+    "Put-away mode" : {},
+    "Putting things away?" : {},
+    "Quantity changes" : {},
+    "Quantity: %lld" : {},
     "Question %lld of %lld" : {
       "localizations" : {
         "en" : {
@@ -854,468 +944,370 @@
         }
       }
     },
-    "Quick start" : {
-
-    },
-    "Reading your photo on this iPhone…" : {
-
-    },
-    "Recap" : {
-
-    },
-    "Remind me to ask for it back" : {
-
-    },
-    "Reminders" : {
-
-    },
-    "Reminders won't show the thing's name." : {
-
-    },
-    "Remove" : {
-
-    },
-    "Remove %lld copies" : {
-
-    },
-    "Remove 1 copy" : {
-
-    },
-    "Remove empty copies" : {
-
-    },
-    "Remove empty copies of places?" : {
-
-    },
-    "Remove from this trip" : {
-
-    },
-    "Remove it from this trip? Where it lives doesn't change." : {
-
-    },
-    "Remove photo" : {
-
-    },
-    "Rename" : {
-
-    },
-    "Rename home" : {
-
-    },
-    "Restore" : {
-
-    },
-    "Restore backup?" : {
-
-    },
-    "Restore from a backup" : {
-
-    },
-    "Restore purchases" : {
-
-    },
-    "Restore the backup from %@" : {
-
-    },
-    "Restore this thing" : {
-
-    },
-    "Restored things show up in search again." : {
-
-    },
-    "Save" : {
-
-    },
-    "Save a kit to reuse a list, like “Weekend away”. Use it to plan a trip." : {
-
-    },
-    "Save changes" : {
-
-    },
-    "Save packed count" : {
-
-    },
-    "Save the notebook file (photos stay on this iPhone)" : {
-
-    },
-    "Save where you found a thing. Leave the place blank if you found it where you keep it." : {
-
-    },
-    "Say what it is and where, such as “the drill's in the garage”." : {
-
-    },
-    "Say where" : {
-
-    },
-    "Scan a label" : {
-
-    },
-    "Send feedback" : {
-
-    },
-    "Set quantity" : {
-
-    },
-    "Settings" : {
-
-    },
-    "Several things" : {
-
-    },
-    "Several things in this photo?" : {
-
-    },
-    "Share or print %lld labels" : {
-
-    },
-    "Share or print the label" : {
-
-    },
-    "Share where it is" : {
-
-    },
-    "Show archived things" : {
-
-    },
-    "Show names in reminders" : {
-
-    },
-    "Show the introduction again" : {
-
-    },
-    "Skip to coming home" : {
-
-    },
-    "Split into name and place" : {
-
-    },
-    "Start listening" : {
-
-    },
-    "Start monthly check" : {
-
-    },
-    "Start with a name" : {
-
-    },
-    "Start with a photo" : {
-
-    },
-    "Start without a kit" : {
-
-    },
-    "Status: %@" : {
-
-    },
-    "Still there" : {
-
-    },
-    "Still there?" : {
-
-    },
-    "Stop listening" : {
-
-    },
-    "Suggested name: %@" : {
-
-    },
-    "Sunday recap" : {
-
-    },
-    "Take a photo to write down a thing and its place." : {
-
-    },
-    "Take photo" : {
-
-    },
-    "Take the same things each time? Save them as a kit." : {
-
-    },
-    "Take your notebook with you." : {
-
-    },
-    "Tap I'm leaving to check if you still need to pack anything." : {
-
-    },
-    "Tap Move when you put it somewhere new. You'll know where to look next time." : {
-
-    },
-    "Terms of Use" : {
-
-    },
-    "That didn't save" : {
-
-    },
-    "That thing isn't in your notebook anymore." : {
-
-    },
-    "The notebook says it's lent out." : {
-
-    },
-    "The spare key's in the blue tin on the hall shelf" : {
-
-    },
-    "Thing" : {
-
-    },
-    "Thing you often look for" : {
-
-    },
-    "Things directly here will have no place set. Places inside it move to the top level. Nothing else is deleted." : {
-
-    },
-    "Things here" : {
-
-    },
-    "This can't be undone without a backup. Type ERASE to confirm." : {
-
-    },
-    "This label's box isn't in your notebook" : {
-
-    },
-    "This place was deleted" : {
-
-    },
-    "This thing was deleted" : {
-
-    },
-    "This week at %@" : {
-
-    },
-    "Touch and hold to start with a photo" : {
-
-    },
-    "Trip" : {
-
-    },
-    "Trip name" : {
-
-    },
-    "Trip options" : {
-
-    },
-    "Trips" : {
-
-    },
-    "Trips you've already planned keep their own lists." : {
-
-    },
-    "Turn on Put-away mode here to move several things to one place." : {
-
-    },
-    "Turn on reminders" : {
-
-    },
-    "Type a place above, like Kitchen or Garage › Shelf 2." : {
-
-    },
-    "Type ERASE" : {
-
-    },
-    "Uncheck things you don't want to save. You can edit the names." : {
-
-    },
-    "Undo" : {
-
-    },
-    "Undo: keep %@" : {
-
-    },
-    "Unpack" : {
-
-    },
-    "Unpack %@" : {
-
-    },
-    "Unpacking" : {
-
-    },
-    "Use kit rule" : {
-
-    },
-    "Use suggestion" : {
-
-    },
-    "Use this kit when you plan a trip. Later edits to the kit won't change that trip." : {
-
-    },
-    "Use this quantity" : {
-
-    },
-    "Usually in %@" : {
-
-    },
-    "What are you writing down?" : {
-
-    },
-    "What did you find?" : {
-
-    },
-    "What did you put away?" : {
-
-    },
-    "What do you call home?" : {
-
-    },
-    "What do you need for your trip?" : {
-
-    },
-    "What is it?" : {
-
-    },
-    "What to pack" : {
-
-    },
-    "What's there?" : {
-
-    },
-    "Where do you keep it?" : {
-
-    },
-    "Where do you keep them?" : {
-
-    },
-    "Where is it?" : {
-
-    },
-    "Where is…" : {
-
-    },
-    "Where it's been" : {
-
-    },
-    "Where was it?" : {
-
-    },
-    "Which places?" : {
-
-    },
-    "Which thing?" : {
-
-    },
-    "Who has it?" : {
-
-    },
-    "With %@" : {
-
-    },
-    "Work" : {
-
-    },
-    "Write ${name} down in ${place}" : {
-
-    },
-    "Write a thing down" : {
-
-    },
-    "Write down as many things as you need." : {
-
-    },
-    "Write down where it is" : {
-
-    },
-    "Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account." : {
-
-    },
-    "Write it down" : {
-
-    },
-    "You already have “%@”. Tap it below if that's the one." : {
-
-    },
-    "You also delete its dates and history. You can undo for a few seconds. Its name stays in packing lists." : {
-
-    },
-    "You also see things in the places inside." : {
-
-    },
-    "You archived this thing. It won't be added to new trips." : {
-
-    },
-    "You called off this trip." : {
-
-    },
-    "You can add a parent's home, a storage unit or a boat." : {
-
-    },
-    "You can also ask Siri where things are." : {
-
-    },
-    "You can change this in Settings any time." : {
-
-    },
-    "You can hide names in reminders in Settings." : {
-
-    },
-    "You can leave things on this list for later. Put them away before you finish the trip." : {
-
-    },
-    "You can rename it any time in Settings." : {
-
-    },
-    "You can restore your notebook from a backup if you come back." : {
-
-    },
-    "You can save %lld of these for free." : {
-
-    },
-    "You can save %lld things for free. Open Hereabouts to get Pro, or archive a thing first." : {
-
-    },
-    "You can turn off recaps in Settings." : {
-
-    },
-    "You delete the trip and its lists. You keep your things and their places." : {
-
-    },
-    "You deleted this thing. Its name stays on the list." : {
-
-    },
-    "You didn't create an account, so there's nothing to close." : {
-
-    },
-    "You have lifetime Pro, and a subscription that's still renewing. Cancel the subscription so you aren't charged again." : {
-
-    },
-    "You keep its packing list. Your things stay in their places." : {
-
-    },
-    "You keep your packed counts and quantities you've set. Check the list after you save." : {
-
-    },
-    "You only get reminders about your own things. Nothing else, ever." : {
-
-    },
-    "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them." : {
-
-    },
-    "You're done unpacking. You can finish the trip." : {
-
-    },
-    "You're keeping up." : {
-
-    },
-    "You've checked everything recently. Nothing to check this month." : {
-
-    },
-    "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five." : {
-
-    },
-    "Your first backup is saved soon after you open the app." : {
-
-    },
-    "Your free plan is full. Get Pro to add more." : {
-
-    },
-    "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest." : {
-
-    },
-    "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics." : {
-
-    },
-    "Your subscription ended. Everything you saved is still here. You can still find, edit and export it." : {
-
-    }
+    "Quick start" : {},
+    "Read it" : {},
+    "Reading your photo on this iPhone…" : {},
+    "Recap" : {},
+    "Recent" : {},
+    "Recently put away" : {},
+    "Remind me to ask for it back" : {},
+    "Reminders" : {},
+    "Reminders when you need them." : {},
+    "Reminders won't show the thing's name." : {},
+    "Remove" : {},
+    "Remove %lld copies" : {},
+    "Remove 1 copy" : {},
+    "Remove empty copies" : {},
+    "Remove empty copies of places?" : {},
+    "Remove from this trip" : {},
+    "Remove it from this trip? Where it lives doesn't change." : {},
+    "Remove photo" : {},
+    "Rename" : {},
+    "Rename home" : {},
+    "Rename or add a home" : {},
+    "Restore" : {},
+    "Restore backup?" : {},
+    "Restore from a backup" : {},
+    "Restore purchases" : {},
+    "Restore the backup from %@" : {},
+    "Restore this backup." : {},
+    "Restore this thing" : {},
+    "Restore your notebook from a saved copy." : {},
+    "Restored things show up in search again." : {},
+    "Review and confirm the final date before saving it." : {},
+    "Save" : {},
+    "Save %lld%%" : {},
+    "Save a kit to reuse a list, like “Weekend away”. Use it to plan a trip." : {},
+    "Save a list of things and places. Open it in Numbers, Excel or another app." : {},
+    "Save changes" : {},
+    "Save packed count" : {},
+    "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts." : {},
+    "Save the notebook file (photos stay on this iPhone)" : {},
+    "Save where you found a thing. Leave the place blank if you found it where you keep it." : {},
+    "Saved automatically" : {},
+    "Say what it is and where, such as “the drill's in the garage”." : {},
+    "Say where" : {},
+    "Say where you put everything before you finish the trip." : {},
+    "Scan a label" : {},
+    "Scan with your iPhone camera to open in Hereabouts." : {},
+    "See what you added, lent out or haven't checked lately." : {},
+    "Send feedback" : {},
+    "Set quantity" : {},
+    "Settings" : {},
+    "Several things" : {},
+    "Several things in this photo?" : {},
+    "Share or print %lld labels" : {},
+    "Share or print the label" : {},
+    "Share where it is" : {},
+    "Share with your household" : {},
+    "Show archived things" : {},
+    "Show names in reminders" : {},
+    "Show the introduction again" : {},
+    "Since %@" : {},
+    "Skip to coming home" : {},
+    "Some %@ entries were missing from the copy. Your original notebook was kept." : {},
+    "Something in this backup has no name, or too much text." : {},
+    "Something in this notebook couldn't be backed up. Nothing has changed." : {},
+    "Source or terms" : {},
+    "Spare keys" : {},
+    "Split into name and place" : {},
+    "Spreadsheet saved." : {},
+    "Start" : {},
+    "Start listening" : {},
+    "Start monthly check" : {},
+    "Start with a name" : {},
+    "Start with a photo" : {},
+    "Start without a kit" : {},
+    "Status: %@" : {},
+    "Still there" : {},
+    "Still there?" : {},
+    "Still there? A few quick questions on the first Saturday" : {},
+    "Still there? You haven't checked a few things lately." : {},
+    "Still to do: %@." : {},
+    "Still to pack: %@ and %lld more." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Still to pack: %1$@ and %2$lld more."
+          }
+        }
+      }
+    },
+    "Still to pack: %@." : {},
+    "Stop listening" : {},
+    "Subscribe for %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscribe for %1$@ %2$@"
+          }
+        }
+      }
+    },
+    "Suggested name: %@" : {},
+    "Sunday" : {},
+    "Sunday recap" : {},
+    "Sunglasses" : {},
+    "Take a photo to write down a thing and its place." : {},
+    "Take keys" : {},
+    "Take photo" : {},
+    "Take the same things each time? Save them as a kit." : {},
+    "Take your notebook with you." : {},
+    "Tap I'm leaving to check if you still need to pack anything." : {},
+    "Tap Move when you put it somewhere new. You'll know where to look next time." : {},
+    "Tape measure" : {},
+    "Terms of Use" : {},
+    "That didn't save" : {},
+    "That one's private. Open Hereabouts to see it." : {},
+    "That place is in a different home." : {},
+    "That thing isn't in your notebook anymore." : {},
+    "The App Store couldn't confirm that purchase. Try Restore purchases." : {},
+    "The App Store hasn't confirmed Pro yet. Try Restore purchases in a moment." : {},
+    "The boat" : {},
+    "The drill" : {},
+    "The evening before you leave, if something's unpacked" : {},
+    "The license text isn't available." : {},
+    "The notebook needs at least one home." : {},
+    "The notebook says it's lent out." : {},
+    "The spare key's in the blue tin on the hall shelf" : {},
+    "Thing" : {},
+    "Thing you often look for" : {},
+    "Things directly here will have no place set. Places inside it move to the top level. Nothing else is deleted." : {},
+    "Things here" : {},
+    "Things you can write down" : {},
+    "This backup is damaged. Choose another one." : {},
+    "This backup is still downloading from iCloud. Try again in a moment." : {},
+    "This backup is too big to restore." : {},
+    "This backup would be over 200 MB. Choose fewer photos and documents." : {},
+    "This can't be undone without a backup. Type ERASE to confirm." : {},
+    "This file isn't a Hereabouts backup. Choose one made with Back up everything." : {},
+    "This is already packed for %@. Unpack it there or finish that trip first." : {},
+    "This label's box isn't in your notebook" : {},
+    "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first." : {},
+    "This place was deleted" : {},
+    "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is." : {},
+    "This thing was deleted" : {},
+    "This week at %@" : {},
+    "This week at home" : {},
+    "Today" : {},
+    "Tomorrow" : {},
+    "Top level" : {},
+    "Touch and hold to start with a photo" : {},
+    "Trip" : {},
+    "Trip name" : {},
+    "Trip options" : {},
+    "Trips" : {},
+    "Trips you've already planned keep their own lists." : {},
+    "Try a sentence such as “passport in the bedroom drawer”. You'll see the suggestion before anything changes." : {},
+    "Try free for %@" : {},
+    "Try here first" : {},
+    "Turn on Put-away mode here to move several things to one place." : {},
+    "Turn on reminders" : {},
+    "Turn on reminders so Hereabouts can tell you before a date passes." : {},
+    "Two places in this backup are inside each other." : {},
+    "Type ERASE" : {},
+    "Type a place above, like Kitchen or Garage › Shelf 2." : {},
+    "US Letter" : {},
+    "Uncheck things you don't want to save. You can edit the names." : {},
+    "Undo" : {},
+    "Undo: keep %@" : {},
+    "Unknown" : {},
+    "Unpack" : {},
+    "Unpack %@" : {},
+    "Unpacking" : {},
+    "Use kit rule" : {},
+    "Use suggestion" : {},
+    "Use this kit when you plan a trip. Later edits to the kit won't change that trip." : {},
+    "Use this quantity" : {},
+    "Usually in %@" : {},
+    "Voice memos don't work on this iPhone. Type instead." : {},
+    "Waiting for approval. You can still use your free plan." : {},
+    "What are you writing down?" : {},
+    "What did you find?" : {},
+    "What did you put away?" : {},
+    "What do you call home?" : {},
+    "What do you need for your trip?" : {},
+    "What do you often look for?" : {},
+    "What is it?" : {},
+    "What to pack" : {},
+    "What you added, lent out or haven't checked lately" : {},
+    "What's there?" : {},
+    "Where do you keep it?" : {},
+    "Where do you keep them?" : {},
+    "Where do you keep things?" : {},
+    "Where in %@?" : {},
+    "Where is it?" : {},
+    "Where is…" : {},
+    "Where it's been" : {},
+    "Where was it?" : {},
+    "Which places?" : {},
+    "Which thing?" : {},
+    "Who has it?" : {},
+    "With %@" : {},
+    "With %@ · since %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "With %1$@ · since %2$@"
+          }
+        }
+      }
+    },
+    "Work" : {},
+    "Write ${name} down in ${place}" : {},
+    "Write a thing down" : {},
+    "Write down %lld things" : {},
+    "Write down 1 thing" : {},
+    "Write down a thing and where you keep it." : {},
+    "Write down a thing this week to get started." : {},
+    "Write down as many things as you need." : {},
+    "Write down where it is" : {},
+    "Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account." : {},
+    "Write it down" : {},
+    "Write them down" : {},
+    "Written down: %@, in %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Written down: %1$@, in %2$@."
+          }
+        }
+      }
+    },
+    "Written down: %@. Add a place in Hereabouts when you know it." : {},
+    "Yearly" : {},
+    "Yesterday" : {},
+    "You already have “%@”. Tap it below if that's the one." : {},
+    "You also delete its dates and history. You can undo for a few seconds. Its name stays in packing lists." : {},
+    "You also move every place and thing inside it." : {},
+    "You also see things in the places inside." : {},
+    "You archived this thing. It won't be added to new trips." : {},
+    "You called off this trip." : {},
+    "You can add %lld more things for free." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You can add %lld more thing for free."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You can add %lld more things for free."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "You can add 1 more thing for free." : {},
+    "You can add a parent's home, a storage unit or a boat." : {},
+    "You can also ask Siri where things are." : {},
+    "You can change this in Settings any time." : {},
+    "You can hide names in reminders in Settings." : {},
+    "You can leave things on this list for later. Put them away before you finish the trip." : {},
+    "You can rename it any time in Settings." : {},
+    "You can restore your notebook from a backup if you come back." : {},
+    "You can save %lld of these for free." : {},
+    "You can save %lld things for free. Open Hereabouts to get Pro, or archive a thing first." : {},
+    "You can turn off recaps in Settings." : {},
+    "You can't put a place inside itself or anything inside it." : {},
+    "You delete the trip and its lists. You keep your things and their places." : {},
+    "You deleted this thing. Its name stays on the list." : {},
+    "You didn't create an account, so there's nothing to close." : {},
+    "You have %lld reminders scheduled on this iPhone." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You have %lld reminder scheduled on this iPhone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You have %lld reminders scheduled on this iPhone."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "You have Hereabouts Pro." : {},
+    "You have lifetime Pro, and a subscription that's still renewing. Cancel the subscription so you aren't charged again." : {},
+    "You keep its packing list. Your things stay in their places." : {},
+    "You keep your packed counts and quantities you've set. Check the list after you save." : {},
+    "You need a newer version of Hereabouts for this backup. Update the app and try again." : {},
+    "You only get reminders about your own things. Nothing else, ever." : {},
+    "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them." : {},
+    "You're done unpacking. You can finish the trip." : {},
+    "You're keeping up." : {},
+    "You're keeping up. Your Sunday recap is ready." : {},
+    "You've checked everything recently. Nothing to check this month." : {},
+    "You've saved %@, but haven't added a place yet." : {},
+    "You've written down a thing this week." : {},
+    "You've written down things for %lld weeks in a row." : {},
+    "Your %@ plan starts then. Cancel in Settings before then if you do not want to pay." : {},
+    "Your Sunday recap" : {},
+    "Your Sunday recap is ready." : {},
+    "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five." : {},
+    "Your first backup is saved soon after you open the app." : {},
+    "Your free plan is full. Archive a thing or get Pro to add more." : {},
+    "Your free plan is full. Get Pro to add more." : {},
+    "Your free trial ends %@" : {},
+    "Your free trial has started. It ends on %@." : {},
+    "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest." : {},
+    "Your notebook for things at home." : {},
+    "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics." : {},
+    "Your subscription ended. Everything you saved is still here. You can still find, edit and export it." : {},
+    "a month" : {},
+    "a year" : {},
+    "and %lld more" : {},
+    "another checklist row" : {},
+    "another trip" : {},
+    "arrow.counterclockwise" : {},
+    "arrow.down.doc" : {},
+    "ask-back date" : {},
+    "called off" : {},
+    "clock.arrow.circlepath" : {},
+    "every trip" : {},
+    "flying trips" : {},
+    "international trips" : {},
+    "is in" : {},
+    "is in %@" : {},
+    "lost thing found" : {},
+    "lost things found" : {},
+    "new thing written down" : {},
+    "new things written down" : {},
+    "no place yet" : {},
+    "not checked since %@" : {},
+    "on an unknown date" : {},
+    "photo.on.rectangle" : {},
+    "recently" : {},
+    "someone" : {},
+    "tablecells" : {},
+    "thing checked and still there" : {},
+    "thing moved or put away" : {},
+    "things checked and still there" : {},
+    "things moved or put away" : {},
+    "trash" : {},
+    "work trips" : {},
+    "“%@” already exists. You can still save another one." : {},
+    "“%@” is an empty copy of another place." : {},
+    "“Ask Sam for Drill back.”" : {}
   },
   "version" : "1.0"
 }

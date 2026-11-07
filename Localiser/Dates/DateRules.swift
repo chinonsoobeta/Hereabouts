@@ -44,8 +44,8 @@ enum DeadlineKind: String, CaseIterable, Identifiable, Sendable {
     /// The day to ask for a lent thing back. Set from "Lend it…".
     case askBack
     var id: String { rawValue }
-    var title: String { "Ask for it back" }
-    var noun: String { "ask-back date" }
+    var title: String { String(localized: "Ask for it back") }
+    var noun: String { String(localized: "ask-back date") }
     var defaultLeadDays: Int { 0 }
 }
 
@@ -80,8 +80,8 @@ struct PlannedReminder: Equatable, Sendable {
 
     /// Notification wording. Item names appear unless the person turned them off in Settings.
     func content(showingNames: Bool) -> (title: String, body: String) {
-        let body = showingNames && !itemName.isEmpty && !person.isEmpty ? "Ask \(person) for \(itemName) back." : "Ask for something back."
-        return ("Lent out", body)
+        let body = showingNames && !itemName.isEmpty && !person.isEmpty ? String(localized: "Ask \(person) for \(itemName) back.") : String(localized: "Ask for something back.")
+        return (String(localized: "Lent out"), body)
     }
 }
 

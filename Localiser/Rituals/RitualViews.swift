@@ -20,34 +20,36 @@ struct RecapView: View {
                 Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
                 HStack(alignment: .top) {
                     // The recap covers every home, so with several it's simply "home".
-                    Text("This week at \(store.hasSeveralHomes ? "home" : store.currentHome?.name.lowercasedFirstArticle ?? "home")").font(.wbDisplay).foregroundStyle(Theme.ink)
+                    Group {
+                        if !store.hasSeveralHomes, let name = store.currentHome?.name.lowercasedFirstArticle { Text("This week at \(name)") } else { Text("This week at home") }
+                    }.font(.wbDisplay).foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    if recap.keepingUp > 0 { Stamp(text: recap.keepingUp == 1 ? "1 week" : "\(recap.keepingUp) weeks", tone: .purple) }
+                    if recap.keepingUp > 0 { Stamp(text: String(localized: "\(recap.keepingUp) weeks"), tone: .purple) }
                 }
                 Text(keepingUpSentence(recap.keepingUp)).font(.wbBody).foregroundStyle(Theme.ink)
                 VStack(spacing: 0) {
-                    figure(recap.added.count, recap.added.count == 1 ? "new thing written down" : "new things written down", recap.added.isEmpty ? "Nothing new this week. That's fine." : Self.names(recap.added))
-                    figure(recap.moved, recap.moved == 1 ? "thing moved or put away" : "things moved or put away", nil)
-                    figure(recap.confirmed, recap.confirmed == 1 ? "thing checked and still there" : "things checked and still there", nil)
-                    if recap.found > 0 { figure(recap.found, recap.found == 1 ? "lost thing found" : "lost things found", nil) }
+                    figure(recap.added.count, recap.added.count == 1 ? String(localized: "new thing written down") : String(localized: "new things written down"), recap.added.isEmpty ? String(localized: "Nothing new this week. That's fine.") : Self.names(recap.added))
+                    figure(recap.moved, recap.moved == 1 ? String(localized: "thing moved or put away") : String(localized: "things moved or put away"), nil)
+                    figure(recap.confirmed, recap.confirmed == 1 ? String(localized: "thing checked and still there") : String(localized: "things checked and still there"), nil)
+                    if recap.found > 0 { figure(recap.found, recap.found == 1 ? String(localized: "lost thing found") : String(localized: "lost things found"), nil) }
                 }
                 .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
-                SectionHeading(title: "Next week").padding(.top, 6)
+                SectionHeading(title: String(localized: "Next week")).padding(.top, 6)
                 VStack(spacing: 0) {
-                    if recap.due.isEmpty { line("Nothing due back", "") }
+                    if recap.due.isEmpty { line(String(localized: "Nothing due back"), "") }
                     ForEach(recap.due.prefix(5)) { deadline in
-                        line(deadline.item?.name ?? "A saved thing", dueDetail(deadline))
+                        line(deadline.item?.name ?? String(localized: "A saved thing"), dueDetail(deadline))
                     }
-                    if recap.due.count > 5 { line("And \(recap.due.count - 5) more", "") }
+                    if recap.due.count > 5 { line(String(localized: "And \(recap.due.count - 5) more"), "") }
                     if recap.stocktakeCount > 0 {
-                        line("Monthly check", recap.stocktakeCount == 1 ? "1 quick question" : "\(recap.stocktakeCount) quick questions")
+                        line(String(localized: "Monthly check"), recap.stocktakeCount == 1 ? String(localized: "1 quick question") : String(localized: "\(recap.stocktakeCount) quick questions"))
                     }
                 }
                 if !recap.drifting.isEmpty {
-                    SectionHeading(title: "Not checked lately").padding(.top, 6)
+                    SectionHeading(title: String(localized: "Not checked lately")).padding(.top, 6)
                     VStack(spacing: 0) {
-                        ForEach(recap.drifting) { item in line(item.name, "not checked since \(item.lastConfirmed.formatted(.dateTime.month(.wide).year()))") }
+                        ForEach(recap.drifting) { item in line(item.name, String(localized: "not checked since \(item.lastConfirmed.formatted(.dateTime.month(.wide).year()))")) }
                     }
                 }
                 VStack(spacing: 10) {
@@ -68,18 +70,18 @@ struct RecapView: View {
     /// Up to four names; past that, three and how many more: "Kettle, Torch, Passport and 5 more".
     static func names(_ names: [String]) -> String {
         guard names.count > 4 else { return ListFormatter.localizedString(byJoining: names) }
-        return ListFormatter.localizedString(byJoining: Array(names.prefix(3)) + ["\(names.count - 3) more"])
+        return ListFormatter.localizedString(byJoining: Array(names.prefix(3)) + [String(localized: "\(names.count - 3) more")])
     }
 
     private func dueDetail(_ deadline: Deadline) -> String {
-        "Ask for it back " + (deadline.day?.formatted ?? "")
+        String(localized: "Ask for it back \(deadline.day?.formatted ?? "")")
     }
 
     private func keepingUpSentence(_ weeks: Int) -> String {
         switch weeks {
-        case 0: "Write down a thing this week to get started."
-        case 1: "You've written down a thing this week."
-        default: "You've written down things for \(weeks) weeks in a row."
+        case 0: String(localized: "Write down a thing this week to get started.")
+        case 1: String(localized: "You've written down a thing this week.")
+        default: String(localized: "You've written down things for \(weeks) weeks in a row.")
         }
     }
 
@@ -202,7 +204,7 @@ struct StocktakeView: View {
 
     private func monthsAgo(_ date: Date) -> String {
         let months = Calendar.current.dateComponents([.month], from: date, to: .now).month ?? 0
-        return months <= 1 ? "A while ago" : "\(months) months ago"
+        return months <= 1 ? String(localized: "A while ago") : String(localized: "\(months) months ago")
     }
 
     private func answer(_ change: () throws -> Void) {
@@ -227,12 +229,12 @@ struct RitualBanners: View {
     var body: some View {
         let _ = store.revision
         let weeks = Rituals.keepingUpWeeks(activity: Rituals.activity(in: store.items))
-        let stamp: String? = weeks > 0 ? (weeks == 1 ? "1 week" : "\(weeks) weeks") : nil
+        let stamp: String? = weeks > 0 ? String(localized: "\(weeks) weeks") : nil
         let recapReady = recapOn && Rituals.seededReadWeek(readWeek) != Rituals.recapWeekKey()
         let stocktake = Rituals.stocktakeDue(store.items, doneMonth: doneMonth)
         VStack(alignment: .leading, spacing: 10) {
             if recapReady {
-                banner(stamp: stamp, text: weeks > 0 ? "You're keeping up. Your Sunday recap is ready." : "Your Sunday recap is ready.", action: "Read it") { open(.recap) }
+                banner(stamp: stamp, text: weeks > 0 ? String(localized: "You're keeping up. Your Sunday recap is ready.") : String(localized: "Your Sunday recap is ready."), action: String(localized: "Read it")) { open(.recap) }
             } else if let stamp {
                 HStack(spacing: 12) {
                     Stamp(text: stamp, tone: .purple)
@@ -241,7 +243,7 @@ struct RitualBanners: View {
                 .padding(.vertical, 4).accessibilityElement(children: .combine)
             }
             if stocktake {
-                banner(stamp: nil, text: "Still there? You haven't checked a few things lately.", action: "Start") { open(.stocktake) }
+                banner(stamp: nil, text: String(localized: "Still there? You haven't checked a few things lately."), action: String(localized: "Start")) { open(.stocktake) }
             }
         }
         .onAppear { readWeek = Rituals.seededReadWeek(readWeek) }

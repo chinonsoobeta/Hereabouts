@@ -31,7 +31,7 @@ struct PackingView: View {
                         }
                     }.card(padding: 16)
                 } else {
-                    SectionHeading(title: "Trips")
+                    SectionHeading(title: String(localized: "Trips"))
                     ForEach(Array(active.enumerated()), id: \.element.id) { index, trip in
                         NavigationLink { TripDetailView(trip: trip) } label: {
                             if index == 0 { TripProgressCard(trip: trip) } else { TripRow(trip: trip) }
@@ -46,13 +46,13 @@ struct PackingView: View {
                         } label: { Text("Past trips (\(past.count))").font(.wbItem).foregroundStyle(Theme.ink) }
                         .tint(Theme.purpleInk)
                     }
-                    SectionHeading(title: "Kits").padding(.top, 8)
+                    SectionHeading(title: String(localized: "Kits")).padding(.top, 8)
                     if store.kitsHere.isEmpty {
                         Text("Save a kit to reuse a list, like \u{201C}Weekend away\u{201D}. Use it to plan a trip.").font(.wbCaption).foregroundStyle(Theme.secondary)
                     }
                     ForEach(store.kitsHere) { kit in
                         NavigationLink { KitDetailView(kit: kit) } label: {
-                            NotebookLine(name: kit.name, detail: kit.entries.count == 1 ? "1 thing" : "\(kit.entries.count) things").card()
+                            NotebookLine(name: kit.name, detail: String(localized: "\(kit.entries.count) things")).card()
                         }.buttonStyle(.plain)
                     }
                     Button("New kit", systemImage: "plus") { newKit = true }.buttonStyle(SoftButtonStyle())
@@ -84,7 +84,7 @@ struct TripRow: View {
 /// Packing → Away → Coming home → Done, with the current stage highlighted.
 struct TripStageStrip: View {
     let state: TripState
-    private static let stages: [(TripState, String)] = [(.packing, "Packing"), (.away, "Away"), (.comingHome, "Home"), (.finished, "Done")]
+    private static let stages: [(TripState, String)] = [(.packing, String(localized: "Packing")), (.away, String(localized: "Away")), (.comingHome, String(localized: "Home")), (.finished, String(localized: "Done"))]
     var body: some View {
         let current = Self.stages.firstIndex { $0.0 == state } ?? -1
         HStack(spacing: 6) {
@@ -96,7 +96,7 @@ struct TripStageStrip: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Status: \(state == .canceled ? "called off" : (TripState.titles[state] ?? "").lowercased())")
+        .accessibilityLabel(String(localized: "Status: \(state == .canceled ? String(localized: "called off") : (TripState.titles[state] ?? "").lowercased())"))
     }
 }
 
@@ -108,7 +108,7 @@ struct TripProgressCard: View {
         let fraction = needed == 0 ? 0 : Double(packed) / Double(needed)
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
-                NotebookLine(name: trip.name, detail: "\(packed) of \(needed) packed")
+                NotebookLine(name: trip.name, detail: String(localized: "\(packed) of \(needed) packed"))
             }
             Text([trip.dateRange, trip.details?.nightsLabel].compactMap { $0 }.joined(separator: " · ")).font(.wbCaption).opacity(0.9)
             ProgressView(value: fraction).tint(Theme.purpleInk).accessibilityLabel("Packing progress")
@@ -122,7 +122,7 @@ struct TripProgressCard: View {
 
 extension TripRecord {
     var dateRange: String {
-        guard let start = CalendarDay(stored: startDay)?.date(), let end = CalendarDay(stored: endDay)?.date() else { return "\(startDay) to \(endDay)" }
+        guard let start = CalendarDay(stored: startDay)?.date(), let end = CalendarDay(stored: endDay)?.date() else { return String(localized: "\(startDay) to \(endDay)") }
         let format = Date.FormatStyle.dateTime.month(.abbreviated).day()
         return startDay == endDay ? start.formatted(format) : "\(start.formatted(format)) – \(end.formatted(format))"
     }
@@ -223,8 +223,14 @@ struct AddTaskField: View {
 extension KitEntry {
     /// "1 · every trip", "2 per night · flying".
     var ruleSummary: String {
-        let amount = perDay ? "\(unitQuantity) per day" : perNight ? "\(unitQuantity) per night" : "\(unitQuantity)"
-        return "\(amount) · \(condition == .always ? "every trip" : condition.title.lowercased() + " trips")"
+        let amount = perDay ? String(localized: "\(unitQuantity) per day") : perNight ? String(localized: "\(unitQuantity) per night") : "\(unitQuantity)"
+        let trips = switch condition {
+        case .always: String(localized: "every trip")
+        case .flying: String(localized: "flying trips")
+        case .international: String(localized: "international trips")
+        case .work: String(localized: "work trips")
+        }
+        return "\(amount) · \(trips)"
     }
 }
 
@@ -248,9 +254,9 @@ struct KitEntryEditor: View {
     }
     private var scaleHint: String {
         switch scale {
-        case .once: "Pack \(quantity) for any trip length."
-        case .perDay: "\(quantity) for each day away, counting travel days. A day trip needs \(quantity); a weekend away needs \(quantity * 3)."
-        case .perNight: "\(quantity) for each night away. A day trip needs none; a weekend away needs \(quantity * 2)."
+        case .once: String(localized: "Pack \(quantity) for any trip length.")
+        case .perDay: String(localized: "\(quantity) for each day away, counting travel days. A day trip needs \(quantity); a weekend away needs \(quantity * 3).")
+        case .perNight: String(localized: "\(quantity) for each night away. A day trip needs none; a weekend away needs \(quantity * 2).")
         }
     }
     var body: some View {
@@ -336,15 +342,18 @@ struct TripDetailView: View {
     @State private var notReady: String?
     @State private var lentPacking: TripEntry?
     @State private var error: String?
-    private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? "Anywhere" }).sorted() }
+    private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? String(localized: "Anywhere") }).sorted() }
     /// Says exactly what is left before the trip can be marked away.
     private var departureBlocker: String? {
         let unpacked = trip.entries.filter { $0.requiredCount > 0 && ($0.item?.archived == true || Int($0.packedCount) < $0.requiredCount) }.map(\.title).sorted()
         let tasks = trip.tasks.filter { !$0.checked }.map(\.title).sorted()
         guard !unpacked.isEmpty || !tasks.isEmpty else { return nil }
         var parts: [String] = []
-        if !unpacked.isEmpty { parts.append("Still to pack: \(unpacked.prefix(5).joined(separator: ", "))\(unpacked.count > 5 ? " and \(unpacked.count - 5) more" : "").") }
-        if !tasks.isEmpty { parts.append("Still to do: \(tasks.joined(separator: ", ")).") }
+        if !unpacked.isEmpty {
+            let list = unpacked.prefix(5).joined(separator: ", ")
+            parts.append(unpacked.count > 5 ? String(localized: "Still to pack: \(list) and \(unpacked.count - 5) more.") : String(localized: "Still to pack: \(list)."))
+        }
+        if !tasks.isEmpty { parts.append(String(localized: "Still to do: \(tasks.joined(separator: ", ")).")) }
         return parts.joined(separator: "\n")
     }
     var body: some View {
@@ -365,7 +374,7 @@ struct TripDetailView: View {
             }
             ForEach(groups, id: \.self) { group in
                 Section(group) {
-                    ForEach(trip.entries.filter { ($0.item?.place?.path ?? "Anywhere") == group }.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
+                    ForEach(trip.entries.filter { ($0.item?.place?.path ?? String(localized: "Anywhere")) == group }.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
                 }
             }
             if trip.state == .packing {
@@ -408,14 +417,14 @@ struct TripDetailView: View {
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("You keep its packing list. Your things stay in their places.") }
         .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("You delete the trip and its lists. You keep your things and their places.") }
-        .confirmationDialog("\(lentPacking?.title ?? "It") is with \(lentPacking?.item?.lentTo ?? "someone")", isPresented: Binding(get: { lentPacking != nil }, set: { if !$0 { lentPacking = nil } }), titleVisibility: .visible, presenting: lentPacking) { entry in
+        .confirmationDialog("\(lentPacking?.title ?? String(localized: "It")) is with \(lentPacking?.item?.lentTo ?? String(localized: "someone"))", isPresented: Binding(get: { lentPacking != nil }, set: { if !$0 { lentPacking = nil } }), titleVisibility: .visible, presenting: lentPacking) { entry in
             Button("Pack it anyway") { attempt { try store.pack(entry, count: entry.requiredCount) } }
             if let item = entry.item { Button("It's back, pack it") { attempt { try store.gotBack(item); try store.pack(entry, count: entry.requiredCount) } } }
         } message: { _ in Text("The notebook says it's lent out.") }
         .alert("Not quite ready", isPresented: Binding(get: { notReady != nil }, set: { if !$0 { notReady = nil } })) {
             Button("Keep packing", role: .cancel) { notReady = nil }
             Button("Leave anyway") { notReady = nil; attempt { try store.changeTripState(trip, to: .comingHome) } }
-        } message: { Text((notReady ?? "") + "\n\nChoose Leave anyway to skip packing checks and go to unpacking when you're back.") }
+        } message: { Text((notReady ?? "") + "\n\n" + String(localized: "Choose Leave anyway to skip packing checks and go to unpacking when you're back.")) }
         .alert("Couldn't update the trip", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
@@ -452,7 +461,7 @@ struct TripDetailView: View {
             }
             NavigationLink { TripEntryDetailView(entry: entry) } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? "Not needed for this trip" : "\(entry.packedCount) of \(entry.requiredCount) packed")
+                    NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? String(localized: "Not needed for this trip") : String(localized: "\(entry.packedCount) of \(entry.requiredCount) packed"))
                     if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
                     if let item = entry.item, item.isLent { Text("With \(item.lentTo)").font(.wbCaption).foregroundStyle(Theme.warning) }
                     if entry.unlinked && entry.item == nil { Text("You deleted this thing. Its name stays on the list.").font(.wbCaption).foregroundStyle(Theme.secondary) }
@@ -503,7 +512,7 @@ struct TripEntryDetailView: View {
         SheetList {
             Section {
                 Text("\(entry.packedCount) of \(entry.requiredCount) packed")
-                Text(entry.item?.place?.path ?? "Anywhere").foregroundStyle(Theme.secondary)
+                Text(entry.item?.place?.path ?? String(localized: "Anywhere")).foregroundStyle(Theme.secondary)
                 if let item = entry.item { NavigationLink("Open \(item.name)") { ItemDetailView(item: item) } }
             }
             if entry.trip?.state == .packing {
@@ -527,7 +536,7 @@ struct TripEntryDetailView: View {
                     if entry.item?.archived == true {
                         Button("Confirm returned or archived") { attempt { try store.resolveHome(entry, resolution: .noLongerHere) } }
                     } else {
-                        Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? "no place yet")") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
+                        Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? String(localized: "no place yet"))") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
                         if entry.item != nil {
                             PlacePicker(selection: $placeID, home: entry.item?.home)
                             Button("Confirm new place") { attempt { try store.resolveHome(entry, resolution: .newPlace, newPlace: store.places.first { $0.id == placeID }) } }.disabled(placeID == nil)

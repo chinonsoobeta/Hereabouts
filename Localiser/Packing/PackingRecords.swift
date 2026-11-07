@@ -3,7 +3,7 @@ import CoreData
 enum PackingCondition: String, CaseIterable, Identifiable, Sendable {
     case always, flying, international, work
     var id: String { rawValue }
-    var title: String { switch self { case .always: "Every trip"; case .flying: "Flying"; case .international: "International"; case .work: "Work" } }
+    var title: String { switch self { case .always: String(localized: "Every trip"); case .flying: String(localized: "Flying"); case .international: String(localized: "International"); case .work: String(localized: "Work") } }
 }
 
 /// How a packing row's quantity scales with trip length.
@@ -11,24 +11,24 @@ enum PackingScale: String, CaseIterable, Identifiable, Sendable {
     case once, perDay, perNight
     var id: String { rawValue }
     init(perNight: Bool, perDay: Bool) { self = perDay ? .perDay : (perNight ? .perNight : .once) }
-    var title: String { switch self { case .once: "Per trip"; case .perDay: "Per day"; case .perNight: "Per night" } }
+    var title: String { switch self { case .once: String(localized: "Per trip"); case .perDay: String(localized: "Per day"); case .perNight: String(localized: "Per night") } }
     var perNight: Bool { self == .perNight }
     var perDay: Bool { self == .perDay }
 }
 
 enum TripState: String {
     case packing, away, comingHome, finished, canceled
-    static let titles: [TripState: String] = [.packing: "Packing", .away: "Away", .comingHome: "Coming home", .finished: "Finished", .canceled: "Called off"]
+    static let titles: [TripState: String] = [.packing: String(localized: "Packing"), .away: String(localized: "Away"), .comingHome: String(localized: "Coming home"), .finished: String(localized: "Finished"), .canceled: String(localized: "Called off")]
 }
 enum HomeResolution: String {
     case pending, putBack, newPlace, unresolved, noLongerHere
     var title: String {
         switch self {
-        case .pending: "Not put away yet"
-        case .putBack: "Put back"
-        case .newPlace: "Moved to a new place"
-        case .unresolved: "Left for later"
-        case .noLongerHere: "No longer here"
+        case .pending: String(localized: "Not put away yet")
+        case .putBack: String(localized: "Put back")
+        case .newPlace: String(localized: "Moved to a new place")
+        case .unresolved: String(localized: "Left for later")
+        case .noLongerHere: String(localized: "No longer here")
         }
     }
 }
@@ -46,7 +46,7 @@ struct TripDetails: Sendable {
         guard let startDate = start.date(calendar: calendar), let endDate = end.date(calendar: calendar) else { return 0 }
         return max(0, calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 0)
     }
-    var nightsLabel: String { nights == 0 ? "Day trip" : nights == 1 ? "1 night" : "\(nights) nights" }
+    var nightsLabel: String { nights == 0 ? String(localized: "Day trip") : nights == 1 ? String(localized: "1 night") : String(localized: "\(nights) nights") }
     /// Days away, counting both the departure and the return day.
     var days: Int { nights + 1 }
     func quantity(unit: Int, perNight: Bool, perDay: Bool = false, condition: PackingCondition) -> Int {

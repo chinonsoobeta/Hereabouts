@@ -3,6 +3,8 @@
   "defaultOptions": {
     "storeKitConfiguration": { "identifier": "LocaliserTests/Localiser.storekit" },
     "codeCoverage": true,
+    "language": "en",
+    "region": "US",
     "targetForVariableExpansion": { "containerPath": "container:Localiser.xcodeproj", "identifier": "679E7C83180DB5491E324FDC", "name": "Localiser" }
   },
   "testTargets": [

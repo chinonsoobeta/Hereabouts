@@ -30,22 +30,25 @@ struct LibraryBackup: Codable, Sendable {
     func encoded() throws -> Data {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(self)
-        guard data.count <= Self.maximumBytes else { throw LocaliserError.invalidBackup("This backup would be over 200 MB. Choose fewer photos and documents.") }
+        guard data.count <= Self.maximumBytes else { throw LocaliserError.invalidBackup(String(localized: "This backup would be over 200 MB. Choose fewer photos and documents.")) }
         return data
     }
     /// What's inside, as a person would say it: "12 things, 5 places and 3 dates".
     var contents: String {
-        let kinds = [("Belonging", "thing", "things"), ("Place", "place", "places"), ("Deadline", "date", "dates"), ("Kit", "kit", "kits"), ("TripRecord", "trip", "trips")]
-        let parts = kinds.compactMap { entity, one, many -> String? in
+        let kinds: [(String, (Int) -> String)] = [
+            ("Belonging", { String(localized: "\($0) things") }), ("Place", { String(localized: "\($0) places") }),
+            ("Deadline", { String(localized: "\($0) dates") }), ("Kit", { String(localized: "\($0) kits") }),
+            ("TripRecord", { String(localized: "\($0) trips") })]
+        let parts = kinds.compactMap { entity, phrase -> String? in
             let count = records.filter { $0.entity == entity }.count
-            return count == 0 ? nil : count == 1 ? "1 \(one)" : "\(count) \(many)"
+            return count == 0 ? nil : phrase(count)
         }
-        guard let last = parts.last else { return "An empty notebook" }
-        return parts.count == 1 ? last : parts.dropLast().joined(separator: ", ") + " and " + last
+        guard let last = parts.last else { return String(localized: "An empty notebook") }
+        return parts.count == 1 ? last : String(localized: "\(parts.dropLast().joined(separator: ", ")) and \(last)")
     }
 
     static func decoded(_ data: Data) throws -> Self {
-        guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup("Choose a Hereabouts backup under 200 MB.") }
+        guard data.count <= maximumBytes else { throw LocaliserError.invalidBackup(String(localized: "Choose a Hereabouts backup under 200 MB.")) }
         struct Header: Decodable { var version: Int }
         do { return try JSONDecoder().decode(Self.self, from: data) } catch {
             // Say which problem it is. A newer app's backup gives its version. Every backup this app writes starts
@@ -57,9 +60,9 @@ struct LibraryBackup: Codable, Sendable {
     /// Return, warranty and expiry dates from before 1.0 still restore, kept as they are but not shown.
     static let deadlineKinds: Set<String> = ["askBack", "returns", "warranty", "expiry"]
     static let decisions: Set<String> = ["open", "returned", "keeping", "returning"]
-    static let newerVersion = "You need a newer version of Hereabouts for this backup. Update the app and try again."
-    static let damaged = "This backup is damaged. Choose another one."
-    static let notABackup = "This file isn't a Hereabouts backup. Choose one made with Back up everything."
+    static let newerVersion = String(localized: "You need a newer version of Hereabouts for this backup. Update the app and try again.")
+    static let damaged = String(localized: "This backup is damaged. Choose another one.")
+    static let notABackup = String(localized: "This file isn't a Hereabouts backup. Choose one made with Back up everything.")
 }
 
 @MainActor extension LocaliserStore {
@@ -69,7 +72,7 @@ struct LibraryBackup: Codable, Sendable {
         for entity in container.managedObjectModel.entities {
             guard let name = entity.name else { continue }
             for object in try context.fetch(NSFetchRequest<NSManagedObject>(entityName: name)) {
-                guard let id = object.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup("Something in this notebook couldn't be backed up. Nothing has changed.") }
+                guard let id = object.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup(String(localized: "Something in this notebook couldn't be backed up. Nothing has changed.")) }
                 var attributes: [String: BackupValue] = [:]
                 for (key, attribute) in entity.attributesByName where key != "id" {
                     if attribute.attributeType == .binaryDataAttributeType && !attachmentIDs.contains(id) { continue }
@@ -81,16 +84,16 @@ struct LibraryBackup: Codable, Sendable {
                     case .dateAttributeType: attributes[key] = .date(value as! Date)
                     case .binaryDataAttributeType:
                         let data = value as! Data; binaryBytes += data.count
-                        guard binaryBytes <= 140 * 1024 * 1024 else { throw LocaliserError.invalidBackup("Choose fewer photos and documents. A backup can hold up to 200 MB.") }
+                        guard binaryBytes <= 140 * 1024 * 1024 else { throw LocaliserError.invalidBackup(String(localized: "Choose fewer photos and documents. A backup can hold up to 200 MB.")) }
                         attributes[key] = .data(data)
-                    default: throw LocaliserError.invalidBackup("Something in this notebook couldn't be backed up. Nothing has changed.")
+                    default: throw LocaliserError.invalidBackup(String(localized: "Something in this notebook couldn't be backed up. Nothing has changed."))
                     }
                 }
                 var relationships: [String: [UUID]] = [:]
                 for (key, relationship) in entity.relationshipsByName {
                     let related = relationship.isToMany ? (object.value(forKey: key) as? NSSet)?.allObjects.compactMap { $0 as? NSManagedObject } ?? [] : (object.value(forKey: key) as? NSManagedObject).map { [$0] } ?? []
                     relationships[key] = try related.map { value in
-                        guard let id = value.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup("Something in this notebook couldn't be backed up. Nothing has changed.") }
+                        guard let id = value.value(forKey: "id") as? UUID else { throw LocaliserError.invalidBackup(String(localized: "Something in this notebook couldn't be backed up. Nothing has changed.")) }
                         return id
                     }.sorted { $0.uuidString < $1.uuidString }
                 }
@@ -150,52 +153,52 @@ struct LibraryBackup: Codable, Sendable {
     func validateBackup(_ file: LibraryBackup) throws {
         guard file.version <= LibraryBackup.currentVersion else { throw LocaliserError.invalidBackup(LibraryBackup.newerVersion) }
         guard file.version >= 1 else { throw LocaliserError.invalidBackup(LibraryBackup.notABackup) }
-        guard file.records.count <= 100_000 else { throw LocaliserError.invalidBackup("This backup is too big to restore.") }
+        guard file.records.count <= 100_000 else { throw LocaliserError.invalidBackup(String(localized: "This backup is too big to restore.")) }
         let schema = container.managedObjectModel.entitiesByName
         var records: [UUID: BackupRecord] = [:]
         for record in file.records {
-            guard records[record.id] == nil, let entity = schema[record.entity] else { throw LocaliserError.invalidBackup("Part of this backup is damaged, or from a newer Hereabouts.") }
+            guard records[record.id] == nil, let entity = schema[record.entity] else { throw LocaliserError.invalidBackup(String(localized: "Part of this backup is damaged, or from a newer Hereabouts.")) }
             let fields = entity.attributesByName.filter { $0.key != "id" }
             // Fields added after the first backup format; older backups omit them and get the model default.
             let required = Set(fields.filter { $0.value.attributeType != .binaryDataAttributeType && !Self.laterFields.contains($0.key) }.keys)
-            guard required.isSubset(of: Set(record.attributes.keys)), Set(record.attributes.keys).isSubset(of: Set(fields.keys)), Set(record.relationships.keys).isSubset(of: Set(entity.relationshipsByName.keys)), Set(entity.relationshipsByName.keys).subtracting(record.relationships.keys).isSubset(of: Self.laterRelationships) else { throw LocaliserError.invalidBackup("Part of this backup is damaged, or from a newer Hereabouts.") }
+            guard required.isSubset(of: Set(record.attributes.keys)), Set(record.attributes.keys).isSubset(of: Set(fields.keys)), Set(record.relationships.keys).isSubset(of: Set(entity.relationshipsByName.keys)), Set(entity.relationshipsByName.keys).subtracting(record.relationships.keys).isSubset(of: Self.laterRelationships) else { throw LocaliserError.invalidBackup(String(localized: "Part of this backup is damaged, or from a newer Hereabouts.")) }
             for (key, value) in record.attributes {
                 switch (fields[key]!.attributeType, value) {
                 case (.stringAttributeType, .string(let value)):
-                    guard value.count <= 500_000, !["name", "title"].contains(key) || !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw LocaliserError.invalidBackup("Something in this backup has no name, or too much text.") }
+                    guard value.count <= 500_000, !["name", "title"].contains(key) || !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw LocaliserError.invalidBackup(String(localized: "Something in this backup has no name, or too much text.")) }
                 case (.booleanAttributeType, .boolean), (.dateAttributeType, .date), (.integer64AttributeType, .integer): break
-                case (.integer16AttributeType, .integer(let value)): guard Int16(exactly: value) != nil else { throw LocaliserError.invalidBackup("A number in this backup is too big.") }
-                case (.binaryDataAttributeType, .data(let value)): guard value.count <= LibraryBackup.maximumFileBytes else { throw LocaliserError.invalidBackup("A photo or document in this backup is over 20 MB.") }
-                default: throw LocaliserError.invalidBackup("Part of this backup is damaged.")
+                case (.integer16AttributeType, .integer(let value)): guard Int16(exactly: value) != nil else { throw LocaliserError.invalidBackup(String(localized: "A number in this backup is too big.")) }
+                case (.binaryDataAttributeType, .data(let value)): guard value.count <= LibraryBackup.maximumFileBytes else { throw LocaliserError.invalidBackup(String(localized: "A photo or document in this backup is over 20 MB.")) }
+                default: throw LocaliserError.invalidBackup(String(localized: "Part of this backup is damaged."))
                 }
             }
             if record.entity == "Deadline" {
-                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, LibraryBackup.deadlineKinds.contains(record.string("kindRaw") ?? ""), LibraryBackup.decisions.contains(record.string("decisionRaw") ?? ""), (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup("A date in this backup is damaged.") }
+                guard CalendarDay(stored: record.string("dayString") ?? "") != nil, LibraryBackup.deadlineKinds.contains(record.string("kindRaw") ?? ""), LibraryBackup.decisions.contains(record.string("decisionRaw") ?? ""), (0...3650).contains(record.integer("leadDays") ?? -1), (0...23).contains(record.integer("hour") ?? -1) else { throw LocaliserError.invalidBackup(String(localized: "A date in this backup is damaged.")) }
             }
             if record.entity == "TripRecord" {
-                guard let start = CalendarDay(stored: record.string("startDay") ?? ""), let end = CalendarDay(stored: record.string("endDay") ?? ""), end >= start, TripState(rawValue: record.string("stateRaw") ?? "") != nil else { throw LocaliserError.invalidBackup("A trip in this backup is damaged.") }
+                guard let start = CalendarDay(stored: record.string("startDay") ?? ""), let end = CalendarDay(stored: record.string("endDay") ?? ""), end >= start, TripState(rawValue: record.string("stateRaw") ?? "") != nil else { throw LocaliserError.invalidBackup(String(localized: "A trip in this backup is damaged.")) }
             }
             if ["KitEntry", "TripEntry"].contains(record.entity) {
-                guard (1...99).contains(record.integer("unitQuantity") ?? 0), PackingCondition(rawValue: record.string("conditionRaw") ?? "") != nil else { throw LocaliserError.invalidBackup("A packing list in this backup is damaged.") }
+                guard (1...99).contains(record.integer("unitQuantity") ?? 0), PackingCondition(rawValue: record.string("conditionRaw") ?? "") != nil else { throw LocaliserError.invalidBackup(String(localized: "A packing list in this backup is damaged.")) }
             }
             if record.entity == "TripEntry" {
-                guard (-1...9999).contains(record.integer("manualQuantity") ?? -2), (record.integer("packedCount") ?? -1) >= 0, HomeResolution(rawValue: record.string("resolutionRaw") ?? "") != nil else { throw LocaliserError.invalidBackup("A packing list in this backup is damaged.") }
+                guard (-1...9999).contains(record.integer("manualQuantity") ?? -2), (record.integer("packedCount") ?? -1) >= 0, HomeResolution(rawValue: record.string("resolutionRaw") ?? "") != nil else { throw LocaliserError.invalidBackup(String(localized: "A packing list in this backup is damaged.")) }
             }
             records[record.id] = record
         }
         for record in file.records {
             for (key, ids) in record.relationships {
                 let relationship = schema[record.entity]!.relationshipsByName[key]!
-                guard Set(ids).count == ids.count, relationship.isToMany || ids.count <= 1 else { throw LocaliserError.invalidBackup("Part of this backup is damaged.") }
+                guard Set(ids).count == ids.count, relationship.isToMany || ids.count <= 1 else { throw LocaliserError.invalidBackup(String(localized: "Part of this backup is damaged.")) }
                 for id in ids {
                     guard let related = records[id], related.entity == relationship.destinationEntity?.name,
-                          let inverse = relationship.inverseRelationship?.name, related.relationships[inverse]?.contains(record.id) == true else { throw LocaliserError.invalidBackup("Part of this backup is damaged.") }
+                          let inverse = relationship.inverseRelationship?.name, related.relationships[inverse]?.contains(record.id) == true else { throw LocaliserError.invalidBackup(String(localized: "Part of this backup is damaged.")) }
                 }
             }
             if record.entity == "TripRecord", record.string("stateRaw") == TripState.finished.rawValue {
                 for id in record.relationships["entries"] ?? [] {
                     let entry = records[id]!
-                    guard (entry.integer("packedCount") ?? 0) == 0 || ![HomeResolution.pending.rawValue, HomeResolution.unresolved.rawValue].contains(entry.string("resolutionRaw") ?? "") else { throw LocaliserError.invalidBackup("A finished trip in this backup still has things to put away.") }
+                    guard (entry.integer("packedCount") ?? 0) == 0 || ![HomeResolution.pending.rawValue, HomeResolution.unresolved.rawValue].contains(entry.string("resolutionRaw") ?? "") else { throw LocaliserError.invalidBackup(String(localized: "A finished trip in this backup still has things to put away.")) }
                 }
             }
         }
@@ -203,7 +206,7 @@ struct LibraryBackup: Codable, Sendable {
         for place in file.records where place.entity == "Place" {
             var path = Set<UUID>(); var next: UUID? = place.id
             while let id = next, !resolved.contains(id) {
-                guard path.insert(id).inserted else { throw LocaliserError.invalidBackup("Two places in this backup are inside each other.") }
+                guard path.insert(id).inserted else { throw LocaliserError.invalidBackup(String(localized: "Two places in this backup are inside each other.")) }
                 next = records[id]?.relationships["parent"]?.first
             }
             resolved.formUnion(path)

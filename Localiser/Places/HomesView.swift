@@ -102,8 +102,8 @@ struct HomesView: View {
     private func summary(_ home: HomeRecord) -> String {
         let places = home.places.filter { $0.parent == nil }.count
         let things = home.items.filter { !$0.archived }.count
-        if places == 0 && things == 0 { return "Empty" }
-        return "\(places == 1 ? "1 room" : "\(places) rooms") · \(things == 1 ? "1 thing" : "\(things) things")"
+        if places == 0 && things == 0 { return String(localized: "Empty") }
+        return "\(String(localized: "\(places) rooms")) · \(String(localized: "\(things) things"))"
     }
 
     private func attempt(_ work: () throws -> Void) {
@@ -131,7 +131,7 @@ struct MoveToHomeSheet: View {
                 ForEach(store.homes.filter { $0 != currentHome }) { home in
                     NavigationLink {
                         PlaceChooser(selection: Binding(get: { nil }, set: { id in move(to: home, place: store.places.first { $0.id == id }) }),
-                                     noneTitle: "Top level", title: "Where in \(home.name)?", home: home)
+                                     noneTitle: String(localized: "Top level"), title: String(localized: "Where in \(home.name)?"), home: home)
                     } label: { NotebookLine(name: home.name, detail: "") }
                 }
             } footer: {
@@ -147,8 +147,8 @@ struct MoveToHomeSheet: View {
 
     private var footer: String {
         switch subject {
-        case .thing: "Choose a home, then a place in it."
-        case .place: "You also move every place and thing inside it."
+        case .thing: String(localized: "Choose a home, then a place in it.")
+        case .place: String(localized: "You also move every place and thing inside it.")
         }
     }
 

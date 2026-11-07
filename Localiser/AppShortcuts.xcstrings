@@ -1,6 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "${applicationName} put away" : {},
+    "Add a thing to ${applicationName}" : {},
     "Ask ${applicationName} where something is" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -16,6 +18,8 @@
         }
       }
     },
+    "Find ${thing} in ${applicationName}" : {},
+    "I found ${thing} in ${applicationName}" : {},
     "Put something away in ${applicationName}" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -44,6 +48,7 @@
         }
       }
     },
+    "Where is ${thing} in ${applicationName}" : {},
     "Write something down in ${applicationName}" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {

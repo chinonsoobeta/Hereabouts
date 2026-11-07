@@ -32,7 +32,7 @@ struct FindView: View {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
-                    LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "Write down a thing and where you keep it.")
+                    LibraryEmptyState(title: String(localized: "Nothing here yet"), systemImage: "magnifyingglass", description: String(localized: "Write down a thing and where you keep it."))
                     Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
                         .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
@@ -128,11 +128,11 @@ struct FindView: View {
         HomeSwitcher()
         RitualBanners { ritual = $0 }
         if !store.missingItems.isEmpty {
-            SectionHeading(title: "Looking for").padding(.top, 4)
+            SectionHeading(title: String(localized: "Looking for")).padding(.top, 4)
             ForEach(store.missingItems) { item in itemCard(item) }
         }
         HStack {
-            SectionHeading(title: "Places")
+            SectionHeading(title: String(localized: "Places"))
             Spacer()
             if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink("All places") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
@@ -142,7 +142,7 @@ struct FindView: View {
             }
             NewPlaceTile { addingPlace = true }
         }
-        SectionHeading(title: "Recently put away").padding(.top, 8)
+        SectionHeading(title: String(localized: "Recently put away")).padding(.top, 8)
         let lately = results.filter { !store.hasSeveralHomes || $0.home == store.currentHome }.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
         ForEach(lately) { item in itemCard(item) }
     }
@@ -170,7 +170,7 @@ struct PlaceTile: View {
     let place: Place
     var body: some View {
         let count = place.activeItemCount
-        NotebookLine(name: place.name, detail: count == 1 ? "1 thing" : "\(count) things")
+        NotebookLine(name: place.name, detail: String(localized: "\(count) things"))
             .padding(.vertical, 14).frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
             .contentShape(Rectangle())
@@ -204,7 +204,7 @@ struct ItemRow: View {
         HStack(spacing: 14) {
             IconTile(systemImage: "shippingbox", photo: item.photo, size: 48)
             VStack(alignment: .leading, spacing: 3) {
-                NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { "is in " + $0.path } ?? "No place yet", query: query)
+                NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { String(localized: "is in \($0.path)") } ?? String(localized: "No place yet"), query: query)
                 if item.isLent, let home = item.place { Text("Usually in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if store.hasSeveralHomes, let home = item.home, home != store.currentHome { Text("At \(home.name)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
@@ -302,14 +302,14 @@ struct ItemEditor: View {
                 if item == nil && name.split(separator: " ").count >= 3 && suggestion == nil {
                     Button("Split into name and place", systemImage: "wand.and.stars") {
                         suggestion = ItemSearch.suggestion(name, places: store.places.map { ($0.id, $0.path) })
-                        if suggestion == nil { error = "Try a sentence such as \u{201C}passport in the bedroom drawer\u{201D}. You'll see the suggestion before anything changes." }
+                        if suggestion == nil { error = String(localized: "Try a sentence such as \u{201C}passport in the bedroom drawer\u{201D}. You'll see the suggestion before anything changes.") }
                     }.font(.subheadline)
                 }
                 if item == nil {
                     if let suggestion {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Suggested name: \(suggestion.name)")
-                            Text(suggestion.placeID.flatMap { id in store.places.first { $0.id == id }?.path } ?? "Confirm a place: \(suggestion.unrecognizedPlace ?? "Unknown")")
+                            Text(suggestion.placeID.flatMap { id in store.places.first { $0.id == id }?.path } ?? String(localized: "Confirm a place: \(suggestion.unrecognizedPlace ?? String(localized: "Unknown"))"))
                             Button("Use suggestion") { name = suggestion.name; placeID = suggestion.placeID; self.suggestion = nil }
                         }
                     }
@@ -376,14 +376,14 @@ struct ItemEditor: View {
                 do {
                     guard let data = try await newValue.loadTransferable(type: Data.self), let image = UIImage(data: data) else { throw CocoaError(.fileReadCorruptFile) }
                     photo = PhotoResize.jpeg(image)
-                } catch { self.error = "Couldn't open that photo. Try another one." }
+                } catch { self.error = String(localized: "Couldn't open that photo. Try another one.") }
                 selectedPhoto = nil
             }
         }
         .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    static let freePlanFull = "Your free plan is full. Archive a thing or get Pro to add more."
+    static let freePlanFull = String(localized: "Your free plan is full. Archive a thing or get Pro to add more.")
 
     /// A quiet note when three or fewer things are left on the free plan.
     private var freeLeft: String? {
@@ -391,8 +391,8 @@ struct ItemEditor: View {
         let left = CreationKind.item.freeLimit - store.activeItemCount
         switch left {
         case ...0: return Self.freePlanFull
-        case 1: return "You can add 1 more thing for free."
-        case 2...3: return "You can add \(left) more things for free."
+        case 1: return String(localized: "You can add 1 more thing for free.")
+        case 2...3: return String(localized: "You can add \(left) more things for free.")
         default: return nil
         }
     }
@@ -446,14 +446,14 @@ struct ItemDetailView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)).accessibilityHidden(true)
                         }
                         FlowLayout(spacing: 8) {
-                            if item.archived { Stamp(text: "Archived") }
-                            else if item.isMissing { Stamp(text: "Missing", tone: .due) }
-                            else if item.isLent { Stamp(text: "With \(item.lentTo)", tone: .purple) }
-                            else if !item.packedTrips.isEmpty { Stamp(text: "Packed", tone: .due) }
-                            else { Stamp(text: "At home", tone: .done) }
+                            if item.archived { Stamp(text: String(localized: "Archived")) }
+                            else if item.isMissing { Stamp(text: String(localized: "Missing"), tone: .due) }
+                            else if item.isLent { Stamp(text: String(localized: "With \(item.lentTo)"), tone: .purple) }
+                            else if !item.packedTrips.isEmpty { Stamp(text: String(localized: "Packed"), tone: .due) }
+                            else { Stamp(text: String(localized: "At home"), tone: .done) }
                             // The canvas leads with the next date when one is close.
                             if let askBack = item.openAskBack, let days = DueLabel.days(until: askBack.day), days <= 30, let pill = DueLabel.pill(for: askBack.day) {
-                                Stamp(text: "Ask for it back · \(pill.0)", tone: pill.1)
+                                Stamp(text: String(localized: "Ask for it back · \(pill.0)"), tone: pill.1)
                             }
                         }
                         Text(item.name).font(.wbDisplay).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
@@ -496,7 +496,7 @@ struct ItemDetailView: View {
                                     }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.askAgain")
                                 }
                             } else if item.isMissing, !item.archived {
-                                Text("Missing since \(item.missingSince?.dayAndMonth ?? "recently").").font(.wbCaption).foregroundStyle(Theme.ink)
+                                Text("Missing since \(item.missingSince?.dayAndMonth ?? String(localized: "recently")).").font(.wbCaption).foregroundStyle(Theme.ink)
                                 Button("Found it") { finding = true }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
                             } else if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
                             if let foundNote { Label(foundNote, systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
@@ -533,7 +533,7 @@ struct ItemDetailView: View {
             } else { ContentUnavailableView("This thing was deleted", systemImage: "trash") }
         }
         .groundBackground()
-        .navigationTitle(available ? item.name : "Deleted").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(available ? item.name : String(localized: "Deleted")).navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if available {
                 if let sentence = item.whereItIsSentence {
@@ -578,7 +578,7 @@ struct ItemDetailView: View {
                 PlaceChooser(selection: Binding(get: { nil }, set: { id in
                     let place = store.places.first { $0.id == id }
                     do { try store.found(item, at: place); foundNote = Movement.foundSentence(place) } catch { self.error = error.localizedDescription }
-                }), noneTitle: "No place yet", suggested: store.foundSuggestions(for: item), title: "Where was it?", home: item.home)
+                }), noneTitle: String(localized: "No place yet"), suggested: store.foundSuggestions(for: item), title: String(localized: "Where was it?"), home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finding = false } } }
             }
         }

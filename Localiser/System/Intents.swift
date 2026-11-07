@@ -39,7 +39,7 @@ struct ThingEntity: AppEntity {
 
 extension ThingEntity {
     /// A private thing can still be asked for by name, but its place isn't shown.
-    @MainActor init(_ item: Belonging) { self.init(id: item.id, name: item.name, path: item.isPrivate ? "Private" : item.place?.path ?? "") }
+    @MainActor init(_ item: Belonging) { self.init(id: item.id, name: item.name, path: item.isPrivate ? String(localized: "Private") : item.place?.path ?? "") }
 }
 
 struct ThingQuery: EntityStringQuery {
@@ -109,14 +109,14 @@ struct FindThingIntent: AppIntent {
     }
 
     @MainActor static func answer(for item: Belonging) -> String {
-        if item.isPrivate { return "That one's private. Open Hereabouts to see it." }
+        if item.isPrivate { return String(localized: "That one's private. Open Hereabouts to see it.") }
         let path = item.place?.path
-        if item.archived { return path.map { "\(item.name) is archived. It was last in \($0)." } ?? "\(item.name) is archived." }
-        if item.isMissing { return path.map { "\(item.name) is marked missing. It was last in \($0)." } ?? "\(item.name) is marked missing." }
-        if item.isLent { return item.lentAt.map { "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide)))." } ?? "\(item.name) is with \(item.lentTo)." }
-        if let trip = item.packedTrips.first { return path.map { "\(item.name) is packed for \(trip.name). You keep it in \($0)." } ?? "\(item.name) is packed for \(trip.name)." }
-        guard let path else { return "You've saved \(item.name), but haven't added a place yet." }
-        return "\(item.name) is in \(path)."
+        if item.archived { return path.map { String(localized: "\(item.name) is archived. It was last in \($0).") } ?? String(localized: "\(item.name) is archived.") }
+        if item.isMissing { return path.map { String(localized: "\(item.name) is marked missing. It was last in \($0).") } ?? String(localized: "\(item.name) is marked missing.") }
+        if item.isLent { return item.lentAt.map { String(localized: "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide))).") } ?? String(localized: "\(item.name) is with \(item.lentTo).") }
+        if let trip = item.packedTrips.first { return path.map { String(localized: "\(item.name) is packed for \(trip.name). You keep it in \($0).") } ?? String(localized: "\(item.name) is packed for \(trip.name).") }
+        guard let path else { return String(localized: "You've saved \(item.name), but haven't added a place yet.") }
+        return String(localized: "\(item.name) is in \(path).")
     }
 }
 
@@ -136,7 +136,7 @@ struct AddThingIntent: AppIntent {
         guard pro.allows(.item, count: store.activeItemCount) else { throw HereaboutsIntentError.freeLimit }
         let chosen = place.flatMap { entity in store.places.first { $0.id == entity.id } }
         let item = try store.addItem(name: name, place: chosen)
-        return .result(dialog: IntentDialog(stringLiteral: chosen.map { "Written down: \(item.name), in \($0.path)." } ?? "Written down: \(item.name). Add a place in Hereabouts when you know it."))
+        return .result(dialog: IntentDialog(stringLiteral: chosen.map { String(localized: "Written down: \(item.name), in \($0.path).") } ?? String(localized: "Written down: \(item.name). Add a place in Hereabouts when you know it.")))
     }
 }
 
@@ -153,7 +153,7 @@ struct FoundThingIntent: AppIntent {
         guard let item = store.items.first(where: { $0.id == thing.id && !$0.isDeleted }) else { throw HereaboutsIntentError.notFound }
         let chosen = place.flatMap { entity in store.places.first { $0.id == entity.id } } ?? item.place
         try store.found(item, at: chosen)
-        return .result(dialog: IntentDialog(stringLiteral: item.isPrivate ? "Noted." : Movement.foundSentence(chosen)))
+        return .result(dialog: IntentDialog(stringLiteral: item.isPrivate ? String(localized: "Noted.") : Movement.foundSentence(chosen)))
     }
 }
 
