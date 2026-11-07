@@ -45,10 +45,14 @@ else fail "free kit limit is '${kits:-missing}', want $WANT_KITS (ProAccess.swif
 intended="$(yml_setting HEREABOUTS_APP_GROUP)"
 if [[ -n "$APP" ]]; then
     actual="$(plist_value "$APP/Info.plist" HereaboutsAppGroup)"
-    entitled="$(codesign -d --entitlements :- "$APP" 2>/dev/null | plutil -extract com.apple.security.application-groups xml1 -o - - 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | tr '\n' ' ' | sed 's/ $//')"
+    entitled="$(codesign -d --entitlements :- "$APP" 2>/dev/null | plutil -extract 'com\.apple\.security\.application-groups' xml1 -o - - 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | tr '\n' ' ' | sed 's/ $//')"
+    # Simulator builds keep their entitlements inside the binary, where codesign can't print them.
+    if [[ -z "$entitled" && "$(plist_value "$APP/Info.plist" DTPlatformName)" == "iphonesimulator" ]]; then
+        entitled="$(plutil -extract 'com\.apple\.security\.application-groups' xml1 -o - "$ROOT/Localiser/Localiser.entitlements" 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | tr '\n' ' ' | sed 's/ $//')"
+    fi
 else
     actual="$intended"
-    entitled="$(plutil -extract com.apple.security.application-groups xml1 -o - "$ROOT/Localiser/Localiser.entitlements" 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | tr '\n' ' ' | sed 's/ $//')"
+    entitled="$(plutil -extract 'com\.apple\.security\.application-groups' xml1 -o - "$ROOT/Localiser/Localiser.entitlements" 2>/dev/null | sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p' | tr '\n' ' ' | sed 's/ $//')"
 fi
 if [[ "$actual" == "$intended" && "$entitled" == "$intended" ]]; then
     pass "App Group is '${intended:-off}' as project.yml intends"

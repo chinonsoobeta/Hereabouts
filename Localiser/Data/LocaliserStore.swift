@@ -1,5 +1,6 @@
 import CoreData
 import Observation
+import WidgetKit
 
 enum LocaliserError: LocalizedError, Equatable {
     case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder
@@ -136,10 +137,15 @@ final class LocaliserStore {
         revision += 1
     }
 
+    /// The one place the widgets are told the notebook changed. The lent-out widget reads the notebook itself.
+    private func reloadWidgets() {
+        if isUserLibrary { WidgetCenter.shared.reloadTimelines(ofKind: LentOutRows.widgetKind) }
+    }
+
     func save(keepingUndo: Bool = false) throws {
         // Any other change closes the undo window, so Undo can only ever reverse the deletion.
         if !keepingUndo { forgetUndo() }
-        do { try context.save(); try refresh() }
+        do { try context.save(); try refresh(); reloadWidgets() }
         catch { context.rollback(); try? refresh(); throw error }
     }
 

@@ -15,7 +15,7 @@ import Speech
 
     /// Voice memos need a parser for the language. English only for now.
     nonisolated static func isAvailable(for locale: Locale = .current) -> Bool {
-        locale.language.languageCode == .english
+        WidgetButtons.voiceWorks(for: locale)
     }
 
     /// A stand-in transcript for UI tests: `--voice-transcript "the drill's in the garage"`.
