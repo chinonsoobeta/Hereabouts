@@ -1,0 +1,63 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Ask ${applicationName} where something is" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Ask ${applicationName} where something is",
+              "Where is ${thing} in ${applicationName}",
+              "Find ${thing} in ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Put something away in ${applicationName}" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Put something away in ${applicationName}",
+              "${applicationName} put away"
+            ]
+          }
+        }
+      }
+    },
+    "Tell ${applicationName} I found something" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Tell ${applicationName} I found something",
+              "I found ${thing} in ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Write something down in ${applicationName}" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Write something down in ${applicationName}",
+              "Add a thing to ${applicationName}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

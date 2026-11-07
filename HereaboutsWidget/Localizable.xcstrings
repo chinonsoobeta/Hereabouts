@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Find" : {
+
+    },
+    "Find a thing or say where you put it." : {
+
+    },
+    "Find and say where" : {
+
+    },
+    "Lent out" : {
+
+    },
+    "Nothing is lent out." : {
+
+    },
+    "Say where" : {
+
+    },
+    "See who has it, since when, and when to ask for it back." : {
+
+    },
+    "You'll see things you lend here." : {
+
+    }
+  },
+  "version" : "1.0"
+}
