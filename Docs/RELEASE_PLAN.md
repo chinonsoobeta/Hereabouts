@@ -314,6 +314,7 @@ These set what's true. Codex's pass then makes it read well.
 
 - [ ] **M43 Unit tests** on iOS 26.5 and iOS 27.0, recorded in `BUILD_STATUS.md`. · P, X1
 - [ ] **M44 All UI tests**, fixed until green. An accessibility-audit exemption only after checking the element by eye. · P
+  - *First pass, 7 November:* 17 tests, 0 failures in two runs in a row (the stocktake demo data and a timing wait in the several-things test). Still open for the second pass, after M41: tapping "Several things in this photo?" just as the photo picker closes can close the whole New thing sheet (`Find/FindView.swift:299`, the tap lands while focus moves to Name); and the lending test's contrast audit has failed now and then.
 - [ ] **M45 Fresh-install Release walkthrough** on an iOS 27 simulator with the local StoreKit file: skip the introduction, open the Settings tab, open Pro, add 15 things and check the 16th opens the paywall. Screenshots to `Docs/Verification`. · X1
 - [ ] **M46 Store screenshots.** Retake the set from M37 with the demo library on the iPhone 17 Pro Max simulator, including Pro. · P, X1
 - [x] **M47 Quality-check harness.** Fixtures and a scoring script for capture (now through the voice parser), search and speed, waiting for O40. · P, X1, D *Done 7 November with 10 stand-in sentences and 10 search pairs (10 of 10 and 9 of 10; "tnet" for Tent is a real miss). O40's examples replace them.*
