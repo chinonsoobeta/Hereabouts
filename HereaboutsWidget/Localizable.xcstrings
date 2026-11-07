@@ -9,6 +9,12 @@
             "value" : "A private thing"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un objeto privado"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -23,6 +29,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ask for it back %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedir que lo devuelvan el %@"
           }
         },
         "fr" : {
@@ -41,6 +53,12 @@
             "value" : "Drill"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taladro"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -55,6 +73,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Find"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar"
           }
         },
         "fr" : {
@@ -73,6 +97,12 @@
             "value" : "Find a thing or say where you put it."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca un objeto o di dónde lo pusiste."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -87,6 +117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Find and say where"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar y decir dónde"
           }
         },
         "fr" : {
@@ -105,6 +141,12 @@
             "value" : "Lent out"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prestados"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -119,6 +161,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing is lent out."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay nada prestado."
           }
         },
         "fr" : {
@@ -137,6 +185,12 @@
             "value" : "Say where"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decir dónde"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -151,6 +205,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "See who has it, since when, and when to ask for it back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira quién lo tiene, desde cuándo y cuándo pedir que lo devuelvan."
           }
         },
         "fr" : {
@@ -169,6 +229,12 @@
             "value" : "Since %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desde el %@"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -183,6 +249,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You'll see things you lend here."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquí verás las cosas que prestes."
           }
         },
         "fr" : {
