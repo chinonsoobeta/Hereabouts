@@ -131,6 +131,19 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(Rituals.tripsNeedingEveReminder(store.trips).map(\.id), [ahead.id])
     }
 
+    func testTripEveRemindersGoToTheNearestTrips() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let today = CalendarDay(.now)
+        let item = try store.addItem(name: "Goggles", place: nil)
+        let kit = try store.addKit(name: "Ski")
+        _ = try store.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
+        for offset in (2...7).reversed() {
+            _ = try store.addTrip(TripDetails(name: "In \(offset)", start: today.adding(days: offset)!, end: today.adding(days: offset + 2)!), kit: kit)
+        }
+        let reminded = Rituals.tripsNeedingEveReminder(store.trips).prefix(5).map(\.name)
+        XCTAssertEqual(reminded, ["In 2", "In 3", "In 4", "In 5", "In 6"])
+    }
+
     func testV5LibrariesMigrateAndBackfillLastConfirmed() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
