@@ -89,7 +89,7 @@ Nothing has been uploaded, published, purchased or sent to anyone.
 | Stage | Who | Items | Done when | Effort |
 | --- | --- | --- | --- | --- |
 | 0. Decisions | Owner | O1 to O7 | Each answer is written down in this conversation. O3 and O4 are answered | — |
-| 1. Build 1.0 | Mac, Codex (M41 only) | M1 to M47 and M63, in order | All merged. Unit tests pass on iOS 26.5 and 27.0, all UI tests pass, no warnings. The voice rule is decided | About 14.5 sessions, plus Codex's pass |
+| 1. Build 1.0 | Mac, Codex (M41 and M64 only) | M1 to M47 and M63, in order, then M64 last | All merged. Unit tests pass on iOS 26.5 and 27.0, all UI tests pass, no warnings. The voice rule is decided | About 14.5 sessions, plus Codex's pass |
 | 2. Business, identifiers, site | Owner | O8 to O19 | Paid Apps Agreement active, App Group registered, pages live | CRA and Apple checks take days |
 | 3. After those steps | Mac, then owner | M48 to M53, O20 to O33 | Signed device builds on both phones. The cut rule is decided | 1.5 sessions |
 | 4. Beta | Owner, then Mac | O34 to O44, M54 to M56 | A week of real use. The physical checks and the quality check pass | At least one week |
@@ -97,7 +97,7 @@ Nothing has been uploaded, published, purchased or sent to anyone.
 
 Stages 1 and 2 run side by side. Inside Stage 1, the cut and the Settings tab go first, because most later items touch the same screens. Each M item is its own local commit on `main`, with tests green (the owner agreed to local commits on 7 November; nothing is pushed), except Codex's pass, which uses its own branch (M41). Nothing is pushed or uploaded.
 
-Codex's usage is limited, so it does only the wording pass (M41) and the fixes from its review (M42), run once after the feature work is merged. Claude builders do every other M item (owner, 7 November).
+Codex's usage is limited, so it does only the wording pass (M41) and the fixes from its review (M42), run once after the feature work is merged, and one of the two adversarial audits at the very end (M64). The wording pass comes first if its usage runs short. Claude builders do every other M item (owner, 7 November).
 
 ## 4. Checklist A: owner-blocked
 
@@ -311,6 +311,21 @@ These set what's true. Codex's pass then makes it read well.
 - [ ] **M45 Fresh-install Release walkthrough** on an iOS 27 simulator with the local StoreKit file: skip the introduction, open the Settings tab, open Pro, add 15 things and check the 16th opens the paywall. Screenshots to `Docs/Verification`. · X1
 - [ ] **M46 Store screenshots.** Retake the set from M37 with the demo library on the iPhone 17 Pro Max simulator, including Pro. · P, X1
 - [ ] **M47 Quality-check harness.** Fixtures and a scoring script for capture (now through the voice parser), search and speed, waiting for O40. · P, X1, D
+
+### Stage 1, part I: adversarial audit (P0, the very last step, 2 sessions)
+
+- [ ] **M64 Two adversarial audits of the app's logic** (owner, 7 November), after everything else in Stage 1 is merged. Two auditors work separately and don't see each other's findings until both are done: I do one myself, and Codex (GPT 6.1 Sol, medium reasoning) does the other with the brief below. Each tries to break the code, not to review its style. Claude builders fix what's confirmed; I check each fix. If Codex's usage has run out, this half is recorded as blocked and discussed with the owner, not swapped for another auditor. · D
+  - **What counts as the app's logic** (there's no server): the notebook store and its model (`Data/`), backups, restore and automatic backups (`Recovery/`), the notebook move to the App Group (`NotebookFile`), Pro and the free limits (`Purchases/`), lending and reminders, trips, kits, the recap and stocktake (`Rituals/`, `Packing/`), Siri and Shortcuts (`System/Intents.swift`, `PutAwayIntent.swift`), links (`AppLinks.swift`), Spotlight, search, moving between homes, the voice parser, the widget and the Control Center buttons.
+  - **Each finding** comes with a failing test that proves it (or exact steps when a test can't), the file and line, what goes wrong for the person, and a severity: data loss or a privacy leak first, then a free limit that can be got round or a wrong answer, then a crash, then the rest. Fixes don't go into the audit branches.
+  - **Check:** every confirmed finding is fixed with its test kept, or recorded here as accepted with the reason; then the unit tests on iOS 26.5 and 27.0 and all UI tests run again and pass.
+
+**Brief for Codex (M64)**
+
+> You are auditing the Hereabouts iPhone app (SwiftUI, Swift 6, Core Data, StoreKit 2, App Intents; iOS 26 minimum). Work only in your worktree on a local branch `audit-codex`; never push, never upload, and don't fix anything. Your job is to break the app's logic and prove each break.
+>
+> **Try at least these:** malformed, truncated, huge or hostile backup files and shared files; a restore over a full notebook; crashes and kills mid-save, mid-move and mid-restore; the App Group move with a missing, damaged, short or stale copy; deleting or moving a place that has nested places, lent things, and trip or kit references; moving things between homes; every way to get past the free limits (15 things in total, 1 kit, 2 homes): Siri, Shortcuts, links, the widget, the Control Center buttons, voice, restore, moving between homes, undo, duplicates; Pro that lapses, is refunded or is shared by Family Sharing, and what a lapsed person can still see, edit and export; private things leaking through Siri, Spotlight, the widget, notifications, search, backups or logs; reminders across time zones, daylight saving, clock changes and months without the day; links with odd or hostile input; search and the voice parser with empty, very long, accented, emoji and right-to-left text; translated strings whose format specifiers don't match; concurrency between the app, the widget and the intents.
+>
+> **For each finding:** a failing XCTest in `LocaliserTests/Audit/` that proves it (or exact steps when a test can't), the file and line, what goes wrong for the person, and a severity: data loss or privacy leak; limit bypass or wrong answer; crash; other. Compile with `xcodebuild ... build-for-testing` (you can't run simulators; the auditor runs the tests). One commit per finding. Finish with `Docs/AUDIT_CODEX.md`: every finding, ranked, with its test's name. Don't write your model name anywhere.
 
 ### After an owner step
 
