@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// What the user calls the place this notebook describes. One home in 1.0; see the plan's 1.x row.
+/// The name of the current home, kept for onboarding and as a fallback. A notebook can hold several homes; see Data/Homes.swift.
 enum Home {
     static let nameKey = "homeName"
     static let defaultName = "Home"

@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 /// Puts item names, aliases and places in Spotlight so a search outside the app finds them.
 /// Only names and place paths are indexed; notes, photos and documents are not. Private things stay out.
 @MainActor enum Spotlight {
-    static let domain = "dev.localiser.items"
+    static let domain = "dev.hereabouts.items"
     private static var pending: Task<Void, Never>?
     private static var lastSignature = 0
 

@@ -57,6 +57,7 @@
 		AE2CA3E64FE2044260D54BF0 /* Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEF6DC9D14F261BA2BE55D1 /* Intents.swift */; };
 		AFCCE7204D1ED840AA374C37 /* AtkinsonHyperlegible-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FFF3BF64DC74A2A97580E8E /* AtkinsonHyperlegible-Italic.ttf */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
+		B42F800692ECF35B8454455B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */; };
 		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
 		C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A479972608E485C29556D57 /* LocaliserApp.swift */; };
@@ -143,6 +144,7 @@
 		2D3457C1DD9B16B068DE78F8 /* HomesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomesTests.swift; sourceTree = "<group>"; };
 		3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayTests.swift; sourceTree = "<group>"; };
 		3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
+		3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookFileTests.swift; sourceTree = "<group>"; };
 		3ECED7D62F188EA3BF86B26C /* Rituals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rituals.swift; sourceTree = "<group>"; };
 		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
@@ -427,6 +429,7 @@
 			children = (
 				840994DA311385611BD55A2F /* HereaboutsControls.swift */,
 				DB1A82975351814180D15AAE /* Info.plist */,
+				3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */,
 			);
 			path = HereaboutsControls;
 			sourceTree = "<group>";
@@ -439,6 +442,7 @@
 			buildConfigurationList = 05E5F4CD910F1FCADB0C5570 /* Build configuration list for PBXNativeTarget "HereaboutsControls" */;
 			buildPhases = (
 				B276E830EB55E43B8EA81A1B /* Sources */,
+				5976623B8CD001CC53F1C70E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -518,16 +522,16 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					1BF18B3DFC73F440343DC3BC = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = BRLCAAM57K;
 					};
 					679E7C83180DB5491E324FDC = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = BRLCAAM57K;
 					};
 					93FA7CA2C450B36166149B45 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = BRLCAAM57K;
 					};
 					F83E690651F319F1104F5837 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = BRLCAAM57K;
 						TestTargetID = 679E7C83180DB5491E324FDC;
 					};
 				};
@@ -560,6 +564,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				320D35A448C990008ED39806 /* Localiser.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5976623B8CD001CC53F1C70E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B42F800692ECF35B8454455B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -703,7 +715,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app.controls;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.app.controls;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HEREABOUTS_CONTROLS";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -745,7 +757,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BRLCAAM57K;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -786,13 +798,14 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.app;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -808,7 +821,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Localiser;
@@ -825,7 +838,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Localiser.app/Localiser";
@@ -867,7 +880,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BRLCAAM57K;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -911,7 +924,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Localiser.app/Localiser";
@@ -928,7 +941,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Localiser;
@@ -947,7 +960,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app.controls;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.app.controls;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HEREABOUTS_CONTROLS";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -968,13 +981,14 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.localiser.app;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hereabouts.app;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

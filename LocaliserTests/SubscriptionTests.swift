@@ -129,8 +129,8 @@ final class SubscriptionTests: XCTestCase {
     }
 
     func testPlansAndTrialReminder() throws {
-        XCTAssertEqual(ProPlan(productID: "dev.localiser.pro.yearly"), .yearly)
-        XCTAssertNil(ProPlan(productID: "dev.localiser.pro.weekly"))
+        XCTAssertEqual(ProPlan(productID: "dev.hereabouts.pro.yearly"), .yearly)
+        XCTAssertNil(ProPlan(productID: "dev.hereabouts.pro.weekly"))
         XCTAssertNil(ProPlan(productID: "other.pro.yearly"))
         var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!
         let now = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 10, day: 12, hour: 9)))

@@ -90,11 +90,12 @@ enum NotebookFile {
         let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
         let store = try coordinator.addPersistentStore(type: .sqlite, at: url, options: options)
         defer { try? coordinator.remove(store) }
+        let entityNames = model.entities.compactMap(\.name)
         let context = NSManagedObjectContext(.privateQueue)
         context.persistentStoreCoordinator = coordinator
         return try context.performAndWait {
             var result: [String: Int] = [:]
-            for name in model.entities.compactMap(\.name) {
+            for name in entityNames {
                 result[name] = try context.count(for: NSFetchRequest<NSManagedObject>(entityName: name))
             }
             let photos = NSFetchRequest<NSManagedObject>(entityName: "Belonging"); photos.predicate = NSPredicate(format: "photo != nil")

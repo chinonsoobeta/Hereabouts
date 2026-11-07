@@ -10,7 +10,7 @@ struct HereaboutsControls: WidgetBundle {
 
 struct PutAwayControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
-        StaticControlConfiguration(kind: "dev.localiser.app.controls.putaway") {
+        StaticControlConfiguration(kind: "dev.hereabouts.app.controls.putaway") {
             ControlWidgetButton(action: PutAwayIntent()) {
                 Label("Put away", systemImage: "tray.and.arrow.down")
             }

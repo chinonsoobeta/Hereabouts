@@ -7,7 +7,7 @@ settings:
   base:
     SWIFT_VERSION: '6.0'
     TARGETED_DEVICE_FAMILY: '1'
-    DEVELOPMENT_TEAM: ''
+    DEVELOPMENT_TEAM: BRLCAAM57K
     # Public website and support address. Replace once hereabouts.app (or another domain) is live.
     HEREABOUTS_SITE_URL: https://hereabouts.app
     HEREABOUTS_SUPPORT_EMAIL: support@hereabouts.app
@@ -47,17 +47,18 @@ targets:
             UIApplicationShortcutItemTitle: Put something away
             UIApplicationShortcutItemIconSymbolName: tray.and.arrow.down
         CFBundleURLTypes:
-          - CFBundleURLName: dev.localiser.app
+          - CFBundleURLName: dev.hereabouts.app
             CFBundleURLSchemes: [hereabouts]
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.localiser.app
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app
         TARGETED_DEVICE_FAMILY: '1'
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Hereabouts
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Hereabouts uses photos you pick to show what a thing looks like. Only the photos you choose are used.
         INFOPLIST_KEY_NSCameraUsageDescription: Hereabouts uses the camera when you take a photo of a thing or a shelf, or scan a box label. Photos stay on this iPhone.
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
@@ -83,7 +84,7 @@ targets:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.localiser.app.controls
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app.controls
         MARKETING_VERSION: '1.0'
         CURRENT_PROJECT_VERSION: '1'
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) HEREABOUTS_CONTROLS
@@ -96,7 +97,7 @@ targets:
       - target: Localiser
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.localiser.tests
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.tests
         GENERATE_INFOPLIST_FILE: YES
   LocaliserUITests:
     type: bundle.ui-testing
@@ -106,7 +107,7 @@ targets:
       - target: Localiser
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.localiser.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.uitests
         GENERATE_INFOPLIST_FILE: YES
 schemes:
   Localiser:

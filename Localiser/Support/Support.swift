@@ -22,7 +22,7 @@ enum Support {
     }
 
     /// A pre-filled feedback email with the app and system versions, and nothing from the library.
-    static func mail(subject: String, body: String = "") -> URL {
+    @MainActor static func mail(subject: String, body: String = "") -> URL {
         let device = "\n\n—\nHereabouts \(version) · iOS \(UIDevice.current.systemVersion)"
         var components = URLComponents()
         components.scheme = "mailto"
