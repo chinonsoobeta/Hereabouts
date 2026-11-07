@@ -16,25 +16,45 @@ struct LibrarySettingsView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(ProAccess.self) private var pro
     @Environment(ReminderService.self) private var reminders
-    @Environment(\.dismiss) private var dismiss
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @AppStorage(Rituals.recapKey) private var recapOn = true
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
 
+    private var coverageSummary: String {
+        switch reminders.permission {
+        case "Enabled", "Quiet delivery":
+            let count = reminders.scheduled.count
+            return count == 1 ? "1 reminder is queued on this iPhone." : "\(count) reminders are queued on this iPhone."
+        case "Disabled in Settings": return "Notifications are off for Hereabouts, so reminders can't reach you."
+        default: return "Turn on reminders so Hereabouts can tell you before a date passes."
+        }
+    }
+
     var body: some View {
         SheetList {
             Section {
-                NavigationLink { ProView(showsClose: false) } label: {
+                NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
                     NotebookLine(name: "Hereabouts Pro", detail: pro.standing?.summary ?? "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
                 }.accessibilityLabel("Hereabouts Pro").accessibilityValue(pro.standing?.summary ?? "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things")
             }
             Section {
-                NavigationLink { HomesView() } label: {
+                NavigationLink { HomesView().toolbarVisibility(.hidden, for: .tabBar) } label: {
                     NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename, or add another home")
                 }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
             Section {
+                Label { Text(coverageSummary).fixedSize(horizontal: false, vertical: true) } icon: {
+                    Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk)
+                }
+                if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
+                    if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue.").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+                } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
+                    Button("Open notification settings", systemImage: "bell.slash") { UIApplication.shared.open(url) }
+                } else {
+                    Button("Turn on reminders", systemImage: "bell.badge") { Task { await reminders.enable() } }
+                }
+                if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
                 Toggle("Show names in reminders", isOn: $showItemNames)
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
                 Toggle("Sunday recap", isOn: $recapOn)
@@ -44,13 +64,13 @@ struct LibrarySettingsView: View {
             } header: { Text("Reminders") }
               footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved thing” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {
-                NavigationLink("Take your notebook with you.") { LeavingView() }.accessibilityIdentifier("settings.leaving")
+                NavigationLink("Take your notebook with you.") { LeavingView().toolbarVisibility(.hidden, for: .tabBar) }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
                 Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
             } header: { Text("Privacy") }
             Section {
-                Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
+                Button("Show the introduction again", systemImage: "play.rectangle") { seenOnboarding = false }
                 Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
                 Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
@@ -60,7 +80,6 @@ struct LibrarySettingsView: View {
         }
         .listStyle(.plain)
         .font(.wbBody).tint(Theme.purpleInk).groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.fontWeight(.semibold) } }
     }
 }
 
@@ -211,18 +230,4 @@ struct BackupFilesView: View {
     private func toggle(_ id: UUID, title: String) -> some View {
         Toggle(title, isOn: Binding(get: { selectedFiles.contains(id) }, set: { if $0 { selectedFiles.insert(id) } else { selectedFiles.remove(id) } }))
     }
-}
-
-/// Gear button that opens Settings from any tab.
-private struct SettingsButton: ViewModifier {
-    @State private var open = false
-    func body(content: Content) -> some View {
-        content
-            .toolbar { ToolbarItem(placement: .topBarLeading) { Button("Settings", systemImage: "gear") { open = true } } }
-            .sheet(isPresented: $open) { NavigationStack { LibrarySettingsView() } }
-    }
-}
-
-extension View {
-    func settingsButton() -> some View { modifier(SettingsButton()) }
 }
