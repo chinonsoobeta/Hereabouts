@@ -78,7 +78,7 @@ struct RootView: View {
         .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {
-            OnboardingView { seenOnboarding = true }
+            OnboardingView { seenOnboarding = true }.environment(pro)
         }
         .task { await pro.observeTransactions() }
         .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }

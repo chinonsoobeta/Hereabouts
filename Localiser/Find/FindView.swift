@@ -426,12 +426,14 @@ struct ItemEditor: View {
         .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
+    static let freePlanFull = "The free plan is full. Archive something, or get Pro to keep adding."
+
     /// A quiet note when three or fewer things are left on the free plan.
     private var freeLeft: String? {
         guard item == nil, !pro.unlocked else { return nil }
         let left = CreationKind.item.freeLimit - store.activeItemCount
         switch left {
-        case ...0: return "The free plan is full. Archive something, or get Pro to keep adding."
+        case ...0: return Self.freePlanFull
         case 1: return "1 more thing fits on the free plan."
         case 2...3: return "\(left) more things fit on the free plan."
         default: return nil

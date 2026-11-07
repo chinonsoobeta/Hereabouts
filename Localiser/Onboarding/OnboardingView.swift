@@ -18,6 +18,7 @@ struct OnboardingView: View {
     var onFinish: () -> Void
     @Environment(LocaliserStore.self) private var store
     @Environment(ReminderService.self) private var reminders
+    @Environment(ProAccess.self) private var pro
     @AppStorage(Home.nameKey) private var homeName = ""
     @State private var page = 0
     @State private var thing = "Spare keys"
@@ -161,11 +162,18 @@ struct OnboardingView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Why the introduction can't write the thing down, or nil when it can.
+    static func refusal(rewriting: Bool, allowed: Bool) -> String? {
+        rewriting || allowed ? nil : ItemEditor.freePlanFull
+    }
+
     private func writeItDown() {
         focused = false
         let rewriting = written.map { $0.managedObjectContext != nil && !$0.isDeleted } ?? false
-        // Replaying the introduction never adds past the free allowance; the editor handles Pro.
-        guard rewriting || store.activeItemCount < CreationKind.item.freeLimit else { withAnimation { page = 2 }; return }
+        // Replaying the introduction never adds past the free allowance, and says why.
+        if let refusal = Self.refusal(rewriting: rewriting, allowed: pro.allows(.item, count: store.activeItemCount)) {
+            withAnimation { page = 2 }; error = refusal; return
+        }
         do {
             let roomName = room.trimmingCharacters(in: .whitespacesAndNewlines)
             var place: Place?
