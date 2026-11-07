@@ -22,6 +22,14 @@ final class AppLinkTests: XCTestCase {
         QuickActions.shared.link = nil
     }
 
+    func testWidgetButtonsOpenFindAndTheVoiceMemo() {
+        XCTAssertEqual(WidgetButtons.links(for: Locale(identifier: "en_US")).compactMap(AppLink.init(url:)), [.find, .say])
+        XCTAssertEqual(WidgetButtons.links(for: Locale(identifier: "en_GB")).compactMap(AppLink.init(url:)), [.find, .say])
+        XCTAssertEqual(WidgetButtons.links(for: Locale(identifier: "fr_FR")).compactMap(AppLink.init(url:)), [.find], "No voice, so Find alone")
+        XCTAssertEqual(WidgetButtons.find, AppLink.find.url)
+        XCTAssertEqual(WidgetButtons.say, AppLink.say.url)
+    }
+
     func testSendWhereItIs() throws {
         let store = try LocaliserStore(inMemory: true)
         let bowl = try store.addPlace(name: "Key bowl", parent: try store.addPlace(name: "Hall"))
