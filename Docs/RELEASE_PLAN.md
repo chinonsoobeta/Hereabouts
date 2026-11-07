@@ -346,7 +346,7 @@ These set what's true. Codex's pass then makes it read well.
 
 Blocked items found while building. Each waits for a talk with the owner.
 
-- **Pushing.** The repository has no remote, so there's nothing to push to. Everything is committed locally on `main`. Say where it should live (a private GitHub repository, for example) and I'll add the remote and push.
+- **Pushing.** Decided 7 November: everything stays local until the app is ready for submission. Then the owner creates a new Git repository, and I add it as the remote and push `main` with its history. Until then nothing is pushed.
 
 ## 6. Recommendations
 
