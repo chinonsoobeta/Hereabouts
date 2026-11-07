@@ -37,6 +37,7 @@ The words below are used the same way on every screen, in Siri answers, widgets,
 | lend / lent out | lend / lent out | prêter / prêtés | prestar / prestados | emprestar / emprestados |
 | ask for it back | ask for it back | le réclamer | pedir que lo devuelvan | pedir de volta |
 | I found it | I found it | Je l’ai trouvé | Lo encontré | Achei |
+| call off (a trip) | call off | renoncer à / abandonné | anular / anulado | desistir de / desistência |
 | lost | lost | perdu | perdido | perdido |
 | archive | archive | archiver | archivar | arquivar |
 | private | private | privé | privado | privado |
@@ -52,6 +53,8 @@ The words below are used the same way on every screen, in Siri answers, widgets,
 | Trips (tab) | Trips | Voyages | Viajes | Viagens |
 
 ## English (U.K.) spelling changes
+
+Call off a trip never uses the word on the system Cancel or Delete buttons.
 
 Acknowledgements, cancelled, licence (but SIL Open Font License, a proper name), any more, any time, towards, organiser (listing only). Demo names: My flat, Mum’s house, Hall cupboard.
 

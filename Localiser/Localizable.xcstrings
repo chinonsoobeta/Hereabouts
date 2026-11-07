@@ -4432,19 +4432,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar viaje"
+            "value" : "Anular viaje"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler le voyage"
+            "value" : "Renoncer au voyage"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar viagem"
+            "value" : "Desistir da viagem"
           }
         }
       }
@@ -4460,19 +4460,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Cancelar “%@”?"
+            "value" : "¿Anular “%@”?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler « %@ » ?"
+            "value" : "Renoncer à « %@ » ?"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar “%@”?"
+            "value" : "Desistir de “%@”?"
           }
         }
       }
@@ -4488,19 +4488,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelado"
+            "value" : "Anulado"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annulé"
+            "value" : "Abandonné"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelada"
+            "value" : "Desistência"
           }
         }
       }
@@ -19056,19 +19056,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelaste este viaje."
+            "value" : "Anulaste este viaje."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous avez annulé ce voyage."
+            "value" : "Vous avez renoncé à ce voyage."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você cancelou esta viagem."
+            "value" : "Você desistiu desta viagem."
           }
         }
       }
@@ -20616,19 +20616,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "cancelado"
+            "value" : "anulado"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "annulé"
+            "value" : "abandonné"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "cancelada"
+            "value" : "desistência"
           }
         }
       }
