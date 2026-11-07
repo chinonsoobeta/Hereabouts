@@ -61,38 +61,38 @@ struct OnboardingView: View {
     // MARK: Pages
 
     @ViewBuilder private var namePage: some View {
-        headline("This is your house's notebook.")
-        Text("Write down where things live. Ask it later. It stays on this phone and never needs an account.").font(.wbBody).foregroundStyle(Theme.ink)
-        Text("What shall we call home?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
-        underlinedField("The flat", text: $homeName).accessibilityLabel("What shall we call home?")
+        headline("Your notebook for things at home.")
+        Text("Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account.").font(.wbBody).foregroundStyle(Theme.ink)
+        Text("What do you call home?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
+        underlinedField("My apartment", text: $homeName).accessibilityLabel("What do you call home?")
             .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
-        suggestions(["The flat", "Home", "Mum's house", "The boat"], selected: homeName) { homeName = $0 }
+        suggestions(["My apartment", "Home", "Mom's house", "The boat"], selected: homeName) { homeName = $0 }
     }
 
     @ViewBuilder private var thingPage: some View {
-        headline("What do you always lose?")
-        Text("Pick one, or write your own. We'll put it on the first page.").font(.wbBody).foregroundStyle(Theme.ink)
+        headline("What do you often look for?")
+        Text("Choose a thing or type your own. Add it to your notebook.").font(.wbBody).foregroundStyle(Theme.ink)
         suggestions(["Spare keys", "Passport", "Charger", "Sunglasses", "The drill", "Tape measure"], selected: thing) { thing = $0 }
-        underlinedField("Spare keys", text: $thing).accessibilityLabel("Thing you always lose")
-        Text("Where does it live?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
-        underlinedField("Kitchen", text: $room).accessibilityLabel("Where does it live?")
+        underlinedField("Spare keys", text: $thing).accessibilityLabel("Thing you often look for")
+        Text("Where do you keep it?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
+        underlinedField("Kitchen", text: $room).accessibilityLabel("Where do you keep it?")
         Text("A room is enough. Shelves and drawers can come later.").font(.wbCaption).foregroundStyle(Theme.pencil)
     }
 
     @ViewBuilder private var nudgePage: some View {
-        headline("A nudge before it's too late.")
-        Text("Hereabouts only speaks up about your own things. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
+        headline("Reminders when you need them.")
+        Text("You only get reminders about your own things. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
         VStack(spacing: 0) {
-            nudge("Lent", "On the day you said you'd ask for it back")
+            nudge("Lent", "On the day you choose to ask for it back")
             nudge("Trip", "The evening before you leave, if something's unpacked")
-            nudge("Sunday", "One recap. What you added, what's lent out, what's drifting.")
+            nudge("Sunday", "What you added, lent out or haven't checked lately")
             nudge("Monthly", "Still there? A few quick questions on the first Saturday")
         }
         .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
         StickyNote {
             VStack(alignment: .leading, spacing: 6) {
                 Text("“Ask Sam for Drill back.”").font(.wbQuote).foregroundStyle(Theme.ink)
-                Text("How a reminder reads. Names can be hidden in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
+                Text("You can hide names in reminders in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
             }
         }
         Text("You can also ask Siri where things are.").font(.wbCaption).foregroundStyle(Theme.pencil)
@@ -105,7 +105,7 @@ struct OnboardingView: View {
                 focused = false; homeName = homeName.trimmingCharacters(in: .whitespacesAndNewlines)
                 if !homeName.isEmpty, let home = store.currentHome { try? store.renameHome(home, to: homeName) }
                 withAnimation { page = 1 }
-            } label: { wrapping("Open it") }
+            } label: { wrapping("Open your notebook") }
                 .buttonStyle(PrimaryButtonStyle())
             Text("You can rename it any time in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
         case 1:
@@ -114,7 +114,7 @@ struct OnboardingView: View {
             Button("I'll do this later") { focused = false; withAnimation { page = 2 } }
                 .font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
         default:
-            Button { Task { await reminders.enable(); onFinish() } } label: { wrapping("Turn on nudges") }
+            Button { Task { await reminders.enable(); onFinish() } } label: { wrapping("Turn on reminders") }
                 .buttonStyle(PrimaryButtonStyle())
             Button("Not now") { onFinish() }.font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
             Text("You can change this in Settings any time.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
