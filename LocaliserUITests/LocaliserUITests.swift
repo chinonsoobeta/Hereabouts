@@ -232,6 +232,50 @@ import XCTest
         XCTAssertEqual(switcher.value as? String, "Home")
     }
 
+    func testMovingAThingToAnotherHome() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-library", UUID().uuidString]
+        app.launch()
+        app.tabBars.buttons["Find"].tap()
+        app.buttons["Add a thing"].tap()
+        let field = app.textFields["item.name"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap(); field.typeText("Kettle")
+        app.buttons["item.save"].tap()
+        XCTAssertTrue(app.staticTexts["Kettle"].waitForExistence(timeout: 5))
+        app.staticTexts["Kettle"].tap()
+        app.buttons["More"].tap()
+        XCTAssertFalse(app.buttons["Move to another home"].exists, "One home has nowhere to move to")
+        app.typeKey(XCUIKeyboardKey.escape, modifierFlags: [])
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.buttons["Settings"].tap()
+        app.buttons["settings.homes"].tap()
+        app.buttons["home.add"].tap()
+        let homeName = app.alerts.textFields.firstMatch
+        XCTAssertTrue(homeName.waitForExistence(timeout: 5))
+        homeName.typeText("Mum's house")
+        app.alerts.buttons["Add"].tap()
+        XCTAssertTrue(app.staticTexts["Mum's house"].waitForExistence(timeout: 5))
+        app.navigationBars["Homes"].buttons["Settings"].tap()
+        app.buttons["Done"].tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Kettle")
+        app.staticTexts["Kettle"].firstMatch.tap()
+        XCTAssertEqual(app.staticTexts["item.home"].label, "Home")
+        app.buttons["More"].tap()
+        let move = app.buttons["Move to another home"]
+        XCTAssertTrue(move.waitForExistence(timeout: 5)); move.tap()
+        app.buttons["Mum's house"].firstMatch.tap()
+        let top = app.buttons["Top level"]
+        XCTAssertTrue(top.waitForExistence(timeout: 5))
+        try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        top.tap()
+        XCTAssertTrue(app.staticTexts["item.home"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["item.home"].label, "Mum's house")
+    }
+
     func testEmptyCopiesOfAPlaceCanBeTidiedUp() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
