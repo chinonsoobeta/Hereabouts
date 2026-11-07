@@ -23,9 +23,23 @@ final class SubscriptionTests: XCTestCase {
         }
     }
 
+    /// StoreKit remembers that an Apple Account used its intro offer for about 15 seconds after `clearTransactions()`
+    /// and `resetToDefaultState()` (measured on iOS 27; eligibility flipped back at 15.0 s every time). A trial test that runs
+    /// after a purchase test would otherwise see "no trial", so wait here until both plans report eligible again.
+    private func waitForTrialEligibility() async throws {
+        for _ in 0..<400 {
+            let products = try await Product.products(for: ProPlan.allCases.map(\.productID))
+            var eligible = !products.isEmpty
+            for product in products { if let subscription = product.subscription, await !subscription.isEligibleForIntroOffer { eligible = false } }
+            if eligible { return }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+    }
+
     func testTrialStartsThenLapseKeepsTheNotebook() async throws {
         let session = try session()
         defer { session.clearTransactions(); session.resetToDefaultState() }
+        try await waitForTrialEligibility()
         let pro = ProAccess()
         await pro.loadProduct(); await pro.refresh()
         XCTAssertEqual(Set(pro.products.keys), Set(ProPlan.allCases))
