@@ -63,7 +63,7 @@ struct ProView: View {
             }
             if let product = pro.product(plan) {
                 Button(buttonTitle(product)) { Task { await pro.purchase(plan) } }.buttonStyle(PrimaryButtonStyle()).disabled(pro.busy)
-                Text(ProPricing.terms(plan: plan, price: product.displayPrice, period: ProPricing.period(product), trial: pro.trialEligible))
+                Text(ProPricing.terms(plan: plan, price: product.displayPrice, period: ProPricing.period(product), trial: pro.trial(plan)))
                     .font(.wbCaption).foregroundStyle(Theme.pencil)
             }
         }
@@ -77,7 +77,7 @@ struct ProView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Text(option.name).font(.wbItem).foregroundStyle(Theme.ink)
-                        if option.isSubscription && pro.trialEligible { Stamp(text: "2 weeks free", tone: .purple) }
+                        if let trial = pro.trial(option) { Stamp(text: "\(trial) free", tone: .purple) }
                     }
                     Text(detail(option)).font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.leading)
                 }
@@ -108,7 +108,7 @@ struct ProView: View {
     private func buttonTitle(_ product: Product) -> String {
         switch plan {
         case .lifetime: "Buy once for \(product.displayPrice)"
-        default: pro.trialEligible ? "Try free for 2 weeks" : "Subscribe for \(product.displayPrice) \(ProPricing.period(product))"
+        default: pro.trial(plan).map { "Try free for \($0)" } ?? "Subscribe for \(product.displayPrice) \(ProPricing.period(product))"
         }
     }
 
@@ -132,6 +132,11 @@ enum ProPricing {
     static func period(_ product: Product) -> String {
         product.subscription?.subscriptionPeriod.unit == .month ? "a month" : "a year"
     }
+    /// "3 days", "2 weeks", "1 month": how long a free trial lasts.
+    static func trialLength(value: Int, unit: Product.SubscriptionPeriod.Unit) -> String {
+        let word = switch unit { case .day: "day"; case .week: "week"; case .month: "month"; case .year: "year"; @unknown default: "period" }
+        return "\(value) \(word)\(value == 1 ? "" : "s")"
+    }
     static func monthly(_ yearly: Decimal) -> Decimal {
         var result = Decimal(), value = yearly / 12
         NSDecimalRound(&result, &value, 2, .plain)
@@ -144,9 +149,9 @@ enum ProPricing {
         let percent = Int(((1 - NSDecimalNumber(decimal: yearly).doubleValue / year) * 100).rounded(.down))
         return percent > 0 ? percent : nil
     }
-    static func terms(plan: ProPlan, price: String, period: String, trial: Bool) -> String {
+    static func terms(plan: ProPlan, price: String, period: String, trial: String?) -> String {
         guard plan.isSubscription else { return "One payment, shared with your family. Nothing renews." }
-        let start = trial ? "Free for 2 weeks, then \(price) \(period)." : "\(price) \(period)."
+        let start = trial.map { "Free for \($0), then \(price) \(period)." } ?? "\(price) \(period)."
         return start + " Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews."
     }
 }

@@ -46,8 +46,12 @@ struct ProStanding: Equatable, Sendable {
     private(set) var standing: ProStanding?
     /// A subscription that has ended, so the Pro screen can say nothing was lost.
     private(set) var lapsed = false
-    /// Whether this Apple Account can still have the two-week trial.
-    private(set) var trialEligible = false
+    /// The free trial each subscription plan offers this Apple Account, as "2 weeks". A plan with no
+    /// trial, or one this account has used, is missing. Each plan is asked on its own.
+    private(set) var trials: [ProPlan: String] = [:]
+    /// Whether any plan still offers a trial.
+    var trialEligible: Bool { !trials.isEmpty }
+    func trial(_ plan: ProPlan) -> String? { trials[plan] }
     private(set) var products: [ProPlan: Product] = [:]
     /// Whether the App Store has answered at least once. Until then the Pro screen waits rather than saying Pro isn't for sale.
     private(set) var productChecked = false
@@ -80,8 +84,18 @@ struct ProStanding: Equatable, Sendable {
         unlocked = best != nil
         NotebookFile.sharedDefaults()?.set(unlocked, forKey: NotebookFile.proUnlockedKey)
         if best == nil { lapsed = await hadSubscription() } else { lapsed = false }
-        if let product = products[.yearly] ?? products[.monthly] { trialEligible = await product.subscription?.isEligibleForIntroOffer ?? false }
+        await checkTrials()
         TrialReminder.update(best)
+    }
+
+    private func checkTrials() async {
+        var found: [ProPlan: String] = [:]
+        for plan in ProPlan.allCases where plan.isSubscription {
+            guard let subscription = products[plan]?.subscription, let offer = subscription.introductoryOffer,
+                  offer.paymentMode == .freeTrial, await subscription.isEligibleForIntroOffer else { continue }
+            found[plan] = ProPricing.trialLength(value: offer.period.value * max(offer.periodCount, 1), unit: offer.period.unit)
+        }
+        trials = found
     }
 
     private func status(of transaction: Transaction) async -> Product.SubscriptionInfo.Status? {
@@ -116,7 +130,7 @@ struct ProStanding: Equatable, Sendable {
             // When the products are missing, the Pro screen says so itself.
             let loaded = try await Product.products(for: Self.productIDs)
             products = Dictionary(loaded.compactMap { product in ProPlan(productID: product.id).map { ($0, product) } }, uniquingKeysWith: { first, _ in first })
-            if let product = products[.yearly] ?? products[.monthly] { trialEligible = await product.subscription?.isEligibleForIntroOffer ?? false }
+            await checkTrials()
         } catch { message = error.localizedDescription }
     }
 
