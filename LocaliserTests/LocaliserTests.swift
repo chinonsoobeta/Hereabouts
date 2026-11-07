@@ -816,4 +816,13 @@ final class LocaliserTests: XCTestCase {
         XCTAssertNil(OnboardingView.refusal(rewriting: false, allowed: free.allows(.item, count: CreationKind.item.freeLimit - 1)))
         XCTAssertNil(OnboardingView.refusal(rewriting: false, allowed: true), "Pro allows any number")
     }
+
+    func testBothTypefaceLicencesLoadFromTheBundle() throws {
+        XCTAssertEqual(Typeface.all.map(\.name), ["Atkinson Hyperlegible", "Fraunces"])
+        for face in Typeface.all {
+            let text = try XCTUnwrap(face.licence(), "\(face.name) licence is missing from the bundle")
+            XCTAssertTrue(text.contains("SIL OPEN FONT LICENSE Version 1.1"), face.name)
+            XCTAssertTrue(face.copyright.hasPrefix("Copyright"), face.name)
+        }
+    }
 }
