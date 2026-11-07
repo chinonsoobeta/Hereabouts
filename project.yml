@@ -11,7 +11,7 @@ settings:
     # Public website and support address. Replace once hereabouts.app (or another domain) is live.
     HEREABOUTS_SITE_URL: https://hereabouts.app
     HEREABOUTS_SUPPORT_EMAIL: support@hereabouts.app
-    HEREABOUTS_FREE_THINGS: '20'
+    HEREABOUTS_FREE_THINGS: '15'
     # The App Group shared with the widget and share sheet. Empty until enrolment; the notebook stays put.
     HEREABOUTS_APP_GROUP: ''
 targets:
