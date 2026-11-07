@@ -77,8 +77,8 @@ final class ModelV7Tests: XCTestCase {
         XCTAssertEqual(restored.movements.first?.kind, item.movements.first?.kind)
     }
 
-    func testAskBackDatesAreNotOfferedAsAnOrdinaryKind() {
-        XCTAssertFalse(DeadlineKind.chosen.contains(.askBack))
+    func testAskBackIsTheOnlyKindOfDate() {
+        XCTAssertEqual(DeadlineKind.allCases, [.askBack])
         XCTAssertEqual(DeadlineKind.askBack.title, "Ask for it back")
     }
 }

@@ -55,7 +55,7 @@ struct LocaliserApp: App {
     }
 }
 
-enum AppTab: Hashable { case find, places, due, packing }
+enum AppTab: Hashable { case find, places, packing }
 
 struct RootView: View {
     @Environment(LocaliserStore.self) private var store
@@ -68,8 +68,6 @@ struct RootView: View {
         TabView(selection: $tab) {
             Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.places) { NavigationStack { PlacesView().settingsButton() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.due) { NavigationStack { DueView(opensReminders: true).settingsButton() } } label: { Label("Due", systemImage: "calendar").environment(\.symbolVariants, .none) }
-                .badge(reminders.coverageGap ? Text("!") : nil)
             Tab(value: AppTab.packing) { NavigationStack { PackingView().settingsButton() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
         }
         .tint(Theme.purpleInk)
@@ -82,7 +80,6 @@ struct RootView: View {
         }
         .task { await pro.observeTransactions() }
         .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }
-        .onChange(of: reminders.openedDeadline) { _, id in if id != nil { tab = .due } }
         .onChange(of: reminders.openedRitual) { _, ritual in
             switch ritual {
             case "trip": tab = .packing; reminders.openedRitual = nil
@@ -118,7 +115,6 @@ extension RootView {
         switch link {
         case .item(let id): store.openedItem = id
         case .place(let id): tab = .places; store.openedPlace = id
-        case .due: tab = .due
         case .find, .new, .putAway: tab = .find; store.findRequest = link
         }
     }

@@ -21,8 +21,8 @@ enum DemoLibrary {
         let drill = try store.addItem(name: "Cordless drill", place: rack)
         let goggles = try store.addItem(name: "Ski goggles", place: drawer)
         let layers = try store.addItem(name: "Base layers", place: drawer)
-        let shoes = try store.addItem(name: "Running shoes", place: hall)
-        let jacket = try store.addItem(name: "Rain jacket", place: hall)
+        try store.addItem(name: "Running shoes", place: hall)
+        try store.addItem(name: "Rain jacket", place: hall)
         let tires = try store.addItem(name: "Winter tires", place: backWall)
         // A believable week, as on the recap canvas. Most things were written down months ago and three this week.
         // The goggles moved to the garage this week and the passports were checked; a few things nobody has
@@ -37,9 +37,7 @@ enum DemoLibrary {
 
         let today = CalendarDay(.now)
         func day(_ offset: Int) -> CalendarDay { today.adding(days: offset) ?? today }
-        _ = try store.setDeadline(item: shoes, kind: .returns, day: day(2), source: "Sport Shop", leadDays: 3, hour: 9, enabled: true, confirmed: true)
-        _ = try store.setDeadline(item: jacket, kind: .returns, day: day(5), source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
-        _ = try store.setDeadline(item: passport, kind: .expiry, day: day(190), source: "", leadDays: 180, hour: 9, enabled: true, confirmed: true)
+        try store.lend(drill, to: "Sam", askBackOn: day(5))
 
         let kit = try store.addKit(name: "Ski trip")
         _ = try store.setKitEntry(kit: kit, name: "", item: goggles, unit: 1, perNight: false, condition: .always)

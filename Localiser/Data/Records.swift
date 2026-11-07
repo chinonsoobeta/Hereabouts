@@ -136,18 +136,11 @@ final class Deadline: NSManagedObject, Identifiable {
     var day: CalendarDay? { CalendarDay(stored: dayString) }
     var active: Bool {
         guard let item, !item.archived else { return false }
-        switch kind {
-        case .returns: return [.open, .returning].contains(decision)
-        case .askBack: return item.isLent && decision == .open
-        default: return true
-        }
+        return kind == .askBack && item.isLent && decision == .open
     }
-    var group: DueGroup { DueGroup.of(kind: kind, active: active, day: day, today: CalendarDay(.now)) }
-    /// Still asks for something: a date still to come, or a return whose day passed without a decision.
-    var needsAttention: Bool { group != .done }
     var reminderInput: ReminderInput? {
         guard let day, let kind, let decision else { return nil }
-        if kind == .askBack && !active { return nil }
+        guard active else { return nil }
         return ReminderInput(id: id, day: day, kind: kind, leadDays: Int(leadDays), hour: Int(hour), enabled: enabled, archived: item?.archived ?? true, decision: decision, itemName: item?.publicName ?? "", itemID: item?.id, person: item?.isPrivate == false ? item?.lentTo ?? "" : "")
     }
 }

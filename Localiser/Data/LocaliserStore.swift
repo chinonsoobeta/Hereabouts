@@ -2,7 +2,7 @@ import CoreData
 import Observation
 
 enum LocaliserError: LocalizedError, Equatable {
-    case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder, closedReturn
+    case nameRequired, placeCycle, occupiedPlace, schemaUnavailable, dateNotConfirmed, invalidReminder
     case invalidPackingEntry, invalidTripDates, packingConflict(String), incompleteDeparture, unresolvedHome
     case invalidBackup(String), libraryNotEmpty, tooLong(String, Int), homeNotEmpty, lastHome
     var errorDescription: String? {
@@ -14,7 +14,6 @@ enum LocaliserError: LocalizedError, Equatable {
         case .schemaUnavailable: "Hereabouts couldn't open your notebook. Nothing has been deleted."
         case .dateNotConfirmed: "Review and confirm the final date before saving it."
         case .invalidReminder: "Choose when to be reminded."
-        case .closedReturn: "Turn on Reopen return decision to change this date."
         case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
         case .invalidTripDates: "Come home on or after the day you leave."
         case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
@@ -257,25 +256,16 @@ final class LocaliserStore {
     }
 
     @discardableResult
-    func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil, reopen: Bool = false) throws -> Deadline {
+    func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil) throws -> Deadline {
         guard confirmed else { throw LocaliserError.dateNotConfirmed }
         guard (0...3650).contains(leadDays), (0...23).contains(hour) else { throw LocaliserError.invalidReminder }
-        if let existing, existing.kind == .returns, [.keeping, .returned].contains(existing.decision), !reopen { throw LocaliserError.closedReturn }
         let cleanSource = try limited(source, TextLimit.source, field: "Source or terms")
         let deadline = existing ?? (NSEntityDescription.insertNewObject(forEntityName: "Deadline", into: context) as! Deadline)
         if existing == nil { deadline.id = UUID(); deadline.decisionRaw = ReturnDecision.open.rawValue }
-        if reopen { deadline.decisionRaw = ReturnDecision.open.rawValue }
         deadline.item = item; deadline.kindRaw = kind.rawValue; deadline.dayString = day.stored
         deadline.source = cleanSource; deadline.leadDays = Int16(leadDays); deadline.hour = Int16(hour); deadline.enabled = enabled
         try save()
         return deadline
-    }
-
-    func decide(_ deadline: Deadline, _ decision: ReturnDecision) throws {
-        guard deadline.kind == .returns else { return }
-        deadline.decisionRaw = decision.rawValue
-        if decision == .returned { deadline.item?.archived = true }
-        try save()
     }
 
     func deleteDeadline(_ deadline: Deadline) throws { context.delete(deadline); try save() }

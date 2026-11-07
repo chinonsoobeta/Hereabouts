@@ -10,7 +10,6 @@ struct RecapView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @AppStorage(Rituals.recapReadKey) private var readWeek = ""
-    var seeDue: () -> Void = {}
     var startStocktake: () -> Void = {}
 
     var body: some View {
@@ -55,9 +54,6 @@ struct RecapView: View {
                     if recap.stocktakeCount > 0 {
                         Button { dismiss(); startStocktake() } label: { Text("Start the stocktake").fixedSize(horizontal: false, vertical: true) }.buttonStyle(PrimaryButtonStyle())
                     }
-                    if !recap.due.isEmpty {
-                        Button { dismiss(); seeDue() } label: { Text("See what's due").fixedSize(horizontal: false, vertical: true) }.buttonStyle(SoftButtonStyle())
-                    }
                 }.padding(.top, 8)
                 Text("Recaps can be turned off in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity)
             }
@@ -76,15 +72,7 @@ struct RecapView: View {
     }
 
     private func dueDetail(_ deadline: Deadline) -> String {
-        let verb: String
-        switch deadline.kind {
-        case .returns: verb = "Return by"
-        case .warranty: verb = "Warranty ends"
-        case .expiry: verb = "Expires"
-        case .askBack: verb = "Ask for it back"
-        case nil: verb = "Due"
-        }
-        return verb + " " + (deadline.day?.formatted ?? "")
+        "Ask for it back " + (deadline.day?.formatted ?? "")
     }
 
     private func keepingUpSentence(_ weeks: Int) -> String {

@@ -5,8 +5,8 @@ import XCTest
 final class AppLinkTests: XCTestCase {
     func testLinksRoundTrip() throws {
         let id = UUID()
-        for link in [AppLink.find, .new, .putAway, .due, .item(id)] { XCTAssertEqual(AppLink(url: link.url), link) }
-        XCTAssertEqual(AppLink(url: URL(string: "hereabouts://due")!), .due)
+        for link in [AppLink.find, .new, .putAway, .item(id)] { XCTAssertEqual(AppLink(url: link.url), link) }
+        XCTAssertNil(AppLink(url: URL(string: "hereabouts://due")!), "The Due page is gone")
         XCTAssertNil(AppLink(url: URL(string: "hereabouts://item/not-an-id")!))
         XCTAssertNil(AppLink(url: URL(string: "https://find")!))
         XCTAssertNil(AppLink(url: URL(string: "hereabouts://elsewhere")!))
@@ -15,9 +15,9 @@ final class AppLinkTests: XCTestCase {
     func testAppIconShortcutsAreFixedLinks() throws {
         let items = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: "UIApplicationShortcutItems") as? [[String: Any]])
         let links = items.compactMap { ($0["UIApplicationShortcutItemType"] as? String).flatMap(URL.init(string:)).flatMap(AppLink.init(url:)) }
-        XCTAssertEqual(links, [.find, .putAway, .due])
-        XCTAssertTrue(QuickActions.shared.handle(UIApplicationShortcutItem(type: "hereabouts://due", localizedTitle: "What's due")))
-        XCTAssertEqual(QuickActions.shared.link, .due)
+        XCTAssertEqual(links, [.find, .putAway])
+        XCTAssertTrue(QuickActions.shared.handle(UIApplicationShortcutItem(type: "hereabouts://putaway", localizedTitle: "Put something away")))
+        XCTAssertEqual(QuickActions.shared.link, .putAway)
         XCTAssertFalse(QuickActions.shared.handle(UIApplicationShortcutItem(type: "recent.thing", localizedTitle: "Passport")))
         QuickActions.shared.link = nil
     }

@@ -24,19 +24,16 @@ final class PrivateThingsTests: XCTestCase {
         XCTAssertEqual(ThingEntity(passport).path, "Private")
     }
 
-    func testRemindersCalendarAndSiriLeaveThePrivateNameOut() throws {
+    func testRemindersLeaveThePrivateNameOut() throws {
         let store = try LocaliserStore(inMemory: true)
         let ring = try store.addItem(name: "Ring", isPrivate: true)
         let day = try XCTUnwrap(CalendarDay(.now).adding(days: 3))
-        _ = try store.setDeadline(item: ring, kind: .warranty, day: day, source: "", leadDays: 1, hour: 9, enabled: true, confirmed: true)
+        try store.lend(ring, to: "Alex", askBackOn: day)
         let deadline = try XCTUnwrap(store.deadlines.first)
         let input = try XCTUnwrap(deadline.reminderInput)
-        XCTAssertEqual(input.itemName, "")
+        XCTAssertEqual(input.itemName, ""); XCTAssertEqual(input.person, "")
         let planned = try XCTUnwrap(ReminderPlan.candidates([input], now: .now).first)
-        XCTAssertTrue(planned.content(showingNames: true).body.hasPrefix("A saved thing"))
-        XCTAssertEqual(CalendarExport.plan(for: deadline)?.title, "Warranty ends")
-        let spoken = WhatsDueIntent.answer(for: store.deadlines)
-        XCTAssertFalse(spoken.contains("Ring"), spoken)
+        XCTAssertEqual(planned.content(showingNames: true).body, "Ask for something back.")
         XCTAssertTrue(store.inventoryCSV().contains("\"Ring\""), "Exports still include it")
         XCTAssertTrue(store.inventoryCSV().hasPrefix("\"id\",\"name\",\"home\",\"place\",\"notes\",\"other names\",\"archived\",\"private\""))
     }

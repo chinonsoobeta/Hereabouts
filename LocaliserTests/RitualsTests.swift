@@ -106,8 +106,10 @@ final class RitualsTests: XCTestCase {
         drifting.createdAt = calendar.date(byAdding: .year, value: -1, to: now)!
         try store.confirm(drifting, on: drifting.createdAt)
         let today = CalendarDay(now, calendar: calendar)
-        _ = try store.setDeadline(item: new, kind: .returns, day: today.adding(days: 3, calendar: calendar)!, source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
-        _ = try store.setDeadline(item: old, kind: .warranty, day: today.adding(days: 40, calendar: calendar)!, source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
+        // Lent out without a movement, so the week's counts stay as they are.
+        new.lentTo = "Sam"; old.lentTo = "Alex"
+        _ = try store.setDeadline(item: new, kind: .askBack, day: today.adding(days: 3, calendar: calendar)!, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true)
+        _ = try store.setDeadline(item: old, kind: .askBack, day: today.adding(days: 40, calendar: calendar)!, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true)
 
         let recap = Rituals.recap(items: store.items, deadlines: store.deadlines, now: now, calendar: calendar)
         XCTAssertEqual(recap.added, ["New lamp"])

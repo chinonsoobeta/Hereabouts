@@ -23,19 +23,6 @@ final class IntentsTests: XCTestCase {
         XCTAssertEqual(FindThingIntent.answer(for: loose), "Torch is archived.")
     }
 
-    func testWhatsDueReadsDatesAloud() throws {
-        let store = try LocaliserStore(inMemory: true)
-        let today = CalendarDay(.now)
-        XCTAssertEqual(WhatsDueIntent.answer(for: [], today: today), "Nothing is due in the next month.")
-        let kettle = try store.addItem(name: "Kettle")
-        try store.setDeadline(item: kettle, kind: .warranty, day: XCTUnwrap(today.adding(days: 1)), source: "", leadDays: 30, hour: 9, enabled: true, confirmed: true)
-        let shoes = try store.addItem(name: "Running shoes")
-        try store.setDeadline(item: shoes, kind: .returns, day: today, source: "", leadDays: 3, hour: 9, enabled: true, confirmed: true)
-        XCTAssertEqual(WhatsDueIntent.answer(for: store.deadlines, today: today), "Running shoes: last day to return is today. Kettle: warranty ends tomorrow.")
-        let later = try XCTUnwrap(today.adding(days: 9))
-        XCTAssertFalse(later.spoken(today: today).contains(later.formatted), "Spoken dates use whole words, not \"Sun 11 Oct\".")
-    }
-
     func testThingQueryMatchesNamesAndAliasesButNotArchived() async throws {
         let store = try LocaliserStore(inMemory: true)
         IntentLibrary.store = store

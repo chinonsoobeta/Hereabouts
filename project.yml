@@ -46,9 +46,6 @@ targets:
           - UIApplicationShortcutItemType: hereabouts://putaway
             UIApplicationShortcutItemTitle: Put something away
             UIApplicationShortcutItemIconSymbolName: tray.and.arrow.down
-          - UIApplicationShortcutItemType: hereabouts://due
-            UIApplicationShortcutItemTitle: What's due
-            UIApplicationShortcutItemIconSymbolName: calendar
         CFBundleURLTypes:
           - CFBundleURLName: dev.localiser.app
             CFBundleURLSchemes: [hereabouts]

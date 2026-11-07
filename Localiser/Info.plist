@@ -70,14 +70,6 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>hereabouts://putaway</string>
 		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>calendar</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>What's due</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>hereabouts://due</string>
-		</dict>
 	</array>
 </dict>
 </plist>

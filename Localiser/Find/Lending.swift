@@ -6,7 +6,7 @@ import CoreData
         items.filter { $0.isLent && !$0.archived && !$0.isDeleted }.sorted { ($0.lentAt ?? .distantPast) > ($1.lentAt ?? .distantPast) }
     }
 
-    /// The thing keeps its home; the movement says who has it. An ask-back day adds a date to Due.
+    /// The thing keeps its home; the movement says who has it. An ask-back day adds a reminder.
     @discardableResult
     func lend(_ item: Belonging, to person: String, askBackOn day: CalendarDay?, hour: Int = 9, on date: Date = .now) throws -> Deadline? {
         let who = try requiredName(person)
@@ -42,6 +42,12 @@ import CoreData
 }
 
 extension Belonging {
+    /// The ask-back date while it's lent out, if one was set.
+    var openAskBack: Deadline? {
+        guard isLent else { return nil }
+        return deadlines.first { $0.kind == .askBack && $0.decision == .open }
+    }
+
     /// "With Sam · since 3 Oct", for lists.
     var lentLine: String? {
         guard isLent else { return nil }

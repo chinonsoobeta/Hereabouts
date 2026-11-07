@@ -16,7 +16,7 @@ final class LendingTests: XCTestCase {
         XCTAssertEqual(drill.movements.first { $0.kind == .lent }?.summary, "Lent to Sam")
         XCTAssertEqual(deadline.kind, .askBack)
         XCTAssertTrue(deadline.active)
-        XCTAssertEqual(deadline.group, .later)
+        XCTAssertNotNil(deadline.reminderInput)
         XCTAssertTrue(drill.lentLine?.hasPrefix("With Sam · since ") == true)
         XCTAssertTrue(FindThingIntent.answer(for: drill).hasPrefix("Drill is with Sam, since "))
         XCTAssertEqual(ItemSearch.results(query: "sam", entries: store.searchIndex, archived: false).map(\.id), [drill.id])
@@ -27,16 +27,36 @@ final class LendingTests: XCTestCase {
         try store.gotBack(drill)
         XCTAssertFalse(drill.isLent)
         XCTAssertFalse(deadline.active)
-        XCTAssertEqual(deadline.group, .done)
         XCTAssertNil(deadline.reminderInput, "No reminder once it's back")
         XCTAssertEqual(drill.movements.first { $0.kind == .back }?.summary, "Back from Sam")
         XCTAssertTrue(store.lentItems.isEmpty)
     }
 
-    func testAnOverdueAskBackWaitsInMissed() throws {
+    func testSettingRemindingAndClearingAnAskBackDate() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let drill = try store.addItem(name: "Drill")
         let today = CalendarDay(.now)
-        XCTAssertEqual(DueGroup.of(kind: .askBack, active: true, day: today.adding(days: -2), today: today), .missed)
-        XCTAssertEqual(DueGroup.of(kind: .warranty, active: true, day: today.adding(days: -2), today: today), .done)
+        let askOn = try XCTUnwrap(today.adding(days: 3))
+        let deadline = try XCTUnwrap(store.lend(drill, to: "Sam", askBackOn: askOn, hour: 10))
+        XCTAssertEqual(drill.openAskBack, deadline)
+        var queued = ReminderPlan.candidates(store.deadlines.compactMap(\.reminderInput))
+        XCTAssertEqual(queued.count, 1, "One reminder, on the day")
+        XCTAssertEqual(queued.first?.deadlineID, deadline.id)
+        XCTAssertEqual(queued.first.map { CalendarDay($0.fireDate) }, askOn)
+        XCTAssertEqual(queued.first.map { Calendar.current.component(.hour, from: $0.fireDate) }, 10)
+        // Lending again moves the same date rather than adding another.
+        try store.lend(drill, to: "Sam", askBackOn: XCTUnwrap(today.adding(days: 5)))
+        XCTAssertEqual(store.deadlines.count, 1)
+        XCTAssertEqual(store.deadlines.first?.day, today.adding(days: 5))
+        // An overdue ask-back stays open until the thing comes back.
+        deadline.dayString = try XCTUnwrap(today.adding(days: -2)).stored
+        XCTAssertTrue(deadline.active)
+        try store.gotBack(drill)
+        XCTAssertNil(drill.openAskBack)
+        queued = ReminderPlan.candidates(store.deadlines.compactMap(\.reminderInput))
+        XCTAssertTrue(queued.isEmpty, "Cleared once it's back")
+        try store.deleteDeadline(deadline)
+        XCTAssertTrue(store.deadlines.isEmpty)
     }
 
     func testAskBackReminderWording() throws {

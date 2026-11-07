@@ -6,7 +6,7 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let image = XCTAttachment(screenshot: app.screenshot()); image.name = "Tab \(tab)"; image.lifetime = .keepAlways; add(image)
             try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
@@ -138,6 +138,14 @@ import XCTest
         let back = app.buttons["item.back"]
         XCTAssertTrue(back.waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["With Sam"].exists)
+        // The thing page shows when to ask for it back, and can push that a week.
+        let askBack = app.staticTexts["item.askBack"]
+        XCTAssertTrue(askBack.exists, app.debugDescription)
+        XCTAssertTrue(askBack.label.hasPrefix("Ask for it back · "), askBack.label)
+        let before = askBack.label
+        app.buttons["item.askAgain"].tap()
+        let moved = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label != %@", before), object: askBack)
+        XCTAssertEqual(XCTWaiter.wait(for: [moved], timeout: 5), .completed)
         back.tap()
         XCTAssertTrue(back.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Back from Sam"].exists, app.debugDescription)
@@ -237,7 +245,7 @@ import XCTest
         XCTAssertTrue(tidy.waitForNonExistence(timeout: 5))
     }
 
-    func testAppLinksOpenWritingDownAndDue() {
+    func testAppLinksOpenWritingDownAndPuttingAway() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString, "--demo-library"]
         app.launch()
@@ -250,9 +258,6 @@ import XCTest
         follow("hereabouts://new")
         XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), app.debugDescription)
         app.buttons["Cancel"].firstMatch.tap()
-        follow("hereabouts://due")
-        XCTAssertTrue(app.tabBars.buttons["Due"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.tabBars.buttons["Due"].isSelected, app.debugDescription)
         follow("hereabouts://putaway")
         XCTAssertTrue(app.buttons["item.save"].waitForExistence(timeout: 5), "Put away opens the capture screen, photo first")
     }
@@ -304,21 +309,6 @@ import XCTest
         app.launch()
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
-        // Store shots show reminders on, as a real user would have them. Turn them on before the first shot: until
-        // then the Due tab carries a warning badge on every screen.
-        app.tabBars.buttons["Due"].tap()
-        let turnOn = app.buttons["Turn on reminders"]
-        if turnOn.waitForExistence(timeout: 2) {
-            turnOn.tap()
-            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
-            if allow.waitForExistence(timeout: 5) { allow.tap() }
-            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
-        }
-        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
-        guard queued.waitForExistence(timeout: 5) else {
-            XCTFail("Notifications are off for Hereabouts on this simulator, so Due would show a warning. The name-only capture test turns them off. Uninstall Hereabouts from the simulator, then run this test on its own.")
-            return
-        }
         app.tabBars.buttons["Find"].tap()
         try shot("1-find")
         search.tap(); search.typeText("pass\n")
@@ -331,8 +321,6 @@ import XCTest
         app.staticTexts["Running shoes"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
         try shot("3-thing")
-        app.tabBars.buttons["Due"].tap()
-        try shot("4-due")
         app.tabBars.buttons["Trips"].tap()
         try shot("5-trips")
         app.tabBars.buttons["Find"].tap()
@@ -401,7 +389,7 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let screenshot = XCTAttachment(screenshot: app.screenshot())
             screenshot.name = "Contrast and clipping audit \(tab)"
@@ -428,12 +416,11 @@ import XCTest
         let app = XCUIApplication()
         app.launchArguments = ["--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Due", "Trips"] {
+        for tab in ["Find", "Places", "Trips"] {
             app.tabBars.buttons[tab].tap()
             let labels: [String]
             switch tab {
             case "Find": labels = ["Add your first thing"]
-            case "Due": labels = ["Remember in time", "Add a return, warranty or expiry date to a thing. Hereabouts reminds you before it passes."]
             case "Trips": labels = ["Make a checklist for a trip, tick things off as you pack, and put everything back where it lives when you're home."]
             default: labels = []
             }
@@ -533,58 +520,7 @@ import XCTest
         XCTAssertTrue(app.staticTexts[name].waitForExistence(timeout: 5))
         let screenshot = XCTAttachment(screenshot: app.screenshot()); screenshot.name = "Saved item"; screenshot.lifetime = .keepAlways; add(screenshot)
         app.staticTexts[name].tap()
-        reveal(app.buttons["Add date"], in: app)
-        app.buttons["Add date"].tap()
-        let save = app.buttons["deadline.save"]
-        XCTAssertTrue(save.waitForExistence(timeout: 5)); XCTAssertFalse(save.isEnabled)
-        let confirmationSwitch = app.switches["deadline.confirm"]
-        reveal(confirmationSwitch, in: app)
-        confirmationSwitch.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
-        XCTAssertEqual(confirmationSwitch.value as? String, "1")
-        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: save)
-        XCTAssertEqual(XCTWaiter.wait(for: [enabled], timeout: 5), .completed)
-        let confirmation = XCTAttachment(screenshot: app.screenshot()); confirmation.name = "Date after confirmation"; confirmation.lifetime = .keepAlways; add(confirmation)
-        save.tap()
-        XCTAssertTrue(save.waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Return by"].waitForExistence(timeout: 5))
-        // The reminders card only shows once there is an active date.
-        app.tabBars.buttons["Due"].tap()
-        let disabled = app.descendants(matching: .any).matching(identifier: "Open notification settings").firstMatch
-        let turnOn = app.buttons["Turn on reminders"]
-        // Turning notifications off can only be checked until something allows them. After the store screenshots
-        // have, reminders are queued and there is no warning to see.
-        let queued = app.staticTexts.containing(NSPredicate(format: "label ENDSWITH %@", "queued on this iPhone.")).firstMatch
-        if !queued.waitForExistence(timeout: 2) {
-            if !disabled.exists && turnOn.exists {
-                reveal(turnOn, in: app)
-                turnOn.tap()
-                let deny = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Don’t Allow"]
-                XCTAssertTrue(deny.waitForExistence(timeout: 5), app.debugDescription)
-                deny.tap()
-            }
-            reveal(disabled, in: app)
-            XCTAssertTrue(disabled.waitForExistence(timeout: 5))
-            let denied = XCTAttachment(screenshot: app.screenshot()); denied.name = "Notifications denied"; denied.lifetime = .keepAlways; add(denied)
-        }
-        app.tabBars.buttons["Find"].tap()
-        app.staticTexts["Return by"].tap()
-        reveal(app.buttons["Add to Calendar"], in: app)
-        app.buttons["Add to Calendar"].tap()
-        let calendarTitle = app.textFields.matching(NSPredicate(format: "identifier == %@ OR label == %@", "title-field", "Title")).firstMatch
-        XCTAssertTrue(calendarTitle.waitForExistence(timeout: 5), app.debugDescription)
-        XCTAssertEqual(calendarTitle.value as? String, "Return: \(name)")
-        let calendar = XCTAttachment(screenshot: app.screenshot()); calendar.name = "Calendar event preview"; calendar.lifetime = .keepAlways; add(calendar)
-        app.buttons["Cancel"].tap()
-        let discard = app.buttons["Discard Changes"]
-        if discard.waitForExistence(timeout: 2) { discard.tap() }
-        XCTAssertTrue(app.navigationBars["New Event"].waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Delete date"].firstMatch.exists || app.navigationBars[name].exists)
-        let deleteDate = app.buttons["Delete date"].firstMatch
-        for _ in 0..<5 { if deleteDate.isHittable { break }; app.swipeUp() }
-        XCTAssertTrue(deleteDate.isHittable); deleteDate.tap()
-        app.sheets.buttons["Delete date"].tap()
-        XCTAssertTrue(app.buttons["Add date"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["Return by"].exists)
+        XCTAssertFalse(app.buttons["Add date"].exists, "Things have no dates of their own")
         app.terminate(); app.launch()
         app.tabBars.buttons["Find"].tap()
         let search = app.searchFields.firstMatch
