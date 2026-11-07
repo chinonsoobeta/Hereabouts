@@ -89,7 +89,6 @@ final class LocaliserStore {
         context.transactionAuthor = Self.appAuthor
         try backfillConfirmation()
         try ensureHomes()
-        try removeCutDates()
         // A failed trim only costs disk space.
         if !inMemory { try? trimHistory() }
         try refresh()
@@ -114,17 +113,6 @@ final class LocaliserStore {
         try context.save()
     }
 
-    /// Return, warranty and expiry dates and receipt scans left Hereabouts in 1.0. The first launch after the
-    /// update deletes them from the notebook; ask-back dates stay. The ScanRecord entity stays in the model, empty.
-    func removeCutDates() throws {
-        let dates = NSFetchRequest<NSManagedObject>(entityName: "Deadline")
-        dates.predicate = NSPredicate(format: "kindRaw != %@", DeadlineKind.askBack.rawValue)
-        let removed = try context.fetch(dates) + context.fetch(NSFetchRequest<NSManagedObject>(entityName: "ScanRecord"))
-        guard !removed.isEmpty else { return }
-        for object in removed { context.delete(object) }
-        try context.save()
-    }
-
     /// The on-device library file. The name predates the Hereabouts rename and must not change.
     static func defaultStoreURL() throws -> URL {
         let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
@@ -138,7 +126,9 @@ final class LocaliserStore {
         items = try context.fetch(itemRequest)
         searchIndex = items.map(ItemSearch.Entry.init)
         places = try context.fetch(NSFetchRequest<Place>(entityName: "Place")).sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
-        deadlines = try context.fetch(NSFetchRequest<Deadline>(entityName: "Deadline")).sorted { $0.dayString < $1.dayString }
+        // Return, warranty and expiry dates from before 1.0 stay in the notebook and in backups, untouched, but
+        // nothing in the app shows or reminds about them.
+        deadlines = try context.fetch(NSFetchRequest<Deadline>(entityName: "Deadline")).filter { $0.kind == .askBack }.sorted { $0.dayString < $1.dayString }
         kits = try context.fetch(NSFetchRequest<Kit>(entityName: "Kit")).sorted { $0.name < $1.name }
         trips = try context.fetch(NSFetchRequest<TripRecord>(entityName: "TripRecord")).sorted { $0.startDay > $1.startDay }
         tripEntries = try context.fetch(NSFetchRequest<TripEntry>(entityName: "TripEntry"))

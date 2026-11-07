@@ -248,57 +248,49 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(LibraryBackup(records: []).contents, "An empty notebook")
     }
 
-    /// Writes the dates and scans 1.0 removed straight into the store, the way an older version left them.
-    private func addRemovedKinds(to store: LocaliserStore, item: Belonging) throws {
-        let day = try XCTUnwrap(CalendarDay(stored: "2030-01-01"))
-        for kind in ["returns", "warranty", "expiry"] {
-            let deadline = try store.setDeadline(item: item, kind: .askBack, day: day, source: "Old", leadDays: 0, hour: 9, enabled: true, confirmed: true)
-            deadline.setValue(kind, forKey: "kindRaw")
+    /// Writes a return date, a warranty date and a receipt scan straight into the store, the way a version
+    /// before 1.0 left them. Returns their ids.
+    @discardableResult
+    private func addOldRecords(to store: LocaliserStore, item: Belonging) throws -> [UUID] {
+        var ids: [UUID] = []
+        for (kind, decision) in [("returns", "keeping"), ("warranty", "open")] {
+            let deadline = NSEntityDescription.insertNewObject(forEntityName: "Deadline", into: store.context)
+            let id = UUID(); ids.append(id)
+            deadline.setValue(id, forKey: "id"); deadline.setValue(kind, forKey: "kindRaw"); deadline.setValue(decision, forKey: "decisionRaw")
+            deadline.setValue("2030-01-0\(ids.count)", forKey: "dayString"); deadline.setValue("Receipt line", forKey: "source")
+            deadline.setValue(Int16(3), forKey: "leadDays"); deadline.setValue(Int16(9), forKey: "hour")
+            deadline.setValue(true, forKey: "enabled"); deadline.setValue(item, forKey: "item")
         }
         let scan = NSEntityDescription.insertNewObject(forEntityName: "ScanRecord", into: store.context)
-        scan.setValue(UUID(), forKey: "id"); scan.setValue(Date.now, forKey: "createdAt"); scan.setValue(true, forKey: "counted")
-        scan.setValue("receipt.jpg", forKey: "filename"); scan.setValue("image/jpeg", forKey: "mime"); scan.setValue(Data([1]), forKey: "data")
+        let scanID = UUID(); ids.append(scanID)
+        scan.setValue(scanID, forKey: "id"); scan.setValue(Date.now, forKey: "createdAt"); scan.setValue(true, forKey: "counted")
+        scan.setValue("receipt.jpg", forKey: "filename"); scan.setValue("image/jpeg", forKey: "mime"); scan.setValue(Data([9, 8, 7]), forKey: "data")
         scan.setValue(item, forKey: "item")
         try store.context.save()
+        try store.refresh()
+        return ids
     }
 
-    func testOlderBackupWithRemovedDatesRestoresOnlyAskBack() throws {
-        let source = try LocaliserStore(inMemory: true)
-        let item = try source.addItem(name: "Drill")
-        let askBack = try source.lend(item, to: "Sam", askBackOn: CalendarDay(stored: "2030-02-01"))
-        try addRemovedKinds(to: source, item: item)
-        var file = try LibraryBackup.decoded(source.backup().encoded())
-        XCTAssertFalse(file.records.contains { $0.entity == "ScanRecord" }, "New backups skip scans")
-        // Put the scan and the old dates back, as a format 3 backup from before 1.0 would hold them.
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Deadline")
-        let old = try source.context.fetch(request).filter { ($0.value(forKey: "kindRaw") as? String) != "askBack" }
-        XCTAssertEqual(old.count, 3)
-        var records = file.records
-        for object in old where !records.contains(where: { $0.id == object.value(forKey: "id") as? UUID }) {
-            records.append(BackupRecord(id: object.value(forKey: "id") as! UUID, entity: "Deadline", attributes: ["kindRaw": .string(object.value(forKey: "kindRaw") as! String)], relationships: [:]))
+    private func rawRecords(_ store: LocaliserStore) throws -> [UUID: [String: String]] {
+        var out: [UUID: [String: String]] = [:]
+        for entity in ["Deadline", "ScanRecord"] {
+            for object in try store.context.fetch(NSFetchRequest<NSManagedObject>(entityName: entity)) {
+                let attributes = object.entity.attributesByName.keys.reduce(into: [String: String]()) { let value = object.value(forKey: $1); $0[$1] = (value as? Data)?.base64EncodedString() ?? String(describing: value ?? "nil") }
+                out[object.value(forKey: "id") as! UUID] = attributes
+            }
         }
-        let scanID = UUID()
-        records.append(BackupRecord(id: scanID, entity: "ScanRecord", attributes: ["filename": .string("receipt.jpg")], relationships: ["item": [item.id]]))
-        if let index = records.firstIndex(where: { $0.id == item.id }) { records[index].relationships["scans", default: []].append(scanID) }
-        file.records = records
-        XCTAssertEqual(file.records.filter { $0.entity == "Deadline" }.count, 4)
-        let restored = try LocaliserStore(inMemory: true)
-        try restored.restore(file)
-        XCTAssertEqual(restored.deadlines.map(\.kind), [.askBack])
-        XCTAssertEqual(restored.deadlines.first?.id, askBack?.id)
-        XCTAssertTrue(try restored.context.fetch(NSFetchRequest<NSManagedObject>(entityName: "ScanRecord")).isEmpty)
-        XCTAssertEqual(restored.items.first?.lentTo, "Sam")
+        return out
     }
 
-    func testFirstLaunchRemovesOldDatesAndScans() throws {
+    func testOldDatesAndScansStayButOnlyAskBackShows() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
         let url = directory.appendingPathComponent("test.sqlite")
         let store = try LocaliserStore(url: url)
         let item = try store.addItem(name: "Drill")
-        _ = try store.lend(item, to: "Sam", askBackOn: CalendarDay(stored: "2030-02-01"))
-        try addRemovedKinds(to: store, item: item)
-        XCTAssertEqual(try store.context.count(for: NSFetchRequest<NSManagedObject>(entityName: "Deadline")), 4)
+        let askBack = try XCTUnwrap(store.lend(item, to: "Sam", askBackOn: CalendarDay(stored: "2030-02-01"))).id
+        try addOldRecords(to: store, item: item)
+        let before = try rawRecords(store)
         for persistentStore in store.container.persistentStoreCoordinator.persistentStores {
             try? store.container.persistentStoreCoordinator.remove(persistentStore)
         }
@@ -308,10 +300,29 @@ final class LocaliserTests: XCTestCase {
                 try? reopened.container.persistentStoreCoordinator.remove(persistentStore)
             }
         }
-        let kinds = try reopened.context.fetch(NSFetchRequest<NSManagedObject>(entityName: "Deadline")).compactMap { $0.value(forKey: "kindRaw") as? String }
-        XCTAssertEqual(kinds, ["askBack"])
-        XCTAssertEqual(try reopened.context.count(for: NSFetchRequest<NSManagedObject>(entityName: "ScanRecord")), 0)
-        XCTAssertEqual(reopened.items.first?.lentTo, "Sam")
+        XCTAssertEqual(try rawRecords(reopened), before, "Opening the notebook leaves old dates and scans as they were")
+        XCTAssertEqual(reopened.deadlines.map(\.id), [askBack])
+        let opened = try XCTUnwrap(reopened.items.first)
+        XCTAssertEqual(opened.deadlines.count, 3)
+        XCTAssertEqual(opened.openAskBack?.id, askBack)
+        XCTAssertEqual(opened.deadlines.compactMap(\.reminderInput).map(\.id), [askBack], "Only the ask-back date gets a reminder")
+        let recap = Rituals.recap(items: reopened.items, deadlines: Array(opened.deadlines), now: try XCTUnwrap(CalendarDay(stored: "2030-01-30")?.date()))
+        XCTAssertEqual(recap.due.map(\.id), [askBack])
+        XCTAssertFalse(reopened.inventoryCSV().contains("2030-01-01"))
+    }
+
+    func testBackupKeepsOldDatesAndScansExactly() throws {
+        let source = try LocaliserStore(inMemory: true)
+        let item = try source.addItem(name: "Drill")
+        _ = try source.lend(item, to: "Sam", askBackOn: CalendarDay(stored: "2030-02-01"))
+        try addOldRecords(to: source, item: item)
+        let file = try LibraryBackup.decoded(source.backup(attachmentIDs: Set([item.id] + (try source.context.fetch(NSFetchRequest<NSManagedObject>(entityName: "ScanRecord")).map { $0.value(forKey: "id") as! UUID }))).encoded())
+        XCTAssertEqual(file.records.filter { $0.entity == "Deadline" }.count, 3)
+        XCTAssertEqual(file.records.filter { $0.entity == "ScanRecord" }.count, 1)
+        let restored = try LocaliserStore(inMemory: true)
+        try restored.restore(file)
+        XCTAssertEqual(try rawRecords(restored), try rawRecords(source))
+        XCTAssertEqual(restored.deadlines.count, 1)
     }
 
     func testLocalPersistenceAndContainerMove() throws {
