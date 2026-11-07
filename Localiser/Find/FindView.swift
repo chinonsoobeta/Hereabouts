@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import TipKit
+import AppIntents
 
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
@@ -15,6 +16,8 @@ struct FindView: View {
     @State private var ritual: Ritual?
     @State private var speaking = false
     @State private var spoken: NewThing?
+    @AppStorage(SiriTip.whereIs.key) private var whereIsTipDismissed = false
+    @AppStorage(SiriTip.writeDown.key) private var writeDownTipDismissed = false
 
     private var results: [Belonging] {
         _ = store.revision
@@ -27,6 +30,7 @@ struct FindView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
+                if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
                     LibraryEmptyState(title: "Nothing here yet", systemImage: "magnifyingglass", description: "The first thing is the hardest to lose.")
                     Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
@@ -113,6 +117,11 @@ struct FindView: View {
             ritual = opened
             reminders.openedRitual = nil
         }
+    }
+
+    @ViewBuilder private var siriTips: some View {
+        if !whereIsTipDismissed { SiriTipView(intent: FindThingIntent(), isVisible: Binding(get: { !whereIsTipDismissed }, set: { whereIsTipDismissed = !$0 })) }
+        if !writeDownTipDismissed { SiriTipView(intent: AddThingIntent(), isVisible: Binding(get: { !writeDownTipDismissed }, set: { writeDownTipDismissed = !$0 })) }
     }
 
     @ViewBuilder private var dashboard: some View {

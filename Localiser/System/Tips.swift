@@ -30,6 +30,23 @@ struct LeavingTip: Tip {
     var message: Text? { Text("When you tap I'm leaving, Hereabouts tells you if anything's still missing.") }
 }
 
+/// The Siri tips on the Find tab, one per phrase. Each is shown until it is dismissed, then stays gone.
+enum SiriTip: String, CaseIterable {
+    case whereIs, writeDown
+    var key: String { "siriTipDismissed." + rawValue }
+    func isShown(in defaults: UserDefaults = .standard) -> Bool { !defaults.bool(forKey: key) }
+    func dismiss(in defaults: UserDefaults = .standard) { defaults.set(true, forKey: key) }
+    /// UI tests of the screens themselves run without the system's tip view, whose own controls fail the accessibility audits.
+    static var hiddenForTesting: Bool {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        return arguments.contains("--ui-test-library") && !arguments.contains("--show-tips")
+        #else
+        return false
+        #endif
+    }
+}
+
 /// Tips read like a note stuck in the margin: lilac paper, a serif title, ink text and a plain close.
 struct NotebookTipStyle: TipViewStyle {
     func makeBody(configuration: Configuration) -> some View {
