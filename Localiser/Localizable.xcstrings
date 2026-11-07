@@ -9524,7 +9524,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les limites ne s’appliquent qu’à l’ajout. Si Pro se termine ou si vous êtes remboursé, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré."
+            "value" : "Les limites ne s’appliquent qu’à l’ajout. Si Pro se termine ou si vous obtenez un remboursement, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré."
           }
         },
         "pt-BR" : {
@@ -12778,13 +12778,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Achat annulé. Vous n’avez pas été facturé."
+            "value" : "Achat annulé. Aucun montant n’a été facturé."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compra cancelada. Você não foi cobrado."
+            "value" : "Compra cancelada. Nenhuma cobrança foi feita."
           }
         }
       }
@@ -19732,7 +19732,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você tem o Pro vitalício e uma assinatura que ainda renova. Cancele a assinatura para não ser cobrado de novo."
+            "value" : "Você tem o Pro vitalício e uma assinatura que ainda renova. Cancele a assinatura para evitar uma nova cobrança."
           }
         }
       }
@@ -19922,7 +19922,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous êtes régulier."
+            "value" : "Tout est à jour."
           }
         },
         "pt-BR" : {
@@ -19950,7 +19950,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous êtes régulier. Votre bilan du dimanche est prêt."
+            "value" : "Tout est à jour. Votre bilan du dimanche est prêt."
           }
         },
         "pt-BR" : {
