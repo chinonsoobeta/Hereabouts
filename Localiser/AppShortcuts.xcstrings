@@ -8,6 +8,12 @@
             "state" : "translated",
             "value" : "${applicationName} put away"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} ranger"
+          }
         }
       }
     },
@@ -17,6 +23,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add a thing to ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un objet à ${applicationName}"
           }
         }
       }
@@ -39,6 +51,12 @@
             "state" : "translated",
             "value" : "Ask ${applicationName} where something is"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demander à ${applicationName} où est quelque chose"
+          }
         }
       }
     },
@@ -49,6 +67,12 @@
             "state" : "translated",
             "value" : "Find ${thing} in ${applicationName}"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chercher ${thing} dans ${applicationName}"
+          }
         }
       }
     },
@@ -58,6 +82,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I found ${thing} in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J’ai trouvé ${thing} dans ${applicationName}"
           }
         }
       }
@@ -79,6 +109,12 @@
             "state" : "translated",
             "value" : "Put something away in ${applicationName}"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranger quelque chose dans ${applicationName}"
+          }
         }
       }
     },
@@ -99,6 +135,12 @@
             "state" : "translated",
             "value" : "Tell ${applicationName} I found something"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dire à ${applicationName} que j’ai trouvé quelque chose"
+          }
         }
       }
     },
@@ -108,6 +150,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Where is ${thing} in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où est ${thing} dans ${applicationName}"
           }
         }
       }
@@ -128,6 +176,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Write something down in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter quelque chose dans ${applicationName}"
           }
         }
       }

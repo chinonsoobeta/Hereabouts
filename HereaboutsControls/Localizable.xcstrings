@@ -8,6 +8,12 @@
             "state" : "translated",
             "value" : "Open the camera in Hereabouts."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrez l’appareil photo dans Hereabouts."
+          }
         }
       }
     },
@@ -17,6 +23,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Put away"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranger"
           }
         }
       }
@@ -28,6 +40,12 @@
             "state" : "translated",
             "value" : "Put something away"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranger quelque chose"
+          }
         }
       }
     },
@@ -37,6 +55,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Take a photo to write down a thing and its place."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prenez une photo pour noter un objet et son endroit."
           }
         }
       }

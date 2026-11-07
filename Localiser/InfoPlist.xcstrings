@@ -16,6 +16,12 @@
             "state" : "translated",
             "value" : "Hereabouts"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts"
+          }
         }
       }
     },
@@ -34,6 +40,12 @@
             "state" : "translated",
             "value" : "Localiser"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localiser"
+          }
         }
       }
     },
@@ -43,6 +55,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Find something"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chercher quelque chose"
           }
         }
       }
@@ -62,6 +80,12 @@
             "state" : "translated",
             "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez photographier un objet ou une étagère, ou scanner l’étiquette d’une boîte. Vos photos restent sur cet iPhone."
+          }
         }
       }
     },
@@ -79,6 +103,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez le micro pour dire où vous rangez un objet. Maintenez pour parler, ou touchez pour commencer et arrêter. Rien n’est enregistré."
           }
         }
       }
@@ -98,6 +128,12 @@
             "state" : "translated",
             "value" : "You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ajouter une photo pour montrer à quoi ressemble un objet. Hereabouts n’utilise que les photos que vous choisissez."
+          }
         }
       }
     },
@@ -107,6 +143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Put something away"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ranger quelque chose"
           }
         }
       }
