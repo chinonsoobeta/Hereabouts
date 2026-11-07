@@ -64,6 +64,7 @@
 		B00FDD89F85E125E5F236A48 /* CalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00E62D2E12D0066C7C1F5041 /* CalendarExport.swift */; };
 		B1A6C3A0B5E63D27D0D04860 /* OrderEmailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E6D84793073270F992B600 /* OrderEmailTests.swift */; };
 		B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ABAF971C1D21D1CB3CC58B8 /* LibraryBackup.swift */; };
+		B42F800692ECF35B8454455B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */; };
 		B754AD53D59525B91CCAE9E7 /* UndoDeletionToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */; };
 		BC4ABA3F53F2F8162E41A4DC /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153312694358421F11F17E69 /* Search.swift */; };
 		C2297898A3530AD2E1B6CD43 /* LocaliserApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A479972608E485C29556D57 /* LocaliserApp.swift */; };
@@ -152,6 +153,7 @@
 		3454E0FE4E17934414A7B5D7 /* PutAwayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PutAwayTests.swift; sourceTree = "<group>"; };
 		3D599B749E6C80DB4D877182 /* Fraunces-Italic[SOFT,WONK,opsz,wght].ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf"; sourceTree = "<group>"; };
 		3D996B5E908CAAEA38BE946D /* OrderEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderEmail.swift; sourceTree = "<group>"; };
+		3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookFileTests.swift; sourceTree = "<group>"; };
 		3ECED7D62F188EA3BF86B26C /* Rituals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rituals.swift; sourceTree = "<group>"; };
 		427E0752B779DA0F309E3F55 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
@@ -456,6 +458,7 @@
 			children = (
 				840994DA311385611BD55A2F /* HereaboutsControls.swift */,
 				DB1A82975351814180D15AAE /* Info.plist */,
+				3DDDC53C471CDD95EA179A0F /* PrivacyInfo.xcprivacy */,
 			);
 			path = HereaboutsControls;
 			sourceTree = "<group>";
@@ -468,6 +471,7 @@
 			buildConfigurationList = 05E5F4CD910F1FCADB0C5570 /* Build configuration list for PBXNativeTarget "HereaboutsControls" */;
 			buildPhases = (
 				B276E830EB55E43B8EA81A1B /* Sources */,
+				5976623B8CD001CC53F1C70E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -589,6 +593,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				320D35A448C990008ED39806 /* Localiser.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5976623B8CD001CC53F1C70E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B42F800692ECF35B8454455B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
