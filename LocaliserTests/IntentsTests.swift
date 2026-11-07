@@ -54,7 +54,7 @@ final class IntentsTests: XCTestCase {
         let garage = try store.addPlace(name: "Garage")
         let intent = AddThingIntent()
         intent.name = "Drill"
-        intent.place = PlaceEntity(id: garage.id, path: garage.path)
+        intent.place = PlaceEntity(garage, severalHomes: false)
         _ = try await intent.perform()
         XCTAssertEqual(store.items.first?.name, "Drill")
         XCTAssertEqual(store.items.first?.place?.id, garage.id)
@@ -88,4 +88,14 @@ final class IntentsTests: XCTestCase {
         XCTAssertEqual(FindThingIntent.answer(for: item), "That one's private. Open Hereabouts to see it.")
     }
 
+    func testPlaceChoicesNameTheHomeWhenThereAreSeveral() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let hall = try store.addPlace(name: "Hall")
+        XCTAssertEqual(PlaceEntity(hall, severalHomes: store.hasSeveralHomes).title, "Hall")
+        let boat = try store.addHome(name: "The boat")
+        let deck = try store.addPlace(name: "Deck", home: boat)
+        let entity = PlaceEntity(deck, severalHomes: store.hasSeveralHomes)
+        XCTAssertEqual(entity.title, "The boat · Deck")
+        XCTAssertEqual(entity.path, "Deck")
+    }
 }
