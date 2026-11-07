@@ -197,9 +197,13 @@ import XCTest
         XCTAssertTrue(picker.waitForNonExistence(timeout: 10))
         let several = app.buttons["item.several"]
         XCTAssertTrue(several.waitForExistence(timeout: 5), app.debugDescription)
+        // Choosing the photo puts the cursor in the name field a moment later. Tapping "several" while that is
+        // still settling closes the whole sheet, so wait for the cursor as a person would.
+        let focused = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hasKeyboardFocus == true"), object: app.textFields["item.name"])
+        XCTAssertEqual(XCTWaiter.wait(for: [focused], timeout: 5), .completed, app.debugDescription)
         several.tap()
         let save = app.buttons["shelf.save"]
-        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        XCTAssertTrue(save.waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.textFields["Tape measure"].waitForExistence(timeout: 5) || app.textFields.matching(NSPredicate(format: "value == 'Tape measure'")).firstMatch.exists, app.debugDescription)
         XCTAssertEqual(save.label, "Write down 3 things")
         app.switches["Include Tape measure"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
