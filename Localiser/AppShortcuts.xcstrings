@@ -20,6 +20,12 @@
             "state" : "translated",
             "value" : "${applicationName} ranger"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} guardar"
+          }
         }
       }
     },
@@ -41,6 +47,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un objet à ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar um objeto ao ${applicationName}"
           }
         }
       }
@@ -75,6 +87,12 @@
             "state" : "translated",
             "value" : "Demander à ${applicationName} où est quelque chose"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perguntar ao ${applicationName} onde está algo"
+          }
         }
       }
     },
@@ -97,6 +115,12 @@
             "state" : "translated",
             "value" : "Chercher ${thing} dans ${applicationName}"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar ${thing} no ${applicationName}"
+          }
         }
       }
     },
@@ -118,6 +142,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "J’ai trouvé ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achei ${thing} no ${applicationName}"
           }
         }
       }
@@ -151,6 +181,12 @@
             "state" : "translated",
             "value" : "Ranger quelque chose dans ${applicationName}"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar algo no ${applicationName}"
+          }
         }
       }
     },
@@ -183,6 +219,12 @@
             "state" : "translated",
             "value" : "Dire à ${applicationName} que j’ai trouvé quelque chose"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dizer ao ${applicationName} que achei algo"
+          }
         }
       }
     },
@@ -204,6 +246,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Où est ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onde está ${thing} no ${applicationName}"
           }
         }
       }
@@ -236,6 +284,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noter quelque chose dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anotar algo no ${applicationName}"
           }
         }
       }

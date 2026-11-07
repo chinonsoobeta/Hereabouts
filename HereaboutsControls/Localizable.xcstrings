@@ -20,6 +20,12 @@
             "state" : "translated",
             "value" : "Ouvrez l’appareil photo dans Hereabouts."
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre a câmera no Hereabouts."
+          }
         }
       }
     },
@@ -41,6 +47,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ranger"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
           }
         }
       }
@@ -64,6 +76,12 @@
             "state" : "translated",
             "value" : "Ranger quelque chose"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar algo"
+          }
         }
       }
     },
@@ -85,6 +103,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prenez une photo pour noter un objet et son endroit."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire uma foto para anotar um objeto e o lugar dele."
           }
         }
       }

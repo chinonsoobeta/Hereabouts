@@ -28,6 +28,12 @@
             "state" : "translated",
             "value" : "Hereabouts"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts"
+          }
         }
       }
     },
@@ -58,6 +64,12 @@
             "state" : "translated",
             "value" : "Localiser"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Localiser"
+          }
         }
       }
     },
@@ -79,6 +91,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chercher quelque chose"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar algo"
           }
         }
       }
@@ -110,6 +128,12 @@
             "state" : "translated",
             "value" : "Vous pouvez photographier un objet ou une étagère, ou scanner l’étiquette d’une boîte. Vos photos restent sur cet iPhone."
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você pode tirar uma foto de um objeto ou de uma prateleira, ou escanear a etiqueta de uma caixa. Suas fotos ficam neste iPhone."
+          }
         }
       }
     },
@@ -139,6 +163,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Utilisez le micro pour dire où vous rangez un objet. Maintenez pour parler, ou touchez pour commencer et arrêter. Rien n’est enregistré."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use o microfone para dizer onde guarda um objeto. Mantenha pressionado para falar, ou toque para começar e parar. Nada é gravado."
           }
         }
       }
@@ -170,6 +200,12 @@
             "state" : "translated",
             "value" : "Vous pouvez ajouter une photo pour montrer à quoi ressemble un objet. Hereabouts n’utilise que les photos que vous choisissez."
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você pode adicionar uma foto para mostrar como é um objeto. O Hereabouts usa apenas as fotos que você escolhe."
+          }
         }
       }
     },
@@ -191,6 +227,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ranger quelque chose"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar algo"
           }
         }
       }
