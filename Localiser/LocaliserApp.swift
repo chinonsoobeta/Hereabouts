@@ -144,7 +144,7 @@ struct StoreFailureView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Image(systemName: "externaldrive.badge.exclamationmark").font(.system(size: 44)).foregroundStyle(Theme.purple).accessibilityHidden(true)
                     Text("Hereabouts couldn't open your notebook").font(.wbTitle).foregroundStyle(Theme.ink)
-                    Text("Nothing has been deleted. Restarting your phone often fixes this. If it keeps happening, save a copy of the notebook file and send it to us.").font(.wbBody).foregroundStyle(Theme.secondary)
+                    Text("Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support.").font(.wbBody).foregroundStyle(Theme.secondary)
                     if let reason { Text(reason).font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
                     if !files.isEmpty {
                         ShareLink(items: files) { Label("Save the notebook file (photos stay on this iPhone)", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())

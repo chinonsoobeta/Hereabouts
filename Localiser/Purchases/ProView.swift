@@ -12,19 +12,19 @@ struct ProView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 Text("Hereabouts Pro").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
-                Text("No limit on what you write down.").font(.wbBody).foregroundStyle(Theme.pencil)
+                Text("Write down as many things as you need.").font(.wbBody).foregroundStyle(Theme.pencil)
                 VStack(spacing: 0) {
                     allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
                     allowance("Packing kits", free: CreationKind.kit.freeLimit.description)
                     allowance("Homes", free: CreationKind.home.freeLimit.description)
-                    NotebookLine(name: "Sharing with your household", detail: "Coming later", strongDetail: true).card()
+                    NotebookLine(name: "Share with your household", detail: "Coming later", strongDetail: true).card()
                     NotebookLine(name: "Everything else", detail: "Already free", strongDetail: true).card()
                 }
                 if let standing = pro.standing {
                     owned(standing)
                 } else {
                     if pro.lapsed {
-                        StickyNote { Text("Your subscription ended. Everything you wrote down is still here, and you can still find, change and export it.").font(.wbBody).foregroundStyle(Theme.ink) }
+                        StickyNote { Text("Your subscription ended. Everything you saved is still here. You can still find, edit and export it.").font(.wbBody).foregroundStyle(Theme.ink) }
                     }
                     choosing
                 }
@@ -32,10 +32,10 @@ struct ProView: View {
                 if pro.busy { ProgressView() }
                 if let message = pro.message { Text(message).font(.wbCaption).foregroundStyle(Theme.ink) }
                 StickyNote {
-                    Text("Reminders, backups, Siri and Spotlight are free for everyone. Pro only takes the limits off. If you never hit them, you never need it.")
+                    Text("Manual backups, reminders, Siri and Spotlight are free. Pro removes the limits and adds weekly backups.")
                         .font(.wbBody).foregroundStyle(Theme.ink)
                 }
-                Text("Limits only apply to adding new things. If Pro ends or a purchase is refunded, everything you've saved stays visible, editable and exportable.").font(.wbCaption).foregroundStyle(Theme.pencil)
+                Text("Limits only apply when you add things. If Pro ends or you get a refund, you can still see, edit and export everything you've saved.").font(.wbCaption).foregroundStyle(Theme.pencil)
                 FlowLayout(spacing: 18) {
                     Link("Privacy Policy", destination: Support.privacy).frame(minWidth: 44, minHeight: 44)
                     Link("Terms of Use", destination: Support.terms).frame(minWidth: 44, minHeight: 44)
@@ -150,9 +150,9 @@ enum ProPricing {
         return percent > 0 ? percent : nil
     }
     static func terms(plan: ProPlan, price: String, period: String, trial: String?) -> String {
-        guard plan.isSubscription else { return "One payment, shared with your family. Nothing renews." }
+        guard plan.isSubscription else { return "Pay once. Share with your family. No renewal." }
         let start = trial.map { "Free for \($0), then \(price) \(period)." } ?? "\(price) \(period)."
-        return start + " Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews."
+        return start + " Renews automatically until you cancel. Cancel in Settings at least a day before it renews."
     }
 }
 
@@ -160,7 +160,7 @@ extension ProStanding {
     /// "Pro, renews 12 Nov", "Free trial, ends 26 Oct", "Lifetime. Thank you."
     var summary: String {
         let shared = familyShared ? " Shared by your family." : ""
-        guard plan.isSubscription, let end = periodEnd else { return "Lifetime. Thank you." + shared }
+        guard plan.isSubscription, let end = periodEnd else { return "Lifetime Pro." + shared }
         let day = end.formatted(.dateTime.day().month(.abbreviated))
         if inTrial { return (willRenew ? "Free trial, ends \(day)" : "Free trial until \(day). It won't renew.") + shared }
         return (willRenew ? "Pro, renews \(day)" : "Pro until \(day). It won't renew.") + shared

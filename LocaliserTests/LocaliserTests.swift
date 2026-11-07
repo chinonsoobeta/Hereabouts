@@ -69,7 +69,7 @@ final class LocaliserTests: XCTestCase {
         session.askToBuyEnabled = true
         await pro.purchase()
         XCTAssertFalse(pro.unlocked)
-        XCTAssertEqual(pro.message, "Waiting for approval. Everything free still works.")
+        XCTAssertEqual(pro.message, "Waiting for approval. You can still use your free plan.")
     }
 
     func testBackupRoundTripPreservesFilesDatesHistoryAndPacking() throws {

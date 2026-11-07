@@ -129,23 +129,23 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertNil(ProPricing.saving(yearly: 40, monthly: 2.99))
         XCTAssertEqual(ProPricing.monthly(Decimal(string: "19.99")!), Decimal(string: "1.67")!)
         XCTAssertEqual(ProPricing.terms(plan: .yearly, price: "$19.99", period: "a year", trial: "2 weeks"),
-                       "Free for 2 weeks, then $19.99 a year. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
+                       "Free for 2 weeks, then $19.99 a year. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
         XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: nil),
-                       "$2.99 a month. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
+                       "$2.99 a month. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
         XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: "1 month"),
-                       "Free for 1 month, then $2.99 a month. Renews automatically until you cancel. Cancel any time in Settings, at least a day before it renews.")
+                       "Free for 1 month, then $2.99 a month. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
         XCTAssertEqual(ProPricing.trialLength(value: 2, unit: .week), "2 weeks")
         XCTAssertEqual(ProPricing.trialLength(value: 1, unit: .month), "1 month")
         XCTAssertEqual(ProPricing.trialLength(value: 3, unit: .day), "3 days")
-        XCTAssertEqual(ProPricing.terms(plan: .lifetime, price: "$49.99", period: "", trial: "2 weeks"), "One payment, shared with your family. Nothing renews.")
+        XCTAssertEqual(ProPricing.terms(plan: .lifetime, price: "$49.99", period: "", trial: "2 weeks"), "Pay once. Share with your family. No renewal.")
     }
 
     func testStandingSummaries() throws {
         var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
         let end = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 12)))
         let day = end.formatted(.dateTime.day().month(.abbreviated))
-        XCTAssertEqual(ProStanding(plan: .lifetime).summary, "Lifetime. Thank you.")
-        XCTAssertEqual(ProStanding(plan: .lifetime, familyShared: true).summary, "Lifetime. Thank you. Shared by your family.")
+        XCTAssertEqual(ProStanding(plan: .lifetime).summary, "Lifetime Pro.")
+        XCTAssertEqual(ProStanding(plan: .lifetime, familyShared: true).summary, "Lifetime Pro. Shared by your family.")
         XCTAssertEqual(ProStanding(plan: .yearly, periodEnd: end).summary, "Pro, renews \(day)")
         XCTAssertEqual(ProStanding(plan: .yearly, periodEnd: end, willRenew: false).summary, "Pro until \(day). It won't renew.")
         XCTAssertEqual(ProStanding(plan: .monthly, periodEnd: end, inTrial: true).summary, "Free trial, ends \(day)")

@@ -27,7 +27,7 @@ struct LibrarySettingsView: View {
         switch reminders.permission {
         case "Enabled", "Quiet delivery":
             let count = reminders.scheduled.count
-            return count == 1 ? "1 reminder is queued on this iPhone." : "\(count) reminders are queued on this iPhone."
+            return count == 1 ? "You have 1 reminder scheduled on this iPhone." : "You have \(count) reminders scheduled on this iPhone."
         case "Disabled in Settings": return "Notifications are off for Hereabouts, so reminders can't reach you."
         default: return "Turn on reminders so Hereabouts can tell you before a date passes."
         }
@@ -42,7 +42,7 @@ struct LibrarySettingsView: View {
             }
             Section {
                 NavigationLink { HomesView().toolbarVisibility(.hidden, for: .tabBar) } label: {
-                    NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename, or add another home")
+                    NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? "\(store.homes.count) homes" : "Rename or add a home")
                 }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
             Section {
@@ -50,7 +50,7 @@ struct LibrarySettingsView: View {
                     Image(systemName: reminders.coverageGap ? "bell.badge" : "bell").foregroundStyle(reminders.coverageGap ? Theme.warning : Theme.purpleInk)
                 }
                 if reminders.permission == "Enabled" || reminders.permission == "Quiet delivery" {
-                    if reminders.coverageGap { Text("Some reminders aren't queued yet because iPhone allows a limited number at once. Opening Hereabouts tops up the queue.").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+                    if reminders.coverageGap { Text("Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest.").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true) }
                 } else if reminders.permission == "Disabled in Settings", let url = URL(string: UIApplication.openSettingsURLString) {
                     Button("Open notification settings", systemImage: "bell.slash") { UIApplication.shared.open(url) }
                 } else {
@@ -61,14 +61,14 @@ struct LibrarySettingsView: View {
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
                 Toggle("Sunday recap", isOn: $recapOn)
                     .onChange(of: recapOn) { _, _ in reminders.refreshRituals(store) }
-                Toggle("Monthly stocktake", isOn: $stocktakeOn)
+                Toggle("Monthly check", isOn: $stocktakeOn)
                     .onChange(of: stocktakeOn) { _, _ in reminders.refreshRituals(store) }
             } header: { Text("Reminders") }
-              footer: { Text(showItemNames ? "Anyone who sees your lock screen can read the thing's name." : "Reminders say “A saved thing” instead of the name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
+              footer: { Text(showItemNames ? "Anyone who sees your Lock Screen can read the thing's name." : "Reminders won't show the thing's name.").font(.wbCaption).foregroundStyle(Theme.pencil) }
             Section {
                 if pro.unlocked {
                     Toggle("Automatic backups", isOn: $automaticBackups)
-                    Text(lastBackupTime > 0 ? "Last one \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "The first one is made soon after you open the app.")
+                    Text(lastBackupTime > 0 ? "Last backup \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "Your first backup is saved soon after you open the app.")
                         .font(.wbCaption).foregroundStyle(Theme.pencil)
                 } else {
                     NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
@@ -76,20 +76,20 @@ struct LibrarySettingsView: View {
                     }
                 }
             } header: { Text("Backups") }
-              footer: { if pro.unlocked { Text("Saved to iCloud Drive, or to this iPhone if iCloud Drive is off. The newest five are kept.").font(.wbCaption).foregroundStyle(Theme.pencil) } }
+              footer: { if pro.unlocked { Text("Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five.").font(.wbCaption).foregroundStyle(Theme.pencil) } }
             Section {
                 NavigationLink("Take your notebook with you.") { LeavingView().toolbarVisibility(.hidden, for: .tabBar) }.accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
-                Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
+                Label("Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics.", systemImage: "lock.shield")
             } header: { Text("Privacy") }
             Section {
                 Button("Show the introduction again", systemImage: "play.rectangle") { seenOnboarding = false }
                 Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
-                Link(destination: Support.privacy) { Label("Privacy policy", systemImage: "hand.raised") }
-                Link(destination: Support.terms) { Label("Terms of use", systemImage: "doc.plaintext") }
-                NavigationLink { AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar) } label: { Label("Acknowledgements", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
+                Link(destination: Support.privacy) { Label("Privacy Policy", systemImage: "hand.raised") }
+                Link(destination: Support.terms) { Label("Terms of Use", systemImage: "doc.plaintext") }
+                NavigationLink { AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar) } label: { Label("Acknowledgments", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
             } header: { Text("Help") }
             Section {} footer: { Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.pencil) }
         }
@@ -122,20 +122,20 @@ struct LeavingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Take your notebook with you.").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
-                Text("Nothing leaves this phone unless you carry it out. Every page is yours to keep, in a form you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
+                Text("Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
                 SectionHeading(title: "Keep a copy")
                 VStack(spacing: 0) {
                     Button { prepareBackup() } label: {
-                        optionLabel("Back up everything", "Places, things, dates, trips and the photos you choose. Restores into a fresh Hereabouts.", "arrow.down.doc")
+                        optionLabel("Back up everything", "Save places, things, dates, trips and photos you choose. Restore into a fresh Hereabouts.", "arrow.down.doc")
                     }.accessibilityLabel("Back up everything")
                     Button { prepareCSV() } label: {
-                        optionLabel("Export a spreadsheet", "A plain list of things and places. Opens in Numbers, Excel or anything else.", "tablecells")
+                        optionLabel("Export a spreadsheet", "Save a list of things and places. Open it in Numbers, Excel or another app.", "tablecells")
                     }.accessibilityLabel("Export a spreadsheet")
                     NavigationLink { BackupFilesView(selectedFiles: $selectedFiles) } label: {
                         optionLabel("Photos and documents to include", selectedFiles.isEmpty ? "None selected" : "\(selectedFiles.count) of \(retainedFileCount) selected", "photo.on.rectangle")
                     }.accessibilityLabel("Photos and documents to include")
                     Button { importing = true } label: {
-                        optionLabel("Restore from a backup", "Bring your notebook home from a saved copy.", "arrow.counterclockwise")
+                        optionLabel("Restore from a backup", "Restore your notebook from a saved copy.", "arrow.counterclockwise")
                     }.accessibilityLabel("Restore from a backup")
                 }.buttonStyle(.plain)
                 if !savedBackups.isEmpty {
@@ -143,25 +143,25 @@ struct LeavingView: View {
                     VStack(spacing: 0) {
                         ForEach(savedBackups) { backup in
                             Button { Task { await chooseSaved(backup) } } label: {
-                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this one.", "clock.arrow.circlepath")
+                                optionLabel(backup.date.formatted(date: .abbreviated, time: .shortened), "Restore this backup.", "clock.arrow.circlepath")
                             }.accessibilityLabel("Restore the backup from \(backup.date.formatted(date: .abbreviated, time: .shortened))")
                         }
                     }.buttonStyle(.plain)
                 }
-                Text("A backup holds your places, things, history, dates, kits and trips. Photos and documents are included only if you choose them. Backups aren't encrypted, so anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
+                Text("A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize(horizontal: false, vertical: true)
-                SectionHeading(title: "Then, if you like")
+                SectionHeading(title: "Erase your notebook")
                 Button(role: .destructive) { confirmErase = true } label: {
-                    optionLabel("Erase this notebook", "Wipes everything on this phone. We'll ask twice. Your backups stay wherever you put them.", "trash")
+                    optionLabel("Erase this notebook", "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them.", "trash")
                 }.buttonStyle(.plain).foregroundStyle(Theme.amber).accessibilityLabel("Erase this notebook")
                 if let notice { Label(notice, systemImage: "checkmark.circle").font(.wbBody).foregroundStyle(Theme.green) }
                 StickyNote {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("“If you ever come back, a backup brings everything home.”").font(.wbQuote)
-                        Text("No account was made, so there's nothing to close. Thanks for keeping a notebook.").font(.wbCaption)
+                        Text("You can restore your notebook from a backup if you come back.").font(.wbQuote)
+                        Text("You didn't create an account, so there's nothing to close.").font(.wbCaption)
                     }.foregroundStyle(Theme.ink)
                 }
-                Button("I'll stay a while") { dismiss() }.buttonStyle(SoftButtonStyle())
+                Button("Back to Settings") { dismiss() }.buttonStyle(SoftButtonStyle())
             }.padding(20)
         }
         .background(Theme.paper).navigationTitle("Leaving").navigationBarTitleDisplayMode(.inline)
@@ -196,7 +196,7 @@ struct LeavingView: View {
         }
         .confirmationDialog("Erase this notebook?", isPresented: $confirmErase, titleVisibility: .visible) {
             Button("Continue to erase", role: .destructive) { erasePhrase = ""; erasing = true }
-        } message: { Text("Wipes everything on this phone. We'll ask twice. Your backups stay wherever you put them.") }
+        } message: { Text("You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them.") }
         .alert("Erase this notebook?", isPresented: $erasing) {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
@@ -286,16 +286,16 @@ struct AcknowledgementsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("Hereabouts is set in two typefaces, both free to use under the SIL Open Font License.").font(.wbBody).foregroundStyle(Theme.ink)
+                Text("Hereabouts uses two fonts. Both are free to use under the SIL Open Font License.").font(.wbBody).foregroundStyle(Theme.ink)
                 ForEach(Typeface.all) { face in
                     VStack(alignment: .leading, spacing: 8) {
                         Text(face.name).font(.wbItem).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
                         Text(face.copyright).font(.wbCaption).foregroundStyle(Theme.pencil)
-                        Text(face.licence() ?? "The licence text isn't available.").font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
+                        Text(face.licence() ?? "The license text isn't available.").font(.wbCaption).foregroundStyle(Theme.ink).textSelection(.enabled)
                     }
                 }
             }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Theme.paper).navigationTitle("Acknowledgements").navigationBarTitleDisplayMode(.inline)
+        .background(Theme.paper).navigationTitle("Acknowledgments").navigationBarTitleDisplayMode(.inline)
     }
 }
