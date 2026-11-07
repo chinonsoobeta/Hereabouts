@@ -79,6 +79,45 @@ import CoreData
         XCTAssertNil(NotebookFile.appGroup, "Empty until enrolment")
     }
 
+    func testMissingDamagedAndShortCopiesKeepTheOriginal() throws {
+        for kind in ["missing", "damaged", "short"] {
+            for flagged in [false, true] {
+                let root = folder.appendingPathComponent("\(kind)-\(flagged)")
+                let legacy = root.appendingPathComponent("Old/Localiser.sqlite")
+                let group = root.appendingPathComponent("Group/Localiser.sqlite")
+                let defaults = ledger().defaults
+                do { let store = try LocaliserStore(url: legacy); try store.addItem(name: "Passport") }
+                try FileManager.default.createDirectory(at: group.deletingLastPathComponent(), withIntermediateDirectories: true)
+                if kind == "damaged" { try Data("not a database".utf8).write(to: group) }
+                if kind == "short" { _ = try LocaliserStore(url: group) }
+                defaults.set(flagged, forKey: NotebookFile.movedKey)
+                let label = "\(kind), flagged \(flagged)"
+                if flagged && kind != "short" {
+                    // The copy was in use and is now gone or damaged: back to the original, kept.
+                    XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), legacy, label)
+                } else if !flagged {
+                    // A leftover copy was never used, so it's replaced by a fresh, checked copy.
+                    XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group, label)
+                    XCTAssertEqual(try LocaliserStore(url: group).items.map(\.name), ["Passport"], label)
+                } else { continue }
+                XCTAssertTrue(FileManager.default.fileExists(atPath: legacy.path), label)
+                XCTAssertEqual(try LocaliserStore(url: legacy).items.map(\.name), ["Passport"], label)
+            }
+        }
+    }
+
+    func testChangesMadeInTheCopyAreKeptOnLaterLaunches() throws {
+        let legacy = folder.appendingPathComponent("Old/Localiser.sqlite")
+        let group = folder.appendingPathComponent("Group/Localiser.sqlite")
+        let defaults = ledger().defaults
+        do { let store = try LocaliserStore(url: legacy); try store.addItem(name: "Passport") }
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group)
+        do { let store = try LocaliserStore(url: group); try store.addItem(name: "Wallet") }
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group, "Different counts after use never send it back")
+        XCTAssertEqual(Set(try LocaliserStore(url: group).items.map(\.name)), ["Passport", "Wallet"])
+        XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group)
+    }
+
     func testHistoryIsTrimmedOnlyBehindEveryReader() {
         let ledger = ledger()
         let now = Date(timeIntervalSince1970: 2_000_000_000)
