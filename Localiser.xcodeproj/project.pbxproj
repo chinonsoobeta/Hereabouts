@@ -10,6 +10,7 @@
 		00F23149788730C9B46F3D62 /* ShelfPhotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F788F66EE415ADA29CD5FC /* ShelfPhotoTests.swift */; };
 		0C2D38C52E116788EF8CC193 /* VoiceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276117AD1674424E9142CC40 /* VoiceSheet.swift */; };
 		0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E822257E4E7F4DD2DD6454C /* Finding.swift */; };
+		11D83AE2104A48A89AA72550 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA49F8884CD7669CDEE53960 /* LocalizationTests.swift */; };
 		17A3067D0A104EFF1BCC30D7 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */; };
 		1B49871AFDAA83DEE0936687 /* PutAway.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5125DB3495BBECED9AFA8D3 /* PutAway.swift */; };
 		1E00789AD31D3C6550A6764C /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */; };
@@ -255,6 +256,7 @@
 		E4830CE7139FF6711AB1EFDA /* AppLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLinkTests.swift; sourceTree = "<group>"; };
 		E7163CC76A54BE1969E0D268 /* LentOutWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LentOutWidget.swift; sourceTree = "<group>"; };
 		E7820544499355832A71CE7A /* AppLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLinks.swift; sourceTree = "<group>"; };
+		EA49F8884CD7669CDEE53960 /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
 		EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV3.xcdatamodel; sourceTree = "<group>"; };
 		EFE72C59BE477B9747AE92EA /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
 		F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelV7Tests.swift; sourceTree = "<group>"; };
@@ -469,6 +471,7 @@
 				466D7845277C269C2276AA16 /* LentOutWidgetTests.swift */,
 				2C1A6852DB6BDC5169C88EB0 /* Localiser.storekit */,
 				F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */,
+				EA49F8884CD7669CDEE53960 /* LocalizationTests.swift */,
 				F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */,
 				3E61CE366D78538CBD2DA6CD /* NotebookFileTests.swift */,
 				879994C3A0BA5B7A3A03611D /* PrivateThingsTests.swift */,
@@ -682,6 +685,10 @@
 			knownRegions = (
 				Base,
 				en,
+				"en-GB",
+				es,
+				fr,
+				"pt-BR",
 			);
 			mainGroup = C9AE5FC5DE68511F2455EFA1;
 			minimizedProjectReferenceProxies = 1;
@@ -766,6 +773,7 @@
 				3B502E6540534A84813DEFBE /* LendingTests.swift in Sources */,
 				351132CECDAF61912E759308 /* LentOutWidgetTests.swift in Sources */,
 				F57A1FFA2D7FC3A25E20C853 /* LocaliserTests.swift in Sources */,
+				11D83AE2104A48A89AA72550 /* LocalizationTests.swift in Sources */,
 				7D9214EA3E29076C5677CEA3 /* ModelV7Tests.swift in Sources */,
 				D00D6178D45D745553B8D9F0 /* NotebookFileTests.swift in Sources */,
 				3B3641A5FC30798CB08D7DF4 /* PrivateThingsTests.swift in Sources */,
