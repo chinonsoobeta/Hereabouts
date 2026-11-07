@@ -63,6 +63,7 @@
 		8C0735201D95432946AEDD32 /* WidgetButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C16902FC2669FF699C9E6A /* WidgetButtons.swift */; };
 		8E221F011A35DF4EF41035F1 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427E0752B779DA0F309E3F55 /* Support.swift */; };
 		8F27FE0DCC702603D0BC0683 /* AutomaticBackups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D64221B0D22A30DCE198F2 /* AutomaticBackups.swift */; };
+		90F56494888DBDFF2973947E /* LanguageTourTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FF6349D25AAB6728C5DC4E /* LanguageTourTests.swift */; };
 		93702C0539BAF2917AD71B9C /* HereaboutsControls.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A645341D05015908431977CC /* HereaboutsControls.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		937F30CAC8E7F939809C03B9 /* quality-capture.json in Resources */ = {isa = PBXBuildFile; fileRef = BBC11CC38AB66FCF8CCBA32A /* quality-capture.json */; };
 		93A170C63D8339AC3420650A /* FindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A697438CB089D0830D4DC2 /* FindView.swift */; };
@@ -248,6 +249,7 @@
 		BDA7CB51BE2372853A56B223 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF170C8864C322B2EF738BC7 /* PackingRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingRecords.swift; sourceTree = "<group>"; };
 		CA7D97836786112962AB22C6 /* UndoDeletionToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UndoDeletionToast.swift; sourceTree = "<group>"; };
+		D3FF6349D25AAB6728C5DC4E /* LanguageTourTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTourTests.swift; sourceTree = "<group>"; };
 		DB1A82975351814180D15AAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DBCC79A8C661311C9C70A285 /* ProView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProView.swift; sourceTree = "<group>"; };
 		DD8870DF501521F78C26C26D /* ShelfPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfPhoto.swift; sourceTree = "<group>"; };
@@ -370,6 +372,7 @@
 		4D338B76994D0905C61DAEBB /* LocaliserUITests */ = {
 			isa = PBXGroup;
 			children = (
+				D3FF6349D25AAB6728C5DC4E /* LanguageTourTests.swift */,
 				8A961609BF5723FD7F58316C /* LocaliserUITests.swift */,
 			);
 			path = LocaliserUITests;
@@ -810,6 +813,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90F56494888DBDFF2973947E /* LanguageTourTests.swift in Sources */,
 				55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

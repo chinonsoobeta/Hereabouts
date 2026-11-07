@@ -32,13 +32,13 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 if page == 0 {
-                    Text("Hereabouts").font(.wbCaption).foregroundStyle(Theme.pencil)
+                    Text("Hereabouts").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize().layoutPriority(1)
                 } else {
                     Button { withAnimation { page -= 1 } } label: { Label("Back", systemImage: "chevron.left") }
                         .font(.wbBody).foregroundStyle(Theme.ink).frame(minHeight: 44)
                 }
                 Spacer()
-                Text("Page \(page + 1) of 3").font(.wbCaption).foregroundStyle(Theme.pencil)
+                Text("Page \(page + 1) of 3").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.trailing)
             }
             .padding(.horizontal, 24).padding(.top, 8)
             ScrollView {
