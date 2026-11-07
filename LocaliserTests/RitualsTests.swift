@@ -206,6 +206,16 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 25, 18), calendar: calendar), "2026-10-25")
     }
 
+    func testStocktakeLeavesLentThingsOut() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let now = date(2026, 10, 10)
+        let drill = try store.addItem(name: "Drill", place: nil)
+        let saw = try store.addItem(name: "Saw", place: nil)
+        try store.confirm(drill, on: date(2026, 1, 1)); try store.confirm(saw, on: date(2026, 1, 1))
+        drill.lentTo = "Sam"
+        XCTAssertEqual(Rituals.stale(store.items, now: now, calendar: calendar).map(\.name), ["Saw"])
+    }
+
     func testHomeNameReadsNaturallyMidSentence() {
         XCTAssertEqual("The flat".lowercasedFirstArticle, "the flat")
         XCTAssertEqual("Mum's house".lowercasedFirstArticle, "Mum's house")

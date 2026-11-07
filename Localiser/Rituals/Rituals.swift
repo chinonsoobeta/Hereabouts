@@ -51,7 +51,7 @@ enum Rituals {
 
     @MainActor static func stale(_ items: [Belonging], now: Date = .now, calendar: Calendar = .current) -> [Belonging] {
         guard let cutoff = calendar.date(byAdding: .month, value: -staleMonths, to: now) else { return [] }
-        return items.filter { !$0.archived && !$0.isDeleted && !$0.isMissing && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
+        return items.filter { !$0.archived && !$0.isDeleted && !$0.isMissing && !$0.isLent && $0.lastConfirmed < cutoff }.sorted { $0.lastConfirmed < $1.lastConfirmed }
     }
 
     /// Up to five things to ask about this month, oldest confirmation first.
