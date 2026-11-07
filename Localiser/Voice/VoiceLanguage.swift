@@ -39,6 +39,8 @@ struct VoiceLanguage: Sendable {
         articles: ["the", "a", "an", "my", "our", "your", "his", "her", "their", "its", "some", "that", "this", "these", "those"],
         possessive: "'s",
         singular: { word in
+            if word.count > 4, word.hasSuffix("ives") { return String(word.dropLast(3)) + "fe" }
+            if word.count > 4, word.hasSuffix("ves") { return String(word.dropLast(3)) + "f" }
             if word.count > 4, word.hasSuffix("ies") { return String(word.dropLast(3)) + "y" }
             if word.count > 4, ["ches", "shes", "sses", "xes", "zes"].contains(where: word.hasSuffix) { return String(word.dropLast(2)) }
             if word.count > 3, word.hasSuffix("s"), !word.hasSuffix("ss"), !word.hasSuffix("us") { return String(word.dropLast()) }

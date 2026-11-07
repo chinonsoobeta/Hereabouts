@@ -49,7 +49,7 @@ import Speech
             let analyzer = SpeechAnalyzer(modules: [transcriber])
             self.analyzer = analyzer
 
-            reading = Task { [weak self] in
+            reading = Task.detached { [weak self] in
                 do {
                     for try await result in transcriber.results {
                         let text = String(result.text.characters)
@@ -71,10 +71,7 @@ import Speech
             let natural = node.outputFormat(forBus: 0)
             let target = format ?? natural
             let converter = target == natural ? nil : AVAudioConverter(from: natural, to: target)
-            node.installTap(onBus: 0, bufferSize: 4096, format: natural) { buffer, _ in
-                guard let converted = Self.convert(buffer, with: converter, to: target) else { return }
-                continuation.yield(AnalyzerInput(buffer: converted))
-            }
+            Self.installTap(on: node, format: natural, converter: converter, target: target, continuation: continuation)
             engine.prepare()
             try engine.start()
             try await analyzer.start(inputSequence: stream)
@@ -121,6 +118,14 @@ import Speech
             do {
                 if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) { try await request.downloadAndInstall() }
             } catch { throw VoiceError.needsDownload }
+        }
+    }
+
+    /// Core Audio calls the tap on its own real-time thread, so the closure must not belong to the main actor.
+    nonisolated private static func installTap(on node: AVAudioInputNode, format: AVAudioFormat, converter: AVAudioConverter?, target: AVAudioFormat, continuation: AsyncStream<AnalyzerInput>.Continuation) {
+        node.installTap(onBus: 0, bufferSize: 4096, format: format) { @Sendable buffer, _ in
+            guard let converted = convert(buffer, with: converter, to: target) else { return }
+            continuation.yield(AnalyzerInput(buffer: converted))
         }
     }
 
