@@ -531,6 +531,13 @@ import XCTest
         try app.performAccessibilityAudit(for: types) { issue in
             print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.detailedDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero) | \(issue.element.map { "\($0.elementType.rawValue) \($0.identifier) exists=\($0.exists)" } ?? "no element")")
             guard let element = issue.element else { return unresolvedContrast && issue.auditType == .contrast }
+            // Checked by eye on 2026-11-07 at default size, light mode (dark mode and the largest size were not
+            // captured): on iOS 27 a sheet's Cancel/Later button is purple ink (#5B3DB8) on a near-white glass
+            // capsule. The colour pair gives 7.1:1 against that capsule (dark mode pair #B59CF5 on #211B2E, 7.2:1).
+            // The audit samples the capsule's soft edge and reports a failure. Only contrast, only a button
+            // inside a navigation bar, only on iOS 27 or later.
+            if #available(iOS 27, *), issue.auditType == .contrast, element.elementType == .button,
+               app.navigationBars.allElementsBoundByIndex.contains(where: { $0.frame.contains(element.frame) }) { return true }
             // Checked by screenshot on 2026-10-12: a sheet's first section header is ink on paper, but it starts
             // just under the bar and the audit samples it against the bar's scroll-edge band, as on Pro below.
             if issue.auditType == .contrast, element.elementType == .staticText, let bar = app.navigationBars.allElementsBoundByIndex.first(where: \.isHittable),
