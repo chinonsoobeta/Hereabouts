@@ -240,7 +240,7 @@ struct RitualBanners: View {
         let _ = store.revision
         let weeks = Rituals.keepingUpWeeks(activity: Rituals.activity(in: store.items))
         let stamp: String? = weeks > 0 ? (weeks == 1 ? "1 week" : "\(weeks) weeks") : nil
-        let recapReady = recapOn && readWeek != Rituals.recapWeekKey()
+        let recapReady = recapOn && Rituals.seededReadWeek(readWeek) != Rituals.recapWeekKey()
         let stocktake = Rituals.stocktakeDue(store.items, doneMonth: doneMonth)
         VStack(alignment: .leading, spacing: 10) {
             if recapReady {
@@ -256,6 +256,7 @@ struct RitualBanners: View {
                 banner(stamp: nil, text: "Still there? A few things haven't been checked in a while.", action: "Start") { open(.stocktake) }
             }
         }
+        .onAppear { readWeek = Rituals.seededReadWeek(readWeek) }
     }
 
     @Environment(\.dynamicTypeSize) private var textSize

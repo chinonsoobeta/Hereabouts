@@ -206,6 +206,15 @@ final class RitualsTests: XCTestCase {
         XCTAssertEqual(Rituals.recapWeekKey(now: date(2026, 10, 25, 18), calendar: calendar), "2026-10-25")
     }
 
+    func testNoRecapBannerOnTheFirstDay() {
+        // First launch on Wednesday 7 October 2026: the recap on offer then counts as read.
+        let seeded = Rituals.seededReadWeek("", now: date(2026, 10, 7), calendar: calendar)
+        XCTAssertEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 7), calendar: calendar))
+        XCTAssertEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 11, 17), calendar: calendar), "No banner before the first Sunday 18:00")
+        XCTAssertNotEqual(seeded, Rituals.recapWeekKey(now: date(2026, 10, 11, 18), calendar: calendar), "The first Sunday's recap is offered")
+        XCTAssertEqual(Rituals.seededReadWeek("2026-10-04", now: date(2026, 10, 11, 18), calendar: calendar), "2026-10-04")
+    }
+
     func testStocktakeLeavesLentThingsOut() throws {
         let store = try LocaliserStore(inMemory: true)
         let now = date(2026, 10, 10)

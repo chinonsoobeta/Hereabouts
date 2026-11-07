@@ -20,7 +20,7 @@ struct LocaliserApp: App {
                 url = directory.appendingPathComponent("UITests/\(id.uuidString)/Localiser.sqlite")
                 UserDefaults.standard.set(true, forKey: OnboardingView.seenKey)
                 UserDefaults.standard.removeObject(forKey: Rituals.stocktakeDoneKey)
-                UserDefaults.standard.removeObject(forKey: Rituals.recapReadKey)
+                UserDefaults.standard.set("2000-01-01", forKey: Rituals.recapReadKey) // An old read week, so the recap is on offer.
                 UserDefaults.standard.removeObject(forKey: ItemEditor.lastPlaceKey)
                 UserDefaults.standard.removeObject(forKey: Home.nameKey)
                 UserDefaults.standard.removeObject(forKey: LocaliserStore.currentHomeKey)

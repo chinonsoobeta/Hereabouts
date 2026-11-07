@@ -92,6 +92,11 @@ enum Rituals {
         return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
     }
 
+    /// The read week to use: a first launch counts the recap on offer as read, so day one shows no banner.
+    static func seededReadWeek(_ readWeek: String, now: Date = .now, calendar: Calendar = .current) -> String {
+        readWeek.isEmpty ? recapWeekKey(now: now, calendar: calendar) : readWeek
+    }
+
     struct Recap {
         var added: [String]
         var moved: Int
