@@ -11,7 +11,7 @@ enum PackingScale: String, CaseIterable, Identifiable, Sendable {
     case once, perDay, perNight
     var id: String { rawValue }
     init(perNight: Bool, perDay: Bool) { self = perDay ? .perDay : (perNight ? .perNight : .once) }
-    var title: String { switch self { case .once: "Fixed amount"; case .perDay: "Per day"; case .perNight: "Per night" } }
+    var title: String { switch self { case .once: "Per trip"; case .perDay: "Per day"; case .perNight: "Per night" } }
     var perNight: Bool { self == .perNight }
     var perDay: Bool { self == .perDay }
 }
