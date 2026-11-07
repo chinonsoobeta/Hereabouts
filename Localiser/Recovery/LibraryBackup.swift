@@ -24,6 +24,8 @@ struct LibraryBackup: Codable, Sendable {
     var createdAt = Date()
     var records: [BackupRecord]
     static let maximumBytes = 200 * 1024 * 1024
+    /// The largest single photo a backup can carry.
+    static let maximumFileBytes = 20 * 1024 * 1024
 
     func encoded() throws -> Data {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
@@ -159,7 +161,7 @@ struct LibraryBackup: Codable, Sendable {
                     guard value.count <= 500_000, !["name", "title"].contains(key) || !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw LocaliserError.invalidBackup("Something in this backup has no name, or too much text.") }
                 case (.booleanAttributeType, .boolean), (.dateAttributeType, .date), (.integer64AttributeType, .integer): break
                 case (.integer16AttributeType, .integer(let value)): guard Int16(exactly: value) != nil else { throw LocaliserError.invalidBackup("A number in this backup is too big.") }
-                case (.binaryDataAttributeType, .data(let value)): guard value.count <= ScanReader.maximumBytes else { throw LocaliserError.invalidBackup("A photo or document in this backup is over 20 MB.") }
+                case (.binaryDataAttributeType, .data(let value)): guard value.count <= LibraryBackup.maximumFileBytes else { throw LocaliserError.invalidBackup("A photo or document in this backup is over 20 MB.") }
                 default: throw LocaliserError.invalidBackup("Part of this backup is damaged.")
                 }
             }

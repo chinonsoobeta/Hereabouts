@@ -7,7 +7,6 @@ struct FindView: View {
     @State private var query = ""
     @State private var newThing: NewThing?
     @FocusState private var searchFocused: Bool
-    @State private var scanning = false
     @State private var showArchived = false
     @State private var putAway = false
     @State private var settings = false
@@ -89,8 +88,6 @@ struct FindView: View {
                 .accessibilityLabel("Find options")
                 .popoverTip(PutAwayTip())
             }
-            ToolbarItem(placement: .topBarTrailing) { Button("Scan", systemImage: "doc.viewfinder") { scanning = true }.popoverTip(ScanTip()) }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
@@ -100,9 +97,8 @@ struct FindView: View {
                 .accessibilityHint("Touch and hold to start with a photo")
             }
         }
-        .onChange(of: store.items.count, initial: true) { _, count in ScanTip.itemCount = count }
+        .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
         .sheet(item: $newThing) { new in NavigationStack { ItemEditor(name: new.name, photoFirst: new.photoFirst) } }
-        .sheet(isPresented: $scanning) { NavigationStack { ScanView() } }
         .sheet(isPresented: $settings) { NavigationStack { LibrarySettingsView() } }
         .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
         .sheet(item: $ritual) { ritual in
@@ -548,15 +544,6 @@ struct ItemDetailView: View {
                     }
                     Button("Add date") { addingDate = true }
                 }
-                if !item.scans.isEmpty {
-                    Section("Scans") {
-                        ForEach(item.scans.sorted { $0.createdAt > $1.createdAt }) { scan in
-                            NavigationLink { StoredScanView(scan: scan) } label: {
-                                VStack(alignment: .leading) { Text(scan.filename); Text(scan.createdAt, format: .dateTime.year().month().day()).font(.caption).foregroundStyle(Theme.secondary) }
-                            }
-                        }
-                    }
-                }
                 if !item.movements.isEmpty {
                     Section("Where it's been") {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
@@ -637,7 +624,7 @@ struct ItemDetailView: View {
             }
             if !item.archived { Button("Archive instead") { toggleArchive() } }
         } message: {
-            Text("Its dates, scans and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
+            Text("Its dates and history go too. You can undo for a few seconds. Packing lists keep a row with its name.")
         }
         .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }

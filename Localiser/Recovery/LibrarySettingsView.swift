@@ -48,7 +48,6 @@ struct LibrarySettingsView: View {
             } header: { Text("Leaving") }
             Section {
                 Label("Your notebook stays on this iPhone. There is no account, no advertising and no analytics.", systemImage: "lock.shield")
-                Label("Receipts are read on the device. The text is thrown away once you confirm a date, unless you choose to keep the original.", systemImage: "doc.text.viewfinder")
             } header: { Text("Privacy") }
             Section {
                 Button("Show the introduction again", systemImage: "play.rectangle") { dismiss(); seenOnboarding = false }
@@ -83,7 +82,7 @@ struct LeavingView: View {
     @State private var addingDates = false
 
     private var libraryIsEmpty: Bool { store.items.isEmpty && store.places.isEmpty && store.deadlines.isEmpty && store.kits.isEmpty && store.trips.isEmpty }
-    private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count + store.items.flatMap(\.scans).filter { $0.data != nil }.count }
+    private var retainedFileCount: Int { store.items.filter { $0.photo != nil }.count }
 
     var body: some View {
         ScrollView {
@@ -204,22 +203,18 @@ struct BackupFilesView: View {
     @Environment(LocaliserStore.self) private var store
     @Binding var selectedFiles: Set<UUID>
     private var photos: [Belonging] { store.items.filter { $0.photo != nil } }
-    private var documents: [ScanRecord] { store.items.flatMap { Array($0.scans) }.filter { $0.data != nil }.sorted { $0.createdAt < $1.createdAt } }
     var body: some View {
         SheetForm {
-            if photos.isEmpty && documents.isEmpty {
+            if photos.isEmpty {
                 Text("No photos or kept documents yet.").foregroundStyle(Theme.secondary)
             } else {
                 Section {
                     Button(selectedFiles.isEmpty ? "Include all" : "Include none") {
-                        selectedFiles = selectedFiles.isEmpty ? Set(photos.map(\.id) + documents.map(\.id)) : []
+                        selectedFiles = selectedFiles.isEmpty ? Set(photos.map(\.id)) : []
                     }
                 } footer: { Text("Files make a backup larger. A backup can be up to 200 MB.").foregroundStyle(Theme.secondary) }
                 if !photos.isEmpty {
                     Section { ForEach(photos) { toggle($0.id, title: $0.name) } } header: { Text("Photos of things").foregroundStyle(Theme.secondary) }
-                }
-                if !documents.isEmpty {
-                    Section { ForEach(documents) { toggle($0.id, title: "\($0.item?.name ?? "Document") · \($0.filename)") } } header: { Text("Kept documents").foregroundStyle(Theme.secondary) }
                 }
             }
         }

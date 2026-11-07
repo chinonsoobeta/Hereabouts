@@ -17,7 +17,6 @@ struct ProView: View {
                     allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
                     allowance("Packing kits", free: CreationKind.kit.freeLimit.description)
                     allowance("Homes", free: CreationKind.home.freeLimit.description)
-                    allowance("Receipt scans a month", free: CreationKind.scan.freeLimit.description)
                     NotebookLine(name: "Everything else", detail: "Already free", strongDetail: true).card()
                 }
                 if let standing = pro.standing {

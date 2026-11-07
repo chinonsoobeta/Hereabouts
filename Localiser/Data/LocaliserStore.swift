@@ -44,8 +44,6 @@ final class LocaliserStore {
     var searchIndex: [ItemSearch.Entry] = []
     var places: [Place] = []
     var deadlines: [Deadline] = []
-    /// Successful scans in the current calendar month. The free tier resets on the 1st.
-    var completedScans = 0
     var kits: [Kit] = []
     var trips: [TripRecord] = []
     var tripEntries: [TripEntry] = []
@@ -130,10 +128,6 @@ final class LocaliserStore {
         searchIndex = items.map(ItemSearch.Entry.init)
         places = try context.fetch(NSFetchRequest<Place>(entityName: "Place")).sorted { $0.path.localizedStandardCompare($1.path) == .orderedAscending }
         deadlines = try context.fetch(NSFetchRequest<Deadline>(entityName: "Deadline")).sorted { $0.dayString < $1.dayString }
-        let scanRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ScanRecord")
-        let monthStart = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .distantPast
-        scanRequest.predicate = NSPredicate(format: "counted == YES AND createdAt >= %@", monthStart as NSDate)
-        completedScans = try context.count(for: scanRequest)
         kits = try context.fetch(NSFetchRequest<Kit>(entityName: "Kit")).sorted { $0.name < $1.name }
         trips = try context.fetch(NSFetchRequest<TripRecord>(entityName: "TripRecord")).sorted { $0.startDay > $1.startDay }
         tripEntries = try context.fetch(NSFetchRequest<TripEntry>(entityName: "TripEntry"))
@@ -247,7 +241,7 @@ final class LocaliserStore {
         undoableDeletion = name
     }
 
-    /// Restores the item removed by the last `deleteItem`, with its dates, scans and history.
+    /// Restores the item removed by the last `deleteItem`, with its dates and history.
     func undoLastDeletion() throws {
         guard let undo = context.undoManager, undo.canUndo else { undoableDeletion = nil; return }
         undo.undo()
@@ -263,7 +257,7 @@ final class LocaliserStore {
     }
 
     @discardableResult
-    func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil, reopen: Bool = false, scan: ScanDraft? = nil, retainSource: Bool = false) throws -> Deadline {
+    func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil, reopen: Bool = false) throws -> Deadline {
         guard confirmed else { throw LocaliserError.dateNotConfirmed }
         guard (0...3650).contains(leadDays), (0...23).contains(hour) else { throw LocaliserError.invalidReminder }
         if let existing, existing.kind == .returns, [.keeping, .returned].contains(existing.decision), !reopen { throw LocaliserError.closedReturn }
@@ -273,14 +267,6 @@ final class LocaliserStore {
         if reopen { deadline.decisionRaw = ReturnDecision.open.rawValue }
         deadline.item = item; deadline.kindRaw = kind.rawValue; deadline.dayString = day.stored
         deadline.source = cleanSource; deadline.leadDays = Int16(leadDays); deadline.hour = Int16(hour); deadline.enabled = enabled
-        if let scan {
-            let record = NSEntityDescription.insertNewObject(forEntityName: "ScanRecord", into: context) as! ScanRecord
-            record.id = UUID(); record.createdAt = .now; record.item = item
-            record.counted = !scan.candidates.isEmpty
-            record.filename = retainSource ? scan.filename : "Date-only scan"
-            record.mime = retainSource ? scan.mime : ""
-            record.data = retainSource ? scan.data : nil
-        }
         try save()
         return deadline
     }
@@ -293,11 +279,6 @@ final class LocaliserStore {
     }
 
     func deleteDeadline(_ deadline: Deadline) throws { context.delete(deadline); try save() }
-
-    func removeScanSource(_ scan: ScanRecord) throws {
-        scan.data = nil; scan.filename = "Date-only scan"; scan.mime = ""
-        try save()
-    }
 
     func requiredName(_ name: String) throws -> String {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)

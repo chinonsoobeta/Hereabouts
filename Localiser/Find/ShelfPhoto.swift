@@ -68,7 +68,7 @@ struct OnDeviceShelfReader: ShelfReader {
     func names(in photo: Data) async throws -> [String] {
         guard let source = CGImageSourceCreateWithData(photo as CFData, nil),
               let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceCreateThumbnailWithTransform: true, kCGImageSourceThumbnailMaxPixelSize: 1024] as CFDictionary)
-        else { throw ScanError.unreadable }
+        else { throw PhotoError.unreadable }
         let session = LanguageModelSession(instructions: "You help someone keep a list of their belongings. Name each separate thing you can see, as they would write it in a notebook.")
         let response = try await session.respond(generating: ShelfNames.self) {
             "What things are in this photo?"

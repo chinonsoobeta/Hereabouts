@@ -186,7 +186,6 @@ struct DeadlineEditor: View {
     @Environment(\.dismiss) private var dismiss
     let item: Belonging
     let existing: Deadline?
-    let scan: ScanDraft?
     let onSaved: (() -> Void)?
     @State private var kind: DeadlineKind
     @State private var date: Date
@@ -202,15 +201,11 @@ struct DeadlineEditor: View {
     @State private var includeAnchor = false
     @State private var reopen = false
     @State private var error: String?
-    @State private var retainSource = false
     @State private var saving = false
     @State private var upgrade = false
-    /// Dates found in pasted order email text; nil until something is pasted.
-    @State private var pasted: [OrderEmail.Found]?
-    @State private var pastedID: String?
 
-    init(item: Belonging, existing: Deadline? = nil, suggestedDate: Date? = nil, source: String = "", suggestedKind: DeadlineKind? = nil, scan: ScanDraft? = nil, onSaved: (() -> Void)? = nil) {
-        self.item = item; self.existing = existing; self.scan = scan; self.onSaved = onSaved
+    init(item: Belonging, existing: Deadline? = nil, suggestedDate: Date? = nil, source: String = "", suggestedKind: DeadlineKind? = nil, onSaved: (() -> Void)? = nil) {
+        self.item = item; self.existing = existing; self.onSaved = onSaved
         let kind = existing?.kind ?? suggestedKind ?? .returns
         _kind = State(initialValue: kind)
         _date = State(initialValue: existing?.day?.date() ?? suggestedDate ?? .now)
@@ -233,15 +228,6 @@ struct DeadlineEditor: View {
 
     var body: some View {
         SheetForm {
-            if let scan {
-                Section {
-                    if let preview = scan.preview, let image = UIImage(data: preview) { Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200) }
-                    Text("A receipt usually shows the day you bought something, not the last day to return it. Choose the kind of date below, and check the shop's terms.").font(.subheadline)
-                    Toggle("Keep original document", isOn: $retainSource)
-                    Text(retainSource ? "The original can show card or ID numbers. It's kept with this thing, in your iPhone's own backup, and in a Hereabouts backup if you include it." : "Only the date and what you type here are saved. The original and its text are thrown away when you close this.").font(.caption).foregroundStyle(Theme.secondary)
-                } header: { Text("Scanned document").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
-            }
-            if scan == nil && kind != .askBack && !closed { pasteSection }
             Section {
                 Picker("Kind of date", selection: $kind) { ForEach(DeadlineKind.chosen + (kind == .askBack ? [.askBack] : [])) { Text($0.title).tag($0) } }.disabled(existing != nil)
                 if kind == .returns {
@@ -289,79 +275,13 @@ struct DeadlineEditor: View {
         .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
-    /// "Paste order email": the dates in the copied text, to pick from and then check below.
-    @ViewBuilder private var pasteSection: some View {
-        Section {
-            PasteButton(payloadType: String.self) { strings in
-                let text = strings.joined(separator: "\n")
-                Task { @MainActor in
-                    pasted = OrderEmail.read(text); pastedID = nil
-                    if let first = pasted?.first { use(first) }
-                }
-            }
-            .labelStyle(.titleAndIcon).buttonBorderShape(.capsule).tint(Theme.purpleInk)
-            .accessibilityIdentifier("deadline.paste")
-            if let pasted {
-                if pasted.isEmpty {
-                    Text("There's no complete date in that text. Copy the part of the email with the dates, or enter the date below.")
-                        .font(.wbCaption).foregroundStyle(Theme.secondary).accessibilityIdentifier("deadline.pasteNone")
-                }
-                ForEach(pasted) { found in
-                    Button { use(found) } label: {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(found.candidate.day.date()?.formatted(.dateTime.year().month().day()) ?? found.candidate.raw).font(.wbBody.weight(.bold)).foregroundStyle(Theme.ink)
-                                Text(Self.roleLabel(found.role)).font(.wbCaption).foregroundStyle(Theme.secondary)
-                                Text(found.candidate.line.trimmingCharacters(in: .whitespaces)).font(.wbCaption).foregroundStyle(Theme.secondary).lineLimit(2)
-                                if found.candidate.ambiguous { Text("This could be day/month or month/day. Pick the one that matches the email.").font(.wbCaption).foregroundStyle(Theme.warning) }
-                            }
-                            Spacer()
-                            if found.id == pastedID { Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.purpleInk).accessibilityHidden(true) }
-                        }
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityAddTraits(found.id == pastedID ? .isSelected : [])
-                }
-            }
-        } header: {
-            Text("From an order email").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil)
-        } footer: {
-            Text("Copy the email text, then paste. It's read on this iPhone and isn't kept.").foregroundStyle(Theme.secondary)
-        }
-    }
-
-    static func roleLabel(_ role: OrderEmail.Role) -> String {
-        switch role {
-        case .returnBy: "Looks like the last day to return"
-        case .delivered: "Looks like the delivery date"
-        case .ordered: "Looks like the order date"
-        case .other: "A date in the email"
-        }
-    }
-
-    /// A return-by date fills the final date; a delivery or order date starts the return window.
-    private func use(_ found: OrderEmail.Found) {
-        guard let value = found.candidate.day.date() else { return }
-        pastedID = found.id
-        if kind == .returns, let anchorType = found.anchorType {
-            useWindow = true; self.anchorType = anchorType; anchor = value
-        } else {
-            if kind == .returns { useWindow = false }
-            date = value
-        }
-        if source.isEmpty { source = "Order email" }
-        confirmed = false
-    }
-
     private func save() {
         guard let day = finalDay, !saving else { return }
-        if let scan, !scan.candidates.isEmpty, !pro.allows(.scan, count: store.completedScans) { upgrade = true; return }
         saving = true
         do {
             var evidence = source
             if kind == .returns && useWindow { evidence += "\n\(anchorType): \(CalendarDay(anchor).stored); \(windowDays) days; starting day \(includeAnchor ? "included" : "excluded")." }
-            try store.setDeadline(item: item, kind: kind, day: day, source: evidence, leadDays: leadDays, hour: hour, enabled: enabled, confirmed: confirmed, existing: existing, reopen: reopen, scan: scan, retainSource: retainSource)
+            try store.setDeadline(item: item, kind: kind, day: day, source: evidence, leadDays: leadDays, hour: hour, enabled: enabled, confirmed: confirmed, existing: existing, reopen: reopen)
             dismiss()
             onSaved?()
         } catch { saving = false; self.error = error.localizedDescription }

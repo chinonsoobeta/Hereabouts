@@ -24,7 +24,6 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(CreationKind.item.freeLimit, 20)
         XCTAssertTrue(pro.allows(.item, count: 19)); XCTAssertFalse(pro.allows(.item, count: 20))
         XCTAssertTrue(pro.allows(.kit, count: 1)); XCTAssertFalse(pro.allows(.kit, count: 2))
-        XCTAssertTrue(pro.allows(.scan, count: 4)); XCTAssertFalse(pro.allows(.scan, count: 5))
         let store = try LocaliserStore(inMemory: true)
         let item = try store.addItem(name: "Keep after refund")
         await pro.purchase(.lifetime)
@@ -80,25 +79,21 @@ final class LocaliserTests: XCTestCase {
         let item = try source.addItem(name: "Passport", place: room, notes: "Travel", aliases: "ID", photo: Data([1, 2]))
         try source.move(item, to: drawer)
         let day = try XCTUnwrap(CalendarDay(stored: "2028-07-14"))
-        let scan = ScanDraft(data: Data([3, 4]), filename: "Receipt.png", mime: "image/png", preview: nil, text: "Expiry 2028-07-14", candidates: ScanDates.candidates("Expiry 2028-07-14"))
-        try source.setDeadline(item: item, kind: .expiry, day: day, source: "Confirmed", leadDays: 180, hour: 9, enabled: true, confirmed: true, scan: scan, retainSource: true)
+        try source.setDeadline(item: item, kind: .expiry, day: day, source: "Confirmed", leadDays: 180, hour: 9, enabled: true, confirmed: true)
         let kit = try source.addKit(name: "Travel")
         try source.setKitEntry(kit: kit, name: "", item: item, unit: 1, perNight: false, condition: .always)
         let trip = try source.addTrip(TripDetails(name: "Trip", start: day, end: day), kit: kit)
         try source.pack(try XCTUnwrap(trip.entries.first), count: 1)
         try source.checkTask(try XCTUnwrap(trip.tasks.first), checked: true)
-        let scanID = try XCTUnwrap(item.scans.first?.id)
-        let file = try LibraryBackup.decoded(source.backup(attachmentIDs: [item.id, scanID]).encoded())
-        XCTAssertEqual(Set(file.records.map(\.entity)).count, 12)
+        let file = try LibraryBackup.decoded(source.backup(attachmentIDs: [item.id]).encoded())
+        XCTAssertEqual(Set(file.records.map(\.entity)).count, 11)
         let restored = try LocaliserStore(inMemory: true)
         try restored.restore(file)
         XCTAssertEqual(restored.items.first?.id, item.id)
         XCTAssertEqual(restored.items.first?.place?.path, "Bedroom › Drawer")
         XCTAssertEqual(restored.items.first?.photo, Data([1, 2]))
-        XCTAssertEqual(restored.items.first?.scans.first?.data, Data([3, 4]))
         XCTAssertEqual(restored.items.first?.movements.count, 1)
         XCTAssertEqual(restored.deadlines.first?.dayString, day.stored)
-        XCTAssertEqual(restored.completedScans, 1)
         XCTAssertEqual(restored.trips.first?.entries.first?.packedCount, 1)
         XCTAssertEqual(restored.trips.first?.tasks.filter(\.checked).count, 1)
         XCTAssertEqual(restored.items.first?.packedTrips.first?.id, trip.id)
@@ -109,8 +104,6 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(try restored.backup().records.map(\.entity), ["Home"], "Erasing leaves one empty home")
         try restored.restore(dateOnly)
         XCTAssertNil(restored.items.first?.photo)
-        XCTAssertNil(restored.items.first?.scans.first?.data)
-        XCTAssertEqual(restored.completedScans, 1)
     }
 
     func testMalformedBackupsRejectBeforeMutationAndDoNotOverwrite() throws {
@@ -168,20 +161,12 @@ final class LocaliserTests: XCTestCase {
         XCTAssertTrue(entry.perNight); XCTAssertFalse(entry.perDay); XCTAssertFalse(entry.unlinked)
     }
 
-    func testFreeTierCountsActiveItemsAndThisMonthsScans() throws {
+    func testFreeTierCountsActiveItems() throws {
         let store = try LocaliserStore(inMemory: true)
-        let kept = try store.addItem(name: "Drill")
+        try store.addItem(name: "Drill")
         let old = try store.addItem(name: "Old phone")
         try store.setArchived(old, true)
         XCTAssertEqual(store.activeItemCount, 1)
-        let candidates = ScanDates.candidates("Expiry 2028-07-14")
-        let scan = ScanDraft(data: Data([1]), filename: "r.png", mime: "image/png", preview: nil, text: "Expiry 2028-07-14", candidates: candidates)
-        try store.setDeadline(item: kept, kind: .expiry, day: candidates[0].day, source: "", leadDays: 0, hour: 9, enabled: true, confirmed: true, scan: scan)
-        XCTAssertEqual(store.completedScans, 1)
-        let lastMonth = try XCTUnwrap(Calendar.current.date(byAdding: .month, value: -1, to: .now))
-        kept.scans.first?.createdAt = lastMonth
-        try store.save()
-        XCTAssertEqual(store.completedScans, 0)
     }
 
     func testTextLimitsAndDuplicatePlaceWarning() throws {
@@ -671,64 +656,19 @@ final class LocaliserTests: XCTestCase {
         #endif
     }
 
-    func testScanAmbiguityInvalidDatesAndPrivacyOnConfirmation() throws {
-        let candidates = ScanDates.candidates("Expiry 04/05/26\nWarranty ends 2027-02-30\nReturn by 14 January 2028")
-        XCTAssertEqual(candidates.count, 3)
-        XCTAssertEqual(Set(candidates.prefix(2).map { $0.day.stored }), ["2026-04-05", "2026-05-04"])
-        XCTAssertTrue(candidates[0].ambiguous)
-        XCTAssertEqual(candidates.last?.hint, .returns)
-        let store = try LocaliserStore(inMemory: true)
-        let item = try store.addItem(name: "Document")
-        let scan = ScanDraft(data: Data([1, 2, 3]), filename: "ID-12345.pdf", mime: "application/pdf", preview: nil, text: "ID 12345 Expiry 04/05/26", candidates: candidates)
-        let day = candidates[0].day
-        XCTAssertThrowsError(try store.setDeadline(item: item, kind: .expiry, day: day, source: "", leadDays: 180, hour: 9, enabled: true, confirmed: false, scan: scan))
-        XCTAssertEqual(store.completedScans, 0); XCTAssertTrue(item.scans.isEmpty)
-        try store.setDeadline(item: item, kind: .expiry, day: day, source: "Confirmed from scan", leadDays: 180, hour: 9, enabled: true, confirmed: true, scan: scan)
-        XCTAssertEqual(store.completedScans, 1)
-        XCTAssertNil(item.scans.first?.data); XCTAssertEqual(item.scans.first?.filename, "Date-only scan")
-        try store.setDeadline(item: item, kind: .expiry, day: day, source: "", leadDays: 180, hour: 9, enabled: true, confirmed: true, scan: scan, retainSource: true)
-        let retained = try XCTUnwrap(item.scans.first { $0.data != nil })
-        XCTAssertEqual(retained.data, scan.data)
-        try store.removeScanSource(retained)
-        XCTAssertNil(retained.data); XCTAssertEqual(store.completedScans, 2)
-        let blank = ScanDraft(data: Data([0]), filename: "Blank.jpg", mime: "image/jpeg", preview: nil, text: "", candidates: [])
-        try store.setDeadline(item: item, kind: .expiry, day: day, source: "", leadDays: 180, hour: 9, enabled: true, confirmed: true, scan: blank)
-        XCTAssertEqual(store.completedScans, 2)
-    }
-
-    func testTwoDigitYearsAndLocalMonthNamesNeedReview() {
-        let short = ScanDates.candidates("Bought 12/05/98")
-        XCTAssertTrue(short.allSatisfy { $0.shortYear && $0.ambiguous })
-        let unique = ScanDates.candidates("Expiry 25/12/30")
-        XCTAssertEqual(unique.count, 1); XCTAssertTrue(unique[0].ambiguous)
-        XCTAssertFalse(ScanDates.candidates("Expiry 25/12/2030")[0].ambiguous)
-        XCTAssertEqual(ScanDates.interpretations("14 January 2028").first?.stored, "2028-01-14")
-        XCTAssertEqual(ScanDates.interpretations("Jan. 14, 2028").first?.stored, "2028-01-14")
-    }
-
-    func testOnDeviceOCRReadsPrintedExpiryAndPDFLimits() async throws {
+    func testOnDeviceOCRReadsTextInAPhotoOfAThing() async throws {
         let format = UIGraphicsImageRendererFormat(); format.scale = 1
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1200, height: 300), format: format)
         let image = renderer.image { context in
             UIColor.white.setFill(); context.fill(CGRect(x: 0, y: 0, width: 1200, height: 300))
-            ("Expiry 2028-07-14" as NSString).draw(at: CGPoint(x: 40, y: 100), withAttributes: [.font: UIFont.systemFont(ofSize: 70), .foregroundColor: UIColor.black])
+            ("Cordless drill" as NSString).draw(at: CGPoint(x: 40, y: 100), withAttributes: [.font: UIFont.systemFont(ofSize: 70), .foregroundColor: UIColor.black])
         }
         let data = try XCTUnwrap(image.pngData())
-        let result = try await Task.detached { try ScanReader.read(data: data, filename: "Photo.jpg", mime: "image/jpeg") }.value
-        XCTAssertTrue(result.candidates.contains { $0.day.stored == "2028-07-14" && $0.hint == .expiry })
-        XCTAssertEqual(result.mime, "image/png")
-        let pdf = PDFDocument()
-        pdf.insert(try XCTUnwrap(PDFPage(image: image)), at: 0)
-        let supportedPDF = try XCTUnwrap(pdf.dataRepresentation())
-        let imported = try await Task.detached { try ScanReader.read(data: supportedPDF, filename: "Expiry.pdf", mime: "application/pdf") }.value
-        XCTAssertEqual(imported.mime, "application/pdf")
-        XCTAssertEqual(imported.data, supportedPDF)
-        XCTAssertNotNil(imported.preview)
-        XCTAssertTrue(imported.candidates.contains { $0.day.stored == "2028-07-14" && $0.hint == .expiry })
-        for index in 1..<11 { pdf.insert(try XCTUnwrap(PDFPage(image: image)), at: index) }
-        let pdfData = try XCTUnwrap(pdf.dataRepresentation())
-        XCTAssertThrowsError(try ScanReader.read(data: pdfData, filename: "Too many.pdf", mime: "application/pdf"))
-        XCTAssertThrowsError(try ScanReader.read(data: Data([0, 1]), filename: "Broken.pdf", mime: "application/pdf"))
+        let text = try await Task.detached { try PhotoText.read(data) }.value
+        XCTAssertTrue(text.contains("Cordless drill"), text)
+        XCTAssertTrue(PhotoText.containsDate("Expiry 2028-07-14"))
+        XCTAssertFalse(PhotoText.containsDate("Cordless drill"))
+        XCTAssertThrowsError(try PhotoText.read(Data([0, 1])))
     }
 
     func testKitCopiesIndependentTripProgressAndKeepsManualCounts() throws {
