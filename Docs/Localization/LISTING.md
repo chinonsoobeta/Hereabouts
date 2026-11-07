@@ -2,7 +2,7 @@
 
 Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name stays **Hereabouts** everywhere and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
 
-Limits: subtitle 30 characters, promotional text 170, keywords 100 (commas, no spaces). Counts below were checked with a script.
+Limits: subtitle 30 characters, promotional text 170, keywords 100 (commas, no spaces). Counts below are characters, checked with a script; every subtitle and keyword list is also within the limit in UTF-8 bytes, in case App Store Connect counts bytes.
 
 App Store Connect locales covered: English (U.K.), French, French (Canada), Spanish (Spain), Spanish (Mexico), Portuguese (Brazil). English (U.S.) is the English listing itself.
 
@@ -17,7 +17,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 ## French
 
 - **Subtitle** (20): Retrouvez vos objets
-- **Keywords** (100): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet,ranger`
+- **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
 - **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:**
 
@@ -58,7 +58,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 Same as French, with these changes for Canadian readers:
 
 - **Subtitle** (20): Retrouvez vos objets
-- **Keywords** (100): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet,ranger`
+- **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
 - **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:** French description, with "tableur" changed to "chiffrier". "Réglages" stays, as iOS uses it in Canada too. The French text already uses a plain space before ? and :, which suits Canadian style.
 - **Review notes, first line:** Hereabouts ne nécessite ni compte ni connexion. Le carnet est enregistré sur l’appareil.
@@ -66,7 +66,7 @@ Same as French, with these changes for Canadian readers:
 ## Spanish (Spain)
 
 - **Subtitle** (19): Encuentra tus cosas
-- **Keywords** (100): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta,viaje`
+- **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
 - **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:**
 
@@ -107,7 +107,7 @@ Same as French, with these changes for Canadian readers:
 Same as Spanish (Spain), with these changes for Latin American readers:
 
 - **Subtitle** (19): Encuentra tus cosas
-- **Keywords** (100): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta,viaje`
+- **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
 - **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:** Spanish (Spain) description with "Mantén pulsado" changed to "Mantén presionado", "de serie" to "de forma predeterminada", "el domingo por la tarde" to "el domingo en la noche", and "abre la app Ajustes" to "abre la app Configuración" (the iOS name in Latin America).
 - **Review notes, first line:** Hereabouts no necesita cuenta ni inicio de sesión. La libreta se guarda en el dispositivo.
