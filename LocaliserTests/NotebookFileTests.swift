@@ -76,7 +76,7 @@ import CoreData
         XCTAssertEqual(try LocaliserStore(url: group).items.map(\.name), ["Passport"])
         XCTAssertEqual(NotebookFile.location(legacy: legacy, group: group, defaults: defaults), group)
         XCTAssertFalse(FileManager.default.fileExists(atPath: legacy.path), "Gone on the next launch")
-        XCTAssertNil(NotebookFile.appGroup, "Empty until enrolment")
+        XCTAssertEqual(NotebookFile.appGroup, "group.dev.hereabouts.app", "Switched on once the App Group was registered")
     }
 
     func testMissingDamagedAndShortCopiesKeepTheOriginal() throws {
