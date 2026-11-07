@@ -109,7 +109,7 @@ struct PlaceChooser: View {
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Create \u{201C}\(typed.joined(separator: " › "))\u{201D}").font(.wbItem).foregroundStyle(Theme.purpleInk)
-                                if typed.count > 1 { Text("Creates any levels that don't exist yet").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                                if typed.count > 1 { Text("Add any missing places along the way").font(.wbCaption).foregroundStyle(Theme.secondary) }
                             }
                         } icon: { Image(systemName: "plus.circle.fill").foregroundStyle(Theme.purple) }
                     }
@@ -126,17 +126,17 @@ struct PlaceChooser: View {
                 }
             }
             Section {
-                row(title: noneTitle, detail: noneTitle == "None" || noneTitle == "Top level" ? "A room or other top-level place" : "Not sure yet", id: nil)
+                row(title: noneTitle, detail: noneTitle == "None" || noneTitle == "Top level" ? "A place that isn't inside another" : "Not sure yet", id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
             } footer: {
                 if scope.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }
             }
         }
         .groundBackground()
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Find or create a place")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Find or add a place")
         .onSubmit(of: .search) { if !typed.isEmpty { create() } }
         .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
-        .alert("Couldn't create that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+        .alert("Couldn't add that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
 
     private func depth(of place: Place) -> Int {

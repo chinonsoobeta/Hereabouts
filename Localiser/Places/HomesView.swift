@@ -69,7 +69,7 @@ struct HomesView: View {
                     }
                 }
             } footer: {
-                Text("Find, Places and Trips show the home you choose. Search, dates and reminders cover every home. A home can be deleted once it's empty.")
+                Text("In Find, Places and Trips, you see your chosen home. Search, dates and reminders cover all homes. You can delete an empty home.")
                     .font(.wbCaption).foregroundStyle(Theme.pencil)
             }
         }
@@ -86,10 +86,10 @@ struct HomesView: View {
             }
         }
         .alert("New home", isPresented: $adding) {
-            TextField("Mum's house", text: $name).accessibilityIdentifier("home.name")
+            TextField("Mom's house", text: $name).accessibilityIdentifier("home.name")
             Button("Cancel", role: .cancel) {}
             Button("Add") { attempt { try store.addHome(name: name) } }
-        } message: { Text("Like a parent's house, a storage unit or the boat.") }
+        } message: { Text("You can add a parent's home, a storage unit or a boat.") }
         .alert("Rename home", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $name)
             Button("Cancel", role: .cancel) { renaming = nil }
@@ -147,8 +147,8 @@ struct MoveToHomeSheet: View {
 
     private var footer: String {
         switch subject {
-        case .thing: "Pick a home, then where it goes there."
-        case .place: "Everything inside moves too: places inside it and their things."
+        case .thing: "Choose a home, then a place in it."
+        case .place: "You also move every place and thing inside it."
         }
     }
 
