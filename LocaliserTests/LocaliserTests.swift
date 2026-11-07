@@ -836,36 +836,37 @@ final class LocaliserTests: XCTestCase {
         let clock = Clock(now: start)
         return (AutomaticBackups(folder: folder, now: { clock.now }, isPro: pro, defaults: defaults), clock, folder)
     }
-    final class Clock { var now: Date; init(now: Date) { self.now = now } }
+    /// The test sets the time between runs, never while one is running, so sharing it with the background task is safe.
+    final class Clock: @unchecked Sendable { var now: Date; init(now: Date) { self.now = now } }
     private func backupFiles(_ folder: URL) -> [String] {
         ((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []).sorted()
     }
 
-    func testAutomaticBackupsRunWeeklyAndNeverTwiceInADay() throws {
+    func testAutomaticBackupsRunWeeklyAndNeverTwiceInADay() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
         let (maker, clock, folder) = try backupMaker()
-        guard case .wrote = maker.runIfDue(store: store) else { return XCTFail("The first backup is due straight away") }
+        guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail("The first backup is due straight away") }
         XCTAssertEqual(backupFiles(folder).count, 1)
         for days in [1.0, 3.0, 6.9] {
             clock.now = Date(timeIntervalSince1970: 1_800_000_000).addingTimeInterval(days * 86_400)
-            guard case .skipped = maker.runIfDue(store: store) else { return XCTFail("Not due after \(days) days") }
+            guard case .skipped = await maker.runIfDue(store: store) else { return XCTFail("Not due after \(days) days") }
         }
         clock.now = Date(timeIntervalSince1970: 1_800_000_000).addingTimeInterval(7 * 86_400)
-        guard case .wrote = maker.runIfDue(store: store) else { return XCTFail("Due after a week") }
+        guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail("Due after a week") }
         XCTAssertEqual(backupFiles(folder).count, 2)
-        guard case .skipped = maker.runIfDue(store: store) else { return XCTFail("Never twice in a day") }
+        guard case .skipped = await maker.runIfDue(store: store) else { return XCTFail("Never twice in a day") }
         XCTAssertEqual(maker.lastBackup, clock.now)
     }
 
-    func testAutomaticBackupsKeepTheNewestFive() throws {
+    func testAutomaticBackupsKeepTheNewestFive() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         let (maker, clock, folder) = try backupMaker(at: start)
         for week in 0..<8 {
             clock.now = start.addingTimeInterval(Double(week) * 7 * 86_400)
-            guard case .wrote = maker.runIfDue(store: store) else { return XCTFail("Week \(week) should write") }
+            guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail("Week \(week) should write") }
         }
         let files = backupFiles(folder)
         XCTAssertEqual(files.count, 5)
@@ -873,43 +874,43 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(files, files.sorted(), "Names sort by date")
     }
 
-    func testLapsedProAndTheSwitchStopNewBackupsButKeepOldOnes() throws {
+    func testLapsedProAndTheSwitchStopNewBackupsButKeepOldOnes() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         let (pro, clock, folder) = try backupMaker(at: start)
-        guard case .wrote = pro.runIfDue(store: store) else { return XCTFail() }
+        guard case .wrote = await pro.runIfDue(store: store) else { return XCTFail() }
         let before = backupFiles(folder)
         clock.now = start.addingTimeInterval(30 * 86_400)
         var lapsed = pro; lapsed.isPro = false
-        guard case .skipped = lapsed.runIfDue(store: store) else { return XCTFail("Lapsed Pro makes no new backup") }
+        guard case .skipped = await lapsed.runIfDue(store: store) else { return XCTFail("Lapsed Pro makes no new backup") }
         XCTAssertEqual(backupFiles(folder), before, "Saved backups are never deleted")
         pro.enabled = false
-        guard case .skipped = pro.runIfDue(store: store) else { return XCTFail("Switched off") }
+        guard case .skipped = await pro.runIfDue(store: store) else { return XCTFail("Switched off") }
         XCTAssertEqual(backupFiles(folder), before)
     }
 
-    func testASavedBackupRestoresIntoAFreshNotebook() throws {
+    func testASavedBackupRestoresIntoAFreshNotebook() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
         let (maker, _, _) = try backupMaker()
-        guard case .wrote = maker.runIfDue(store: store) else { return XCTFail() }
+        guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail() }
         let saved = try XCTUnwrap(maker.saved().first)
-        let file = try AutomaticBackups.load(saved)
+        let file = try await AutomaticBackups.load(saved)
         let fresh = try LocaliserStore(inMemory: true)
         try fresh.validateBackup(file)
         try fresh.restore(file)
         XCTAssertEqual(fresh.items.map(\.name), ["Passport"])
     }
 
-    func testAFailedWriteLeavesOlderBackupsAlone() throws {
+    func testAFailedWriteLeavesOlderBackupsAlone() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
         let start = Date(timeIntervalSince1970: 1_800_000_000)
         let (good, clock, folder) = try backupMaker(at: start)
         for week in 0..<5 {
             clock.now = start.addingTimeInterval(Double(week) * 7 * 86_400)
-            _ = good.runIfDue(store: store)
+            _ = await good.runIfDue(store: store)
         }
         let before = backupFiles(folder)
         XCTAssertEqual(before.count, 5)
@@ -917,8 +918,84 @@ final class LocaliserTests: XCTestCase {
         var failing = good
         failing.write = { _, _ in throw DiskFull() }
         clock.now = start.addingTimeInterval(6 * 7 * 86_400)
-        guard case .failed = failing.runIfDue(store: store) else { return XCTFail("The write fails") }
+        guard case .failed = await failing.runIfDue(store: store) else { return XCTFail("The write fails") }
         XCTAssertEqual(backupFiles(folder), before, "Nothing is pruned when the new one didn't land")
-        guard case .skipped = good.runIfDue(store: store) else { return XCTFail("A failed try isn't retried the same day") }
+        guard case .skipped = await good.runIfDue(store: store) else { return XCTFail("A failed try isn't retried the same day") }
+    }
+
+    // MARK: Automatic backups off the main thread, and iCloud placeholders
+
+    func testAPlaceholderNameParsesToTheSameDate() throws {
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let name = AutomaticBackups.fileName(for: date)
+        XCTAssertEqual(AutomaticBackups.date(fromFileName: name), date)
+        XCTAssertEqual(AutomaticBackups.date(fromFileName: ".\(name).icloud"), date)
+        XCTAssertEqual(AutomaticBackups.realName(ofPlaceholder: ".\(name).icloud"), name)
+        XCTAssertNil(AutomaticBackups.realName(ofPlaceholder: name))
+        XCTAssertNil(AutomaticBackups.date(fromFileName: ".Other file.json.icloud"))
+    }
+
+    func testPlaceholdersAreListedAndCountTowardsTheFiveKept() async throws {
+        let store = try LocaliserStore(inMemory: true)
+        _ = try store.addItem(name: "Passport", place: nil)
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        let (maker, clock, folder) = try backupMaker(at: start)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        // Three weeks of backups made on another phone, not downloaded here yet.
+        for week in 0..<3 {
+            let name = AutomaticBackups.fileName(for: start.addingTimeInterval(Double(week - 3) * 7 * 86_400))
+            try Data().write(to: folder.appendingPathComponent(".\(name).icloud"))
+        }
+        let listed = maker.saved()
+        XCTAssertEqual(listed.count, 3)
+        XCTAssertTrue(listed.allSatisfy(\.isPlaceholder))
+        XCTAssertEqual(listed.first?.url.lastPathComponent, AutomaticBackups.fileName(for: start.addingTimeInterval(-7 * 86_400)))
+        for week in 0..<4 {
+            clock.now = start.addingTimeInterval(Double(week) * 7 * 86_400)
+            guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail("Week \(week) should write") }
+        }
+        let after = maker.saved()
+        XCTAssertEqual(after.count, 5, "Placeholders count towards the five")
+        XCTAssertEqual(after.filter(\.isPlaceholder).count, 1, "The two oldest placeholders were pruned")
+        XCTAssertEqual(backupFiles(folder).filter { $0.hasSuffix(".icloud") }.count, 1)
+    }
+
+    func testAPlaceholderThatCannotBeDownloadedSaysSo() async throws {
+        let (maker, _, folder) = try backupMaker()
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let name = AutomaticBackups.fileName(for: Date(timeIntervalSince1970: 1_800_000_000))
+        try Data().write(to: folder.appendingPathComponent(".\(name).icloud"))
+        let saved = try XCTUnwrap(maker.saved().first)
+        do { _ = try await AutomaticBackups.load(saved); XCTFail("There is no real file to read") }
+        catch { XCTAssertEqual(error.localizedDescription, "This backup is still downloading from iCloud. Try again in a moment.") }
+    }
+
+    func testTheBackupIsEncodedAndWrittenOffTheMainThread() async throws {
+        let store = try LocaliserStore(inMemory: true)
+        _ = try store.addItem(name: "Passport", place: nil)
+        let before = store.items.map(\.name)
+        let (maker, _, folder) = try backupMaker()
+        let wroteOnMain = Locked(true)
+        var checking = maker
+        checking.write = { data, url in wroteOnMain.value = Thread.isMainThread; try data.write(to: url, options: .atomic) }
+        guard case .wrote = await checking.runIfDue(store: store) else { return XCTFail("The backup is written") }
+        XCTAssertFalse(wroteOnMain.value, "Writing happens off the main thread")
+        XCTAssertEqual(store.items.map(\.name), before, "The notebook is unchanged")
+        XCTAssertEqual(backupFiles(folder).count, 1)
+    }
+
+    func testTwoCallsAtLaunchWriteOnlyOneBackup() async throws {
+        let store = try LocaliserStore(inMemory: true)
+        _ = try store.addItem(name: "Passport", place: nil)
+        let (maker, _, folder) = try backupMaker()
+        async let first = maker.runIfDue(store: store)
+        async let second = maker.runIfDue(store: store)
+        _ = await (first, second)
+        XCTAssertEqual(backupFiles(folder).count, 1)
+    }
+    final class Locked: @unchecked Sendable {
+        private let lock = NSLock(); private var stored: Bool
+        init(_ value: Bool) { stored = value }
+        var value: Bool { get { lock.withLock { stored } } set { lock.withLock { stored = newValue } } }
     }
 }
