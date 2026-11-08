@@ -487,7 +487,7 @@ import XCTest
         let findStart = Date()
         XCTAssertTrue(app.tabBars.buttons["Find"].waitForExistence(timeout: 10), app.debugDescription)
         try shot("2a-find-just-after-install")
-        let siriText = app.staticTexts["Ask Hereabouts where something is"]
+        let siriText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Ask Hereabouts where something is'")).firstMatch
         let siriShown = siriText.waitForExistence(timeout: 60)
         let siriDelay = Date().timeIntervalSince(findStart)
         print("M45 Siri tip text \(siriShown ? "appeared" : "did not appear") after \(String(format: "%.1f", siriDelay)) s")
@@ -511,6 +511,8 @@ import XCTest
             XCTAssertTrue(add.waitForExistence(timeout: 5), "Thing \(number): no add button\n\(app.debugDescription)")
             add.tap()
             let name = app.textFields["item.name"]
+            // The first tap can land while the previous sheet is still leaving; tap once more if nothing opened.
+            if !name.waitForExistence(timeout: 3) { add.tap() }
             XCTAssertTrue(name.waitForExistence(timeout: 5), "Thing \(number)\n\(app.debugDescription)")
             name.tap(); name.typeText("Walkthrough thing \(number)")
             app.buttons["item.save"].tap()
