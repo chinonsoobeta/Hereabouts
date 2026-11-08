@@ -685,4 +685,4 @@ Final runs, Xcode 27.2, same simulators and commands as the Stage 1 record above
   - The three skips run only on demand: the language tour, the store screenshots and the fresh-install walkthrough.
 - The unit target didn't change in the M45 merge.
 
-That completes Stage 1. What's left needs the owner first: the device and sandbox checks (O35, O36, O39), the App Store Connect entries, and M48 to M54. M65 checks whatever lands after this point, just before the submission archive.
+That completes Stage 1: every M item that doesn't wait on the owner is done. M48, M49, M53, M54 and M56 each follow an owner step, and M57 and M58 apply only to a release with sync. M65 checks whatever lands after this point, just before the submission archive. The owner's 34 open items include the device and sandbox checks (O35, O36, O39) and the App Store Connect entries.
