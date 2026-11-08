@@ -4,6 +4,8 @@ import StoreKitTest
 @MainActor final class LocaliserUITests: XCTestCase {
     func testSettingsExportsAndProAreReachable() throws {
         continueAfterFailure = false
+        let storeKit = try openLocalStoreKit()
+        defer { withExtendedLifetime(storeKit) {} }
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
@@ -383,10 +385,7 @@ import StoreKitTest
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
-        // The app under UI test gets no local StoreKit file from the test plan, so load the same one here for the Pro shot.
-        let storeKitFile = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
-        let storeKit = try SKTestSession(contentsOf: storeKitFile)
-        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        let storeKit = try openLocalStoreKit()
         defer { withExtendedLifetime(storeKit) {} }
         let base = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         // 2: say where it is. Voice memos may be cut for 1.0, so this file is easy to drop.
@@ -495,6 +494,78 @@ import StoreKitTest
         app.staticTexts["1 of 8 packed"].tap()
         XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
         try shot("review-trip")
+    }
+
+    /// What App Review sees: a clean install of a Release build. Runs only when asked, in Release on an erased simulator:
+    /// `TEST_RUNNER_RELEASE_WALKTHROUGH_DIR=<folder> xcodebuild … -configuration Release -only-testing:LocaliserUITests/LocaliserUITests/testFreshInstallReleaseWalkthrough test`
+    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. In a simulator the plans never load on a fresh install, in Debug or Release, so the Pro checks fail there. They're meant for a device (see `Docs/Verification/M45`).
+    func testFreshInstallReleaseWalkthrough() throws {
+        guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
+        let folder = URL(fileURLWithPath: path)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let storeKit = try openLocalStoreKit()
+        defer { withExtendedLifetime(storeKit) {} }
+        let app = XCUIApplication()
+        func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        // 1. Skip the introduction.
+        let open = app.buttons["Open your notebook"]
+        XCTAssertTrue(open.waitForExistence(timeout: 10), app.debugDescription)
+        try shot("1-introduction")
+        open.tap()
+        let later = app.buttons["I'll do this later"]
+        XCTAssertTrue(later.waitForExistence(timeout: 5), app.debugDescription)
+        later.tap()
+        let notNow = app.buttons["Not now"]
+        XCTAssertTrue(notNow.waitForExistence(timeout: 5), app.debugDescription)
+        notNow.tap()
+        // The Find tab straight after install: watch the tips and the Siri tip's text.
+        let findStart = Date()
+        XCTAssertTrue(app.tabBars.buttons["Find"].waitForExistence(timeout: 10), app.debugDescription)
+        try shot("2a-find-just-after-install")
+        let siriText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Ask Hereabouts where something is'")).firstMatch
+        let siriShown = siriText.waitForExistence(timeout: 60)
+        let siriDelay = Date().timeIntervalSince(findStart)
+        print("M45 Siri tip text \(siriShown ? "appeared" : "did not appear") after \(String(format: "%.1f", siriDelay)) s")
+        try shot("2b-find-siri-tip")
+        // 2. Settings, then Pro.
+        app.tabBars.buttons["Settings"].tap()
+        try shot("2-settings")
+        let pro = app.buttons["Hereabouts Pro"]
+        reveal(pro, in: app); pro.tap()
+        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), app.debugDescription)
+        // Each plan is a button whose label starts with its name, as in testSettingsExportsAndProAreReachable.
+        let plans = ["Yearly", "Monthly", "Lifetime"].map { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", $0)).firstMatch }
+        XCTAssertTrue(plans[0].waitForExistence(timeout: 20), app.debugDescription)
+        for plan in plans { XCTAssertTrue(plan.exists, "\(plan) is missing\n\(app.debugDescription)") }
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists, "No trial button\n\(app.debugDescription)")
+        try shot("3-pro")
+        app.navigationBars["Pro"].buttons["Settings"].tap()
+        // 3. Add things one at a time until there are 15.
+        app.tabBars.buttons["Find"].tap()
+        for number in 1...15 {
+            let add = number == 1 ? app.buttons["Add your first thing"] : app.buttons["Add a thing"]
+            XCTAssertTrue(add.waitForExistence(timeout: 5), "Thing \(number): no add button\n\(app.debugDescription)")
+            add.tap()
+            let name = app.textFields["item.name"]
+            // The first tap can land while the previous sheet is still leaving; tap once more if nothing opened.
+            if !name.waitForExistence(timeout: 3) { add.tap() }
+            XCTAssertTrue(name.waitForExistence(timeout: 5), "Thing \(number)\n\(app.debugDescription)")
+            name.tap(); name.typeText("Walkthrough thing \(number)")
+            app.buttons["item.save"].tap()
+            XCTAssertTrue(name.waitForNonExistence(timeout: 5), "Thing \(number) did not save\n\(app.debugDescription)")
+        }
+        try shot("4-fifteen-things")
+        // 4. The 16th opens the paywall instead of saving.
+        app.buttons["Add a thing"].tap()
+        let name = app.textFields["item.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5), app.debugDescription)
+        name.tap(); name.typeText("Walkthrough thing 16")
+        app.buttons["item.save"].tap()
+        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), "The 16th thing did not open the paywall\n\(app.debugDescription)")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch.waitForExistence(timeout: 20), app.debugDescription)
+        try shot("5-paywall-on-16th")
     }
 
     func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
@@ -783,6 +854,15 @@ import StoreKitTest
         let results = app.otherElements["DOCSearchControllerContainerViewIdentifier"]
         let scope: XCUIElement = results.waitForExistence(timeout: 5) ? results : app
         return scope.cells
+    }
+
+    /// Opens and resets the local StoreKit session in the test runner. Keep the result alive for the whole test.
+    /// This alone doesn't give the app its plans: the app sees them only after a unit test has run since it was installed (M45).
+    private func openLocalStoreKit(file: StaticString = #filePath) throws -> SKTestSession {
+        let storeKitFile = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
+        let storeKit = try SKTestSession(contentsOf: storeKitFile)
+        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        return storeKit
     }
 
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
