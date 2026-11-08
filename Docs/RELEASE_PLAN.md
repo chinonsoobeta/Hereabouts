@@ -139,7 +139,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O21 Products.** `dev.hereabouts.pro.lifetime` at US$49.99, non-consumable, Family Sharing on. Then `dev.hereabouts.pro.monthly` at US$2.99 and `dev.hereabouts.pro.yearly` at US$19.99 in the group "Hereabouts Pro", each with a two-week free trial. Family Sharing can't be turned off later. For each product, choose the United States as the base country so Apple fills in the other countries, then change Canada by hand to CA$2.99, CA$19.99 and CA$49.99 (O4).
 - [ ] **O22 Product metadata.** A display name, description and review screenshot for each product and for the subscription group.
 - [ ] **O23 Billing Grace Period**, 16 days.
-- [ ] **O24 App Privacy.** "Data Not Collected". Voice memos are transcribed on the phone and the recording is not kept, and automatic backups go to the person's own iCloud Drive, which the developer can't see, so this answer doesn't change. Apple's own TestFlight crash reports don't count.
+- [x] **O24 App Privacy.** "Data Not Collected". Voice memos are transcribed on the phone and the recording is not kept, and automatic backups go to the person's own iCloud Drive, which the developer can't see, so this answer doesn't change. Apple's own TestFlight crash reports don't count. *Published 8 November with the owner's OK: Data Not Collected, privacy policy URL https://hereaboutsapp.com/privacy in all seven listing languages.*
 - [ ] **O25 Age rating.** Expect 4+.
 - [ ] **O26 URLs.** Privacy Policy and Support URLs. The Terms of Use line goes at the end of the description.
 - [ ] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0.
