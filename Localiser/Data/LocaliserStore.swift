@@ -8,23 +8,23 @@ enum LocaliserError: LocalizedError, Equatable {
     case invalidBackup(String), libraryNotEmpty, tooLong(String, Int), homeNotEmpty, lastHome, wrongHome
     var errorDescription: String? {
         switch self {
-        case .nameRequired: "Enter a name."
-        case .tooLong(let field, let limit): "\(field) can be up to \(limit.formatted()) characters."
-        case .placeCycle: "You can't put a place inside itself or anything inside it."
-        case .occupiedPlace: "Move what's inside somewhere else first."
-        case .schemaUnavailable: "Hereabouts couldn't open your notebook. Nothing has been deleted."
-        case .dateNotConfirmed: "Review and confirm the final date before saving it."
-        case .invalidReminder: "Choose when to be reminded."
-        case .invalidPackingEntry: "Check the thing, quantity and trip before changing this list."
-        case .invalidTripDates: "Come home on or after the day you leave."
-        case .packingConflict(let trip): "This is already packed for \(trip). Unpack it there or finish that trip first."
-        case .incompleteDeparture: "Finish packing and your checklist before you leave."
-        case .unresolvedHome: "Say where you put everything before you finish the trip."
+        case .nameRequired: String(localized: "Enter a name.")
+        case .tooLong(let field, let limit): String(localized: "\(field) can be up to \(limit.formatted()) characters.")
+        case .placeCycle: String(localized: "You can't put a place inside itself or anything inside it.")
+        case .occupiedPlace: String(localized: "Move what's inside somewhere else first.")
+        case .schemaUnavailable: String(localized: "Hereabouts couldn't open your notebook. Nothing has been deleted.")
+        case .dateNotConfirmed: String(localized: "Review and confirm the final date before saving it.")
+        case .invalidReminder: String(localized: "Choose when to be reminded.")
+        case .invalidPackingEntry: String(localized: "Check the thing, quantity and trip before changing this list.")
+        case .invalidTripDates: String(localized: "Come home on or after the day you leave.")
+        case .packingConflict(let trip): String(localized: "This is already packed for \(trip). Unpack it there or finish that trip first.")
+        case .incompleteDeparture: String(localized: "Finish packing and your checklist before you leave.")
+        case .unresolvedHome: String(localized: "Say where you put everything before you finish the trip.")
         case .invalidBackup(let reason): reason
-        case .homeNotEmpty: "Move or delete what's in this home first."
-        case .lastHome: "The notebook needs at least one home."
-        case .wrongHome: "That place is in a different home."
-        case .libraryNotEmpty: "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first."
+        case .homeNotEmpty: String(localized: "Move or delete what's in this home first.")
+        case .lastHome: String(localized: "The notebook needs at least one home.")
+        case .wrongHome: String(localized: "That place is in a different home.")
+        case .libraryNotEmpty: String(localized: "This notebook already has things in it. Choose Erase and restore to replace them, or back them up first.")
         }
     }
 }
@@ -154,7 +154,7 @@ final class LocaliserStore {
     func addItem(name: String, place: Place? = nil, notes: String = "", aliases: String = "", photo: Data? = nil, isPrivate: Bool = false) throws -> Belonging {
         // Validate everything before inserting, so a rejected item never lingers half-made in the context.
         let clean = try requiredName(name)
-        let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
+        let cleanNotes = try limited(notes, TextLimit.notes, field: String(localized: "Notes")), cleanAliases = try limited(aliases, TextLimit.aliases, field: String(localized: "Other names"))
         let item = NSEntityDescription.insertNewObject(forEntityName: "Belonging", into: context) as! Belonging
         item.id = UUID(); item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases
         item.createdAt = .now; item.confirmedAt = .now; item.archived = false; item.place = place; item.photo = photo; item.isPrivate = isPrivate
@@ -165,7 +165,7 @@ final class LocaliserStore {
 
     func editItem(_ item: Belonging, name: String, place: Place?, notes: String, aliases: String, photo: Data?, isPrivate: Bool? = nil) throws {
         let clean = try requiredName(name)
-        let cleanNotes = try limited(notes, TextLimit.notes, field: "Notes"), cleanAliases = try limited(aliases, TextLimit.aliases, field: "Other names")
+        let cleanNotes = try limited(notes, TextLimit.notes, field: String(localized: "Notes")), cleanAliases = try limited(aliases, TextLimit.aliases, field: String(localized: "Other names"))
         recordMove(item, to: place)
         item.name = clean; item.notes = cleanNotes; item.aliases = cleanAliases; item.photo = photo
         if let isPrivate { item.isPrivate = isPrivate }
@@ -268,7 +268,7 @@ final class LocaliserStore {
     func setDeadline(item: Belonging, kind: DeadlineKind, day: CalendarDay, source: String, leadDays: Int, hour: Int, enabled: Bool, confirmed: Bool, existing: Deadline? = nil) throws -> Deadline {
         guard confirmed else { throw LocaliserError.dateNotConfirmed }
         guard (0...3650).contains(leadDays), (0...23).contains(hour) else { throw LocaliserError.invalidReminder }
-        let cleanSource = try limited(source, TextLimit.source, field: "Source or terms")
+        let cleanSource = try limited(source, TextLimit.source, field: String(localized: "Source or terms"))
         let deadline = existing ?? (NSEntityDescription.insertNewObject(forEntityName: "Deadline", into: context) as! Deadline)
         if existing == nil { deadline.id = UUID(); deadline.decisionRaw = ReturnDecision.open.rawValue }
         deadline.item = item; deadline.kindRaw = kind.rawValue; deadline.dayString = day.stored
@@ -282,7 +282,7 @@ final class LocaliserStore {
     func requiredName(_ name: String) throws -> String {
         let clean = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { throw LocaliserError.nameRequired }
-        guard clean.count <= TextLimit.name else { throw LocaliserError.tooLong("Names", TextLimit.name) }
+        guard clean.count <= TextLimit.name else { throw LocaliserError.tooLong(String(localized: "Names"), TextLimit.name) }
         return clean
     }
 

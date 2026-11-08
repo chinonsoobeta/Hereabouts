@@ -159,7 +159,7 @@ struct ShelfNamesView: View {
 
     private var saveTitle: String {
         let count = pro.unlocked ? chosen.count : min(chosen.count, max(fits, 0))
-        return count == 1 ? "Write down 1 thing" : count == 0 ? "Write them down" : "Write down \(count) things"
+        return count == 1 ? String(localized: "Write down 1 thing") : count == 0 ? String(localized: "Write them down") : String(localized: "Write down \(count) things")
     }
 
     private func save() {

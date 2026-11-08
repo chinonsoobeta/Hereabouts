@@ -14,11 +14,11 @@ struct ProView: View {
                 Text("Hereabouts Pro").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
                 Text("Write down as many things as you need.").font(.wbBody).foregroundStyle(Theme.pencil)
                 VStack(spacing: 0) {
-                    allowance("Things you can write down", free: CreationKind.item.freeLimit.description)
-                    allowance("Packing kits", free: CreationKind.kit.freeLimit.description)
-                    allowance("Homes", free: CreationKind.home.freeLimit.description)
-                    NotebookLine(name: "Share with your household", detail: "Coming later", strongDetail: true).card()
-                    NotebookLine(name: "Everything else", detail: "Already free", strongDetail: true).card()
+                    allowance(String(localized: "Things you can write down"), free: CreationKind.item.freeLimit.description)
+                    allowance(String(localized: "Packing kits"), free: CreationKind.kit.freeLimit.description)
+                    allowance(String(localized: "Homes"), free: CreationKind.home.freeLimit.description)
+                    NotebookLine(name: String(localized: "Share with your household"), detail: String(localized: "Coming later"), strongDetail: true).card()
+                    NotebookLine(name: String(localized: "Everything else"), detail: String(localized: "Already free"), strongDetail: true).card()
                 }
                 if let standing = pro.standing {
                     owned(standing)
@@ -79,11 +79,11 @@ struct ProView: View {
                     ViewThatFits(in: .horizontal) {
                         HStack(spacing: 8) {
                             Text(option.name).font(.wbItem).foregroundStyle(Theme.ink).fixedSize()
-                            if let trial = pro.trial(option) { Stamp(text: "\(trial) free", tone: .purple) }
+                            if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
                         }
                         VStack(alignment: .leading, spacing: 6) {
                             Text(option.name).font(.wbItem).foregroundStyle(Theme.ink)
-                            if let trial = pro.trial(option) { Stamp(text: "\(trial) free", tone: .purple) }
+                            if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
                         }
                     }
                     Text(detail(option)).font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.leading)
@@ -103,19 +103,19 @@ struct ProView: View {
         guard let product = pro.product(option) else { return "" }
         switch option {
         case .yearly:
-            var parts = ["\(product.displayPrice) a year"]
-            parts.append("\(ProPricing.monthly(product.price).formatted(product.priceFormatStyle)) a month")
-            if let monthly = pro.product(.monthly), let saving = ProPricing.saving(yearly: product.price, monthly: monthly.price) { parts.append("Save \(saving)%") }
+            var parts = [String(localized: "\(product.displayPrice) a year")]
+            parts.append(String(localized: "\(ProPricing.monthly(product.price).formatted(product.priceFormatStyle)) a month"))
+            if let monthly = pro.product(.monthly), let saving = ProPricing.saving(yearly: product.price, monthly: monthly.price) { parts.append(String(localized: "Save \(saving)%")) }
             return parts.joined(separator: " · ")
-        case .monthly: return "\(product.displayPrice) a month"
-        case .lifetime: return "\(product.displayPrice) once. Never renews."
+        case .monthly: return String(localized: "\(product.displayPrice) a month")
+        case .lifetime: return String(localized: "\(product.displayPrice) once. Never renews.")
         }
     }
 
     private func buttonTitle(_ product: Product) -> String {
         switch plan {
-        case .lifetime: "Buy once for \(product.displayPrice)"
-        default: pro.trial(plan).map { "Try free for \($0)" } ?? "Subscribe for \(product.displayPrice) \(ProPricing.period(product))"
+        case .lifetime: String(localized: "Buy once for \(product.displayPrice)")
+        default: pro.trial(plan).map { String(localized: "Try free for \($0)") } ?? String(localized: "Subscribe for \(product.displayPrice) \(ProPricing.period(product))")
         }
     }
 
@@ -130,19 +130,24 @@ struct ProView: View {
     }
 
     private func allowance(_ name: String, free: String) -> some View {
-        NotebookLine(name: name, detail: "\(free) → No limit", strongDetail: true).card()
+        NotebookLine(name: name, detail: String(localized: "\(free) → No limit"), strongDetail: true).card()
     }
 }
 
 /// Pricing sentences, kept apart from the view so they can be tested.
 enum ProPricing {
     static func period(_ product: Product) -> String {
-        product.subscription?.subscriptionPeriod.unit == .month ? "a month" : "a year"
+        product.subscription?.subscriptionPeriod.unit == .month ? String(localized: "a month") : String(localized: "a year")
     }
     /// "3 days", "2 weeks", "1 month": how long a free trial lasts.
     static func trialLength(value: Int, unit: Product.SubscriptionPeriod.Unit) -> String {
-        let word = switch unit { case .day: "day"; case .week: "week"; case .month: "month"; case .year: "year"; @unknown default: "period" }
-        return "\(value) \(word)\(value == 1 ? "" : "s")"
+        switch unit {
+        case .day: return String(localized: "\(value) days")
+        case .week: return String(localized: "\(value) weeks")
+        case .month: return String(localized: "\(value) months")
+        case .year: return String(localized: "\(value) years")
+        @unknown default: return String(localized: "\(value) periods")
+        }
     }
     static func monthly(_ yearly: Decimal) -> Decimal {
         var result = Decimal(), value = yearly / 12
@@ -157,19 +162,19 @@ enum ProPricing {
         return percent > 0 ? percent : nil
     }
     static func terms(plan: ProPlan, price: String, period: String, trial: String?) -> String {
-        guard plan.isSubscription else { return "Pay once. Share with your family. No renewal." }
-        let start = trial.map { "Free for \($0), then \(price) \(period)." } ?? "\(price) \(period)."
-        return start + " Renews automatically until you cancel. Cancel in Settings at least a day before it renews."
+        guard plan.isSubscription else { return String(localized: "Pay once. Share with your family. No renewal.") }
+        let start = trial.map { String(localized: "Free for \($0), then \(price) \(period).") } ?? "\(price) \(period)."
+        return start + String(localized: " Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
     }
 }
 
 extension ProStanding {
     /// "Pro, renews 12 Nov", "Free trial, ends 26 Oct", "Lifetime. Thank you."
     var summary: String {
-        let shared = familyShared ? " Shared by your family." : ""
-        guard plan.isSubscription, let end = periodEnd else { return "Lifetime Pro." + shared }
+        let shared = familyShared ? String(localized: " Shared by your family.") : ""
+        guard plan.isSubscription, let end = periodEnd else { return String(localized: "Lifetime Pro.") + shared }
         let day = end.formatted(.dateTime.day().month(.abbreviated))
-        if inTrial { return (willRenew ? "Free trial, ends \(day)" : "Free trial until \(day). It won't renew.") + shared }
-        return (willRenew ? "Pro, renews \(day)" : "Pro until \(day). It won't renew.") + shared
+        if inTrial { return (willRenew ? String(localized: "Free trial, ends \(day)") : String(localized: "Free trial until \(day). It won't renew.")) + shared }
+        return (willRenew ? String(localized: "Pro, renews \(day)") : String(localized: "Pro until \(day). It won't renew.")) + shared
     }
 }

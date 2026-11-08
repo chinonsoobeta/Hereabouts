@@ -318,12 +318,12 @@ enum DueLabel {
     static func pill(for day: CalendarDay?) -> (String, Stamp.Tone)? {
         guard let days = days(until: day) else { return nil }
         switch days {
-        case -1: return ("Yesterday", .due)
-        case ..<0: return ("\(-days) days ago", .due)
-        case 0: return ("Today", .due)
-        case 1: return ("Tomorrow", .due)
-        case 2...3: return ("In \(days) days", .due)
-        default: return ("In \(days) days", .neutral)
+        case -1: return (String(localized: "Yesterday"), .due)
+        case ..<0: return (String(localized: "\(-days) days ago"), .due)
+        case 0: return (String(localized: "Today"), .due)
+        case 1: return (String(localized: "Tomorrow"), .due)
+        case 2...3: return (String(localized: "In \(days) days"), .due)
+        default: return (String(localized: "In \(days) days"), .neutral)
         }
     }
 

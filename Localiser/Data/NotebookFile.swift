@@ -50,7 +50,7 @@ enum NotebookFile {
     enum MoveError: LocalizedError {
         case countsDiffer(String)
         var errorDescription: String? {
-            switch self { case .countsDiffer(let entity): "Some \(entity) entries were missing from the copy. Your original notebook was kept." }
+            switch self { case .countsDiffer(let entity): String(localized: "Some \(entity) entries were missing from the copy. Your original notebook was kept.") }
         }
     }
 

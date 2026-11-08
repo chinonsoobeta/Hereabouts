@@ -38,9 +38,9 @@ struct PlacePicker: View {
     @Environment(LocaliserStore.self) private var store
     @Binding var selection: UUID?
     var excluded: Place? = nil
-    var title = "Place"
+    var title = String(localized: "Place")
     /// What "no place" is called here: a thing without a place yet, or a place that isn't inside another.
-    var noneTitle = "No place yet"
+    var noneTitle = String(localized: "No place yet")
     /// Offered first in the chooser, under "Recent".
     var recent: [Place] = []
     /// Whose places to offer. The current home when nil.
@@ -48,7 +48,7 @@ struct PlacePicker: View {
     var body: some View {
         let _ = store.revision
         NavigationLink {
-            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: "Recent", home: home)
+            PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: String(localized: "Recent"), home: home)
         } label: {
             HStack(spacing: 12) {
                 Text(title).foregroundStyle(Theme.ink)
@@ -70,11 +70,11 @@ struct PlaceChooser: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var selection: UUID?
     var excluded: Place? = nil
-    var noneTitle = "No place yet"
+    var noneTitle = String(localized: "No place yet")
     /// Shown first when nothing is typed, as "Try here first". Used by "Found it".
     var suggested: [Place] = []
-    var suggestedTitle = "Try here first"
-    var title = "Choose a place"
+    var suggestedTitle = String(localized: "Try here first")
+    var title = String(localized: "Choose a place")
     /// Whose places to offer, and where a typed place is made. The current home when nil.
     var home: HomeRecord? = nil
     @State private var query = ""
@@ -126,7 +126,7 @@ struct PlaceChooser: View {
                 }
             }
             Section {
-                row(title: noneTitle, detail: noneTitle == "None" || noneTitle == "Top level" ? "A place that isn't inside another" : "Not sure yet", id: nil)
+                row(title: noneTitle, detail: noneTitle == String(localized: "None") || noneTitle == String(localized: "Top level") ? String(localized: "A place that isn't inside another") : String(localized: "Not sure yet"), id: nil)
                 ForEach(candidates) { place in row(title: place.name, detail: place.parent?.path, id: place.id, depth: depth(of: place)) }
             } footer: {
                 if scope.isEmpty { Text("Type a place above, like Kitchen or Garage › Shelf 2.").foregroundStyle(Theme.secondary) }

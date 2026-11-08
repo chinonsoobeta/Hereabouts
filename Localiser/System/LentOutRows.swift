@@ -23,7 +23,7 @@ struct LentOutRow: Equatable, Identifiable, Sendable {
 enum LentOutRows {
     /// The widget's kind, for `WidgetCenter.reloadTimelines(ofKind:)`.
     static let widgetKind = "dev.hereabouts.app.widget.lentout"
-    static let privateName = "A private thing"
+    static let privateName = String(localized: "A private thing")
     /// What fits in a medium widget.
     static let fits = 4
 
@@ -35,8 +35,8 @@ enum LentOutRows {
             LentOutRow(id: index,
                        title: record.isPrivate || record.name.isEmpty ? privateName : record.name,
                        person: record.person,
-                       sinceText: "Since \(written(record.since))",
-                       askBackText: askBackDate(record.askBackDay, calendar: calendar).map { "Ask for it back \(written($0))" })
+                       sinceText: String(localized: "Since \(written(record.since))"),
+                       askBackText: askBackDate(record.askBackDay, calendar: calendar).map { String(localized: "Ask for it back \(written($0))") })
         }
     }
 

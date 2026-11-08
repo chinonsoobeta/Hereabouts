@@ -9,7 +9,7 @@ struct PlacesView: View {
     @State private var labelled: Place?
     @State private var unknownLabel = false
     @State private var tidying = false
-    private let starters = ["Kitchen", "Bedroom", "Garage", "Hall closet", "Office", "Attic"]
+    private let starters = [String(localized: "Kitchen"), String(localized: "Bedroom"), String(localized: "Garage"), String(localized: "Hall closet"), String(localized: "Office"), String(localized: "Attic")]
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -30,7 +30,7 @@ struct PlacesView: View {
                     } message: { Text("Only empty copies are removed. Places inside them move into the place you're keeping.") }
                 }
                 if store.placesHere.isEmpty {
-                    LibraryEmptyState(title: "Where do you keep things?", systemImage: "house", description: "Add a room, then the drawers, shelves and boxes inside it.")
+                    LibraryEmptyState(title: String(localized: "Where do you keep things?"), systemImage: "house", description: String(localized: "Add a room, then the drawers, shelves and boxes inside it."))
                     quickStart(starters)
                     Button("Add a place") { adding = true }.buttonStyle(PrimaryButtonStyle())
                 } else {
@@ -44,7 +44,7 @@ struct PlacesView: View {
                     if rooms.count < 3, !unusedStarters.isEmpty { quickStart(unusedStarters) }
                 }
                 if !store.lentItems.isEmpty {
-                    SectionHeading(title: "Lent out").padding(.top, 8)
+                    SectionHeading(title: String(localized: "Lent out")).padding(.top, 8)
                     ForEach(store.lentItems) { item in
                         NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain)
                     }
@@ -160,7 +160,7 @@ struct PlaceEditor: View {
                 }
             }
             Section {
-                PlacePicker(selection: $parentID, excluded: place, title: "Inside", noneTitle: "None", home: place?.home)
+                PlacePicker(selection: $parentID, excluded: place, title: String(localized: "Inside"), noneTitle: String(localized: "None"), home: place?.home)
             } footer: { Text("Choose None if this place isn't inside another place.").foregroundStyle(Theme.secondary) }
         }
         .groundBackground()
@@ -224,7 +224,7 @@ struct PlaceDetailView: View {
                     Section("Places inside") {
                         ForEach(place.children.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }) { child in
                             NavigationLink { PlaceDetailView(place: child) } label: {
-                                NotebookLine(name: child.name, detail: child.activeItemCount == 1 ? "1 thing" : "\(child.activeItemCount) things")
+                                NotebookLine(name: child.name, detail: String(localized: "\(child.activeItemCount) things"))
                             }
                         }
                     }

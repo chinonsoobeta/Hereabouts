@@ -9,7 +9,7 @@ enum BoxLabels {
     enum Paper: String, CaseIterable, Identifiable {
         case a4, letter
         var id: String { rawValue }
-        var title: String { self == .a4 ? "A4" : "US Letter" }
+        var title: String { self == .a4 ? String(localized: "A4") : String(localized: "US Letter") }
         /// Points, portrait.
         var size: CGSize { self == .a4 ? CGSize(width: 595.28, height: 841.89) : CGSize(width: 612, height: 792) }
         /// Letter where it's the usual paper; A4 everywhere else.
@@ -84,17 +84,17 @@ enum BoxLabels {
         if listContents {
             let names = place.items.filter { !$0.archived && !$0.isPrivate }.map(\.name).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
             if !names.isEmpty {
-                let shown = names.prefix(8).joined(separator: ", ") + (names.count > 8 ? " and \(names.count - 8) more" : "")
+                let shown = names.prefix(8).joined(separator: ", ") + (names.count > 8 ? " " + String(localized: "and \(names.count - 8) more") : "")
                 write(shown, .systemFont(ofSize: 10), .darkGray, in: CGRect(x: column.minX, y: y, width: column.width, height: column.maxY - y), lines: 7)
             }
         }
-        let note = "Scan with your iPhone camera to open in Hereabouts."
+        let note = String(localized: "Scan with your iPhone camera to open in Hereabouts.")
         (note as NSString).draw(in: CGRect(x: inset.minX, y: inset.maxY - noteFont.lineHeight, width: inset.width, height: noteFont.lineHeight), withAttributes: [.font: noteFont, .foregroundColor: UIColor.gray])
     }
 
     /// Writes the sheet to a temporary file named for sharing or printing.
     @MainActor static func file(for places: [Place], paper: Paper, listContents: Bool) throws -> URL {
-        let name = places.count == 1 ? "\(places[0].name) label.pdf" : "Hereabouts labels.pdf"
+        let name = places.count == 1 ? String(localized: "\(places[0].name) label.pdf") : String(localized: "Hereabouts labels.pdf")
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(name.replacingOccurrences(of: "/", with: "-"))
         try pdf(for: places, paper: paper, listContents: listContents).write(to: url, options: .atomic)
         return url

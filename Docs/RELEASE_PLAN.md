@@ -109,7 +109,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [x] **O4 How Pro is sold in 1.0.** Option B, decided 7 November: US$2.99 a month, US$19.99 a year with a two-week trial, and US$49.99 Lifetime, as planned on 12 October. **Prices by country** (owner, 7 November): the US prices are the base, and every other country gets Apple's automatic equivalent of them, except Canada, which is set by hand to the same numbers in Canadian dollars: CA$2.99, CA$19.99 and CA$49.99. Canadian prices on the App Store are shown before tax, with GST/HST added at checkout, and a price set by hand doesn't follow exchange rates. M30 and O23 apply, and the review notes make the case for ongoing value (M34). If App Review rejects the subscriptions under guideline 3.1.2(a), the fallback is to detach them and ship Lifetime only (Option A), with the subscriptions returning in 1.1 alongside household sharing.
 - [x] **O5 Two product gaps.** Decided 7 November: moving a thing or place to another home is in 1.0 (M62); explaining Lifetime while subscribed waits for 1.1.
 - [x] **O6 The phone for the speed check.** The iPhone 16 Pro Max, decided 7 November; results are labelled "slowest phone tested". Original wording: The quality check times search over 5,000 records on the slowest supported phone. Say which phone; if only the iPhone 16 Pro Max is available, the result is labelled "slowest phone tested".
-- [ ] **O7 The listing's subtitle and wording.** The subtitle "Find things, track returns" has to change. Approve the new subtitle, description and captions after Codex's pass (M36, M41).
+- [x] **O7 The listing's subtitle and wording.** The subtitle "Find things, track returns" has to change. Approve the new subtitle, description and captions after Codex's pass (M36, M41). *Approved 7 November with the rest of the wording (O38): subtitle "Find your things", the description and the captions as in `Docs/BETA_AND_RELEASE.md`.*
 
 ### Business and accounts
 
@@ -162,7 +162,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O35 Sandbox purchases.** Buy each product; start both trials and cancel; restore on a second device; a failed purchase; Ask to Buy; a refund; Family Sharing. After the refund, check everything is still visible, editable and exportable.
 - [ ] **O36 First run on a clean phone.** Introduction, first thing, first place, a voice memo, lending with an ask-back date, a kit, the Sunday recap preview, erase.
 - [ ] **O37 Screenshots.** Approve the set from M46.
-- [ ] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you.
+- [x] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you. *Approved 7 November: "I'm happy with the wording."*
 - [ ] **O39 Physical-device checks**, one tick each:
   - [ ] iOS 26 on the smallest supported phone you can borrow, and phones with and without Apple Intelligence.
   - [ ] Airplane mode with no iCloud account: create, edit, move, search, a voice memo and relaunch, with nothing lost.
@@ -276,8 +276,8 @@ These set what's true. Codex's pass then makes it read well.
 
 ### Stage 1, part G: wording that sounds human (Codex)
 
-- [ ] **M41 Codex rewrites every piece of wording**, after parts A to F are merged and, ideally, after O3. The brief below is complete, because Codex can't see this conversation. Codex works on a local branch `copy-rewrite`, one commit per area, and pushes nothing. · D
-- [ ] **M42 Review and merge.** I read every change against the brief, run all tests, and fix layouts that no longer fit. The owner signs off in O38. Then merge into `main`. · D
+- [x] **M41 Codex rewrites every piece of wording**, after parts A to F are merged and, ideally, after O3. The brief below is complete, because Codex can't see this conversation. Codex works on a local branch `copy-rewrite`, one commit per area, and pushes nothing. · D *Done 7 November: about 280 changes in `Docs/COPY_CHANGES.md`. Codex stopped once at its usage limit and resumed in the same session; its sandbox couldn't write to git, so I made the per-area commits.*
+- [x] **M42 Review and merge.** I read every change against the brief, run all tests, and fix layouts that no longer fit. The owner signs off in O38. Then merge into `main`. · D *Done 7 November (merge fbcb38c). Ten review notes applied, including "Call off trip" (next to the system Cancel button), the privacy line for Pro's default-on backups, and Siri shortcut phrases without a parameter listed first so Siri tips don't show a placeholder. One layout fix: the monthly check's title is now "November check" (the longer one clipped). Unit tests 152 on iOS 26.5 (6 skipped) and on iOS 27; no new UI failures on either.*
 
 **Brief for Codex**
 
@@ -300,7 +300,7 @@ These set what's true. Codex's pass then makes it read well.
 
 ### Stage 1, part G2: languages (P1, 2.5 sessions)
 
-- [ ] **M63 Five languages** (owner, 7 November), after M42, so the translations start from the final English. A Claude builder does it. English (US) stays the source language; the app adds English (UK), French, Spanish and Portuguese. · P, X1
+- [x] **M63 Five languages** (owner, 7 November), after M42, so the translations start from the final English. A Claude builder does it. English (US) stays the source language; the app adds English (UK), French, Spanish and Portuguese. · P, X1
   - **Groundwork.** The app has no localization yet: no string catalogs and no `String(localized:)`. Set `developmentLanguage: en` and the known regions in `project.yml`, turn on `LOCALIZATION_PREFERS_STRING_CATALOGS` and `SWIFT_EMIT_LOC_STRINGS`, and add string catalogs for the app, `HereaboutsControls` and `HereaboutsWidget`: `Localizable.xcstrings`, `InfoPlist.xcstrings` (usage strings; the display name stays Hereabouts) and `AppShortcuts.xcstrings` (Siri phrases, each keeping the app name).
   - **Make every string localizable.** Text built as a plain `String` (alerts, errors, notification titles and bodies, App Intents dialogs, widget and control text including the lent-out rows' "Since" and "Ask back" in `LentOutRows.swift`, VoiceOver labels, tips) moves to `String(localized:)` or `LocalizedStringResource`. Counts use plural variations ("1 thing", "2 things"). Dates, numbers and prices go through formatters and StoreKit's `displayPrice`, never hand-built.
   - **Translate.** Use `xcodebuild -exportLocalizations` and `-importLocalizations`, or edit the catalogs directly. Write the way the English does: second person, short, warm, no marketing tone. French uses "vous", Spanish "tú", Portuguese "você". `Docs/Localization/GLOSSARY.md` fixes one word per language for thing, place, home, kit, trip, notebook, lend, ask for it back, put away and Found it; "Pro" and "Hereabouts" stay as they are. English (UK) changes only spelling and the odd word (colour, favourite, organise, cancelled). The paywall keeps every fact in every language: price, period, trial, automatic renewal, Restore purchases and both links.
@@ -309,6 +309,7 @@ These set what's true. Codex's pass then makes it read well.
   - **Prices.** Never written into the app, the listing, the review notes or the website: the paywall shows StoreKit's price for the person's country, and the App Store shows its own (O4).
   - **Listing.** `Docs/Localization/LISTING.md`: the subtitle (30 characters at most), promotional text, description, keywords (100 characters at most) and the review notes' first line, for each App Store language in O49. Nothing is uploaded. The website pages stay English for 1.0.
   - **Check:** a unit test that every catalog entry is translated in every language, that format specifiers match the English, and that every Siri phrase keeps the app name; the UI tests pin English so they stay stable; a screenshot tour of every tab, Settings, Pro and the introduction in each language, at the default and the largest text size, saved to `Docs/Verification/Languages` for O48, with nothing clipped or overlapping.
+  - **Done 7 November** (merge 33f4d4c, touch-up d5376da). 751 entries across five catalogs, all translated in en-GB, fr, es and pt-BR. Audit round 1 fixed: "Call off" no longer uses the word on the system Cancel button (fr Renoncer, es Anular, pt-BR Desistir); no gendered words about the person; room icons know French, Spanish and Portuguese room names and the British "Hall cupboard"; listing keywords fit 100 characters and 100 bytes. Unit tests 158/158 on iOS 26.5 and 27. Stays English on purpose: the demo notebook, voice capture, the "Name in Place" typed shortcut, "ERASE", CSV headers and the support email subject. For O48, the least certain words are the Canadian French and Mexican Spanish listing variants and pt-BR "Abandonada" for a called-off trip.
 
 ### Stage 1, part H: verification (P0, 1 session)
 
@@ -343,7 +344,7 @@ These set what's true. Codex's pass then makes it read well.
 - [x] **M52 The lent-out widget** (after M51). Medium size: who has what, since when, and the ask-back date. Private things show as "A private thing". The app reloads it after saves. · D
 - [ ] **M53 Ship or cut** the shared notebook and the lent-out widget, by the cut rule, and record the result here. · merge
 - [ ] **M54 Purchase wording** (after O35). Fix anything that read wrong in the sandbox. · P
-- [ ] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings in the source before the first build; British spellings belong only in the English (UK) catalog (M63). · P
+- [x] **M55 One English.** Done by Codex's pass (M41) in American English. Check with a search for British spellings in the source before the first build; British spellings belong only in the English (UK) catalog (M63). · P *Checked 7 November after M42: the only British spellings left are in code comments, identifiers and test data. Re-run the search in M65.*
 - [ ] **M56 Each archive** (after O42 or O44). Raise `CURRENT_PROJECT_VERSION` at `project.yml:69` and `:92`, archive with Xcode 27.2, run `scripts/check-release.sh`, upload only on the go-ahead. · P, X1
 - [ ] **M57 Sync week** (only if B4 is tried for 1.0). · P
 - [ ] **M58 CloudKit schema** to production, for a release with sync. · P, X1

@@ -46,9 +46,9 @@ extension Movement {
     var summary: String {
         switch kind {
         case .moved: "\(Movement.display(fromPath)) → \(Movement.display(toPath))"
-        case .found: fromPath == toPath ? "Found where it should be" : "Found in \(Movement.display(toPath))"
-        case .lent: "Lent to \(toPath)"
-        case .back: "Back from \(fromPath)"
+        case .found: fromPath == toPath ? String(localized: "Found where it should be") : String(localized: "Found in \(Movement.display(toPath))")
+        case .lent: String(localized: "Lent to \(toPath)")
+        case .back: String(localized: "Back from \(fromPath)")
         }
     }
 
@@ -57,6 +57,6 @@ extension Movement {
 
     /// What the app says after a find: "Noted. Next time, look in Hall › Drawer."
     static func foundSentence(_ place: Place?) -> String {
-        place.map { "Noted. Next time, look in \($0.path)." } ?? "Noted. Add a place when you know where you keep it."
+        place.map { String(localized: "Noted. Next time, look in \($0.path).") } ?? String(localized: "Noted. Add a place when you know where you keep it.")
     }
 }
