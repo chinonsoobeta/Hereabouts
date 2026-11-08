@@ -33,7 +33,11 @@ enum NotebookFile {
             // The copy is in use, so its counts may rightly differ from the original now. Only check it
             // still opens; if it's gone or damaged, go back to the original and keep it.
             guard files.fileExists(atPath: group.path), opens(group) else {
-                return files.fileExists(atPath: legacy.path) ? legacy : group
+                let original = files.fileExists(atPath: legacy.path)
+                // A missing copy means edits now go to the original. Clear the flag so a stale copy that
+                // turns up later is replaced from the original, not trusted. A damaged copy keeps the flag.
+                if original, !files.fileExists(atPath: group.path) { defaults.removeObject(forKey: movedKey) }
+                return original ? legacy : group
             }
             try? removeOriginal(at: legacy)
             return group

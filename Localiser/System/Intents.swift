@@ -107,12 +107,13 @@ struct FindThingIntent: AppIntent {
     @MainActor func perform() async throws -> some IntentResult & ProvidesDialog {
         let store = try IntentLibrary.open()
         guard let item = store.items.first(where: { $0.id == thing.id && !$0.isDeleted }) else { throw HereaboutsIntentError.notFound }
-        return .result(dialog: IntentDialog(stringLiteral: Self.answer(for: item)))
+        return .result(dialog: IntentDialog(stringLiteral: Self.answer(for: item, severalHomes: store.hasSeveralHomes)))
     }
 
-    @MainActor static func answer(for item: Belonging) -> String {
+    @MainActor static func answer(for item: Belonging, severalHomes: Bool = false) -> String {
         if item.isPrivate { return String(localized: "That one's private. Open Hereabouts to see it.") }
-        let path = item.place?.path
+        // With several homes, the home leads, as in PlaceEntity.
+        let path = item.place.map { place in severalHomes ? place.home.map { "\($0.name) · \(place.path)" } ?? place.path : place.path }
         if item.archived { return path.map { String(localized: "\(item.name) is archived. It was last in \($0).") } ?? String(localized: "\(item.name) is archived.") }
         if item.isMissing { return path.map { String(localized: "\(item.name) is marked missing. It was last in \($0).") } ?? String(localized: "\(item.name) is marked missing.") }
         if item.isLent { return item.lentAt.map { String(localized: "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide))).") } ?? String(localized: "\(item.name) is with \(item.lentTo).") }
