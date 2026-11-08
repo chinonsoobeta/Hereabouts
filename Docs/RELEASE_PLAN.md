@@ -145,7 +145,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0.
 - [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
-- [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Beta description saved 8 November. Still needed: feedback email, then (for external testers only) the review contact, privacy policy URL (O17) and marketing URL.*
+- [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Still needed for external testers: the privacy policy URL (O17), and optionally a marketing URL.*
 - [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
 
 ### Hands-on checks
