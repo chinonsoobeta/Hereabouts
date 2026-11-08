@@ -114,10 +114,10 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 ### Business and accounts
 
 - [x] **O8 Enrol in the Apple Developer Program.** Done 6 November.
-- [ ] **O9 Paid Apps Agreement.** Accepted. It turns Active once the bank, both tax forms and Apple's checks are through. See section 2.
+- [x] **O9 Paid Apps Agreement.** Accepted. It turns Active once the bank, both tax forms and Apple's checks are through. See section 2. *Active, checked in App Store Connect on 8 November, along with the bank account, all three tax forms and the Digital Services Act details.*
 - [x] **O10 Register with the CRA.** Done 7 November; Form 506 is Active. Use Business Registration Online as a sole proprietor and open a GST/HST account. Enter the 9-digit Business Number and the RT number (usually 0001) on Form 506 in App Store Connect, under Business. Registering means filing GST/HST returns from then on; ask an accountant how often.
 - [x] **O11 The leftover US tax row.** Filed 7 November; Active. If "U.S. Certificate of Foreign Status of Beneficial Owner" still shows missing once everything else is in, ask Apple through Contact Us rather than filing a second form.
-- [ ] **O12 Small Business Program** (15% commission). Apply once the Paid Apps Agreement is Active, before the first sale.
+- [ ] **O12 Small Business Program** (15% commission). Apply once the Paid Apps Agreement is Active, before the first sale. *Ready since 8 November: the agreement is Active and the enrolment form still offers to enrol.*
 - [x] **O13 EU contact details.** Decided 7 November: keep the current details for now. They can be changed later under Business, Compliance; Apple checks the new details again, and anything already shown may have been seen or copied.
 
 ### Identifiers
@@ -146,6 +146,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
 - [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact.
+- [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
 
 ### Hands-on checks
 
