@@ -498,6 +498,7 @@ import StoreKitTest
 
     /// What App Review sees: a clean install of a Release build. Runs only when asked, in Release on an erased simulator:
     /// `TEST_RUNNER_RELEASE_WALKTHROUGH_DIR=<folder> xcodebuild … -configuration Release -only-testing:LocaliserUITests/LocaliserUITests/testFreshInstallReleaseWalkthrough test`
+    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. On iOS 27 simulators a Release build gets no plans from the local StoreKit file, so the Pro checks fail there; Debug runs load them.
     func testFreshInstallReleaseWalkthrough() throws {
         guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
         let folder = URL(fileURLWithPath: path)
