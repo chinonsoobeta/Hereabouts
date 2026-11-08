@@ -50,8 +50,9 @@ struct AutomaticBackups: @unchecked Sendable {
     /// Due when a week has passed since the last backup, and never twice in a day.
     func isDue() -> Bool {
         let current = now()
-        if let last = lastBackup, current.timeIntervalSince(last) < Self.interval { return false }
-        if let attempt = date(forKey: Self.attemptKey), current.timeIntervalSince(attempt) < Self.retryGap { return false }
+        // A date ahead of the clock means the clock was wrong when it was stored, so it doesn't count.
+        if let last = lastBackup, last <= current, current.timeIntervalSince(last) < Self.interval { return false }
+        if let attempt = date(forKey: Self.attemptKey), attempt <= current, current.timeIntervalSince(attempt) < Self.retryGap { return false }
         return true
     }
 

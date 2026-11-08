@@ -161,7 +161,11 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O34 Voice memos in your own words.** Say 20 sentences the way you'd really say them, in a quiet room and a noisy one, with and without Wi-Fi. Note each one it got wrong. This feeds the voice rule.
 - [ ] **O35 Sandbox purchases.** Buy each product; start both trials and cancel; restore on a second device; a failed purchase; Ask to Buy; a refund; Family Sharing. After the refund, check everything is still visible, editable and exportable.
 - [ ] **O36 First run on a clean phone.** Introduction, first thing, first place, a voice memo, lending with an ask-back date, a kit, the Sunday recap preview, erase.
-- [ ] **O37 Screenshots.** Approve the set from M46.
+- [ ] **O37 Screenshots.** Approve the set from M46 (`Docs/Store/iPhone-6.9`). Points to decide:
+  - The Pro shot shows the US prices ($2.99, $19.99, $49.99). Canada sees the same numbers, but other countries pay a different amount. Keep it, or ask for a shot without the plans.
+  - The voice shot shows the filled-in Put away screen, not the heard sentence. The test also takes the Say where screen with the sentence, if you'd rather show that or both.
+  - On the lending shot, the history line says 6:56 PM while the status bar says 9:41.
+  - Drop `2-voice-optional.png` if voice memos are cut.
 - [x] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you. *Approved 7 November: "I'm happy with the wording."*
 - [ ] **O39 Physical-device checks**, one tick each:
   - [ ] iOS 26 on the smallest supported phone you can borrow, and phones with and without Apple Intelligence.
@@ -319,7 +323,7 @@ These set what's true. Codex's pass then makes it read well.
   - **Done 7 November** (merge `01a616e`): every UI test green on iOS 26.5 and 27 (the language tour and store screenshots run on demand), twice each by the builder and once each by me after the merge. Three contrast exemptions, each measured by eye in both modes; the dark-mode Later on the monthly check measured 4.2:1 and was fixed instead (`135204d`). Fixes: Several things sits under the photo, packing rows redraw after a tick, Pro plan names wrap beside the trial stamp.
   - *First pass, 7 November:* 17 tests, 0 failures in two runs in a row (the stocktake demo data and a timing wait in the several-things test). Still open for the second pass, after M41: tapping "Several things in this photo?" just as the photo picker closes can close the whole New thing sheet (`Find/FindView.swift:299`, the tap lands while focus moves to Name); and the lending test's contrast audit has failed now and then.
 - [ ] **M45 Fresh-install Release walkthrough** on an iOS 27 simulator with the local StoreKit file: skip the introduction, open the Settings tab, open Pro, add 15 things and check the 16th opens the paywall. Screenshots to `Docs/Verification`. · X1
-- [ ] **M46 Store screenshots.** Retake the set from M37 with the demo library on the iPhone 17 Pro Max simulator, including Pro. · P, X1
+- [x] **M46 Store screenshots.** Retake the set from M37 with the demo library on the iPhone 17 Pro Max simulator, including Pro. · P, X1 *Done 7 November (`23cdb8b`): five shots at 1320 × 2868 in `Docs/Store/iPhone-6.9`, captions in `Docs/Store/README.md`, dark copies in `Docs/Store/night-review`.*
 - [x] **M47 Quality-check harness.** Fixtures and a scoring script for capture (now through the voice parser), search and speed, waiting for O40. · P, X1, D *Done 7 November with 10 stand-in sentences and 10 search pairs (10 of 10 and 9 of 10; "tnet" for Tent is a real miss). O40's examples replace them.*
 
 ### Stage 1, part I: adversarial audit (P0, the very last step, 2 sessions)
