@@ -4500,7 +4500,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desistência"
+            "value" : "Abandonada"
           }
         }
       }
@@ -20628,7 +20628,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "desistência"
+            "value" : "abandonada"
           }
         }
       }

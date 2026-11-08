@@ -122,6 +122,7 @@ final class LocalizationTests: XCTestCase {
             ("Étagère", "books.vertical"), ("Estante", "books.vertical"), ("Prateleira", "books.vertical"),
             ("Carton", "shippingbox"), ("Boîte", "shippingbox"), ("Caja", "shippingbox"), ("Caixa", "shippingbox"),
             ("Voiture", "car"), ("Coche", "car"), ("Carro", "car"), ("Car", "car"), ("Carnet", "square.grid.2x2"),
+            ("Hall closet", "hanger"), ("Hall cupboard", "hanger"), ("Wardrobe", "hanger"),
         ]
         for (name, symbol) in cases { XCTAssertEqual(PlaceTile.symbol(for: name), symbol, name) }
     }

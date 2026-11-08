@@ -37,7 +37,7 @@ The words below are used the same way on every screen, in Siri answers, widgets,
 | lend / lent out | lend / lent out | prêter / prêtés | prestar / prestados | emprestar / emprestados |
 | ask for it back | ask for it back | le réclamer | pedir que lo devuelvan | pedir de volta |
 | I found it | I found it | Je l’ai trouvé | Lo encontré | Achei |
-| call off (a trip) | call off | renoncer à / abandonné | anular / anulado | desistir de / desistência |
+| call off (a trip) | call off | renoncer à / abandonné | anular / anulado | desistir de / abandonada |
 | lost | lost | perdu | perdido | perdido |
 | archive | archive | archiver | archivar | arquivar |
 | private | private | privé | privado | privado |

@@ -185,7 +185,7 @@ struct PlaceTile: View {
             ("bed", "bed.double"), ("chambre", "bed.double"), ("dormitorio", "bed.double"), ("habitacion", "bed.double"), ("quarto", "bed.double"),
             ("bath", "shower"), ("salle de bain", "shower"), ("banheiro", "shower"), ("bano", "shower"),
             ("office", "desktopcomputer"), ("desk", "desktopcomputer"), ("bureau", "desktopcomputer"), ("oficina", "desktopcomputer"), ("escritorio", "desktopcomputer"),
-            ("closet", "hanger"), ("placard", "hanger"), ("armoire", "hanger"), ("armario", "hanger"),
+            ("closet", "hanger"), ("cupboard", "hanger"), ("wardrobe", "hanger"), ("placard", "hanger"), ("armoire", "hanger"), ("armario", "hanger"),
             ("hall", "door.left.hand.closed"), ("entree", "door.left.hand.closed"), ("couloir", "door.left.hand.closed"), ("pasillo", "door.left.hand.closed"), ("corredor", "door.left.hand.closed"),
             ("living", "sofa"), ("salon", "sofa"), ("sala", "sofa"),
             ("storage", "archivebox"), ("locker", "lock"),
