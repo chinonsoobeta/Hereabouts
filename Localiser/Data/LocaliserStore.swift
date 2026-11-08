@@ -223,6 +223,8 @@ final class LocaliserStore {
             item.confirmedAt = seen
         }
         for child in place.children { child.parent = place.parent }
+        // A packed thing's return place moves up too, so coming home still knows where it goes.
+        for entry in trips.flatMap(\.entries) where entry.homePlace == place { entry.homePlace = place.parent }
         context.delete(place)
         try save()
     }
