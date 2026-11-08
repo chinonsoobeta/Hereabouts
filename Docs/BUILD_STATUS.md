@@ -638,9 +638,9 @@ xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -d
 
 UI tests (M44), same simulators, `-only-testing:LocaliserUITests`, run through the two-slot lock:
 
-- iOS 26.5: **17 run, 1 skipped (the language tour, which runs only with `TOUR_DIR`), 0 failures.** Result `DerivedData/Audit/Logs/Test/Test-Localiser-2026.11.07_18-31-06--0700.xcresult`.
-- iOS 27.0: **17 run, 1 skipped, 0 failures.** Result `DerivedData/Audit27/Logs/Test/Test-Localiser-2026.11.07_18-32-36--0700.xcresult`.
-- The builder ran the same suite twice on each OS before the merge, all green. The xcodebuild summary prints 18 and 2 skipped because it counts the bundle, which includes the store screenshot test.
+- iOS 26.5: **18 run, 2 skipped, 0 failures.** The skips are the language tour (runs only with `TOUR_DIR`) and the store screenshots (run on demand for M46). Result `DerivedData/Audit/Logs/Test/Test-Localiser-2026.11.07_18-31-06--0700.xcresult`.
+- iOS 27.0: **18 run, 2 skipped, 0 failures.** Same two skips. Result `DerivedData/Audit27/Logs/Test/Test-Localiser-2026.11.07_18-32-36--0700.xcresult`.
+- The builder ran the same suite twice on each OS before the merge, all green.
 
 Accessibility audit exemptions added in M44, each measured from screenshot pixels in light and dark mode, at default and largest text:
 
