@@ -4,6 +4,8 @@ import StoreKitTest
 @MainActor final class LocaliserUITests: XCTestCase {
     func testSettingsExportsAndProAreReachable() throws {
         continueAfterFailure = false
+        let storeKit = try openLocalStoreKit()
+        defer { withExtendedLifetime(storeKit) {} }
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
@@ -383,10 +385,7 @@ import StoreKitTest
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
-        // The app under UI test gets no local StoreKit file from the test plan, so load the same one here for the Pro shot.
-        let storeKitFile = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
-        let storeKit = try SKTestSession(contentsOf: storeKitFile)
-        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        let storeKit = try openLocalStoreKit()
         defer { withExtendedLifetime(storeKit) {} }
         let base = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         // 2: say where it is. Voice memos may be cut for 1.0, so this file is easy to drop.
@@ -503,6 +502,8 @@ import StoreKitTest
         guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
         let folder = URL(fileURLWithPath: path)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let storeKit = try openLocalStoreKit()
+        defer { withExtendedLifetime(storeKit) {} }
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
@@ -851,6 +852,14 @@ import StoreKitTest
         let results = app.otherElements["DOCSearchControllerContainerViewIdentifier"]
         let scope: XCUIElement = results.waitForExistence(timeout: 5) ? results : app
         return scope.cells
+    }
+
+    /// The app under UI test gets no local StoreKit file from the test plan, so open the same one here, reset. Keep the result alive for the whole test.
+    private func openLocalStoreKit(file: StaticString = #filePath) throws -> SKTestSession {
+        let storeKitFile = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
+        let storeKit = try SKTestSession(contentsOf: storeKitFile)
+        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        return storeKit
     }
 
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
