@@ -538,6 +538,10 @@ import XCTest
             // inside a navigation bar, only on iOS 27 or later.
             if #available(iOS 27, *), issue.auditType == .contrast, element.elementType == .button,
                app.navigationBars.allElementsBoundByIndex.contains(where: { $0.frame.contains(element.frame) }) { return true }
+            // Checked by eye on 2026-11-07 (screenshot, iOS 26.5, light mode): the Lend it button is white text on
+            // the primary purple (#5B3DB8), 7.5:1 by the colour pair, and renders solid and sharp. The audit still
+            // reports it on iOS 26.5 while a name is typed. Only contrast, only this button.
+            if issue.auditType == .contrast, element.identifier == "lend.save" { return true }
             // Checked by screenshot on 2026-10-12: a sheet's first section header is ink on paper, but it starts
             // just under the bar and the audit samples it against the bar's scroll-edge band, as on Pro below.
             if issue.auditType == .contrast, element.elementType == .staticText, let bar = app.navigationBars.allElementsBoundByIndex.first(where: \.isHittable),
