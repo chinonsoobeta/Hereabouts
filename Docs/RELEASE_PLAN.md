@@ -34,12 +34,13 @@ Nothing in this plan authorises an upload, a purchase, a message to anyone, an i
 - Voice memos, if they pass the voice rule below.
 - Five languages (owner, 7 November): English (US), English (UK), French, Spanish and Portuguese (M63).
 - The lent-out widget and the shared notebook file (B1), if they pass the cut rule below.
+- iPhone Duo and iPad (owner, 8 November): on a wide screen, places down the side and things beside them (M66), and a native iPad app (M67). Designs: the Duo and iPad design canvases.
 
 **Out of 1.0**
 
 - Return, warranty and expiry dates, receipt scanning, pasting an order email (A9), the Due tab, Add to Calendar, the share sheet (B3) and the "What's due?" Siri phrase. The last commit before they go is tagged so a separate app can start from it (M1).
 - B4 iCloud sync, unless it passes its two-device week during the beta. B6 household sharing. Both are 1.1.
-- iPad and Mac layouts. The app still runs on iPad in compatibility mode and is checked there.
+- A Mac layout. Mac and Vision Pro stay off in App Store Connect.
 - Buying Lifetime while subscribed (O5). Apple's purchase sheet handles it; the app explaining it waits for 1.1.
 - Anything else new. During the beta, only fixes go in.
 
@@ -92,7 +93,7 @@ Nothing has been uploaded, published, purchased or sent to anyone.
 | 1. Build 1.0 | Mac, Codex (M41 and M64 only) | M1 to M47 and M63, in order, then M64 last | All merged. Unit tests pass on iOS 26.5 and 27.0, all UI tests pass, no warnings. The voice rule is decided | About 14.5 sessions, plus Codex's pass |
 | 2. Business, identifiers, site | Owner | O8 to O19 | Paid Apps Agreement active, App Group registered, pages live | CRA and Apple checks take days |
 | 3. After those steps | Mac, then owner | M48 to M53, O20 to O33 | Signed device builds on both phones. The cut rule is decided | 1.5 sessions |
-| 4. Beta | Owner, then Mac | O34 to O44, M54 to M56 | A week of real use. The physical checks and the quality check pass | At least one week |
+| 4. Beta | Owner, then Mac | O34 to O44, M54 to M56, with M66 and M67 built first (owner, 8 November) | A week of real use, on iPhone and iPad. The physical checks and the quality check pass | At least one week, plus about 6 sessions for the Duo and iPad, which may move submission by one to two weeks |
 | 5. Submission | Owner | O20 to O30 finished, section 7, O45, O46 | The pre-submit check is all ticked | — |
 
 Stages 1 and 2 run side by side. Inside Stage 1, the cut and the Settings tab go first, because most later items touch the same screens. Each M item is its own local commit on `main`, with tests green (the owner agreed to local commits on 7 November; nothing is pushed), except Codex's pass, which uses its own branch (M41). Nothing is pushed or uploaded.
@@ -167,6 +168,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - The voice shot shows the filled-in Put away screen, not the heard sentence. The test also takes the Say where screen with the sentence, if you'd rather show that or both.
   - On the lending shot, the history line says 6:56 PM while the status bar says 9:41.
   - Drop `2-voice-optional.png` if voice memos are cut.
+  - The 13-inch iPad set from M67, and Duo shots if App Store Connect asks for them.
 - [x] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you. *Approved 7 November: "I'm happy with the wording."*
 - [ ] **O39 Physical-device checks**, one tick each:
   - [ ] iOS 26 on the smallest supported phone you can borrow, and phones with and without Apple Intelligence.
@@ -181,7 +183,8 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - [ ] Sunday recap, first-Saturday stocktake and trip-eve reminder arrive, open the right sheet, and stop when turned off.
   - [ ] Automatic backups: one arrives in iCloud Drive, a restore from it brings everything back, and turning Pro off keeps the saved ones. A backup made on the other phone shows under "Saved automatically" and restores, and the sixth backup removes the oldest from iCloud Drive.
   - [ ] Widgets: both buttons at small size and on the Lock Screen; the lent-out widget if it ships.
-  - [ ] iPad in compatibility mode, all four tabs.
+  - [ ] On an iPad, if you have one or can borrow one: all four tabs sideways and upright, Split View, a keyboard, voice memos, a purchase. Otherwise the simulator runs in M67 stand in.
+  - [ ] On an iPhone Duo, if you can try one: fold and unfold mid-task, and check the places and things stay put.
 - [ ] **O40 Quality-check examples.** 200 capture sentences, written as people would say them, and 100 search pairs, from people who didn't write the code. I freeze the commit and score them (M47).
 - [ ] **O41 Ask Angela** whether she'll be the second tester.
 - [x] **O47 Voice memos in other languages.** Decided 7 November: English only in 1.0. The microphone and Say it buttons show only when the app's language is English; French, Spanish and Portuguese voice memos come in 1.1, each with its own practice sentences and the voice rule.
@@ -346,9 +349,12 @@ These set what's true. Codex's pass then makes it read well.
 >
 > **For each finding:** a failing XCTest in `LocaliserTests/Audit/` that proves it (or exact steps when a test can't), the file and line, what goes wrong for the person, and a severity: data loss or privacy leak; limit bypass or wrong answer; crash; other. Compile with `xcodebuild ... build-for-testing` (you can't run simulators; the auditor runs the tests). One commit per finding. Finish with `Docs/AUDIT_CODEX.md`: every finding, ranked, with its test's name. Don't write your model name anywhere.
 
-### Late addition: iPhone Duo (P1, 1 session)
+### Late addition: iPhone Duo and iPad (P1, about 6 sessions)
 
-- [ ] **M66 Fit the iPhone Duo's inner screen** (owner, 8 November). The Duo has a 5.4-inch outer screen and a 7.6-inch inner one. Built with the 27.1 SDK or later, the app fills the inner screen rather than sitting in a letterbox. That screen is regular width and height and ignores the portrait-only setting, so our one-column screens stretch edge to edge. For 1.0, keep the single column: cap the content of every tab and sheet at a comfortable reading width and centre it when the width is regular. Apply it to the "Add a thing" bar and the Find heading too. Check each screen in both orientations, and when folding and unfolding mid-task (an open sheet, the voice sheet while held, a search, the introduction). The two-column layout waits for 1.1 (section 8). Needs the iOS 27.2 simulator runtime (Xcode, Settings, Components). Falls under M65, since it lands after M64. **Check:** a UI test on the iPhone Duo simulator opens each tab and the New thing sheet in landscape, and confirms the content stays within the cap. The accessibility audit passes there. Screenshots of each tab go to `Docs/Verification/M66`. If App Store Connect asks for Duo screenshots, take them with M46's demo library. · P, X1
+Decided 8 November: both in 1.0. Built during the beta week, before the TestFlight build that goes to testers (O42), so the beta covers them. Both fall under M65, since they land after M64. Needs the iOS 27.2 simulator runtime for the Duo. The designs are the Duo and iPad design canvases.
+
+- [ ] **M66 Places beside things on wide screens** (owner, 8 November). One adaptive layout, used whenever the width is regular: the Duo's 7.6-inch inner screen (regular in both directions, ignores the portrait-only setting) and every iPad. The app keeps its tabs on a compact width (the Duo's outer screen and every iPhone). On a regular width it uses a sidebar-adaptable tab view: a lilac sidebar with the home's name and date, search, Find, Trips and Settings, the places with their counts, and "Add a thing" at the bottom. Picking a place shows its things beside the sidebar; on a wide enough screen (iPad sideways), picking a thing opens it in a third column, otherwise it slides over the things. Find keeps its single column, capped at a comfortable reading width and centred, with the Siri tip and streak card side by side. Trips shows the trips and kits in the sidebar and "Still to pack" beside "Packed". Sheets (New thing, Pro, Settings pages) open as centred form sheets, with New thing in two columns. Folding and unfolding the Duo, and resizing an iPad window, keep the selected place and thing, any open sheet, the voice sheet while held, a search and the introduction's page. **Check:** UI tests on the Duo simulator (sideways and upright) and the iPad 13-inch simulator open each tab, pick a place and a thing, and open New thing; the accessibility audit passes on both; the existing iPhone UI tests still pass unchanged. Screenshots of each screen go to `Docs/Verification/M66`. · D, X1
+- [ ] **M67 A native iPad app** (owner, 8 November), after M66. Set `TARGETED_DEVICE_FAMILY` to `1,2` at `project.yml:12` and `:71`, keep all four iPad orientations (`project.yml:77`), and support Split View, Slide Over and Stage Manager windows at any size, falling back to the iPhone layout when a window is compact. Add keyboard shortcuts for New thing (⌘N), search (⌘F) and the tabs (⌘1 to ⌘4), pointer hover on rows and buttons, and drag a thing onto a place in the sidebar to move it. Check on iPad: the photo and camera pickers, voice memos and the microphone prompt, Siri, the widgets and the Control Centre button (no Action button), notifications, backups and restore, and purchases. Shelf photos keep their Apple Intelligence check. Store screenshots: a 13-inch iPad set (2064 × 2752) from the demo library alongside M46's iPhone set, plus Duo screenshots if App Store Connect asks for them. Review notes say the app runs on iPad. **Check:** unit tests and every UI test pass on the iPad simulator as well as iOS 26.5 and 27.0 on iPhone; a UI test in a third-width Split View window gets the iPhone layout; `scripts/check-release.sh` confirms the device family. Once a version ships with iPad, later versions keep it. · P, X1, D
 
 ### After an owner step
 
@@ -399,7 +405,7 @@ Blocked items found while building. Each waits for a talk with the owner.
 | 5.1.1 Permissions | Vague strings, asking at launch | Calendar permission gone. Microphone and speech asked only when you first record. Badge dropped (M27) |
 | 5.1 Privacy claims | App does more than it says | Data Not Collected (O24). Private-thing promises kept by M7 and M8. Recordings not kept |
 | Privacy manifests | Missing reasons | App, Control Centre (M25), widget (M21), App Group reason (M51) |
-| Orientation | Broken landscape | Portrait only (M23) |
+| Orientation | Broken landscape | Portrait only on iPhone (M23). On iPad and the Duo's inner screen, every orientation is laid out and tested (M66, M67) |
 
 **Pre-submit check**, on the day:
 
@@ -408,6 +414,7 @@ Blocked items found while building. Each waits for a talk with the owner.
 - [ ] The voice rule and the cut rule are recorded, and the description matches them.
 - [ ] No open data-loss defect, no place ever filled in unseen, and proof that real reminders arrived.
 - [ ] Products attached and ready, with metadata and review screenshots.
+- [ ] iPhone and 13-inch iPad screenshots uploaded (and Duo, if asked).
 - [ ] Privacy and Support URLs open on a phone off your Wi-Fi.
 - [ ] Terms of Use line in the description.
 - [ ] Data Not Collected, age rating done, Mac and Vision Pro off.
@@ -417,9 +424,9 @@ Blocked items found while building. Each waits for a talk with the owner.
 
 ## 8. Not in 1.0
 
-- **1.1:** household sharing, sync if it missed 1.0, voice memos or the shared notebook if their rules moved them, and a two-column layout on the iPhone Duo's inner screen (places down the side, things beside them; M66 does the 1.0 fit).
+- **1.1:** household sharing, sync if it missed 1.0, voice memos or the shared notebook if their rules moved them.
 - **A separate app:** receipts, returns, warranties and expiry dates, starting from the `receipts-spinoff-base` tag (M1).
-- **Later:** iPad and Mac layouts, a Face ID lock, NFC tags, an insurance report, Android.
+- **Later:** a Mac layout, a Face ID lock, NFC tags, an insurance report, Android.
 
 ## 9. Where this plan came from
 
