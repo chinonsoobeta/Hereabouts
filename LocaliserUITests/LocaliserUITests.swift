@@ -679,9 +679,8 @@ import StoreKitTest
             // Verified at Accessibility Extra Large: this Settings footer grows like every other footer.
             if issue.auditType == .dynamicType && element.label.hasPrefix("A backup holds your places") { return true }
             guard issue.auditType == .dynamicType else { return false }
-            // Top bar buttons, and Find's centred title (Hereabouts, the home, the date), sit above the content within
-            // the status and navigation bar area. The system caps text there; long-press shows the large content viewer.
-            return (element.elementType == .button || element.elementType == .staticText || element.elementType == .other) && element.frame.maxY < 140
+            // Top bar buttons sit above the content, within the status and navigation bar area.
+            return element.elementType == .button && element.frame.maxY < 140
         }
     }
 

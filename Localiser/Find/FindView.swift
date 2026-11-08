@@ -30,6 +30,7 @@ struct FindView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
+                if browsing || store.items.isEmpty { titleCard }
                 if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
                     LibraryEmptyState(title: String(localized: "Nothing here yet"), systemImage: "magnifyingglass", description: String(localized: "Write down a thing and where you keep it."))
@@ -59,6 +60,7 @@ struct FindView: View {
         .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused { addBar } }
         .navigationTitle("Hereabouts")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(removing: .title)
         .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }
@@ -78,7 +80,6 @@ struct FindView: View {
             store.findRequest = nil
         }
         .toolbar {
-            ToolbarItem(placement: .principal) { centredTitle }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Toggle("Show archived things", systemImage: "archivebox", isOn: $showArchived)
@@ -110,16 +111,18 @@ struct FindView: View {
         }
     }
 
-    /// "Hereabouts" in the middle of the bar, with the home and the date on their own lines below.
-    private var centredTitle: some View {
-        VStack(spacing: 0) {
-            Text("Hereabouts").font(.wbTitle).foregroundStyle(Theme.ink)
-            Text(store.currentHome?.name ?? Home.defaultName).font(.wbCaption).foregroundStyle(Theme.pencil)
-            Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
+    /// The top of Find: the home's name large and centred on the paper, the date under it, and a short ink rule.
+    /// "Hereabouts" stays the screen's title for VoiceOver and the back button, but isn't shown.
+    private var titleCard: some View {
+        VStack(spacing: 6) {
+            Text(store.currentHome?.name ?? Home.defaultName).font(.wbDisplay).foregroundStyle(Theme.ink)
+            Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbBody).foregroundStyle(Theme.pencil)
+            Rectangle().fill(Theme.ink).frame(width: 56, height: 1.5).padding(.top, 10).accessibilityHidden(true)
         }
-        .lineLimit(1).minimumScaleFactor(0.8).multilineTextAlignment(.center)
+        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+        .padding(.vertical, 18).padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine).accessibilityAddTraits(.isHeader)
-        .accessibilityShowsLargeContentViewer()
     }
 
     /// Wide and low on the screen, where a thumb reaches it. Touch and hold to start with a photo.
