@@ -6,15 +6,17 @@ Codex audited the app's logic on its own and didn't see Claude's half. It wrote 
 
 | # | Finding | Decision |
 | --- | --- | --- |
-| 1 | Edits lost when a stale shared notebook returns | Fix: when the shared copy is missing, go back to the original and copy it across again on the next launch. Only phones that ran a build from before the App Group can reach this. |
+| 1 | Edits lost when a stale shared notebook returns | Fixed in `c8e4633`: when the shared copy is missing, go back to the original and copy it across again on the next launch. Only phones that ran a build from before the App Group can reach this. |
 | 2 | Blank Shortcuts search lists private things | Already fixed: the same bug as Claude's F3 (`419146c`). |
 | 3 | Put back after deleting the place clears it | Already fixed: the same bug as Claude's F1 (`b71be59`). |
 | 4 | Restore isn't held to the free limits | Accepted. A person whose Pro has lapsed must be able to restore their own notebook. Going past the limits this way means writing a backup file by hand. The test is left out of the suite. |
 | 5 | Restore accepts a thing in another home from its place | Accepted. Only a backup file edited by hand can do this; the app keeps a thing and its place in the same home. The test is left out of the suite. |
 | 6 | Restore accepts one thing packed for two overlapping trips | Accepted, for the same reason as 5. The person can unpack either trip. The test is left out of the suite. |
-| 7 | Siri doesn't say which home | Fix: with more than one home, the answer leads with the home, the same way places are shown in Shortcuts ("Cottage · Drawer"). |
+| 7 | Siri doesn't say which home | Fixed in `8a4e97a`: with more than one home, the answer leads with the home, the same way places are shown in Shortcuts ("Cottage · Drawer"). |
 | 8 | Voice matches a place nested the other way round | Accepted. It needs a place tree nested the opposite way to how the person describes it. The suggested fix would break the natural "in the hall closet, on the top shelf" order. The person checks the place on the Put away screen before saving. The test is left out of the suite. |
 | 9 | Restored notes over the limit block unrelated edits | Accepted. Only a hand-edited backup can carry notes over 5,000 characters. The editor shows the counter, so the person can trim them. The test is left out of the suite. |
+
+With both fixes, the unit tests pass: 165 run on iOS 27 with 0 failures, and 165 run on iOS 26.5 with 6 skipped (the StoreKit purchase tests) and 0 failures.
 
 The rest of this file is Codex's report as written, apart from the Verification section, which now gives the auditor's results.
 
