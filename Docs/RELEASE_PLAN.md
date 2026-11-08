@@ -135,7 +135,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### App Store Connect
 
-- [ ] **O20 App record.** Name, primary language (per O3), bundle ID, SKU. Productivity, with Utilities second.
+- [x] **O20 App record.** Name, primary language (per O3), bundle ID, SKU. Productivity, with Utilities second. *Created 8 November as "Hereabouts: Find Your Things" (plain "Hereabouts" was already reserved by someone else), English (U.S.), dev.hereabouts.app, SKU hereabouts-ios, Full Access, Apple ID 6832324775. Still to set in App Information: categories, age rating (including the new social-media questions) and a new subtitle (proposed: "Remember where you put it"). Each listing language (O49) needs its own name too.*
 - [ ] **O21 Products.** `dev.hereabouts.pro.lifetime` at US$49.99, non-consumable, Family Sharing on. Then `dev.hereabouts.pro.monthly` at US$2.99 and `dev.hereabouts.pro.yearly` at US$19.99 in the group "Hereabouts Pro", each with a two-week free trial. Family Sharing can't be turned off later. For each product, choose the United States as the base country so Apple fills in the other countries, then change Canada by hand to CA$2.99, CA$19.99 and CA$49.99 (O4).
 - [ ] **O22 Product metadata.** A display name, description and review screenshot for each product and for the subscription group.
 - [ ] **O23 Billing Grace Period**, 16 days.
@@ -145,7 +145,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0.
 - [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
-- [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact.
+- [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Beta description saved 8 November. Still needed: feedback email, then (for external testers only) the review contact, privacy policy URL (O17) and marketing URL.*
 - [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
 
 ### Hands-on checks

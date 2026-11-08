@@ -1,6 +1,6 @@
 # Hereabouts: App Store listing in each language
 
-Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name stays **Hereabouts** everywhere and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
+Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name under the icon stays **Hereabouts** everywhere. In App Store Connect the English name is "Hereabouts: Find Your Things" (8 November; plain Hereabouts was taken), and each language's listing name is still to choose and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
 
 Limits: subtitle 30 characters, promotional text 170, keywords 100 (commas, no spaces). Counts below are characters, checked with a script; every subtitle and keyword list is also within the limit in UTF-8 bytes, in case App Store Connect counts bytes.
 
@@ -8,7 +8,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 
 ## English (U.K.)
 
-- **Subtitle** (16): Find your things
+- **Subtitle** (25): Remember where you put it (proposed 8 November; was "Find your things", now in the name)
 - **Keywords** (98): `where,find,belongings,inventory,home,organiser,packing,list,storage,lost,lend,borrow,keys,notebook`
 - **Promotional text:** Keep up to 15 things for free. Try Pro free for two weeks or buy Lifetime once. No account, ads or tracking.
 - **Description:** the English description with these changes only: "Export a backup or spreadsheet any time." (for "anytime"). Everything else reads the same in British English.
