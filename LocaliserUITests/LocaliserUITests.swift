@@ -462,6 +462,72 @@ import XCTest
         try shot("review-trip")
     }
 
+    /// What App Review sees: a clean install of a Release build. Runs only when asked, in Release on an erased simulator:
+    /// `TEST_RUNNER_RELEASE_WALKTHROUGH_DIR=<folder> xcodebuild … -configuration Release -only-testing:LocaliserUITests/LocaliserUITests/testFreshInstallReleaseWalkthrough test`
+    func testFreshInstallReleaseWalkthrough() throws {
+        guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
+        let folder = URL(fileURLWithPath: path)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let app = XCUIApplication()
+        func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launch()
+        // 1. Skip the introduction.
+        let open = app.buttons["Open your notebook"]
+        XCTAssertTrue(open.waitForExistence(timeout: 10), app.debugDescription)
+        try shot("1-introduction")
+        open.tap()
+        let later = app.buttons["I'll do this later"]
+        XCTAssertTrue(later.waitForExistence(timeout: 5), app.debugDescription)
+        later.tap()
+        let notNow = app.buttons["Not now"]
+        XCTAssertTrue(notNow.waitForExistence(timeout: 5), app.debugDescription)
+        notNow.tap()
+        // The Find tab straight after install: watch the tips and the Siri tip's text.
+        let findStart = Date()
+        XCTAssertTrue(app.tabBars.buttons["Find"].waitForExistence(timeout: 10), app.debugDescription)
+        try shot("2a-find-just-after-install")
+        let siriText = app.staticTexts["Ask Hereabouts where something is"]
+        let siriShown = siriText.waitForExistence(timeout: 60)
+        let siriDelay = Date().timeIntervalSince(findStart)
+        print("M45 Siri tip text \(siriShown ? "appeared" : "did not appear") after \(String(format: "%.1f", siriDelay)) s")
+        try shot("2b-find-siri-tip")
+        // 2. Settings, then Pro.
+        app.tabBars.buttons["Settings"].tap()
+        try shot("2-settings")
+        let pro = app.buttons["Hereabouts Pro"]
+        reveal(pro, in: app); pro.tap()
+        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), app.debugDescription)
+        let plans = ["Yearly", "Monthly", "Lifetime"].map { app.staticTexts[$0].firstMatch }
+        XCTAssertTrue(plans[0].waitForExistence(timeout: 20), app.debugDescription)
+        for plan in plans { XCTAssertTrue(plan.exists, "\(plan) is missing\n\(app.debugDescription)") }
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS ' free'")).firstMatch.exists, "No trial stamp\n\(app.debugDescription)")
+        try shot("3-pro")
+        app.navigationBars["Pro"].buttons["Settings"].tap()
+        // 3. Add things one at a time until there are 15.
+        app.tabBars.buttons["Find"].tap()
+        for number in 1...15 {
+            let add = number == 1 ? app.buttons["Add your first thing"] : app.buttons["Add a thing"]
+            XCTAssertTrue(add.waitForExistence(timeout: 5), "Thing \(number): no add button\n\(app.debugDescription)")
+            add.tap()
+            let name = app.textFields["item.name"]
+            XCTAssertTrue(name.waitForExistence(timeout: 5), "Thing \(number)\n\(app.debugDescription)")
+            name.tap(); name.typeText("Walkthrough thing \(number)")
+            app.buttons["item.save"].tap()
+            XCTAssertTrue(name.waitForNonExistence(timeout: 5), "Thing \(number) did not save\n\(app.debugDescription)")
+        }
+        try shot("4-fifteen-things")
+        // 4. The 16th opens the paywall instead of saving.
+        app.buttons["Add a thing"].tap()
+        let name = app.textFields["item.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5), app.debugDescription)
+        name.tap(); name.typeText("Walkthrough thing 16")
+        app.buttons["item.save"].tap()
+        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), "The 16th thing did not open the paywall\n\(app.debugDescription)")
+        XCTAssertTrue(app.staticTexts["Yearly"].firstMatch.waitForExistence(timeout: 20), app.debugDescription)
+        try shot("5-paywall-on-16th")
+    }
+
     func testLaunchTabsContrastAndClippingWithoutChangingTextSize() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
