@@ -12,8 +12,13 @@ extension AuditCodexTests {
         let secondDrawer = try store.addPlace(name: "Drawer")
         try store.moveThing(item, toHome: second, place: secondDrawer)
 
-        let answer = FindThingIntent.answer(for: item)
+        let answer = FindThingIntent.answer(for: item, severalHomes: store.hasSeveralHomes)
         XCTAssertTrue(answer.contains(second.name),
                       "Siri must identify which home's Drawer now contains the Passport; actual: \(answer)")
+
+        let single = try LocaliserStore(inMemory: true)
+        let drawer = try single.addPlace(name: "Drawer")
+        let other = try single.addItem(name: "Passport", place: drawer)
+        XCTAssertEqual(FindThingIntent.answer(for: other, severalHomes: single.hasSeveralHomes), "Passport is in Drawer.")
     }
 }
