@@ -4,9 +4,13 @@ This half of the audit tried to break the app's data, privacy and money code fro
 
 Each confirmed finding has a failing test in `LocaliserTests/Audit/AuditClaudeTests.swift`. Before any fix, all three tests fail on iOS 26.5 and iOS 27 (3 tests, 6 failed assertions on each). A fix is done when its test passes and the rest of the suite stays green.
 
+**All three are fixed** (7 November). With the fixes, the unit tests pass: 161 run on iOS 27 with 0 failures, and 161 run on iOS 26.5 with 6 skipped (the StoreKit purchase tests) and 0 failures.
+
 ## Findings, most serious first
 
 ### F1. Putting a packed thing back after its place was deleted leaves it with no place
+
+*Fixed in `b71be59`.*
 
 - **Severity:** Medium. It loses where a thing lives, and the delete dialog promised otherwise.
 - **Where:** `Localiser/Data/LocaliserStore.swift:218` (`deletePlace`) and `Localiser/Packing/PackingStore.swift:132` (`resolveHome`, `.putBack`).
@@ -21,6 +25,8 @@ Each confirmed finding has a failing test in `LocaliserTests/Audit/AuditClaudeTe
 
 ### F2. Automatic backups stop for as long as the clock was once set ahead
 
+*Fixed in `222b08a`.*
+
 - **Severity:** Medium impact, rare. Pro's weekly safety net goes quiet without an error.
 - **Where:** `Localiser/Recovery/AutomaticBackups.swift:51-56` (`isDue()`).
 - **What happens:**
@@ -32,6 +38,8 @@ Each confirmed finding has a failing test in `LocaliserTests/Audit/AuditClaudeTe
 - **Suggested fix:** treat a last-backup or attempt date later than now as missing, so a backup is due. Optionally clear the stored date so Settings stops showing a future time.
 
 ### F3. A blank search from Shortcuts or Siri lists private things
+
+*Fixed in `419146c`.*
 
 - **Severity:** Low. A person needs the unlocked phone, but it breaks a stated promise.
 - **Where:** `Localiser/System/Intents.swift:54-57` (`ThingQuery.matches`) and `Localiser/Find/Search.swift:54`.
