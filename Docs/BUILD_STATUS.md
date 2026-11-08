@@ -649,3 +649,12 @@ Accessibility audit exemptions added in M44, each measured from screenshot pixel
 - Unresolved contrast reports (no element) on the Pro screen on iOS 27. Every element on it measures 5.2:1 or better in dark mode and 5.6:1 or better in light.
 
 What this doesn't cover: physical devices (O39), real sandbox purchases (O35), and a fresh-install Release build (M45).
+
+## Store screenshots (M46, Claude, 7 November)
+
+Merged at `23cdb8b`. The five approved shots were retaken on `HB Store 27` (iPhone 17 Pro Max, iOS 27, 1320 × 2868) from the demo library. Captions are in `Docs/Store/README.md`, word for word from `BETA_AND_RELEASE.md`.
+
+- `testStoreScreenshots` stays on demand: it skips unless `TEST_RUNNER_STORE_SHOTS` is set.
+- It now turns reminders on first, so the Settings tab carries no warning badge.
+- It opens an `SKTestSession` on `LocaliserTests/Localiser.storekit`, so the Pro shot shows the plans. The app under UI test doesn't get the test plan's StoreKit file.
+- Debug UI suite on `HB Store 27`: **18 run, 2 skipped, 1 failure.** The failure was `testBackupExportsAndRestoresIntoFreshLibrary` at the Files picker search, on a simulator new to the suite. It passed when run alone. The full suite runs again after the audit fixes (M64).

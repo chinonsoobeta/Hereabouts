@@ -104,7 +104,7 @@ Before publishing, check each sentence against the shipped build. Do not claim s
 
 ## Screenshots
 
-Use the demo library with the Debug-only launch argument `--demo-library` on a 6.9-inch and a 6.5-inch iPhone simulator. Light mode, default text size, status bar at 9:41.
+Use the demo library with the Debug-only launch argument `--demo-library` on the 6.9-inch iPhone 17 Pro Max simulator. App Store Connect scales the 6.9-inch set for smaller iPhones, so no 6.5-inch set is needed. Light mode, default text size, status bar at 9:41.
 
 1. **Find** showing "Running shoes" and its place path. Caption: "Find your things by place".
 2. **Voice memo** with the heard sentence and the filled-in Put away screen (if voice memos ship). Caption: "Say where it is. Check it. Save it."
