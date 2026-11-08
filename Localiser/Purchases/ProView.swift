@@ -75,16 +75,10 @@ struct ProView: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle").font(.title3).foregroundStyle(Theme.purpleInk).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
-                    // At the largest text sizes the stamp drops below the name instead of squeezing it.
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 8) {
-                            Text(option.name).font(.wbItem).foregroundStyle(Theme.ink).fixedSize()
-                            if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
-                        }
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(option.name).font(.wbItem).foregroundStyle(Theme.ink)
-                            if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
-                        }
+                    // At the largest text sizes the stamp wraps below the name instead of squeezing it.
+                    FlowLayout(spacing: 8) {
+                        Text(option.name).font(.wbItem).foregroundStyle(Theme.ink)
+                        if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
                     }
                     Text(detail(option)).font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.leading)
                 }
