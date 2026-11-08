@@ -656,5 +656,33 @@ Merged at `23cdb8b`. The five approved shots were retaken on `HB Store 27` (iPho
 
 - `testStoreScreenshots` stays on demand: it skips unless `TEST_RUNNER_STORE_SHOTS` is set.
 - It now turns reminders on first, so the Settings tab carries no warning badge.
-- It opens an `SKTestSession` on `LocaliserTests/Localiser.storekit`, so the Pro shot shows the plans. The app under UI test doesn't get the test plan's StoreKit file.
+- It opens an `SKTestSession` on `LocaliserTests/Localiser.storekit`. Correction from M45: that session isn't what brings the plans. The app sees them because a unit test had run on that simulator since the app was installed.
 - Debug UI suite on `HB Store 27`: **18 run, 2 skipped, 1 failure.** The failure was `testBackupExportsAndRestoresIntoFreshLibrary` at the Files picker search, on a simulator new to the suite. It passed when run alone. The full suite runs again after the audit fixes (M64).
+
+## Adversarial audit and fresh-install walkthrough (M64, M45, Claude, 7 November)
+
+Two audits tried to break the app's logic separately: mine (`Docs/AUDIT_CLAUDE.md`) and Codex's (`Docs/AUDIT_CODEX.md`). They made twelve findings, two of them found by both.
+
+- **Fixed (5),** each with its failing test kept in `LocaliserTests/Audit/`:
+  - Deleting a place left a packed thing with no return place (`b71be59`).
+  - A clock set ahead stopped automatic backups (`222b08a`).
+  - A blank Shortcuts search listed private things (`419146c`).
+  - A stale shared notebook coming back could win over newer edits (`c8e4633`).
+  - Siri didn't say which home (`8a4e97a`).
+- **Accepted (5),** with reasons in `AUDIT_CODEX.md`. Four need a backup file edited by hand. The fifth is a voice match on a place tree nested against how people describe it. Their tests stay in the `audit-codex` branch, out of the suite.
+
+The fresh-install walkthrough (M45) is `testFreshInstallReleaseWalkthrough`, on demand. In Release on an iOS 27 simulator, the introduction, 15 things and the 16th opening the paywall pass. Pro shows no plans: in a simulator, a fresh install never gets them from the local StoreKit file. The three-step check is in `Docs/Verification/M45/README.md`.
+
+Final runs, Xcode 27.2, same simulators and commands as the Stage 1 record above:
+
+- **Unit tests, main at `317981d`** (both audits and their fixes merged):
+  - iOS 26.5: **165 run, 6 skipped, 0 failures.** The skips are the StoreKit purchase tests.
+  - iOS 27.0: **165 run, 0 skipped, 0 failures.**
+- **UI tests, main at `317981d`:** 18 run, 2 skipped, 0 failures on each OS.
+- **UI tests again, main at `60e7bf7`** (after the M45 merge, which changed the UI test file):
+  - iOS 26.5: **19 run, 3 skipped, 0 failures.** Result `DerivedData/Audit/Logs/Test/Test-Localiser-2026.11.07_20-02-43--0700.xcresult`.
+  - iOS 27.0: **19 run, 3 skipped, 0 failures.** Result `DerivedData/Audit27/Logs/Test/Test-Localiser-2026.11.07_20-02-43--0700.xcresult`.
+  - The three skips run only on demand: the language tour, the store screenshots and the fresh-install walkthrough.
+- The unit target didn't change in the M45 merge.
+
+That completes Stage 1. What's left needs the owner first: the device and sandbox checks (O35, O36, O39), the App Store Connect entries, and M48 to M54. M65 checks whatever lands after this point, just before the submission archive.

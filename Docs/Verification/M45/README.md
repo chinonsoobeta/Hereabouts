@@ -20,6 +20,6 @@ It's the simulator's StoreKit testing, not the app. Checked on `HB Store 27` the
 
 So the app sees the local plans only after a unit test has run since it was installed, and the UI test's own session doesn't change that. A fresh install, which this walkthrough needs, can't show plans in a simulator, in Debug or in Release. The product code (`ProAccess.loadProduct`) is the same in both configurations. The Pro screen asks for the products again every time it opens, so a failed load isn't permanent.
 
-The plans in a real build are proven by O35 (a sandbox purchase on a device) and O36 (TestFlight). Those use the App Store's sandbox, not this file.
+The plans in a real build are proven on a phone: by O35 (sandbox purchases) and by rehearsing the reviewer walkthrough in `BETA_AND_RELEASE.md` (steps 7 and 8). Both use the App Store's sandbox, not this file.
 
 The first StoreKit unit test after a fresh install also failed once (`testRefundLocks`: the purchase took longer than the test waits). All seven subscription tests passed when run again straight after.
