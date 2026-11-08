@@ -52,8 +52,10 @@ struct ThingQuery: EntityStringQuery {
     }
     /// A private thing is only found by its name or another name, so a place or note doesn't give it away.
     @MainActor static func matches(_ string: String, in store: LocaliserStore) -> [Belonging] {
-        ItemSearch.results(query: string, entries: store.searchIndex, archived: false)
-            .filter { !$0.isPrivate || ItemSearch.score(query: string, name: $0.name, aliases: $0.aliases, place: "", notes: "") != nil }
+        // A blank query matches everything in Find, but here it would list private things.
+        let named = !ItemSearch.normalized(string).isEmpty
+        return ItemSearch.results(query: string, entries: store.searchIndex, archived: false)
+            .filter { !$0.isPrivate || named && ItemSearch.score(query: string, name: $0.name, aliases: $0.aliases, place: "", notes: "") != nil }
             .prefix(12).map { $0 }
     }
     @MainActor func suggestedEntities() async throws -> [ThingEntity] {
