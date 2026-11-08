@@ -498,7 +498,7 @@ import StoreKitTest
 
     /// What App Review sees: a clean install of a Release build. Runs only when asked, in Release on an erased simulator:
     /// `TEST_RUNNER_RELEASE_WALKTHROUGH_DIR=<folder> xcodebuild … -configuration Release -only-testing:LocaliserUITests/LocaliserUITests/testFreshInstallReleaseWalkthrough test`
-    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. On iOS 27 simulators a Release build gets no plans from the local StoreKit file, so the Pro checks fail there. Debug on HB Store 27 loads them.
+    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. In a simulator the plans never load on a fresh install, in Debug or Release, so the Pro checks fail there. They're meant for a device (see `Docs/Verification/M45`).
     func testFreshInstallReleaseWalkthrough() throws {
         guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
         let folder = URL(fileURLWithPath: path)
@@ -856,7 +856,8 @@ import StoreKitTest
         return scope.cells
     }
 
-    /// The app under UI test gets no local StoreKit file from the test plan, so open the same one here, reset. Keep the result alive for the whole test.
+    /// Opens and resets the local StoreKit session in the test runner. Keep the result alive for the whole test.
+    /// This alone doesn't give the app its plans: the app sees them only after a unit test has run since it was installed (M45).
     private func openLocalStoreKit(file: StaticString = #filePath) throws -> SKTestSession {
         let storeKitFile = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
         let storeKit = try SKTestSession(contentsOf: storeKitFile)
