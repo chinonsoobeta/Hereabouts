@@ -49,7 +49,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 > GRATUIT, OU PRO
 > Enregistrez 15 objets, 1 kit et 2 maisons gratuitement. Pro supprime les limites. Les sauvegardes hebdomadaires du carnet dans votre propre iCloud Drive sont activées par défaut. Choisissez mensuel ou annuel avec deux semaines d’essai gratuit, ou achetez À vie une fois. Le partage avec votre foyer arrivera plus tard. Si Pro se termine, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré.
 >
-> Votre abonnement se renouvelle automatiquement, sauf si vous l’annulez au moins 24 heures avant la fin de la période. Pour le gérer ou l’annuler, ouvrez l’app Réglages, touchez votre nom, puis Abonnements. Conditions d’utilisation : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Politique de confidentialité : https://hereabouts.app/privacy.
+> Votre abonnement se renouvelle automatiquement, sauf si vous l’annulez au moins 24 heures avant la fin de la période. Pour le gérer ou l’annuler, ouvrez l’app Réglages, touchez votre nom, puis Abonnements. Conditions d’utilisation : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Politique de confidentialité : https://hereaboutsapp.com/privacy.
 
 - **Review notes, first line:** Hereabouts ne nécessite ni compte ni connexion. Le carnet est enregistré sur l’appareil.
 
@@ -98,7 +98,7 @@ Same as French, with these changes for Canadian readers:
 > GRATIS, O PRO
 > Guarda 15 objetos, 1 kit y 2 casas gratis. Pro quita los límites. Las copias semanales de la libreta en tu propio iCloud Drive están activadas de serie. Elige mensual o anual con dos semanas de prueba gratis, o compra De por vida una sola vez. Compartir con tu hogar llegará más adelante. Si Pro termina, puedes seguir viendo, editando y exportando todo lo que guardaste.
 >
-> Tu suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes de que termine el periodo. Para gestionarla o cancelarla, abre la app Ajustes, toca tu nombre y luego Suscripciones. Condiciones de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de privacidad: https://hereabouts.app/privacy.
+> Tu suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes de que termine el periodo. Para gestionarla o cancelarla, abre la app Ajustes, toca tu nombre y luego Suscripciones. Condiciones de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de privacidad: https://hereaboutsapp.com/privacy.
 
 - **Review notes, first line:** Hereabouts no necesita cuenta ni inicio de sesión. La libreta se guarda en el dispositivo.
 
@@ -147,7 +147,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 > GRÁTIS, OU PRO
 > Salve 15 objetos, 1 kit e 2 casas grátis. O Pro tira os limites. Os backups semanais do caderno no seu próprio iCloud Drive vêm ativados. Escolha mensal ou anual com duas semanas de teste grátis, ou compre o Vitalício uma vez. O compartilhamento com a família chega depois. Se o Pro acabar, você ainda pode ver, editar e exportar tudo o que salvou.
 >
-> Sua assinatura renova automaticamente, a menos que você a cancele pelo menos 24 horas antes do fim do período. Para gerenciar ou cancelar, abra o app Ajustes, toque no seu nome e depois em Assinaturas. Termos de Uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de Privacidade: https://hereabouts.app/privacy.
+> Sua assinatura renova automaticamente, a menos que você a cancele pelo menos 24 horas antes do fim do período. Para gerenciar ou cancelar, abra o app Ajustes, toque no seu nome e depois em Assinaturas. Termos de Uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de Privacidade: https://hereaboutsapp.com/privacy.
 
 - **Review notes, first line:** O Hereabouts não precisa de conta nem login. O caderno fica salvo no aparelho.
 

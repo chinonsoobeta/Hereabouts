@@ -96,7 +96,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > FREE, OR PRO
 > Save 15 things, 1 kit and 2 homes for free. Pro removes the limits. Weekly notebook backups to your own iCloud Drive are on by default. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, you can still see, edit and export everything you saved.
 >
-> Your subscription renews automatically unless you cancel at least 24 hours before the period ends. To manage or cancel it, open the Settings app. Tap your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereabouts.app/privacy.
+> Your subscription renews automatically unless you cancel at least 24 hours before the period ends. To manage or cancel it, open the Settings app. Tap your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereaboutsapp.com/privacy.
 
 Leave the voice paragraph out if voice memos don't ship (voice rule, `RELEASE_PLAN.md` section 1). The listing carries no price, because prices differ by country. Description and subtitle are for the owner to approve in O7, after the wording pass.
 
@@ -134,7 +134,7 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 >
 > Hereabouts is designed for iPhone. On iPad, it runs in iPhone compatibility mode.
 >
-> Privacy policy: https://hereabouts.app/privacy. Support: https://hereabouts.app/support.
+> Privacy policy: https://hereaboutsapp.com/privacy. Support: https://hereaboutsapp.com/support.
 
 Replace both links if the domain changes.
 

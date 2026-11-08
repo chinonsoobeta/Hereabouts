@@ -129,7 +129,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### Website and mailbox
 
-- [ ] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49).
+- [ ] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49). *hereaboutsapp.com bought 8 November (hereabouts.app was taken). Hosting still to set up.*
 - [ ] **O18 Put the two pages live** at `/privacy` and `/support` once M32, M33 and M41 are merged. Open both from a phone off your Wi-Fi.
 - [ ] **O19 Support mailbox.** Set it up and test it from a phone.
 

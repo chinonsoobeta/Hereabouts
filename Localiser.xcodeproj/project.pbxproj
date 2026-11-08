@@ -1014,8 +1014,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEREABOUTS_APP_GROUP = group.dev.hereabouts.app;
 				HEREABOUTS_FREE_THINGS = 15;
-				HEREABOUTS_SITE_URL = "https://hereabouts.app";
-				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
+				HEREABOUTS_SITE_URL = "https://hereaboutsapp.com";
+				HEREABOUTS_SUPPORT_EMAIL = "support@hereaboutsapp.com";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1146,8 +1146,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEREABOUTS_APP_GROUP = group.dev.hereabouts.app;
 				HEREABOUTS_FREE_THINGS = 15;
-				HEREABOUTS_SITE_URL = "https://hereabouts.app";
-				HEREABOUTS_SUPPORT_EMAIL = "support@hereabouts.app";
+				HEREABOUTS_SITE_URL = "https://hereaboutsapp.com";
+				HEREABOUTS_SUPPORT_EMAIL = "support@hereaboutsapp.com";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;

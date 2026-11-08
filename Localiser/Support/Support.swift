@@ -8,11 +8,11 @@ enum Support {
         let raw = Bundle.main.object(forInfoDictionaryKey: key) as? String ?? ""
         return raw.isEmpty || raw.hasPrefix("$(") ? fallback : raw
     }
-    static var site: URL { URL(string: value("HereaboutsSiteURL", "https://hereabouts.app"))! }
+    static var site: URL { URL(string: value("HereaboutsSiteURL", "https://hereaboutsapp.com"))! }
     static var privacy: URL { site.appendingPathComponent("privacy") }
     static var terms: URL { URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")! }
     static var supportPage: URL { site.appendingPathComponent("support") }
-    static var email: String { value("HereaboutsSupportEmail", "support@hereabouts.app") }
+    static var email: String { value("HereaboutsSupportEmail", "support@hereaboutsapp.com") }
 
     static var version: String {
         let info = Bundle.main.infoDictionary

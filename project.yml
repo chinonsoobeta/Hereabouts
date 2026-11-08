@@ -11,9 +11,9 @@ settings:
     SWIFT_EMIT_LOC_STRINGS: YES
     TARGETED_DEVICE_FAMILY: '1'
     DEVELOPMENT_TEAM: BRLCAAM57K
-    # Public website and support address. Replace once hereabouts.app (or another domain) is live.
-    HEREABOUTS_SITE_URL: https://hereabouts.app
-    HEREABOUTS_SUPPORT_EMAIL: support@hereabouts.app
+    # Public website and support address. hereaboutsapp.com, bought 8 November.
+    HEREABOUTS_SITE_URL: https://hereaboutsapp.com
+    HEREABOUTS_SUPPORT_EMAIL: support@hereaboutsapp.com
     HEREABOUTS_FREE_THINGS: '15'
     # The App Group shared with the widget. The notebook moves into it on the first launch (NotebookFile).
     HEREABOUTS_APP_GROUP: group.dev.hereabouts.app
