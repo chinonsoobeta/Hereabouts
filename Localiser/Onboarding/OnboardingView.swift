@@ -3,7 +3,7 @@ import SwiftUI
 /// The name of the current home, kept for onboarding and as a fallback. A notebook can hold several homes; see Data/Homes.swift.
 enum Home {
     static let nameKey = "homeName"
-    static let defaultName = "Home"
+    static let defaultName = String(localized: "Home")
     /// Long enough for "Grandma's cottage by the sea", short enough for the Find subtitle.
     static let maxLength = 40
     static var name: String {
@@ -21,7 +21,7 @@ struct OnboardingView: View {
     @Environment(ProAccess.self) private var pro
     @AppStorage(Home.nameKey) private var homeName = ""
     @State private var page = 0
-    @State private var thing = "Spare keys"
+    @State private var thing = String(localized: "Spare keys")
     @State private var room = ""
     @State private var error: String?
     /// The thing written down on page 2. Going back and writing again edits it rather than adding another.
@@ -32,13 +32,13 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 if page == 0 {
-                    Text("Hereabouts").font(.wbCaption).foregroundStyle(Theme.pencil)
+                    Text("Hereabouts").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize().layoutPriority(1)
                 } else {
                     Button { withAnimation { page -= 1 } } label: { Label("Back", systemImage: "chevron.left") }
                         .font(.wbBody).foregroundStyle(Theme.ink).frame(minHeight: 44)
                 }
                 Spacer()
-                Text("Page \(page + 1) of 3").font(.wbCaption).foregroundStyle(Theme.pencil)
+                Text("Page \(page + 1) of 3").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.trailing)
             }
             .padding(.horizontal, 24).padding(.top, 8)
             ScrollView {
@@ -61,32 +61,32 @@ struct OnboardingView: View {
     // MARK: Pages
 
     @ViewBuilder private var namePage: some View {
-        headline("Your notebook for things at home.")
+        headline(String(localized: "Your notebook for things at home."))
         Text("Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account.").font(.wbBody).foregroundStyle(Theme.ink)
         Text("What do you call home?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
-        underlinedField("My apartment", text: $homeName).accessibilityLabel("What do you call home?")
+        underlinedField(String(localized: "My apartment"), text: $homeName).accessibilityLabel(String(localized: "What do you call home?"))
             .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
-        suggestions(["My apartment", "Home", "Mom's house", "The boat"], selected: homeName) { homeName = $0 }
+        suggestions([String(localized: "My apartment"), String(localized: "Home"), String(localized: "Mom's house"), String(localized: "The boat")], selected: homeName) { homeName = $0 }
     }
 
     @ViewBuilder private var thingPage: some View {
-        headline("What do you often look for?")
+        headline(String(localized: "What do you often look for?"))
         Text("Choose a thing or type your own. Add it to your notebook.").font(.wbBody).foregroundStyle(Theme.ink)
-        suggestions(["Spare keys", "Passport", "Charger", "Sunglasses", "The drill", "Tape measure"], selected: thing) { thing = $0 }
-        underlinedField("Spare keys", text: $thing).accessibilityLabel("Thing you often look for")
+        suggestions([String(localized: "Spare keys"), String(localized: "Passport"), String(localized: "Charger"), String(localized: "Sunglasses"), String(localized: "The drill"), String(localized: "Tape measure")], selected: thing) { thing = $0 }
+        underlinedField(String(localized: "Spare keys"), text: $thing).accessibilityLabel(String(localized: "Thing you often look for"))
         Text("Where do you keep it?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
-        underlinedField("Kitchen", text: $room).accessibilityLabel("Where do you keep it?")
+        underlinedField(String(localized: "Kitchen"), text: $room).accessibilityLabel(String(localized: "Where do you keep it?"))
         Text("A room is enough. Shelves and drawers can come later.").font(.wbCaption).foregroundStyle(Theme.pencil)
     }
 
     @ViewBuilder private var nudgePage: some View {
-        headline("Reminders when you need them.")
+        headline(String(localized: "Reminders when you need them."))
         Text("You only get reminders about your own things. Nothing else, ever.").font(.wbBody).foregroundStyle(Theme.ink)
         VStack(spacing: 0) {
-            nudge("Lent", "On the day you choose to ask for it back")
-            nudge("Trip", "The evening before you leave, if something's unpacked")
-            nudge("Sunday", "What you added, lent out or haven't checked lately")
-            nudge("Monthly", "Still there? A few quick questions on the first Saturday")
+            nudge(String(localized: "Lent"), String(localized: "On the day you choose to ask for it back"))
+            nudge(String(localized: "Trip"), String(localized: "The evening before you leave, if something's unpacked"))
+            nudge(String(localized: "Sunday"), String(localized: "What you added, lent out or haven't checked lately"))
+            nudge(String(localized: "Monthly"), String(localized: "Still there? A few quick questions on the first Saturday"))
         }
         .overlay(alignment: .top) { Rectangle().fill(Theme.ink).frame(height: 1.5) }
         StickyNote {
@@ -105,16 +105,16 @@ struct OnboardingView: View {
                 focused = false; homeName = homeName.trimmingCharacters(in: .whitespacesAndNewlines)
                 if !homeName.isEmpty, let home = store.currentHome { try? store.renameHome(home, to: homeName) }
                 withAnimation { page = 1 }
-            } label: { wrapping("Open your notebook") }
+            } label: { wrapping(String(localized: "Open your notebook")) }
                 .buttonStyle(PrimaryButtonStyle())
             Text("You can rename it any time in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
         case 1:
-            Button { writeItDown() } label: { wrapping("Write it down") }
+            Button { writeItDown() } label: { wrapping(String(localized: "Write it down")) }
                 .buttonStyle(PrimaryButtonStyle()).disabled(thing.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("I'll do this later") { focused = false; withAnimation { page = 2 } }
                 .font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
         default:
-            Button { Task { await reminders.enable(); onFinish() } } label: { wrapping("Turn on reminders") }
+            Button { Task { await reminders.enable(); onFinish() } } label: { wrapping(String(localized: "Turn on reminders")) }
                 .buttonStyle(PrimaryButtonStyle())
             Button("Not now") { onFinish() }.font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
             Text("You can change this in Settings any time.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)

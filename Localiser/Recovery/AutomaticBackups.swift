@@ -119,14 +119,14 @@ struct AutomaticBackups: @unchecked Sendable {
         try await Task.detached { try read(saved) }.value
     }
     private static func read(_ saved: SavedBackup) throws -> LibraryBackup {
-        let downloading = LocaliserError.invalidBackup("This backup is still downloading from iCloud. Try again in a moment.")
+        let downloading = LocaliserError.invalidBackup(String(localized: "This backup is still downloading from iCloud. Try again in a moment."))
         if saved.isPlaceholder { try? FileManager.default.startDownloadingUbiquitousItem(at: saved.url) }
         var coordinationError: NSError?
         var result: Result<Data, Error> = .failure(downloading)
         NSFileCoordinator(filePresenter: nil).coordinate(readingItemAt: saved.url, options: [], error: &coordinationError) { safe in
             result = Result {
                 let size = try safe.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                guard size <= LibraryBackup.maximumBytes else { throw LocaliserError.invalidBackup("Choose a backup under 200 MB.") }
+                guard size <= LibraryBackup.maximumBytes else { throw LocaliserError.invalidBackup(String(localized: "Choose a backup under 200 MB.")) }
                 return try Data(contentsOf: safe)
             }
         }

@@ -6,7 +6,7 @@ import CoreData
         let clean = try requiredName(name)
         let kit = NSEntityDescription.insertNewObject(forEntityName: "Kit", into: context) as! Kit
         kit.id = UUID(); kit.name = clean; kit.home = currentHome
-        for title in ["Check appliances", "Lock doors", "Take keys"] {
+        for title in [String(localized: "Check appliances"), String(localized: "Lock doors"), String(localized: "Take keys")] {
             let task = NSEntityDescription.insertNewObject(forEntityName: "KitTask", into: context) as! KitTask
             task.id = UUID(); task.title = title; task.kit = kit
         }
@@ -50,7 +50,7 @@ import CoreData
             entry.unitQuantity = template.unitQuantity; entry.perNight = template.perNight; entry.perDay = template.perDay; entry.unlinked = template.unlinked; entry.conditionRaw = template.conditionRaw
             entry.manualQuantity = -1; entry.packedCount = 0; entry.resolutionRaw = HomeResolution.pending.rawValue
         }
-        let tasks = kit.map { $0.tasks.map(\.title) } ?? ["Check appliances", "Lock doors", "Take keys"]
+        let tasks = kit.map { $0.tasks.map(\.title) } ?? [String(localized: "Check appliances"), String(localized: "Lock doors"), String(localized: "Take keys")]
         for title in tasks {
             let task = NSEntityDescription.insertNewObject(forEntityName: "TripTask", into: context) as! TripTask
             task.id = UUID(); task.trip = trip; task.title = title; task.checked = false
@@ -64,7 +64,7 @@ import CoreData
         // Validate the proposed dates before changing anything: existing allocations may overlap after an edit.
         for entry in trip.entries where entry.allocatesItem {
             if let item = entry.item, let conflict = tripEntries.first(where: { $0.item == item && $0.trip != trip && $0.allocatesItem && ($0.trip?.startDay ?? "") <= details.end.stored && details.start.stored <= ($0.trip?.endDay ?? "") }) {
-                throw LocaliserError.packingConflict(conflict.trip?.name ?? "another trip")
+                throw LocaliserError.packingConflict(conflict.trip?.name ?? String(localized: "another trip"))
             }
         }
         apply(details, name: clean, to: trip); try save()
@@ -90,7 +90,7 @@ import CoreData
               count <= max(entry.requiredCount, Int(entry.packedCount)), count == 0 || entry.item?.archived != true else { throw LocaliserError.invalidPackingEntry }
         if count > 0, let item = entry.item {
             if let conflict = tripEntries.first(where: { $0.id != entry.id && $0.item == item && $0.allocatesItem && ($0.trip == trip || $0.trip.map(trip.overlaps) == true) }) {
-                throw LocaliserError.packingConflict(conflict.trip?.name ?? "another checklist row")
+                throw LocaliserError.packingConflict(conflict.trip?.name ?? String(localized: "another checklist row"))
             }
         }
         if entry.packedCount == 0 && count > 0 { entry.homePlace = entry.item?.place; entry.resolutionRaw = HomeResolution.pending.rawValue }

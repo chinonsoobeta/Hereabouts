@@ -115,7 +115,7 @@ final class Movement: NSManagedObject, Identifiable {
 
     /// Moves record "Unspecified" when there was no place. The stored word stays for older backups.
     static let noPlace = "Unspecified"
-    static func display(_ path: String) -> String { path.isEmpty || path == noPlace ? "No place" : path }
+    static func display(_ path: String) -> String { path.isEmpty || path == noPlace ? String(localized: "No place") : path }
 }
 
 @objc(Deadline)

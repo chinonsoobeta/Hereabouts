@@ -83,7 +83,7 @@ import CoreData
 
     private func homeName(_ name: String) throws -> String {
         let clean = try requiredName(name)
-        guard clean.count <= Home.maxLength else { throw LocaliserError.tooLong("A home's name", Home.maxLength) }
+        guard clean.count <= Home.maxLength else { throw LocaliserError.tooLong(String(localized: "A home's name"), Home.maxLength) }
         return clean
     }
 

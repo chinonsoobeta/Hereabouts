@@ -1,11 +1,14 @@
 name: Localiser
 options:
+  developmentLanguage: en
   deploymentTarget:
     iOS: '26.0'
   createIntermediateGroups: true
 settings:
   base:
     SWIFT_VERSION: '6.0'
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
     TARGETED_DEVICE_FAMILY: '1'
     DEVELOPMENT_TEAM: BRLCAAM57K
     # Public website and support address. Replace once hereabouts.app (or another domain) is live.

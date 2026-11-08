@@ -51,6 +51,6 @@ extension Belonging {
     /// "With Sam · since 3 Oct", for lists.
     var lentLine: String? {
         guard isLent else { return nil }
-        return lentAt.map { "With \(lentTo) · since \($0.formatted(.dateTime.day().month(.abbreviated)))" } ?? "With \(lentTo)"
+        return lentAt.map { String(localized: "With \(lentTo) · since \($0.formatted(.dateTime.day().month(.abbreviated)))") } ?? String(localized: "With \(lentTo)")
     }
 }

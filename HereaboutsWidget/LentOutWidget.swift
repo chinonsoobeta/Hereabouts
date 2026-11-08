@@ -16,7 +16,7 @@ struct LentOutProvider: TimelineProvider {
 
     func placeholder(in context: Context) -> LentOutEntry {
         LentOutEntry(date: .now, rows: LentOutRows.rows([
-            LentOutRecord(name: "Drill", isPrivate: false, person: "Sam", since: .now, askBackDay: nil),
+            LentOutRecord(name: String(localized: "Drill"), isPrivate: false, person: "Sam", since: .now, askBackDay: nil),
         ]))
     }
     func getSnapshot(in context: Context, completion: @escaping (LentOutEntry) -> Void) { completion(entry()) }

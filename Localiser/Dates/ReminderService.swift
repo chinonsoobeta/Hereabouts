@@ -101,17 +101,17 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         let calendar = Calendar.current
         var requests: [(id: String, title: String, body: String, ritual: String, when: DateComponents, repeats: Bool)] = []
         if Rituals.recapEnabled && !store.items.isEmpty {
-            requests.append(("localiser.ritual.recap", "Your Sunday recap", "See what you added, lent out or haven't checked lately.", "recap", DateComponents(hour: 18, weekday: 1), true))
+            requests.append(("localiser.ritual.recap", String(localized: "Your Sunday recap"), String(localized: "See what you added, lent out or haven't checked lately."), "recap", DateComponents(hour: 18, weekday: 1), true))
         }
         if Rituals.stocktakeEnabled, let date = Rituals.nextStocktakeDate(after: now, calendar: calendar) {
             let count = min(Rituals.stale(store.items, now: date, calendar: calendar).count, Rituals.stocktakeSize)
             if count > 0 {
-                requests.append(("localiser.ritual.stocktake", "Still there?", count == 1 ? "Check where you keep one thing." : "Check where you keep \(count) things.", "stocktake", calendar.dateComponents([.year, .month, .day, .hour], from: date), false))
+                requests.append(("localiser.ritual.stocktake", String(localized: "Still there?"), count == 1 ? String(localized: "Check where you keep one thing.") : String(localized: "Check where you keep \(count) things."), "stocktake", calendar.dateComponents([.year, .month, .day, .hour], from: date), false))
             }
         }
         for trip in Rituals.tripsNeedingEveReminder(store.trips, now: now, calendar: calendar).prefix(5) {
             guard let eve = CalendarDay(stored: trip.startDay)?.adding(days: -1, calendar: calendar)?.date(calendar: calendar, hour: 19), eve > now else { continue }
-            requests.append(("localiser.ritual.trip.\(trip.id.uuidString)", "Leaving tomorrow", "\(trip.name): some things aren't packed yet.", "trip", calendar.dateComponents([.year, .month, .day, .hour], from: eve), false))
+            requests.append(("localiser.ritual.trip.\(trip.id.uuidString)", String(localized: "Leaving tomorrow"), String(localized: "\(trip.name): some things aren't packed yet."), "trip", calendar.dateComponents([.year, .month, .day, .hour], from: eve), false))
         }
         let previous = ritualTask
         previous?.cancel()
