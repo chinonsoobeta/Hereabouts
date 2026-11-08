@@ -52,14 +52,15 @@ The words below are used the same way on every screen, in Siri answers, widgets,
 | Places (tab) | Places | Endroits | Lugares | Lugares |
 | Trips (tab) | Trips | Voyages | Viajes | Viagens |
 
-## English (U.K.) spelling changes
-
 Call off a trip never uses the word on the system Cancel or Delete buttons.
+
+Room icons in Places match room names in all five languages, with or without accents.
+
+## English (U.K.) spelling changes
 
 Acknowledgements, cancelled, licence (but SIL Open Font License, a proper name), any more, any time, towards, organiser (listing only). Demo names: My flat, Mum’s house, Hall cupboard.
 
 ## Things that stay English on purpose
 
 - Voice capture and the "Name in Place" typed shortcut understand English only. The listing says so in each language.
-- Room icons are picked by matching English room names; translated room names get the default icon.
 - Box label PDFs use the strings above; the support email subject and CSV column headers stay English so support can read them.

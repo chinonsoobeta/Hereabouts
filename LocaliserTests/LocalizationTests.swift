@@ -109,6 +109,23 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func testRoomIconsMatchEveryLanguage() {
+        let cases: [(String, String)] = [
+            ("Cuisine", "fork.knife"), ("Cocina", "fork.knife"), ("Cozinha", "fork.knife"), ("Kitchen", "fork.knife"),
+            ("Chambre", "bed.double"), ("Habitación", "bed.double"), ("habitacion", "bed.double"), ("Quarto", "bed.double"),
+            ("Salle de bain", "shower"), ("Baño", "shower"), ("Banheiro", "shower"),
+            ("Bureau", "desktopcomputer"), ("Escritório", "desktopcomputer"), ("Placard", "hanger"), ("Armário", "hanger"),
+            ("Entrée", "door.left.hand.closed"), ("entree", "door.left.hand.closed"), ("Pasillo", "door.left.hand.closed"),
+            ("Salon", "sofa"), ("Sala", "sofa"), ("Sous-sol", "stairs"), ("Sótano", "stairs"), ("Porão", "stairs"),
+            ("Grenier", "house"), ("Desván", "house"), ("Ático", "house"), ("Sótão", "house"),
+            ("Tiroir", "rectangle.split.1x2"), ("Cajón", "rectangle.split.1x2"), ("Gaveta", "rectangle.split.1x2"),
+            ("Étagère", "books.vertical"), ("Estante", "books.vertical"), ("Prateleira", "books.vertical"),
+            ("Carton", "shippingbox"), ("Boîte", "shippingbox"), ("Caja", "shippingbox"), ("Caixa", "shippingbox"),
+            ("Voiture", "car"), ("Coche", "car"), ("Carro", "car"), ("Car", "car"), ("Carnet", "square.grid.2x2"),
+        ]
+        for (name, symbol) in cases { XCTAssertEqual(PlaceTile.symbol(for: name), symbol, name) }
+    }
+
     func testSearchIgnoresAccents() {
         XCTAssertNotNil(ItemSearch.score(query: "cafe", name: "Café", aliases: "", place: "", notes: ""))
         XCTAssertNotNil(ItemSearch.score(query: "PERCEUSE", name: "perceuse", aliases: "", place: "", notes: ""))

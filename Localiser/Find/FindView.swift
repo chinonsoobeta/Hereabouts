@@ -177,8 +177,24 @@ struct PlaceTile: View {
     }
 
     static func symbol(for name: String) -> String {
-        let name = name.lowercased()
-        let table: [(String, String)] = [("garage", "car"), ("kitchen", "fork.knife"), ("bed", "bed.double"), ("bath", "shower"), ("office", "desktopcomputer"), ("desk", "desktopcomputer"), ("closet", "hanger"), ("hall", "door.left.hand.closed"), ("living", "sofa"), ("storage", "archivebox"), ("locker", "lock"), ("car", "car"), ("basement", "stairs"), ("attic", "house"), ("drawer", "rectangle.split.1x2"), ("shelf", "books.vertical"), ("box", "shippingbox"), ("bin", "shippingbox")]
+        // Folded so "Entrée" and "entree" both match. More specific words come first: "carton",
+        // "carnet" and "carro" must not fall to "car", nor "salle de bain" to "sala".
+        let name = name.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+        let table: [(String, String)] = [
+            ("garage", "car"), ("kitchen", "fork.knife"), ("cuisine", "fork.knife"), ("cocina", "fork.knife"), ("cozinha", "fork.knife"),
+            ("bed", "bed.double"), ("chambre", "bed.double"), ("dormitorio", "bed.double"), ("habitacion", "bed.double"), ("quarto", "bed.double"),
+            ("bath", "shower"), ("salle de bain", "shower"), ("banheiro", "shower"), ("bano", "shower"),
+            ("office", "desktopcomputer"), ("desk", "desktopcomputer"), ("bureau", "desktopcomputer"), ("oficina", "desktopcomputer"), ("escritorio", "desktopcomputer"),
+            ("closet", "hanger"), ("placard", "hanger"), ("armoire", "hanger"), ("armario", "hanger"),
+            ("hall", "door.left.hand.closed"), ("entree", "door.left.hand.closed"), ("couloir", "door.left.hand.closed"), ("pasillo", "door.left.hand.closed"), ("corredor", "door.left.hand.closed"),
+            ("living", "sofa"), ("salon", "sofa"), ("sala", "sofa"),
+            ("storage", "archivebox"), ("locker", "lock"),
+            ("carton", "shippingbox"), ("carnet", "square.grid.2x2"), ("carro", "car"), ("car", "car"), ("voiture", "car"), ("coche", "car"),
+            ("basement", "stairs"), ("sous-sol", "stairs"), ("sotano", "stairs"), ("porao", "stairs"), ("cave", "stairs"),
+            ("attic", "house"), ("grenier", "house"), ("desvan", "house"), ("atico", "house"), ("sotao", "house"),
+            ("drawer", "rectangle.split.1x2"), ("tiroir", "rectangle.split.1x2"), ("cajon", "rectangle.split.1x2"), ("gaveta", "rectangle.split.1x2"),
+            ("shelf", "books.vertical"), ("etagere", "books.vertical"), ("estante", "books.vertical"), ("prateleira", "books.vertical"),
+            ("box", "shippingbox"), ("bin", "shippingbox"), ("boite", "shippingbox"), ("caja", "shippingbox"), ("caixa", "shippingbox")]
         return table.first { name.contains($0.0) }?.1 ?? "square.grid.2x2"
     }
 }
