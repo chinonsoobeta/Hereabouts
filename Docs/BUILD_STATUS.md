@@ -621,3 +621,31 @@ Tests changed along the way:
 - `2c171f5` **B1, "Circled stamp".** A purple HERE stamp tilted 8 degrees, circled by a marigold pen loop, on paper. In dark mode the ground is night and the stamp lilac. `Docs/Design/icon/render-app-icon.swift` draws both 1024 px PNGs from the design canvas's geometry and the app's Atkinson Hyperlegible Bold. There's no tinted or clear image; iOS makes those from the icon.
 - Unit tests, iPhone 17 simulator, iOS 26.5: 114 run, 6 skipped, 0 failures. The built `Assets.car` holds the icon in light and dark.
 - Your iPhone 16 Pro Max: a Release build of `2c171f5` (`HEREABOUTS_FREE_THINGS=200`, with the Control Centre extension, `DerivedData/ControlSigning`) was installed over Wi-Fi at 20:11 PDT and opened. Fresh free-team profiles for the app and the extension run to Wed 21 Oct, 20:07 PDT. Angela's phone wasn't available, so her copy still stops on Sat 17 Oct, 12:11 PDT.
+
+## Stage 1 test record: languages and the second UI pass (Claude, 7 November)
+
+Main at `01a616e`: the wording pass (M41, `fbcb38c`), five languages (M63, `33f4d4c`) and the second UI pass (M44, `01a616e`). Xcode 27.2 (27B52).
+
+Unit tests (M43), on iOS 26.5 (`HB Audit`, 126A7DF5) and iOS 27.0 (`HB Audit 27`, FE2B76C0):
+
+```sh
+xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=<simulator>' -derivedDataPath DerivedData/<Audit|Audit27> -parallel-testing-enabled NO -jobs 3 -only-testing:LocaliserTests test
+```
+
+- iOS 26.5: **158 run, 6 skipped, 0 failures.** The six skips are the StoreKit purchase tests, which need iOS 27's local StoreKit service (see above). Result `DerivedData/Audit/Logs/Test/Test-Localiser-2026.11.07_18-29-04--0700.xcresult`.
+- iOS 27.0: **158 run, 0 skipped, 0 failures**, including every purchase, restore, refund and trial test. Result `DerivedData/Audit27/Logs/Test/Test-Localiser-2026.11.07_18-30-01--0700.xcresult`.
+- New since the last record: `LocalizationTests` (every catalog entry translated in en-GB, fr, es and pt-BR; format specifiers match the English; every Siri phrase keeps the app name; accent-free search; room icons in each language).
+
+UI tests (M44), same simulators, `-only-testing:LocaliserUITests`, run through the two-slot lock:
+
+- iOS 26.5: **17 run, 1 skipped (the language tour, which runs only with `TOUR_DIR`), 0 failures.** Result `DerivedData/Audit/Logs/Test/Test-Localiser-2026.11.07_18-31-06--0700.xcresult`.
+- iOS 27.0: **17 run, 1 skipped, 0 failures.** Result `DerivedData/Audit27/Logs/Test/Test-Localiser-2026.11.07_18-32-36--0700.xcresult`.
+- The builder ran the same suite twice on each OS before the merge, all green. The xcodebuild summary prints 18 and 2 skipped because it counts the bundle, which includes the store screenshot test.
+
+Accessibility audit exemptions added in M44, each measured from screenshot pixels in light and dark mode, at default and largest text:
+
+- iOS 27 bar buttons over a glass capsule. Cancel on Lend measures 6.8:1 light and 5.4:1 dark. Later on the monthly check measures 6.5:1 light. In dark mode Later measured **4.2:1**, so the exemption would have hidden a real failure. It now uses `Theme.barInkOnLilac` and measures 6.1:1 (`135204d`).
+- The Lend it button: white on the solid purple fill (#5B3DB8), the same in both modes. The audit reports it on iOS 26.5 while a name is being typed.
+- Unresolved contrast reports (no element) on the Pro screen on iOS 27. Every element on it measures 5.2:1 or better in dark mode and 5.6:1 or better in light.
+
+What this doesn't cover: physical devices (O39), real sandbox purchases (O35), and a fresh-install Release build (M45).

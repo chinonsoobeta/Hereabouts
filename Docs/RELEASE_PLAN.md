@@ -313,8 +313,10 @@ These set what's true. Codex's pass then makes it read well.
 
 ### Stage 1, part H: verification (P0, 1 session)
 
-- [ ] **M43 Unit tests** on iOS 26.5 and iOS 27.0, recorded in `BUILD_STATUS.md`. · P, X1
-- [ ] **M44 All UI tests**, fixed until green. An accessibility-audit exemption only after checking the element by eye. · P
+- [x] **M43 Unit tests** on iOS 26.5 and iOS 27.0, recorded in `BUILD_STATUS.md`. · P, X1
+  - **Done 7 November** on main `01a616e`: 158 run on each OS, 0 failures (6 StoreKit skips on 26.5). Recorded in `BUILD_STATUS.md`.
+- [x] **M44 All UI tests**, fixed until green. An accessibility-audit exemption only after checking the element by eye. · P
+  - **Done 7 November** (merge `01a616e`): 17 UI tests green on iOS 26.5 and 27, twice each by the builder and once each by me after the merge. Three contrast exemptions, each measured by eye in both modes; the dark-mode Later on the monthly check measured 4.2:1 and was fixed instead (`135204d`). Fixes: Several things sits under the photo, packing rows redraw after a tick, Pro plan names wrap beside the trial stamp.
   - *First pass, 7 November:* 17 tests, 0 failures in two runs in a row (the stocktake demo data and a timing wait in the several-things test). Still open for the second pass, after M41: tapping "Several things in this photo?" just as the photo picker closes can close the whole New thing sheet (`Find/FindView.swift:299`, the tap lands while focus moves to Name); and the lending test's contrast audit has failed now and then.
 - [ ] **M45 Fresh-install Release walkthrough** on an iOS 27 simulator with the local StoreKit file: skip the introduction, open the Settings tab, open Pro, add 15 things and check the 16th opens the paywall. Screenshots to `Docs/Verification`. · X1
 - [ ] **M46 Store screenshots.** Retake the set from M37 with the demo library on the iPhone 17 Pro Max simulator, including Pro. · P, X1
