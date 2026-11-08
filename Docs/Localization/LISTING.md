@@ -1,6 +1,6 @@
 # Hereabouts: App Store listing in each language
 
-Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name under the icon stays **Hereabouts** everywhere. In App Store Connect the English name is "Hereabouts: Find Your Things" (8 November; plain Hereabouts was taken), each language's listing name is set below (owner's OK, 8 November), and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
+Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name under the icon stays **Hereabouts** everywhere. In App Store Connect the English name is "Hereabouts: Find Your Things" (8 November; plain Hereabouts was taken), each language's listing name is set below and saved in App Store Connect App Information (owner's OK, 8 November), and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
 
 Limits: subtitle 30 characters, promotional text 170, keywords 100 (commas, no spaces). Counts below are characters, checked with a script; every subtitle and keyword list is also within the limit in UTF-8 bytes, in case App Store Connect counts bytes.
 
@@ -17,7 +17,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 
 ## French
 
-- **Name** (27): Hereabouts : Retrouvez tout
+- **Name** (30): Hereabouts : Où est-ce rangé ? (App Store Connect refused "Hereabouts : Retrouvez tout" and "Hereabouts – Retrouvez tout" for French as already used; French (Canada) kept "Retrouvez tout")
 - **Subtitle** (29): N'oubliez plus où c'est rangé
 - **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
 - **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
@@ -119,7 +119,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 
 ## Portuguese (Brazil)
 
-- **Name** (25): Hereabouts: Encontre tudo
+- **Name** (25): Hereabouts: Onde guardei? ("Hereabouts: Encontre tudo" was refused as already used)
 - **Subtitle** (24): Lembre onde você guardou
 - **Keywords** (96): `onde,achar,objetos,inventário,casa,organizar,mala,lista,guardar,perdido,emprestar,chaves,caderno`
 - **Promotional text:** Anote até 15 objetos grátis. Teste o Pro grátis por duas semanas ou compre o Vitalício uma vez. Sem conta, sem anúncios e sem rastreamento.
