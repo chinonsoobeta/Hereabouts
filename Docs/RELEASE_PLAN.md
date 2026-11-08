@@ -129,9 +129,9 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### Website and mailbox
 
-- [ ] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49). *hereaboutsapp.com bought 8 November at GoDaddy (hereabouts.app was taken). Name servers moved to Cloudflare (Free plan). Site on Cloudflare Pages, project "hereabouts", deployed from `Site/` with `wrangler pages deploy Site --project-name hereabouts --branch main` (no Git link: the GitHub app is tied to another Cloudflare login). hereaboutsapp.com and www attached; live once the name servers propagate.*
+- [x] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49). *hereaboutsapp.com bought 8 November at GoDaddy (hereabouts.app was taken). Name servers moved to Cloudflare (Free plan). Site on Cloudflare Pages, project "hereabouts", deployed from `Site/` with `wrangler pages deploy Site --project-name hereabouts --branch main` (no Git link: the GitHub app is tied to another Cloudflare login). hereaboutsapp.com and www attached. Live 8 November: home, /privacy and /support all load on hereaboutsapp.com and www.*
 - [ ] **O18 Put the two pages live** at `/privacy` and `/support` once M32, M33 and M41 are merged. Open both from a phone off your Wi-Fi.
-- [ ] **O19 Support mailbox.** Set it up and test it from a phone. *Cloudflare Email Routing on hereaboutsapp.com, MX/SPF/DKIM added 8 November; support@ forwards to the owner's Gmail once that address is verified.*
+- [ ] **O19 Support mailbox.** Set it up and test it from a phone. *Cloudflare Email Routing on hereaboutsapp.com, MX/SPF/DKIM added 8 November; support@ forwards to the owner's Gmail (rule active, address verified). Left: send a test from a phone.*
 
 ### App Store Connect
 
@@ -145,7 +145,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0.
 - [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
-- [ ] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Still needed for external testers: the privacy policy URL (O17), and optionally a marketing URL.*
+- [x] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Privacy policy URL (hereaboutsapp.com/privacy) and marketing URL (hereaboutsapp.com) added the same day.*
 - [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
 
 ### Hands-on checks
