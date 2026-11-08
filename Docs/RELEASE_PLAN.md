@@ -129,9 +129,9 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 
 ### Website and mailbox
 
-- [ ] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49). *hereaboutsapp.com bought 8 November (hereabouts.app was taken). Hosting still to set up.*
+- [ ] **O17 Domain.** Own and host a domain, and tell me the site address and support email (M49). *hereaboutsapp.com bought 8 November at GoDaddy (hereabouts.app was taken). Name servers moved to Cloudflare (Free plan). Site on Cloudflare Pages, project "hereabouts", deployed from `Site/` with `wrangler pages deploy Site --project-name hereabouts --branch main` (no Git link: the GitHub app is tied to another Cloudflare login). hereaboutsapp.com and www attached; live once the name servers propagate.*
 - [ ] **O18 Put the two pages live** at `/privacy` and `/support` once M32, M33 and M41 are merged. Open both from a phone off your Wi-Fi.
-- [ ] **O19 Support mailbox.** Set it up and test it from a phone.
+- [ ] **O19 Support mailbox.** Set it up and test it from a phone. *Cloudflare Email Routing on hereaboutsapp.com, MX/SPF/DKIM added 8 November; support@ forwards to the owner's Gmail once that address is verified.*
 
 ### App Store Connect
 
