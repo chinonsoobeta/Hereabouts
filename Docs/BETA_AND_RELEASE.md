@@ -53,7 +53,7 @@ No public launch with an open data-loss defect, a place filled in without the pe
 | Field | Value | Limit |
 | --- | --- | --- |
 | Name | Hereabouts: Find Your Things (App Store Connect name since 8 November: plain "Hereabouts" was taken). The name under the icon stays Hereabouts | 30 |
-| Subtitle | Remember where you put it (proposed 8 November, since the name now says "Find Your Things"; needs the owner's OK) | 30 |
+| Subtitle | Remember where you put it (owner's OK, 8 November) | 30 |
 | Primary category | Productivity | |
 | Secondary category | Utilities | |
 | Age rating | 4+ | |

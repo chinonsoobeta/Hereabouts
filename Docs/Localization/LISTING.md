@@ -1,6 +1,6 @@
 # Hereabouts: App Store listing in each language
 
-Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name under the icon stays **Hereabouts** everywhere. In App Store Connect the English name is "Hereabouts: Find Your Things" (8 November; plain Hereabouts was taken), and each language's listing name is still to choose and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
+Translated from the English listing in `BETA_AND_RELEASE.md` (M63). The name under the icon stays **Hereabouts** everywhere. In App Store Connect the English name is "Hereabouts: Find Your Things" (8 November; plain Hereabouts was taken), each language's listing name is set below (owner's OK, 8 November), and **Pro** is never translated. No prices are written: the App Store shows each country's own. Keep the voice paragraph only if voice memos ship; voice works in English only, and each translation says so.
 
 Limits: subtitle 30 characters, promotional text 170, keywords 100 (commas, no spaces). Counts below are characters, checked with a script; every subtitle and keyword list is also within the limit in UTF-8 bytes, in case App Store Connect counts bytes.
 
@@ -8,7 +8,8 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 
 ## English (U.K.)
 
-- **Subtitle** (25): Remember where you put it (proposed 8 November; was "Find your things", now in the name)
+- **Name** (28): Hereabouts: Find Your Things
+- **Subtitle** (25): Remember where you put it
 - **Keywords** (98): `where,find,belongings,inventory,home,organiser,packing,list,storage,lost,lend,borrow,keys,notebook`
 - **Promotional text:** Keep up to 15 things for free. Try Pro free for two weeks or buy Lifetime once. No account, ads or tracking.
 - **Description:** the English description with these changes only: "Export a backup or spreadsheet any time." (for "anytime"). Everything else reads the same in British English.
@@ -16,7 +17,8 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 
 ## French
 
-- **Subtitle** (20): Retrouvez vos objets
+- **Name** (27): Hereabouts : Retrouvez tout
+- **Subtitle** (29): N'oubliez plus où c'est rangé
 - **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
 - **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:**
@@ -57,7 +59,8 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 
 Same as French, with these changes for Canadian readers:
 
-- **Subtitle** (20): Retrouvez vos objets
+- **Name** (27): Hereabouts : Retrouvez tout
+- **Subtitle** (29): N'oubliez plus où c'est rangé
 - **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
 - **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:** French description, with "tableur" changed to "chiffrier". "Réglages" stays, as iOS uses it in Canada too. The French text already uses a plain space before ? and :, which suits Canadian style.
@@ -65,7 +68,8 @@ Same as French, with these changes for Canadian readers:
 
 ## Spanish (Spain)
 
-- **Subtitle** (19): Encuentra tus cosas
+- **Name** (26): Hereabouts: Encuentra todo
+- **Subtitle** (27): Recuerda dónde lo guardaste
 - **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
 - **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:**
@@ -106,7 +110,8 @@ Same as French, with these changes for Canadian readers:
 
 Same as Spanish (Spain), with these changes for Latin American readers:
 
-- **Subtitle** (19): Encuentra tus cosas
+- **Name** (26): Hereabouts: Encuentra todo
+- **Subtitle** (27): Recuerda dónde lo guardaste
 - **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
 - **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:** Spanish (Spain) description with "Mantén pulsado" changed to "Mantén presionado", "de serie" to "de forma predeterminada", "el domingo por la tarde" to "el domingo en la noche", and "abre la app Ajustes" to "abre la app Configuración" (the iOS name in Latin America).
@@ -114,7 +119,8 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 
 ## Portuguese (Brazil)
 
-- **Subtitle** (20): Encontre suas coisas
+- **Name** (25): Hereabouts: Encontre tudo
+- **Subtitle** (24): Lembre onde você guardou
 - **Keywords** (96): `onde,achar,objetos,inventário,casa,organizar,mala,lista,guardar,perdido,emprestar,chaves,caderno`
 - **Promotional text:** Anote até 15 objetos grátis. Teste o Pro grátis por duas semanas ou compre o Vitalício uma vez. Sem conta, sem anúncios e sem rastreamento.
 - **Description:**
