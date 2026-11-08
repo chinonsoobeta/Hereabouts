@@ -75,7 +75,8 @@ struct ProView: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle").font(.title3).foregroundStyle(Theme.purpleInk).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
+                    // At the largest text sizes the stamp wraps below the name instead of squeezing it.
+                    FlowLayout(spacing: 8) {
                         Text(option.name).font(.wbItem).foregroundStyle(Theme.ink)
                         if let trial = pro.trial(option) { Stamp(text: String(localized: "\(trial) free"), tone: .purple) }
                     }

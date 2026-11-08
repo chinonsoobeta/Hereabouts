@@ -297,6 +297,10 @@ struct ItemEditor: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(photo == nil ? "Add photo" : "Change photo")
+                if item == nil, photo != nil, ShelfReading.reader != nil {
+                    Button("Several things in this photo?", systemImage: "square.grid.2x2") { nameFocused = false; several = true }
+                        .font(.subheadline).accessibilityIdentifier("item.several").padding(.horizontal, 20).padding(.vertical, 10)
+                }
             }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
             Section {
                 TextField("Name", text: $name).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }.accessibilityIdentifier("item.name")
@@ -310,10 +314,6 @@ struct ItemEditor: View {
                             }
                         }
                     }
-                }
-                if item == nil, photo != nil, ShelfReading.reader != nil {
-                    Button("Several things in this photo?", systemImage: "square.grid.2x2") { nameFocused = false; several = true }
-                        .font(.subheadline).accessibilityIdentifier("item.several")
                 }
                 if item == nil && name.split(separator: " ").count >= 3 && suggestion == nil {
                     Button("Split into name and place", systemImage: "wand.and.stars") {
