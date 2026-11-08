@@ -1,4 +1,5 @@
 import XCTest
+import StoreKitTest
 
 @MainActor final class LocaliserUITests: XCTestCase {
     func testSettingsExportsAndProAreReachable() throws {
@@ -382,10 +383,24 @@ import XCTest
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
+        // The app under UI test gets no local StoreKit file from the test plan, so load the same one here for the Pro shot.
+        let storeKitFile = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
+        let storeKit = try SKTestSession(contentsOf: storeKitFile)
+        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        defer { withExtendedLifetime(storeKit) {} }
         let base = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
         // 2: say where it is. Voice memos may be cut for 1.0, so this file is easy to drop.
         app.launchArguments = base + ["--voice-transcript", "the spare charger is in the blue tin on the garage back wall"]
         app.launch()
+        // Reminders on, as a real user would have them, so Settings carries no warning badge. The permission outlasts the relaunches below.
+        app.tabBars.buttons["Settings"].tap()
+        let turnOn = app.buttons["Turn on reminders"]
+        if turnOn.waitForExistence(timeout: 5) {
+            turnOn.tap()
+            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+            if allow.waitForExistence(timeout: 5) { allow.tap() }
+            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
+        }
         app.tabBars.buttons["Find"].tap()
         let say = app.buttons["find.say"]
         XCTAssertTrue(say.waitForExistence(timeout: 5))
@@ -398,6 +413,8 @@ import XCTest
         next.tap()
         XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.buttons["voice.newPlace"].waitForExistence(timeout: 5))
+        if app.keyboards.firstMatch.exists { app.keyboards.buttons.matching(NSPredicate(format: "label IN {'return', 'Return', 'done', 'Done'}")).firstMatch.tap() }
+        reveal(app.buttons["voice.newPlace"], in: app)
         try shot("2-voice-optional")
         app.terminate()
         // 3: lending, with the ask-back date on the thing page.
@@ -457,7 +474,7 @@ import XCTest
         XCTAssertTrue(app.navigationBars["Garage"].waitForExistence(timeout: 5))
         try shot("review-place")
         app.tabBars.buttons["Find"].tap()
-        search.tap(); search.typeText("running\n")
+        search.tap(); search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 20)); search.typeText("running\n")
         app.staticTexts["Running shoes"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
         app.buttons["item.move"].tap()
@@ -469,6 +486,8 @@ import XCTest
         try shot("review-editor")
         app.navigationBars["Edit thing"].buttons["Cancel"].tap()
         app.tabBars.buttons["Trips"].tap()
+        // The trip page opened for its store shot is still on this tab.
+        if !app.staticTexts["4 things"].waitForExistence(timeout: 2) { app.navigationBars.buttons.element(boundBy: 0).tap() }
         app.staticTexts["4 things"].tap()
         XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
         try shot("review-kit")
