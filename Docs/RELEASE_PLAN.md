@@ -346,6 +346,10 @@ These set what's true. Codex's pass then makes it read well.
 >
 > **For each finding:** a failing XCTest in `LocaliserTests/Audit/` that proves it (or exact steps when a test can't), the file and line, what goes wrong for the person, and a severity: data loss or privacy leak; limit bypass or wrong answer; crash; other. Compile with `xcodebuild ... build-for-testing` (you can't run simulators; the auditor runs the tests). One commit per finding. Finish with `Docs/AUDIT_CODEX.md`: every finding, ranked, with its test's name. Don't write your model name anywhere.
 
+### Late addition: iPhone Duo (P1, 1 session)
+
+- [ ] **M66 Fit the iPhone Duo's inner screen** (owner, 8 November). The Duo has a 5.4-inch outer screen and a 7.6-inch inner one. Built with the 27.1 SDK or later, the app fills the inner screen rather than sitting in a letterbox. That screen is regular width and height and ignores the portrait-only setting, so our one-column screens stretch edge to edge. For 1.0, keep the single column: cap the content of every tab and sheet at a comfortable reading width and centre it when the width is regular. Apply it to the "Add a thing" bar and the Find heading too. Check each screen in both orientations, and when folding and unfolding mid-task (an open sheet, the voice sheet while held, a search, the introduction). The two-column layout waits for 1.1 (section 8). Needs the iOS 27.2 simulator runtime (Xcode, Settings, Components). Falls under M65, since it lands after M64. **Check:** a UI test on the iPhone Duo simulator opens each tab and the New thing sheet in landscape, and confirms the content stays within the cap. The accessibility audit passes there. Screenshots of each tab go to `Docs/Verification/M66`. If App Store Connect asks for Duo screenshots, take them with M46's demo library. · P, X1
+
 ### After an owner step
 
 - [ ] **M48 Builds for both phones** (after M31). Development builds, or TestFlight once O42 is given. · P
@@ -413,7 +417,7 @@ Blocked items found while building. Each waits for a talk with the owner.
 
 ## 8. Not in 1.0
 
-- **1.1:** household sharing, sync if it missed 1.0, voice memos or the shared notebook if their rules moved them.
+- **1.1:** household sharing, sync if it missed 1.0, voice memos or the shared notebook if their rules moved them, and a two-column layout on the iPhone Duo's inner screen (places down the side, things beside them; M66 does the 1.0 fit).
 - **A separate app:** receipts, returns, warranties and expiry dates, starting from the `receipts-spinoff-base` tag (M1).
 - **Later:** iPad and Mac layouts, a Face ID lock, NFC tags, an insurance report, Android.
 
