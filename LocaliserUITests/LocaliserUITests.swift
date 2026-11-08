@@ -498,7 +498,7 @@ import StoreKitTest
 
     /// What App Review sees: a clean install of a Release build. Runs only when asked, in Release on an erased simulator:
     /// `TEST_RUNNER_RELEASE_WALKTHROUGH_DIR=<folder> xcodebuild … -configuration Release -only-testing:LocaliserUITests/LocaliserUITests/testFreshInstallReleaseWalkthrough test`
-    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. On iOS 27 simulators a Release build gets no plans from the local StoreKit file, so the Pro checks fail there; Debug runs load them.
+    /// Release needs `ENABLE_TESTABILITY=YES` on the command line. On iOS 27 simulators a Release build gets no plans from the local StoreKit file, so the Pro checks fail there. Debug on HB Store 27 loads them.
     func testFreshInstallReleaseWalkthrough() throws {
         guard let path = ProcessInfo.processInfo.environment["RELEASE_WALKTHROUGH_DIR"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_RELEASE_WALKTHROUGH_DIR to a folder to walk through a fresh Release install") }
         let folder = URL(fileURLWithPath: path)
@@ -535,10 +535,11 @@ import StoreKitTest
         let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), app.debugDescription)
-        let plans = ["Yearly", "Monthly", "Lifetime"].map { app.staticTexts[$0].firstMatch }
+        // Each plan is a button whose label starts with its name, as in testSettingsExportsAndProAreReachable.
+        let plans = ["Yearly", "Monthly", "Lifetime"].map { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", $0)).firstMatch }
         XCTAssertTrue(plans[0].waitForExistence(timeout: 20), app.debugDescription)
         for plan in plans { XCTAssertTrue(plan.exists, "\(plan) is missing\n\(app.debugDescription)") }
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS ' free'")).firstMatch.exists, "No trial stamp\n\(app.debugDescription)")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists, "No trial button\n\(app.debugDescription)")
         try shot("3-pro")
         app.navigationBars["Pro"].buttons["Settings"].tap()
         // 3. Add things one at a time until there are 15.
@@ -563,7 +564,7 @@ import StoreKitTest
         name.tap(); name.typeText("Walkthrough thing 16")
         app.buttons["item.save"].tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5), "The 16th thing did not open the paywall\n\(app.debugDescription)")
-        XCTAssertTrue(app.staticTexts["Yearly"].firstMatch.waitForExistence(timeout: 20), app.debugDescription)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch.waitForExistence(timeout: 20), app.debugDescription)
         try shot("5-paywall-on-16th")
     }
 
