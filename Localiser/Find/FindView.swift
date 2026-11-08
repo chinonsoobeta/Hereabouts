@@ -33,8 +33,6 @@ struct FindView: View {
                 if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
                 if store.items.isEmpty {
                     LibraryEmptyState(title: String(localized: "Nothing here yet"), systemImage: "magnifyingglass", description: String(localized: "Write down a thing and where you keep it."))
-                    Button { newThing = NewThing() } label: { Text("Add your first thing").fixedSize(horizontal: false, vertical: true) }
-                        .buttonStyle(PrimaryButtonStyle())
                 } else if browsing {
                     dashboard
                 } else {
@@ -58,8 +56,9 @@ struct FindView: View {
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
         .background(Theme.ground)
+        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused { addBar } }
         .navigationTitle("Hereabouts")
-        .navigationSubtitle("\(store.currentHome?.name ?? Home.defaultName) · \(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }
@@ -79,6 +78,7 @@ struct FindView: View {
             store.findRequest = nil
         }
         .toolbar {
+            ToolbarItem(placement: .principal) { centredTitle }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Toggle("Show archived things", systemImage: "archivebox", isOn: $showArchived)
@@ -89,15 +89,6 @@ struct FindView: View {
             }
             if VoiceCapture.isAvailable() {
                 ToolbarItem(placement: .topBarTrailing) { Button("Say where", systemImage: "mic") { speaking = true }.accessibilityIdentifier("find.say") }
-            }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
-                    Button("Start with a photo", systemImage: "camera") { newThing = NewThing(photoFirst: true) }
-                } label: { Label("Add a thing", systemImage: "plus") } primaryAction: { newThing = NewThing() }
-                .buttonStyle(.borderedProminent).tint(Theme.purpleFill)
-                .accessibilityHint("Touch and hold to start with a photo")
             }
         }
         .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
@@ -119,9 +110,34 @@ struct FindView: View {
         }
     }
 
+    /// "Hereabouts" in the middle of the bar, with the home and the date on their own lines below.
+    private var centredTitle: some View {
+        VStack(spacing: 0) {
+            Text("Hereabouts").font(.wbTitle).foregroundStyle(Theme.ink)
+            Text(store.currentHome?.name ?? Home.defaultName).font(.wbCaption).foregroundStyle(Theme.pencil)
+            Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
+        }
+        .lineLimit(1).minimumScaleFactor(0.8).multilineTextAlignment(.center)
+        .accessibilityElement(children: .combine).accessibilityAddTraits(.isHeader)
+        .accessibilityShowsLargeContentViewer()
+    }
+
+    /// Wide and low on the screen, where a thumb reaches it. Touch and hold to start with a photo.
+    private var addBar: some View {
+        Button { newThing = NewThing() } label: { Label("Add a thing", systemImage: "plus").fixedSize(horizontal: false, vertical: true) }
+            .buttonStyle(PrimaryButtonStyle())
+            .contextMenu {
+                Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
+                Button("Start with a photo", systemImage: "camera") { newThing = NewThing(photoFirst: true) }
+            }
+            .accessibilityHint("Touch and hold to start with a photo")
+            .accessibilityAction(named: "Start with a photo") { newThing = NewThing(photoFirst: true) }
+            .padding(.horizontal, 20).padding(.vertical, 8)
+    }
+
     @ViewBuilder private var siriTips: some View {
-        if !whereIsTipDismissed { SiriTipView(intent: FindThingIntent(), isVisible: Binding(get: { !whereIsTipDismissed }, set: { whereIsTipDismissed = !$0 })) }
-        if !writeDownTipDismissed { SiriTipView(intent: AddThingIntent(), isVisible: Binding(get: { !writeDownTipDismissed }, set: { writeDownTipDismissed = !$0 })) }
+        if !whereIsTipDismissed { SiriTipRow(phrase: "Say **“Ask Hereabouts where something is”**") { whereIsTipDismissed = true } }
+        if !writeDownTipDismissed { SiriTipRow(phrase: "Say **“Write something down in Hereabouts”**") { writeDownTipDismissed = true } }
     }
 
     @ViewBuilder private var dashboard: some View {
@@ -154,6 +170,23 @@ struct FindView: View {
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.secondary).accessibilityHidden(true)
             }.card()
         }.buttonStyle(.plain)
+    }
+}
+
+/// A Siri phrase to try, with the current Siri glyph. The system's own tip view still draws the old orb.
+struct SiriTipRow: View {
+    let phrase: LocalizedStringKey
+    let dismiss: () -> Void
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "siri").font(.title2).foregroundStyle(Theme.ink).accessibilityHidden(true)
+            Text(phrase).font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+            Button { withAnimation { dismiss() } } label: { Image(systemName: "xmark").font(.body.weight(.semibold)).foregroundStyle(Theme.pencil) }
+                .frame(minWidth: 44, minHeight: 44).accessibilityLabel("Hide this tip")
+        }
+        .padding(.leading, 14).padding(.trailing, 4).padding(.vertical, 4)
+        .background(Theme.noteBox, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

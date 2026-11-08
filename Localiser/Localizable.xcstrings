@@ -2427,6 +2427,100 @@
         }
       }
     },
+    "%lld-week streak" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-week streak"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-week streak"
+                }
+              }
+            }
+          }
+        },
+        "en-GB" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-week streak"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld-week streak"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha de %lld semana"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Racha de %lld semanas"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Série de %lld semaine"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Série de %lld semaines"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sequência de %lld semana"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sequência de %lld semanas"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "1 match" : {
       "localizations" : {
         "en-GB" : {
@@ -2815,34 +2909,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Um objeto privado"
-          }
-        }
-      }
-    },
-    "A room is enough. Shelves and drawers can come later." : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A room is enough. Shelves and drawers can come later."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Con una habitación basta. Los estantes y cajones pueden esperar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Une pièce suffit. Les étagères et les tiroirs peuvent attendre."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um cômodo basta. Prateleiras e gavetas podem esperar."
           }
         }
       }
@@ -3347,34 +3413,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adicionar ao kit"
-          }
-        }
-      }
-    },
-    "Add your first thing" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add your first thing"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añade tu primer objeto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajoutez votre premier objet"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adicione seu primeiro objeto"
           }
         }
       }
@@ -8219,30 +8257,58 @@
         }
       }
     },
-    "Hold the button to talk, or tap to start and stop. Nothing is recorded." : {
+    "Hide this tip" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hold the button to talk, or tap to start and stop. Nothing is recorded."
+            "value" : "Hide this tip"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mantén pulsado el botón para hablar, o toca para empezar y parar. No se graba nada."
+            "value" : "Ocultar este consejo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maintenez le bouton pour parler, ou touchez pour commencer et arrêter. Rien n’est enregistré."
+            "value" : "Masquer ce conseil"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mantenha o botão pressionado para falar, ou toque para começar e parar. Nada é gravado."
+            "value" : "Ocultar esta dica"
+          }
+        }
+      }
+    },
+    "Hold the button while you talk, and let go when you're done. Nothing is recorded." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold the button while you talk, and let go when you're done. Nothing is recorded."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén pulsado el botón mientras hablas y suéltalo al terminar. No se graba nada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maintenez le bouton pendant que vous parlez, puis relâchez-le quand vous avez fini. Rien n’est enregistré."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenha o botão pressionado enquanto fala e solte quando terminar. Nada é gravado."
           }
         }
       }
@@ -9619,30 +9685,30 @@
         }
       }
     },
-    "Make a checklist for a trip. Check off things as you pack. Put them away when you're home." : {
+    "Make a checklist for a trip, check off things as you pack, and put them away when you're home." : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make a checklist for a trip. Check off things as you pack. Put them away when you're home."
+            "value" : "Make a checklist for a trip, check off things as you pack, and put them away when you're home."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Haz una lista para un viaje. Marca las cosas mientras haces la maleta. Guárdalas al volver."
+            "value" : "Haz una lista para un viaje, marca las cosas mientras haces la maleta y guárdalas al volver."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faites une liste pour un voyage. Cochez les objets au fur et à mesure. Rangez-les à votre retour."
+            "value" : "Faites une liste pour un voyage, cochez les objets au fur et à mesure et rangez-les à votre retour."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faça uma lista para uma viagem. Marque as coisas enquanto faz a mala. Guarde tudo na volta."
+            "value" : "Faça uma lista para uma viagem, marque as coisas enquanto faz a mala e guarde tudo na volta."
           }
         }
       }
@@ -14401,6 +14467,62 @@
         }
       }
     },
+    "Say **“Ask Hereabouts where something is”**" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say **“Ask Hereabouts where something is”**"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Di **«Preguntar a Hereabouts dónde está algo»**"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dites **« Demander à Hereabouts où est quelque chose »**"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diga **“Perguntar ao Hereabouts onde está algo”**"
+          }
+        }
+      }
+    },
+    "Say **“Write something down in Hereabouts”**" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Say **“Write something down in Hereabouts”**"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Di **«Anotar algo en Hereabouts»**"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dites **« Noter quelque chose dans Hereabouts »**"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diga **“Anotar algo no Hereabouts”**"
+          }
+        }
+      }
+    },
     "Say what it is and where, such as “the drill's in the garage”." : {
       "localizations" : {
         "en-GB" : {
@@ -18703,30 +18825,30 @@
         }
       }
     },
-    "Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account." : {
+    "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account." : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account."
+            "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anota dónde guardas tus cosas. Encuéntralas después. Tu libreta se guarda en este iPhone. No necesitas una cuenta."
+            "value" : "Anota dónde guardas tus cosas y encuéntralas después. Tu libreta se guarda en este iPhone, así que no necesitas una cuenta."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notez où vous rangez vos affaires. Retrouvez-les plus tard. Votre carnet est enregistré sur cet iPhone. Aucun compte nécessaire."
+            "value" : "Notez où vous rangez vos affaires et retrouvez-les plus tard. Votre carnet est enregistré sur cet iPhone, donc aucun compte n’est nécessaire."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anote onde você guarda suas coisas. Encontre-as depois. Seu caderno fica neste iPhone. Não precisa de conta."
+            "value" : "Anote onde você guarda suas coisas e encontre-as depois. Seu caderno fica neste iPhone, então você não precisa de conta."
           }
         }
       }

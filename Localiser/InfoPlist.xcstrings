@@ -143,32 +143,32 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded."
+            "state" : "translated",
+            "value" : "Use the microphone to say where you keep a thing. Hold to talk, and let go when you're done. Nothing is recorded."
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use the microphone to say where you keep a thing. Hold to talk, or tap to start and stop. Nothing is recorded."
+            "value" : "Use the microphone to say where you keep a thing. Hold to talk, and let go when you're done. Nothing is recorded."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usa el micrófono para decir dónde guardas un objeto. Mantén pulsado para hablar, o toca para empezar y parar. No se graba nada."
+            "value" : "Usa el micrófono para decir dónde guardas un objeto. Mantén pulsado para hablar y suelta al terminar. No se graba nada."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilisez le micro pour dire où vous rangez un objet. Maintenez pour parler, ou touchez pour commencer et arrêter. Rien n’est enregistré."
+            "value" : "Utilisez le micro pour dire où vous rangez un objet. Maintenez pour parler et relâchez quand vous avez fini. Rien n’est enregistré."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use o microfone para dizer onde guarda um objeto. Mantenha pressionado para falar, ou toque para começar e parar. Nada é gravado."
+            "value" : "Use o microfone para dizer onde guarda um objeto. Mantenha pressionado para falar e solte quando terminar. Nada é gravado."
           }
         }
       }

@@ -25,7 +25,7 @@ struct RecapView: View {
                     }.font(.wbDisplay).foregroundStyle(Theme.ink)
                         .accessibilityAddTraits(.isHeader).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    if recap.keepingUp > 0 { Stamp(text: String(localized: "\(recap.keepingUp) weeks"), tone: .purple) }
+                    if recap.keepingUp > 0 { Stamp(text: String(localized: "\(recap.keepingUp)-week streak"), tone: .purple) }
                 }
                 Text(keepingUpSentence(recap.keepingUp)).font(.wbBody).foregroundStyle(Theme.ink)
                 VStack(spacing: 0) {
@@ -229,7 +229,7 @@ struct RitualBanners: View {
     var body: some View {
         let _ = store.revision
         let weeks = Rituals.keepingUpWeeks(activity: Rituals.activity(in: store.items))
-        let stamp: String? = weeks > 0 ? String(localized: "\(weeks) weeks") : nil
+        let stamp: String? = weeks > 0 ? String(localized: "\(weeks)-week streak") : nil
         let recapReady = recapOn && Rituals.seededReadWeek(readWeek) != Rituals.recapWeekKey()
         let stocktake = Rituals.stocktakeDue(store.items, doneMonth: doneMonth)
         VStack(alignment: .leading, spacing: 10) {

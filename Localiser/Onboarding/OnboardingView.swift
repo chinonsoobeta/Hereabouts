@@ -21,6 +21,8 @@ struct OnboardingView: View {
     @Environment(ProAccess.self) private var pro
     @AppStorage(Home.nameKey) private var homeName = ""
     @State private var page = 0
+    /// Which way the pages slide: forward pushes the current page out to the left.
+    @State private var forward = true
     @State private var thing = String(localized: "Spare keys")
     @State private var room = ""
     @State private var error: String?
@@ -34,25 +36,33 @@ struct OnboardingView: View {
                 if page == 0 {
                     Text("Hereabouts").font(.wbCaption).foregroundStyle(Theme.pencil).fixedSize().layoutPriority(1)
                 } else {
-                    Button { withAnimation { page -= 1 } } label: { Label("Back", systemImage: "chevron.left") }
+                    Button { go(to: page - 1) } label: { Label("Back", systemImage: "chevron.left") }
                         .font(.wbBody).foregroundStyle(Theme.ink).frame(minHeight: 44)
                 }
                 Spacer()
                 Text("Page \(page + 1) of 3").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.trailing)
             }
             .padding(.horizontal, 24).padding(.top, 8)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    switch page {
-                    case 0: namePage
-                    case 1: thingPage
-                    default: nudgePage
+            ZStack {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 18) {
+                            switch page {
+                            case 0: namePage
+                            case 1: thingPage
+                            default: nudgePage
+                            }
+                        }
+                        .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 12)
                     }
+                    .scrollDismissesKeyboard(.interactively)
+                    VStack(spacing: 10) { actions }.padding(.horizontal, 24).padding(.bottom, 16)
                 }
-                .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 12)
+                .background(Theme.paper)
+                .id(page)
+                .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading), removal: .move(edge: forward ? .leading : .trailing)))
             }
-            .scrollDismissesKeyboard(.interactively)
-            VStack(spacing: 10) { actions }.padding(.horizontal, 24).padding(.bottom, 16)
+            .clipped()
         }
         .background(Theme.paper)
         .alert("Couldn't write that down", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -62,7 +72,7 @@ struct OnboardingView: View {
 
     @ViewBuilder private var namePage: some View {
         headline(String(localized: "Your notebook for things at home."))
-        Text("Write down where you keep things. Find them later. Your notebook is saved on this iPhone. You don't need an account.").font(.wbBody).foregroundStyle(Theme.ink)
+        Text("Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account.").font(.wbBody).foregroundStyle(Theme.ink)
         Text("What do you call home?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
         underlinedField(String(localized: "My apartment"), text: $homeName).accessibilityLabel(String(localized: "What do you call home?"))
             .onChange(of: homeName) { _, name in if name.count > Home.maxLength { homeName = String(name.prefix(Home.maxLength)) } }
@@ -74,9 +84,8 @@ struct OnboardingView: View {
         Text("Choose a thing or type your own. Add it to your notebook.").font(.wbBody).foregroundStyle(Theme.ink)
         suggestions([String(localized: "Spare keys"), String(localized: "Passport"), String(localized: "Charger"), String(localized: "Sunglasses"), String(localized: "The drill"), String(localized: "Tape measure")], selected: thing) { thing = $0 }
         underlinedField(String(localized: "Spare keys"), text: $thing).accessibilityLabel(String(localized: "Thing you often look for"))
-        Text("Where do you keep it?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).padding(.top, 10)
-        underlinedField(String(localized: "Kitchen"), text: $room).accessibilityLabel(String(localized: "Where do you keep it?"))
-        Text("A room is enough. Shelves and drawers can come later.").font(.wbCaption).foregroundStyle(Theme.pencil)
+        underlinedField(String(localized: "Kitchen"), text: $room).accessibilityLabel(String(localized: "Where do you keep it?")).padding(.top, 10)
+        Text("Where do you keep it?").font(.wbLabel).textCase(.uppercase).tracking(1.76).foregroundStyle(Theme.pencil).accessibilityHidden(true)
     }
 
     @ViewBuilder private var nudgePage: some View {
@@ -104,14 +113,14 @@ struct OnboardingView: View {
             Button {
                 focused = false; homeName = homeName.trimmingCharacters(in: .whitespacesAndNewlines)
                 if !homeName.isEmpty, let home = store.currentHome { try? store.renameHome(home, to: homeName) }
-                withAnimation { page = 1 }
+                go(to: 1)
             } label: { wrapping(String(localized: "Open your notebook")) }
                 .buttonStyle(PrimaryButtonStyle())
             Text("You can rename it any time in Settings.").font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity)
         case 1:
             Button { writeItDown() } label: { wrapping(String(localized: "Write it down")) }
                 .buttonStyle(PrimaryButtonStyle()).disabled(thing.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            Button("I'll do this later") { focused = false; withAnimation { page = 2 } }
+            Button("I'll do this later") { focused = false; go(to: 2) }
                 .font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
         default:
             Button { Task { await reminders.enable(); onFinish() } } label: { wrapping(String(localized: "Turn on reminders")) }
@@ -122,6 +131,12 @@ struct OnboardingView: View {
     }
 
     // MARK: Pieces
+
+    /// Slides to another page. The direction is set first, on its own, so the page leaving uses it too.
+    private func go(to target: Int) {
+        forward = target > page
+        Task { @MainActor in withAnimation(.easeInOut(duration: 0.35)) { page = target } }
+    }
 
     private func wrapping(_ title: String) -> some View {
         Text(title).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
@@ -172,7 +187,7 @@ struct OnboardingView: View {
         let rewriting = written.map { $0.managedObjectContext != nil && !$0.isDeleted } ?? false
         // Replaying the introduction never adds past the free allowance, and says why.
         if let refusal = Self.refusal(rewriting: rewriting, allowed: pro.allows(.item, count: store.activeItemCount)) {
-            withAnimation { page = 2 }; error = refusal; return
+            go(to: 2); error = refusal; return
         }
         do {
             let roomName = room.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -183,7 +198,7 @@ struct OnboardingView: View {
             } else {
                 written = try store.addItem(name: thing, place: place)
             }
-            withAnimation { page = 2 }
+            go(to: 2)
         } catch { self.error = error.localizedDescription }
     }
 }

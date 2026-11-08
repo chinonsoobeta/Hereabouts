@@ -19,7 +19,7 @@ struct PackingView: View {
                             Image(systemName: "suitcase.rolling").foregroundStyle(Theme.purple).accessibilityHidden(true)
                             Text("What do you need for your trip?").fixedSize(horizontal: false, vertical: true)
                         }.font(.wbTitle)
-                        Text("Make a checklist for a trip. Check off things as you pack. Put them away when you're home.")
+                        Text("Make a checklist for a trip, check off things as you pack, and put them away when you're home.")
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                         Button("Plan a trip") { newTrip = true }.buttonStyle(PrimaryButtonStyle())
                         HStack(spacing: 12) {

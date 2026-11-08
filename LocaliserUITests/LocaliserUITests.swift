@@ -81,7 +81,7 @@ import StoreKitTest
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         app.buttons["Not now"].tap()
         XCTAssertTrue(app.staticTexts["Passport"].waitForExistence(timeout: 5), app.debugDescription)
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "My apartment ·")).firstMatch.exists, app.debugDescription)
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "My apartment")).firstMatch.exists, app.debugDescription)
     }
 
     func testRecapStocktakeAndStillThere() throws {
@@ -545,7 +545,7 @@ import StoreKitTest
         // 3. Add things one at a time until there are 15.
         app.tabBars.buttons["Find"].tap()
         for number in 1...15 {
-            let add = number == 1 ? app.buttons["Add your first thing"] : app.buttons["Add a thing"]
+            let add = app.buttons["Add a thing"]
             XCTAssertTrue(add.waitForExistence(timeout: 5), "Thing \(number): no add button\n\(app.debugDescription)")
             add.tap()
             let name = app.textFields["item.name"]
@@ -603,8 +603,8 @@ import StoreKitTest
             app.tabBars.buttons[tab].tap()
             let labels: [String]
             switch tab {
-            case "Find": labels = ["Add your first thing"]
-            case "Trips": labels = ["Make a checklist for a trip. Check off things as you pack. Put them away when you're home."]
+            case "Find": labels = ["Add a thing"]
+            case "Trips": labels = ["Make a checklist for a trip, check off things as you pack, and put them away when you're home."]
             default: labels = []
             }
             recordTypography(app, labels: labels, name: tab)
@@ -679,8 +679,9 @@ import StoreKitTest
             // Verified at Accessibility Extra Large: this Settings footer grows like every other footer.
             if issue.auditType == .dynamicType && element.label.hasPrefix("A backup holds your places") { return true }
             guard issue.auditType == .dynamicType else { return false }
-            // Top bar buttons sit above the content, within the status and navigation bar area.
-            return element.elementType == .button && element.frame.maxY < 140
+            // Top bar buttons, and Find's centred title (Hereabouts, the home, the date), sit above the content within
+            // the status and navigation bar area. The system caps text there; long-press shows the large content viewer.
+            return (element.elementType == .button || element.elementType == .staticText || element.elementType == .other) && element.frame.maxY < 140
         }
     }
 

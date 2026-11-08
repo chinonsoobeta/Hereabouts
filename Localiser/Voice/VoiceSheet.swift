@@ -14,8 +14,8 @@ struct VoiceSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var capture = VoiceCapture()
     @State private var text = ""
-    @State private var pressStart: Date?
-    @State private var wasListening = false
+    /// True while a finger is on the microphone.
+    @State private var holding = false
     @State private var noSplit = false
     /// Called with the name, the matched place and any new place before the sheet closes.
     let onResult: (NewThing) -> Void
@@ -28,7 +28,7 @@ struct VoiceSheet: View {
                 if let message = capture.message { Text(message).font(.wbCaption).foregroundStyle(Theme.warning) }
                 if noSplit { Text("Say what it is and where, such as \u{201C}the drill's in the garage\u{201D}.").font(.wbCaption).foregroundStyle(Theme.secondary) }
             } header: { Text("What did you put away?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
-              footer: { Text("Hold the button to talk, or tap to start and stop. Nothing is recorded.").foregroundStyle(Theme.secondary) }
+              footer: { Text("Hold the button while you talk, and let go when you're done. Nothing is recorded.").foregroundStyle(Theme.secondary) }
             Section { microphone.frame(maxWidth: .infinity) }.listRowBackground(Color.clear)
         }
         .groundBackground()
@@ -54,16 +54,15 @@ struct VoiceSheet: View {
             .symbolEffect(.variableColor.iterative, isActive: capture.phase == .listening)
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { _ in
-                    guard pressStart == nil else { return }
-                    pressStart = .now
-                    wasListening = listening
-                    if !wasListening { Task { await capture.start() } }
+                    guard !holding else { return }
+                    holding = true
+                    // Letting go before listening has started (the first time asks for the microphone) stops it as soon as it starts.
+                    Task { await capture.start(); if !holding { await capture.stop() } }
                 }
                 .onEnded { _ in
-                    // A long hold stops on release; a short tap leaves it listening until the next tap.
-                    let held = pressStart.map { Date.now.timeIntervalSince($0) } ?? 0
-                    pressStart = nil
-                    if wasListening || held > 0.5 { Task { await capture.stop() } }
+                    // Listening lasts only while the button is held.
+                    holding = false
+                    if capture.phase == .listening { Task { await capture.stop() } }
                 })
             .accessibilityElement()
             .accessibilityLabel(listening ? "Stop listening" : "Start listening")
