@@ -151,7 +151,7 @@ struct StocktakeView: View {
         }
         .background(Theme.lilacPaper)
         .navigationTitle("\(Date.now.formatted(.dateTime.month(.wide))) check").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Later") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Later") { dismiss() }.tint(Theme.barInkOnLilac) } }
         .onAppear {
             guard total == 0 else { return }
             queue = Rituals.stocktake(store.items); total = queue.count

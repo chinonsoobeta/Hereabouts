@@ -12,6 +12,9 @@ enum Theme {
     static let ink = adaptive(0x241B3D, 0xF1EBF7)
     static let purpleInk = adaptive(0x5B3DB8, 0xB59CF5)
     static let deepInk = adaptive(0x3B2A7A, 0xB59CF5)
+    /// A bar button over lilac paper. By night the glass capsule picks up the lilac and sits lighter than the
+    /// paper, so the usual lavender falls to about 4.2:1 against it; this one keeps about 6:1.
+    static let barInkOnLilac = adaptive(0x5B3DB8, 0xD4C4FB)
     static let pencil = adaptive(0x655C7A, 0xB5ABC9)
     static let rule = adaptive(0xD9D0E6, 0x3A3150)
     static let leader = adaptive(0xB4A9C7, 0x4A4062)

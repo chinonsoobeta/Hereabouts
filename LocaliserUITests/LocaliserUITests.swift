@@ -537,11 +537,11 @@ import XCTest
         try app.performAccessibilityAudit(for: types) { issue in
             print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.detailedDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero) | \(issue.element.map { "\($0.elementType.rawValue) \($0.identifier) exists=\($0.exists)" } ?? "no element")")
             guard let element = issue.element else { return unresolvedContrast && issue.auditType == .contrast }
-            // Checked by eye on 2026-11-07 at default size, light mode (dark mode and the largest size were not
-            // captured): on iOS 27 a sheet's Cancel/Later button is purple ink (#5B3DB8) on a near-white glass
-            // capsule. The colour pair gives 7.1:1 against that capsule (dark mode pair #B59CF5 on #211B2E, 7.2:1).
-            // The audit samples the capsule's soft edge and reports a failure. Only contrast, only a button
-            // inside a navigation bar, only on iOS 27 or later.
+            // Checked by eye on 2026-11-07, light and dark, default and largest size, measured from screenshot
+            // pixels against the glass capsule itself: Cancel on Lend 6.8:1 light, 5.4:1 dark; Later on the monthly
+            // check 6.5:1 light, 6.1:1 dark (it was 4.2:1 before Theme.barInkOnLilac). The audit samples the
+            // capsule's soft edge and reports a failure. Only contrast, only a button inside a navigation bar, only
+            // on iOS 27 or later. A new bar button over a tinted sheet needs the same measurement.
             if #available(iOS 27, *), issue.auditType == .contrast, element.elementType == .button,
                app.navigationBars.allElementsBoundByIndex.contains(where: { $0.frame.contains(element.frame) }) { return true }
             // Checked by eye on 2026-11-07 (screenshot, iOS 26.5, light mode): the Lend it button is white text on
