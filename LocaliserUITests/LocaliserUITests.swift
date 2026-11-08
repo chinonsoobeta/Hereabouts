@@ -382,39 +382,54 @@ import XCTest
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let app = XCUIApplication()
         func shot(_ name: String) throws { try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png")) }
-        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
+        let base = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
+        // 2: say where it is. Voice memos may be cut for 1.0, so this file is easy to drop.
+        app.launchArguments = base + ["--voice-transcript", "the spare charger is in the blue tin on the garage back wall"]
         app.launch()
-        let search = app.searchFields.firstMatch
+        app.tabBars.buttons["Find"].tap()
+        let say = app.buttons["find.say"]
+        XCTAssertTrue(say.waitForExistence(timeout: 5))
+        say.tap()
+        app.buttons["voice.microphone"].tap()
+        let next = app.buttons["voice.continue"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textViews["voice.text"].waitForExistence(timeout: 5) || app.textFields["voice.text"].exists)
+        try shot("review-voice-heard")
+        next.tap()
+        XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.buttons["voice.newPlace"].waitForExistence(timeout: 5))
+        try shot("2-voice-optional")
+        app.terminate()
+        // 3: lending, with the ask-back date on the thing page.
+        app.launchArguments = base
+        app.launch()
+        var search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        app.buttons["More"].firstMatch.tap()
+        app.buttons["Lend it…"].tap()
+        let person = app.textFields["lend.person"]
+        XCTAssertTrue(person.waitForExistence(timeout: 5), app.debugDescription)
+        person.tap(); person.typeText("Sam")
+        app.buttons["lend.save"].tap()
+        XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
+        try shot("3-lending")
+        app.terminate()
+        // 1, 4, 5: find, trip detail, Pro.
+        app.launch()
+        search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         app.tabBars.buttons["Find"].tap()
-        try shot("1-find")
-        search.tap(); search.typeText("pass\n")
-        XCTAssertTrue(app.staticTexts["Passports (family)"].firstMatch.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("running\n")
+        XCTAssertTrue(app.staticTexts["Running shoes"].firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
-        try shot("2-search")
-        search.tap()
-        search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 4))
-        search.typeText("running\n")
-        app.staticTexts["Running shoes"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
-        try shot("3-thing")
+        try shot("1-find")
         app.tabBars.buttons["Trips"].tap()
-        try shot("5-trips")
-        app.tabBars.buttons["Find"].tap()
-        app.navigationBars.buttons.firstMatch.tap()
-        search.tap(); search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 8))
-        let readIt = app.buttons["Read it"]
-        if !readIt.isHittable { search.typeText("\n") }
-        XCTAssertTrue(readIt.waitForExistence(timeout: 5), app.debugDescription)
-        readIt.tap()
-        XCTAssertTrue(app.navigationBars["Recap"].waitForExistence(timeout: 5))
-        try shot("6-recap")
-        let start = app.buttons["Start monthly check"]
-        reveal(start, in: app); start.tap()
-        XCTAssertTrue(app.staticTexts["Still there?"].waitForExistence(timeout: 5))
-        try shot("7-stocktake")
-        app.buttons["Later"].tap()
-        XCTAssertTrue(app.staticTexts["Still there?"].waitForNonExistence(timeout: 5))
+        app.staticTexts["1 of 8 packed"].tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        try shot("4-trip")
         // Leave the search field so the navigation bar's buttons come back.
         for label in ["Close", "Cancel"] where app.navigationBars.buttons[label].exists || app.buttons[label].exists {
             app.buttons[label].firstMatch.tap()
@@ -425,7 +440,8 @@ import XCTest
         let pro = app.buttons["Hereabouts Pro"]
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
-        try shot("8-pro")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.waitForExistence(timeout: 10), "Plans didn't load")
+        try shot("5-pro")
         // Design review: the grouped lists and forms, which change the most between light and dark.
         app.navigationBars["Pro"].buttons["Settings"].tap()
         try shot("review-settings")
