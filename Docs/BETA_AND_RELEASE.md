@@ -44,7 +44,7 @@ These match O39 in `RELEASE_PLAN.md`; check them off there.
 - Sunday recap and stocktake: leave the phone through a Sunday 18:00 and a first Saturday with things not checked for three months. Tap each notification and check it opens the right sheet. Turn both off in Settings and check nothing more arrives. Check the trip-eve reminder the evening before a trip that isn't fully packed.
 - Automatic backups: one arrives in iCloud Drive, a restore from it brings everything back, and turning Pro off keeps the saved ones.
 - Widgets: both buttons at small size and on the Lock Screen; the lent-out widget if it ships.
-- iPad: install on an iPad and walk all four tabs. The app is iPhone-only and runs in compatibility mode.
+- iPad: install on an iPad and walk all four sections in the sidebar, in both orientations, in Split View and Slide Over at a third of the screen (the iPhone layout), and with Stage Manager windows resized. Try the keyboard shortcuts and dragging a thing onto a place.
 
 No public launch with an open data-loss defect, a place filled in without the person seeing it, or missing proof that real reminders arrive.
 
@@ -122,17 +122,17 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 
 > Hereabouts needs no account or login. The notebook is stored on the device.
 >
-> The free plan allows 15 things, 1 kit and 2 homes. Pro removes those limits. There are monthly and yearly subscriptions, each with a two-week free trial, and a one-time Lifetime purchase. The products are dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly and dev.hereabouts.pro.lifetime in the group "Hereabouts Pro". Lifetime supports Family Sharing for people who prefer a one-time purchase.
+> The free plan allows 15 things, 1 kit and 2 homes. Pro removes those limits. There are monthly and yearly subscriptions, each with a two-week free trial, and a one-time Lifetime purchase. The products are dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly and dev.hereabouts.pro.lifetime in the group "Hereabouts Pro". All three support Family Sharing.
 >
 > Pro includes automatic weekly backups of the whole notebook. They're on by default and go to the person's own iCloud Drive, or the device if iCloud Drive is off. The newest five are kept. Subscriptions also include regular updates. Household sharing is planned for version 1.1. If Pro ends, saved data remains visible, editable and exportable.
 >
 > To reach the paywall, open Settings at the bottom right, then tap Hereabouts Pro. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
 >
-> Shelf photos and voice understanding use Apple's on-device model on iPhones that support Apple Intelligence. On other iPhones, the app uses simpler rules. Voice memos are transcribed on the device with Apple's Speech framework. The recording isn't kept. Nothing is saved until the person taps Save. (Include the voice-memo sentences only if voice memos ship.)
+> Shelf photos and voice understanding use Apple's on-device model on devices that support Apple Intelligence. On other devices, the app uses simpler rules. Voice memos are transcribed on the device with Apple's Speech framework. The recording isn't kept. Nothing is saved until the person taps Save.
 >
 > Reminders are local notifications. Hereabouts doesn't use the calendar.
 >
-> Hereabouts is designed for iPhone. On iPad, it runs in iPhone compatibility mode.
+> Hereabouts runs on iPhone and iPad. On iPad, places and things show side by side, and it works in Split View, Slide Over and Stage Manager.
 >
 > Privacy policy: https://hereaboutsapp.com/privacy. Support: https://hereaboutsapp.com/support.
 
