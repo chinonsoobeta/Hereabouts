@@ -468,7 +468,7 @@ import StoreKitTest
         try shot("review-settings")
         let leaving = app.buttons["settings.leaving"]
         reveal(leaving, in: app); leaving.tap()
-        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
         try shot("review-leaving")
         app.navigationBars["Leaving"].buttons["Settings"].tap()
         app.tabBars.buttons["Find"].tap()
@@ -848,7 +848,7 @@ import StoreKitTest
     private func openLeaving(in app: XCUIApplication) {
         let leaving = app.buttons["settings.leaving"]
         reveal(leaving, in: app); leaving.tap()
-        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
     }
 
     /// Searches the Files picker and returns its result cells. The results sit over the folder the picker opened in,
