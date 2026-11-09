@@ -35,6 +35,53 @@ final class IntentsTests: XCTestCase {
         XCTAssertEqual(byAlias.map(\.name), ["Passports (family)"])
     }
 
+    func testSiriGetsEveryShareableThingMostRecentlyConfirmedFirst() async throws {
+        let store = try LocaliserStore(inMemory: true)
+        IntentLibrary.store = store
+        for index in 0..<30 { _ = try store.addItem(name: "Thing \(index)") }
+        _ = try store.addItem(name: "Secret", isPrivate: true)
+        let old = try store.addItem(name: "Old")
+        try store.setArchived(old, true)
+        let gone = try store.addItem(name: "Gone")
+        try store.deleteItem(gone)
+        let first = try XCTUnwrap(store.items.first { $0.name == "Thing 0" })
+        try store.confirm(first, on: .now.addingTimeInterval(60))
+        let names = try await ThingQuery().suggestedEntities().map(\.name)
+        XCTAssertEqual(names.count, 30, "More than the old 12, and not the private, archived or deleted ones")
+        XCTAssertEqual(names.first, "Thing 0", "Most recently confirmed leads")
+        for left in ["Secret", "Old", "Gone"] { XCTAssertFalse(names.contains(left), left) }
+    }
+
+    func testSiriNamesStopAtTheCap() throws {
+        let store = try LocaliserStore(inMemory: true)
+        for index in 0..<(ShortcutParameters.cap + 5) { _ = try store.addItem(name: "Thing \(index)") }
+        XCTAssertEqual(ThingQuery.shareable(in: store).count, ShortcutParameters.cap)
+        XCTAssertEqual(ThingQuery.shareable(in: store, limit: 3).count, 3)
+    }
+
+    func testTurningAThingPrivateTakesItOutOfWhatSiriIsTold() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let ring = try store.addItem(name: "Ring")
+        XCTAssertEqual(ThingQuery.shareable(in: store).map(\.id), [ring.id])
+        try store.editItem(ring, name: "Ring", place: nil, notes: "", aliases: "", photo: nil, isPrivate: true)
+        XCTAssertTrue(ThingQuery.shareable(in: store).isEmpty)
+    }
+
+    func testSiriIsToldOnceAfterABurstOfChanges() async throws {
+        var calls = 0
+        let (savedDelay, savedUpdate) = (ShortcutParameters.delay, ShortcutParameters.update)
+        defer { ShortcutParameters.delay = savedDelay; ShortcutParameters.update = savedUpdate }
+        ShortcutParameters.delay = .milliseconds(100)
+        ShortcutParameters.update = { calls += 1 }
+        for _ in 0..<200 { ShortcutParameters.schedule() }
+        XCTAssertEqual(calls, 0, "Nothing is sent in the middle of the burst")
+        try await Task.sleep(for: .milliseconds(400))
+        XCTAssertEqual(calls, 1)
+        ShortcutParameters.schedule()
+        try await Task.sleep(for: .milliseconds(400))
+        XCTAssertEqual(calls, 2, "A later change is sent again")
+    }
+
     func testAddThingWritesItDownInTheChosenPlace() async throws {
         let store = try LocaliserStore(inMemory: true)
         IntentLibrary.store = store

@@ -110,6 +110,31 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    /// Siri only opens the app for a sentence with its name in it, so the example each tip teaches must be one
+    /// of that language's phrases, with a thing's name where "${thing}" is.
+    func testSiriTipExamplesAreSiriPhrases() throws {
+        let all = try entries()
+        let tips = all.filter { $0.catalog.hasSuffix("Localiser/Localizable.xcstrings") && $0.key.contains("in Hereabouts?”") }
+        XCTAssertEqual(tips.count, 2, "The Find tab tip and the introduction's line")
+        let phrases = all.filter { $0.catalog.hasSuffix("AppShortcuts.xcstrings") }
+        for tip in tips {
+            for language in Self.languages {
+                let text = try XCTUnwrap(tip.translations[language]?[""], "\(language) \(tip.key)")
+                let quoted = try XCTUnwrap(text.range(of: "[“«][^”»]+[”»]", options: .regularExpression), "\(language) \(text)")
+                let example = text[quoted].dropFirst().dropLast().replacingOccurrences(of: "’", with: "'")
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "¿? ").union(.whitespaces))
+                let matches = phrases.contains { phrase in
+                    guard let value = phrase.translations[language]?[""], value.contains("${thing}") else { return false }
+                    let pattern = "^" + NSRegularExpression.escapedPattern(for: value.replacingOccurrences(of: "’", with: "'"))
+                        .replacingOccurrences(of: "\\$\\{thing\\}", with: ".+")
+                        .replacingOccurrences(of: "\\$\\{applicationName\\}", with: "Hereabouts") + "$"
+                    return example.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil
+                }
+                XCTAssertTrue(matches, "\(language) tip example is not one of its Siri phrases: \(example)")
+            }
+        }
+    }
+
     func testHereaboutsAndProAreNeverTranslated() throws {
         for entry in try entries() {
             let english = entry.english[""] ?? entry.english["other"] ?? entry.key
