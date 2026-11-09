@@ -16,6 +16,7 @@ struct LibrarySettingsView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(ProAccess.self) private var pro
     @Environment(ReminderService.self) private var reminders
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @AppStorage(ReminderService.showNamesKey) private var showItemNames = true
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = true
     @AppStorage(Rituals.recapKey) private var recapOn = true
@@ -36,12 +37,12 @@ struct LibrarySettingsView: View {
     var body: some View {
         SheetList {
             Section {
-                NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
+                NavigationLink(value: SettingsPage.pro) {
                     NotebookLine(name: String(localized: "Hereabouts Pro"), detail: pro.standing?.summary ?? String(localized: "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
                 }.accessibilityLabel(String(localized: "Hereabouts Pro")).accessibilityValue(pro.standing?.summary ?? String(localized: "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
             }
             Section {
-                NavigationLink { HomesView().toolbarVisibility(.hidden, for: .tabBar) } label: {
+                NavigationLink(value: SettingsPage.homes) {
                     NotebookLine(name: store.currentHome?.name ?? Home.defaultName, detail: store.hasSeveralHomes ? String(localized: "\(store.homes.count) homes") : String(localized: "Rename or add a home"))
                 }.accessibilityIdentifier("settings.homes")
             } header: { Text("Home") }
@@ -71,14 +72,14 @@ struct LibrarySettingsView: View {
                     Text(lastBackupTime > 0 ? "Last backup \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "Your first backup is saved soon after you open the app.")
                         .font(.wbCaption).foregroundStyle(Theme.pencil)
                 } else {
-                    NavigationLink { ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar) } label: {
+                    NavigationLink(value: SettingsPage.pro) {
                         NotebookLine(name: String(localized: "Automatic backups"), detail: String(localized: "Pro saves a copy of your notebook every week."))
                     }
                 }
             } header: { Text("Backups") }
               footer: { if pro.unlocked { Text("Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five.").font(.wbCaption).foregroundStyle(Theme.pencil) } }
             Section {
-                NavigationLink("Take your notebook with you.") { LeavingView().toolbarVisibility(.hidden, for: .tabBar) }.accessibilityIdentifier("settings.leaving")
+                NavigationLink("Take your notebook with you.", value: SettingsPage.leaving).accessibilityIdentifier("settings.leaving")
             } header: { Text("Leaving") }
             Section {
                 Label("Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics.", systemImage: "lock.shield")
@@ -89,12 +90,24 @@ struct LibrarySettingsView: View {
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
                 Link(destination: Support.privacy) { Label("Privacy Policy", systemImage: "hand.raised") }
                 Link(destination: Support.terms) { Label("Terms of Use", systemImage: "doc.plaintext") }
-                NavigationLink { AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar) } label: { Label("Acknowledgments", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
+                NavigationLink(value: SettingsPage.acknowledgements) { Label("Acknowledgments", systemImage: "text.book.closed") }.accessibilityIdentifier("settings.acknowledgements")
             } header: { Text("Help") }
             Section {} footer: { Text("Hereabouts \(Support.version)").font(.wbCaption).foregroundStyle(Theme.pencil) }
         }
         .listStyle(.plain)
-        .font(.wbBody).tint(Theme.purpleInk).groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
+        .font(.wbBody).tint(Theme.purpleInk)
+        // One comfortable column on a wide screen, like Find.
+        .frame(maxWidth: sizeClass == .regular ? FindView.readingWidth : .infinity)
+        .frame(maxWidth: .infinity)
+        .groundBackground().navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: SettingsPage.self) { page in
+            switch page {
+            case .pro: ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar)
+            case .homes: HomesView().toolbarVisibility(.hidden, for: .tabBar)
+            case .leaving: LeavingView().toolbarVisibility(.hidden, for: .tabBar)
+            case .acknowledgements: AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar)
+            }
+        }
     }
 }
 

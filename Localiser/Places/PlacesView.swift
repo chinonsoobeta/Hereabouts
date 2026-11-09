@@ -36,7 +36,7 @@ struct PlacesView: View {
                 } else {
                     VStack(spacing: 0) {
                         ForEach(rooms) { place in
-                            NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
+                            RouteLink(route: .place(place.id)) { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
                         }
                         NewPlaceTile { ui.addingPlace = true }
                     }
@@ -46,7 +46,7 @@ struct PlacesView: View {
                 if !store.lentItems.isEmpty {
                     SectionHeading(title: String(localized: "Lent out")).padding(.top, 8)
                     ForEach(store.lentItems) { item in
-                        NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain)
+                        RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain)
                     }
                 }
             }
@@ -227,7 +227,7 @@ struct PlaceDetailView: View {
                 if !place.children.isEmpty {
                     Section("Places inside") {
                         ForEach(place.children.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }) { child in
-                            NavigationLink { PlaceDetailView(place: child) } label: {
+                            RouteLink(route: .place(child.id)) { PlaceDetailView(place: child) } label: {
                                 NotebookLine(name: child.name, detail: String(localized: "\(child.activeItemCount) things"))
                             }
                         }
@@ -245,7 +245,7 @@ struct PlaceDetailView: View {
                                 .listRowBackground(ui.selectedItem == item.id ? Theme.highlighter : Theme.sheet)
                                 .accessibilityAddTraits(ui.selectedItem == item.id ? .isSelected : [])
                         } else {
-                            NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item) }
+                            RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item) }
                         }
                     }
                 } header: { Text("Things here").foregroundStyle(Theme.secondary) }
@@ -261,8 +261,17 @@ struct PlaceDetailView: View {
         .navigationTitle(available ? place.name : "").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if available {
-                Button("Print a label", systemImage: "printer") { printing = true }
-                Button("Edit") { editing = true }
+                if picksThingsBeside {
+                    // The thing beside has its own Edit in the same bar, so the place's actions share one menu.
+                    Menu {
+                        Button("Print a label", systemImage: "printer") { printing = true }
+                        Button("Edit", systemImage: "pencil") { editing = true }
+                    } label: { Image(systemName: "ellipsis.circle") }
+                    .accessibilityLabel("Place options")
+                } else {
+                    Button("Print a label", systemImage: "printer") { printing = true }
+                    Button("Edit") { editing = true }
+                }
             }
         }
         .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: [place]) } }
@@ -282,7 +291,20 @@ struct PlaceDetailView: View {
     }
 }
 
+/// Pushes by value on the compact Places tab, whose path the window state keeps, and by destination everywhere else.
+struct RouteLink<Label: View, Target: View>: View {
+    @Environment(\.pushesRoutes) private var pushesRoutes
+    let route: PlaceRoute
+    @ViewBuilder let destination: () -> Target
+    @ViewBuilder let label: () -> Label
+    var body: some View {
+        if pushesRoutes { NavigationLink(value: route, label: label) } else { NavigationLink(destination: destination, label: label) }
+    }
+}
+
 extension EnvironmentValues {
+    /// True on the compact Places tab, where places and things are pushed by value.
+    @Entry var pushesRoutes = false
     /// True inside the wide layout's places column, where picking a thing opens it in the column beside.
     @Entry var picksThingsBeside = false
 }

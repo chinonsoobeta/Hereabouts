@@ -81,6 +81,51 @@ final class WindowStateTests: XCTestCase {
         XCTAssertEqual(ui.selectedItem, drill.id)
     }
 
+    func testFoldingCarriesThePlaceAndThingBothWays() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let garage = try store.addPlace(name: "Garage")
+        let rack = try store.addPlace(name: "Rack", parent: garage)
+        let shelf = try store.addPlace(name: "Shelf", parent: rack)
+        let drill = try store.addItem(name: "Drill", place: shelf)
+        let kettle = try store.addItem(name: "Kettle", place: try store.addPlace(name: "Kitchen"))
+
+        // Wide to compact: the room, the places down to the thing, then the thing.
+        let ui = WindowState()
+        XCTAssertEqual(ui.routes(in: store), [], "Find has nothing pushed")
+        ui.reveal(garage)
+        XCTAssertEqual(ui.routes(in: store), [.place(garage.id)])
+        ui.reveal(shelf, item: drill.id)
+        XCTAssertEqual(ui.routes(in: store), [.place(garage.id), .place(rack.id), .place(shelf.id), .item(drill.id)])
+
+        // Compact to wide: the first place is the room, a last thing is the selection.
+        let phone = WindowState()
+        phone.tab = .places
+        phone.adopt([.place(garage.id), .place(rack.id), .item(drill.id)], in: store)
+        XCTAssertEqual(phone.destination, .place(garage.id))
+        XCTAssertEqual(phone.selectedItem, drill.id)
+        phone.adopt([.place(garage.id), .place(rack.id)], in: store)
+        XCTAssertNil(phone.selectedItem, "A place on top means no thing is open")
+        phone.adopt([], in: store)
+        XCTAssertEqual(phone.destination, .places, "Back at the list of places")
+        phone.adopt([.place(rack.id)], in: store)
+        XCTAssertEqual(phone.destination, .place(garage.id), "A place inside opens its room")
+
+        // Round trip, and a path whose thing has gone is cut back.
+        let round = WindowState()
+        round.reveal(shelf, item: drill.id)
+        let there = round.routes(in: store)
+        let back = WindowState()
+        back.tab = .places
+        back.adopt(there, in: store)
+        XCTAssertEqual(back.destination, .place(garage.id))
+        XCTAssertEqual(back.selectedItem, drill.id)
+        back.placesPath = there
+        try store.deleteItem(drill)
+        back.dropStaleSelection(in: store)
+        XCTAssertEqual(back.placesPath, [.place(garage.id), .place(rack.id), .place(shelf.id)])
+        XCTAssertNotNil(kettle)
+    }
+
     func testStaleSelectionIsDroppedButLiveSelectionSurvives() throws {
         let store = try LocaliserStore(inMemory: true)
         let kitchen = try store.addPlace(name: "Kitchen")

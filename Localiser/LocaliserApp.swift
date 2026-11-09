@@ -83,6 +83,21 @@ enum Destination: Hashable {
     }
 }
 
+/// A place or thing pushed on the compact Places tab. The window keeps the path, so a fold can carry it to the wide layout and back.
+enum PlaceRoute: Hashable { case place(UUID), item(UUID) }
+
+/// A page pushed in Settings, kept in the window state so a fold doesn't send you back to the list.
+enum SettingsPage: Hashable { case pro, homes, leaving, acknowledgements }
+
+/// The sheets a thing opens. They are presented from the root, so they stay open when the layout changes.
+enum ItemSheet: Hashable, Identifiable {
+    case edit(UUID), move(UUID), moveHome(UUID), lend(UUID), found(UUID)
+    var id: Self { self }
+    var itemID: UUID {
+        switch self { case .edit(let id), .move(let id), .moveHome(let id), .lend(let id), .found(let id): id }
+    }
+}
+
 /// What is open in the window, kept above the part of the view tree that swaps between the compact tabs and the
 /// wide sidebar. Folding the Duo or resizing an iPad window tears that part down, so nothing here may live inside it.
 @MainActor @Observable final class WindowState {
@@ -100,6 +115,15 @@ enum Destination: Hashable {
     var spoken: NewThing?
     var addingPlace = false
     var ritual: Ritual?
+    /// The places and things pushed on the compact Places tab.
+    var placesPath: [PlaceRoute] = []
+    var settingsPath: [SettingsPage] = []
+    var itemSheet: ItemSheet?
+    var upgrading = false
+    /// "Moved to the shelf" after Found it, shown on the thing it was said about.
+    var foundNote: (item: UUID, text: String)?
+    /// Whether the wide layout's sidebar is showing. Find draws its own Add a thing bar only when it isn't.
+    var sidebar = NavigationSplitViewVisibility.all
 
     var tab: AppTab {
         get { destination.tab }
@@ -112,6 +136,31 @@ enum Destination: Hashable {
         selectedItem = item
     }
 
+    /// The compact Places stack for what the wide layout has open: the room, the places down to the thing, then the thing.
+    func routes(in store: LocaliserStore) -> [PlaceRoute] {
+        guard case .place(let id) = destination else { return [] }
+        var routes: [PlaceRoute] = [.place(id)]
+        if let picked = selectedItem, let item = store.items.first(where: { $0.id == picked }), let place = item.place {
+            var inside: [PlaceRoute] = []
+            var current: Place? = place
+            var seen: Set<UUID> = []
+            while let here = current, here.id != id, seen.insert(here.id).inserted { inside.append(.place(here.id)); current = here.parent }
+            routes += inside.reversed()
+            routes.append(.item(picked))
+        }
+        return routes
+    }
+
+    /// Makes what the compact Places stack has open the wide layout's room and thing.
+    func adopt(_ routes: [PlaceRoute], in store: LocaliserStore) {
+        guard case .place(let first)? = routes.first, let place = store.places.first(where: { $0.id == first }) else {
+            if destination.tab == .places { destination = .places; selectedItem = nil }
+            return
+        }
+        destination = .place(place.topLevel.id)
+        if case .item(let id)? = routes.last { selectedItem = id } else { selectedItem = nil }
+    }
+
     /// Forgets what has been deleted or no longer belongs where it was picked.
     func dropStaleSelection(in store: LocaliserStore) {
         switch destination {
@@ -121,10 +170,19 @@ enum Destination: Hashable {
         default: break
         }
         if let id = selectedItem {
-            guard let item = store.items.first(where: { $0.id == id }), !item.isDeleted else { selectedItem = nil; return }
-            if case .place(let placeID) = destination, item.place?.topLevel.id != placeID { selectedItem = nil }
+            if let item = store.items.first(where: { $0.id == id }), !item.isDeleted {
+                if case .place(let placeID) = destination, item.place?.topLevel.id != placeID { selectedItem = nil }
+            } else { selectedItem = nil }
         }
         if let id = findItem, !store.items.contains(where: { $0.id == id }) { findItem = nil }
+        let gone = placesPath.firstIndex { route in
+            switch route {
+            case .place(let id): !store.places.contains { $0.id == id }
+            case .item(let id): !store.items.contains { $0.id == id && !$0.isDeleted }
+            }
+        }
+        if let gone { placesPath.removeSubrange(gone...) }
+        if let sheet = itemSheet, !store.items.contains(where: { $0.id == sheet.itemID }) { itemSheet = nil }
     }
 }
 
@@ -133,6 +191,7 @@ struct RootView: View {
     @Environment(ReminderService.self) private var reminders
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var textSize
     @State private var pro = ProAccess()
     @State private var ui = WindowState()
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = false
@@ -141,7 +200,7 @@ struct RootView: View {
     var body: some View {
         @Bindable var ui = ui
         Group {
-            if wide { wideTabs } else { compactTabs }
+            if wide { wideLayout } else { compactTabs }
         }
         .tint(Theme.purpleInk)
         .tipViewStyle(NotebookTipStyle())
@@ -154,6 +213,10 @@ struct RootView: View {
         .sheet(item: $ui.newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
         .sheet(isPresented: $ui.speaking, onDismiss: { if let spoken = ui.spoken { ui.newThing = spoken; ui.spoken = nil } }) { NavigationStack { VoiceSheet { ui.spoken = $0 } } }
         .sheet(isPresented: $ui.addingPlace) { NavigationStack { PlaceEditor() } }
+        .sheet(item: $ui.itemSheet) { sheet in
+            NavigationStack { ItemSheetView(sheet: sheet) }
+        }
+        .sheet(isPresented: $ui.upgrading) { NavigationStack { ProView() } }
         .sheet(item: $ui.ritual) { ritual in
             NavigationStack {
                 switch ritual {
@@ -183,6 +246,11 @@ struct RootView: View {
             if destination == .search { ui.destination = .find; store.findRequest = .find }
             // A different place starts with nothing picked.
             if case .place(let id) = destination, let picked = ui.selectedItem, store.items.first(where: { $0.id == picked })?.place?.topLevel.id != id { ui.selectedItem = nil }
+        }
+        .onChange(of: wide) { _, nowWide in
+            // A place or thing open on one layout is open on the other.
+            guard ui.destination.tab == .places else { return }
+            if nowWide { ui.adopt(ui.placesPath, in: store) } else { ui.placesPath = ui.routes(in: store) }
         }
         .onChange(of: seenOnboarding) { _, seen in if !seen { ui.tab = .find } }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
@@ -214,56 +282,106 @@ struct RootView: View {
         @Bindable var ui = ui
         return TabView(selection: $ui.tab) {
             Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.places) { NavigationStack { PlacesView() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.places) { placesStack } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.packing) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.settings) { NavigationStack { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.settings) { NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
                 .badge(reminders.coverageGap ? Text("!") : nil)
         }
     }
 
-    /// A sidebar beside the content: the Duo's inner screen and every iPad.
-    private var wideTabs: some View {
+    /// The compact Places stack, with its path kept in the window state.
+    private var placesStack: some View {
+        @Bindable var ui = ui
+        return NavigationStack(path: $ui.placesPath) {
+            PlacesView()
+                .navigationDestination(for: PlaceRoute.self) { route in
+                    switch route {
+                    case .place(let id): if let place = store.places.first(where: { $0.id == id }) { PlaceDetailView(place: place) }
+                    case .item(let id): if let item = store.items.first(where: { $0.id == id }) { ItemDetailView(item: item) }
+                    }
+                }
+        }
+        .environment(\.pushesRoutes, true)
+    }
+
+    /// A lilac sidebar beside the content: the Duo's inner screen and every iPad.
+    private var wideLayout: some View {
         @Bindable var ui = ui
         let _ = store.revision
-        return TabView(selection: $ui.destination) {
-            Tab(value: Destination.search, role: .search) { Color.clear } label: { Label("Search", systemImage: "magnifyingglass") }
-            Tab(value: Destination.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "house") }
-            Tab(value: Destination.trips) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase") }
-            Tab(value: Destination.settings) { NavigationStack { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear") }
-                .badge(reminders.coverageGap ? Text("!") : nil)
-            TabSection("Places") {
-                Tab(value: Destination.places) { NavigationStack { PlacesView() } } label: { Label("All places", systemImage: "shippingbox") }
-                ForEach(store.placesHere.filter { $0.parent == nil }) { place in
-                    Tab(value: Destination.place(place.id)) { WidePlaceView(place: place) } label: { Label(place.name, systemImage: PlaceTile.symbol(for: place.name)) }
-                        .badge(place.activeItemCount)
-                }
-            }
-            .expandedByDefault()
-            TabSection("Coming up") {
-                ForEach(store.tripsHere.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay }) { trip in
-                    Tab(value: Destination.trip(trip.id)) { NavigationStack { TripDetailView(trip: trip) } } label: { Label(trip.name, systemImage: "suitcase") }
-                }
-            }
-            .expandedByDefault()
-            TabSection("Kits") {
-                ForEach(store.kitsHere) { kit in
-                    Tab(value: Destination.kit(kit.id)) { NavigationStack { KitDetailView(kit: kit) } } label: { Label(kit.name, systemImage: "checklist") }
-                }
-            }
-            .expandedByDefault()
+        return NavigationSplitView(columnVisibility: $ui.sidebar) {
+            sidebar
+                .navigationSplitViewColumnWidth(min: 260, ideal: textSize.isAccessibilitySize ? 400 : 300, max: textSize.isAccessibilitySize ? 440 : 340)
+        } detail: {
+            wideDetail
         }
-        .tabViewStyle(.sidebarAdaptable)
-        .tabViewSidebarHeader {
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    private func row(_ destination: Destination, _ title: String, _ symbol: String, count: Int? = nil) -> some View {
+        HStack {
+            Label(title, systemImage: symbol).environment(\.symbolVariants, .none)
+            if let count { Spacer(minLength: 8); Text("\(count)").foregroundStyle(Theme.secondary) }
+        }
+        .tag(destination)
+        .listRowBackground(ui.destination == destination ? Theme.highlighter : Color.clear)
+    }
+
+    private var sidebar: some View {
+        let places = store.placesHere.filter { $0.parent == nil }
+        let trips = store.tripsHere.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay }
+        return List(selection: Binding(get: { ui.destination }, set: { if let destination = $0 { ui.destination = destination } })) {
+            row(.search, String(localized: "Search"), "magnifyingglass")
+            row(.find, String(localized: "Find"), "house")
+            row(.trips, String(localized: "Trips"), "suitcase")
+            row(.settings, String(localized: "Settings"), "gear")
+            Section("Places") {
+                row(.places, String(localized: "All places"), "shippingbox")
+                ForEach(places) { place in row(.place(place.id), place.name, PlaceTile.symbol(for: place.name), count: place.activeItemCount) }
+            }
+            if !trips.isEmpty {
+                Section("Coming up") { ForEach(trips) { trip in row(.trip(trip.id), trip.name, "suitcase") } }
+            }
+            if !store.kitsHere.isEmpty {
+                Section("Kits") { ForEach(store.kitsHere) { kit in row(.kit(kit.id), kit.name, "checklist") } }
+            }
+        }
+        .listStyle(.sidebar)
+        .scrollContentBackground(.hidden)
+        .background(Theme.lilacPaper)
+        // The bar stays for the sidebar toggle, which sits in it; it has no title and no background of its own.
+        .navigationBarTitleDisplayMode(.inline).toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top, spacing: 0) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(store.currentHome?.name ?? Home.defaultName).font(.wbTitle).foregroundStyle(Theme.ink)
                 Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
             }
             .accessibilityElement(children: .combine)
-            .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20).padding(.vertical, 12)
+            .background(Theme.lilacPaper)
         }
-        .tabViewSidebarBottomBar {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             Button { ui.newThing = NewThing() } label: { Label("Add a thing", systemImage: "plus").fixedSize(horizontal: false, vertical: true) }
                 .buttonStyle(PrimaryButtonStyle()).padding(12)
+                .background(Theme.lilacPaper)
+        }
+    }
+
+    @ViewBuilder private var wideDetail: some View {
+        @Bindable var ui = ui
+        switch ui.destination {
+        case .find, .search: NavigationStack { FindView() }
+        case .places: NavigationStack { PlacesView() }
+        case .place(let id):
+            if let place = store.placesHere.first(where: { $0.id == id }) { WidePlaceView(place: place).id(id) }
+            else { NavigationStack { FindView() } }
+        case .trips: NavigationStack { PackingView() }
+        case .trip(let id):
+            if let trip = store.tripsHere.first(where: { $0.id == id }) { NavigationStack { TripDetailView(trip: trip) }.id(id) }
+            else { NavigationStack { PackingView() } }
+        case .kit(let id):
+            if let kit = store.kitsHere.first(where: { $0.id == id }) { NavigationStack { KitDetailView(kit: kit) }.id(id) }
+            else { NavigationStack { PackingView() } }
+        case .settings: NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() }
         }
     }
 }

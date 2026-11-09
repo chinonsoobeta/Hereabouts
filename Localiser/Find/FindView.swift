@@ -65,7 +65,7 @@ struct FindView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Theme.ground)
-        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused { addBar.frame(maxWidth: regular ? Self.readingWidth : .infinity) } }
+        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused && !(regular && ui.sidebar != .detailOnly) { addBar.frame(maxWidth: regular ? Self.readingWidth : .infinity) } }
         .navigationTitle("Hereabouts")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(removing: .title)
@@ -511,17 +511,13 @@ struct ItemDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let item: Belonging
     var putAway = false
-    @State private var editing = false
-    @State private var moving = false
-    @State private var finding = false
-    @State private var lending = false
-    @State private var foundNote: String?
+    /// The sheets live in the window state and are presented from the root, so a fold doesn't close them.
+    @Environment(WindowState.self) private var ui
     @State private var confirmedPutAway = false
-    @State private var upgrade = false
     @State private var error: String?
     @State private var deleting = false
-    @State private var movingHome = false
     @Environment(ProAccess.self) private var pro
+    private var foundNote: String? { ui.foundNote.flatMap { $0.item == item.id ? $0.text : nil } }
     private var available: Bool { item.managedObjectContext != nil && !item.isDeleted }
 
     var body: some View {
@@ -534,7 +530,7 @@ struct ItemDetailView: View {
                             Image(uiImage: image).resizable().scaledToFill().frame(maxWidth: .infinity).frame(height: 220)
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)).accessibilityHidden(true)
                         }
-                        FlowLayout(spacing: 8) {
+                        FlowLayout(spacing: 18) {
                             if item.archived { Stamp(text: String(localized: "Archived")) }
                             else if item.isMissing { Stamp(text: String(localized: "Missing"), tone: .due) }
                             else if item.isLent { Stamp(text: String(localized: "With \(item.lentTo)"), tone: .purple) }
@@ -561,7 +557,7 @@ struct ItemDetailView: View {
                             }
                             .accessibilityElement(children: .combine)
                             HStack(spacing: 10) {
-                                Button(item.place == nil ? "Choose a place…" : "Move…") { moving = true }
+                                Button(item.place == nil ? "Choose a place…" : "Move…") { ui.itemSheet = .move(item.id) }
                                     .buttonStyle(SoftButtonStyle(compact: true))
                                     .accessibilityIdentifier("item.move")
                                     .popoverTip(MoveTip())
@@ -586,8 +582,8 @@ struct ItemDetailView: View {
                                 }
                             } else if item.isMissing, !item.archived {
                                 Text("Missing since \(item.missingSince?.dayAndMonth ?? String(localized: "recently")).").font(.wbCaption).foregroundStyle(Theme.ink)
-                                Button("Found it") { finding = true }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
-                            } else if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { moving = true } }
+                                Button("Found it") { ui.itemSheet = .found(item.id) }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
+                            } else if item.place != nil, !item.archived, !putAway { StillThereRow(item: item) { ui.itemSheet = .move(item.id) } }
                             if let foundNote { Label(foundNote, systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                             if confirmedPutAway { Label("Put away.", systemImage: "checkmark.circle").font(.wbCaption).foregroundStyle(Theme.sageInk) }
                         }
@@ -630,17 +626,17 @@ struct ItemDetailView: View {
                         ShareLink(item: sentence) { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("Share where it is")
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) { Button("Edit") { editing = true } }
+                ToolbarItem(placement: .topBarTrailing) { Button("Edit") { ui.itemSheet = .edit(item.id) } }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button("Move…", systemImage: "arrow.right.circle") { moving = true }
-                        if store.hasSeveralHomes { Button("Move to another home", systemImage: "house") { movingHome = true } }
-                        if !item.archived, !item.isLent { Button("Lend it…", systemImage: "person.badge.clock") { lending = true } }
+                        Button("Move…", systemImage: "arrow.right.circle") { ui.itemSheet = .move(item.id) }
+                        if store.hasSeveralHomes { Button("Move to another home", systemImage: "house") { ui.itemSheet = .moveHome(item.id) } }
+                        if !item.archived, !item.isLent { Button("Lend it…", systemImage: "person.badge.clock") { ui.itemSheet = .lend(item.id) } }
                         if !item.archived {
-                            Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { finding = true }
+                            Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { ui.itemSheet = .found(item.id) }
                             if !item.isMissing {
                                 Button("Can't find it", systemImage: "questionmark.circle") {
-                                    do { try store.markMissing(item); foundNote = nil } catch { self.error = error.localizedDescription }
+                                    do { try store.markMissing(item); ui.foundNote = nil } catch { self.error = error.localizedDescription }
                                 }
                             }
                         }
@@ -652,27 +648,6 @@ struct ItemDetailView: View {
                 }
             }
         }
-        .sheet(isPresented: $moving) {
-            NavigationStack {
-                PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
-                    do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
-                }), home: item.home)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } } }
-            }
-        }
-        .sheet(isPresented: $movingHome) { NavigationStack { MoveToHomeSheet(subject: .thing(item)) } }
-        .sheet(isPresented: $lending) { NavigationStack { LendSheet(item: item) } }
-        .sheet(isPresented: $finding) {
-            NavigationStack {
-                PlaceChooser(selection: Binding(get: { nil }, set: { id in
-                    let place = store.places.first { $0.id == id }
-                    do { try store.found(item, at: place); foundNote = Movement.foundSentence(place) } catch { self.error = error.localizedDescription }
-                }), noneTitle: String(localized: "No place yet"), suggested: store.foundSuggestions(for: item), title: String(localized: "Where was it?"), home: item.home)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { finding = false } } }
-            }
-        }
-        .sheet(isPresented: $upgrade) { NavigationStack { ProView() } }
-        .sheet(isPresented: $editing) { NavigationStack { ItemEditor(item: item) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? item.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
@@ -686,7 +661,38 @@ struct ItemDetailView: View {
     }
 
     private func toggleArchive() {
-        if item.archived && !pro.allows(.item, count: store.activeItemCount) { upgrade = true; return }
+        if item.archived && !pro.allows(.item, count: store.activeItemCount) { ui.upgrading = true; return }
         do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
+    }
+}
+
+/// The sheets a thing opens, presented from the root of the window.
+struct ItemSheetView: View {
+    @Environment(LocaliserStore.self) private var store
+    @Environment(WindowState.self) private var ui
+    let sheet: ItemSheet
+    @State private var error: String?
+
+    var body: some View {
+        if let item = store.items.first(where: { $0.id == sheet.itemID }) {
+            switch sheet {
+            case .edit: ItemEditor(item: item)
+            case .moveHome: MoveToHomeSheet(subject: .thing(item))
+            case .lend: LendSheet(item: item)
+            case .move:
+                PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
+                    do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
+                }), home: item.home)
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { ui.itemSheet = nil } } }
+                .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+            case .found:
+                PlaceChooser(selection: Binding(get: { nil }, set: { id in
+                    let place = store.places.first { $0.id == id }
+                    do { try store.found(item, at: place); ui.foundNote = (item.id, Movement.foundSentence(place)) } catch { self.error = error.localizedDescription }
+                }), noneTitle: String(localized: "No place yet"), suggested: store.foundSuggestions(for: item), title: String(localized: "Where was it?"), home: item.home)
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { ui.itemSheet = nil } } }
+                .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+            }
+        }
     }
 }
