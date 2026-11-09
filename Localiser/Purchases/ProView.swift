@@ -137,6 +137,8 @@ enum ProPricing {
     /// "3 days", "2 weeks", "1 month": how long a free trial lasts.
     static func trialLength(value: Int, unit: Product.SubscriptionPeriod.Unit) -> String {
         switch unit {
+        // Some iOS versions report a two-week trial as 14 days; say weeks, as the listing does.
+        case .day where value >= 7 && value % 7 == 0: return String(localized: "\(value / 7) weeks")
         case .day: return String(localized: "\(value) days")
         case .week: return String(localized: "\(value) weeks")
         case .month: return String(localized: "\(value) months")

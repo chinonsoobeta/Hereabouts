@@ -137,6 +137,9 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(ProPricing.trialLength(value: 2, unit: .week), "2 weeks")
         XCTAssertEqual(ProPricing.trialLength(value: 1, unit: .month), "1 month")
         XCTAssertEqual(ProPricing.trialLength(value: 3, unit: .day), "3 days")
+        XCTAssertEqual(ProPricing.trialLength(value: 14, unit: .day), "2 weeks", "A two-week trial reads the same on every iOS version")
+        XCTAssertEqual(ProPricing.trialLength(value: 7, unit: .day), "1 week")
+        XCTAssertEqual(ProPricing.trialLength(value: 10, unit: .day), "10 days")
         XCTAssertEqual(ProPricing.terms(plan: .lifetime, price: "$49.99", period: "", trial: "2 weeks"), "Pay once. Share with your family. No renewal.")
     }
 
