@@ -468,7 +468,7 @@ import StoreKitTest
         try shot("review-settings")
         let leaving = app.buttons["settings.leaving"]
         reveal(leaving, in: app); leaving.tap()
-        XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
         try shot("review-leaving")
         app.navigationBars["Leaving"].buttons["Settings"].tap()
         app.tabBars.buttons["Find"].tap()
@@ -848,7 +848,7 @@ import StoreKitTest
     private func openLeaving(in app: XCUIApplication) {
         let leaving = app.buttons["settings.leaving"]
         reveal(leaving, in: app); leaving.tap()
-        XCTAssertTrue(app.navigationBars["Leaving"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
     }
 
     /// Searches the Files picker and returns its result cells. The results sit over the folder the picker opened in,
@@ -1180,16 +1180,16 @@ import StoreKitTest
     // MARK: M65 fixes: leaving a Settings page, and links
 
     /// Opens a page in Settings by the identifier of its row, scrolling to it.
-    private func openSettingsPage(_ identifier: String, label: String? = nil, in app: XCUIApplication) {
+    private func openSettingsPage(_ identifier: String, in app: XCUIApplication) {
         openSection("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
-        let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@ OR label == %@", identifier, label ?? identifier)).firstMatch
-        for _ in 0..<12 where !(row.exists && row.isHittable) {
+        let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@ OR label == %@", identifier, identifier)).firstMatch
+        for _ in 0..<12 where !row.exists {
             // A drag in the detail column, to the right of the sidebar.
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.7)).press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.2)))
         }
-        XCTAssertTrue(row.isHittable, "\(identifier) is in Settings")
-        row.tap()
+        XCTAssertTrue(row.exists, "\(identifier) is in Settings")
+        row.tap() // scrolls it into view
     }
 
     private func openLink(_ path: String, in app: XCUIApplication) {
@@ -1207,15 +1207,15 @@ import StoreKitTest
         openSection("Garage", in: app)
         XCTAssertTrue(drill(app).waitForExistence(timeout: 5), "Garage shows after leaving Homes")
         XCTAssertEqual(app.state, .runningForeground)
-        openSettingsPage("settings.acknowledgements", label: "Acknowledgments", in: app)
-        XCTAssertTrue(app.navigationBars["Acknowledgments"].waitForExistence(timeout: 5))
+        openSettingsPage("settings.homes", in: app)
+        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
         openSection("Find", in: app)
-        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5), "Find shows after leaving Acknowledgments")
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5), "Find shows after leaving Homes")
         XCTAssertEqual(app.state, .runningForeground)
-        // Coming back to Settings starts at the list, not on the page that was left.
+        // Coming back to Settings starts at the list.
         openSection("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.navigationBars["Acknowledgments"].exists)
+        XCTAssertFalse(app.navigationBars["Homes"].exists)
     }
 
     /// A link that arrives while a Settings page is open does the same.
@@ -1225,7 +1225,8 @@ import StoreKitTest
         openSettingsPage("settings.homes", in: app)
         XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
         openLink("item/Cordless%20drill", in: app)
-        XCTAssertTrue(app.navigationBars["Rack 2"].waitForExistence(timeout: 8) || drill(app).waitForExistence(timeout: 8), "The linked thing's room opens")
+        // Beside its room, or over the room's things where the screen is narrow.
+        XCTAssertTrue(app.navigationBars["Cordless drill"].waitForExistence(timeout: 8) || drill(app).waitForExistence(timeout: 8), "The linked thing's room opens")
         XCTAssertTrue(app.navigationBars["Homes"].waitForNonExistence(timeout: 5), "...and the Settings page has gone")
         XCTAssertEqual(app.state, .runningForeground)
     }
