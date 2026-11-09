@@ -27,12 +27,12 @@ TEST_RUNNER_STORE_SHOTS=/private/tmp/hb-store-ipad xcodebuild -project Localiser
 | `iPhone-6.9/4-trip.png` | Reuse your packing list |
 | `iPhone-6.9/5-pro.png` | No account. Always yours to export |
 | `iPad-13/1-find.png` to `iPad-13/5-pro.png` | The same five screens, with the sidebar, on the 13-inch iPad |
-| `Duo/1-find.png` to `Duo/5-pro.png` | The same five screens on the Duo's inner screen (not an App Store size; for the website and review) |
+| `Duo/1-find.png` to `Duo/5-pro.png` | The same five screens on the Duo's inner screen, for App Store Connect's iPhone Duo slot |
 
 Notes:
 - **Voice memo:** `2-voice.png` is the only shot that shows voice memos. If they are cut, delete that file and upload four.
-- **Duo:** a UI test's own screenshot of the Duo comes back black, so the Duo set (2853 × 2007, landscape, unfolded) is taken with `xcrun simctl io <duo> screenshot --display=3`. Put an empty file called `external` in the `STORE_SHOTS` folder: the test then writes `<name>.ready` at each screen and waits up to a minute for `<name>.done`, and a script takes the screenshot in between. The order is 2-voice, 3-lending, 1-find, 4-trip, 5-pro.
+- **Duo:** a UI test's own screenshot of the Duo comes back black, so the Duo set (2853 × 2007, landscape, unfolded) is taken with `xcrun simctl io <duo> screenshot --display=3`. Put an empty file called `external` in the `STORE_SHOTS` folder: the test then writes `<name>.ready` at each screen and waits up to a minute for `<name>.done`, and a script takes the screenshot in between. The order is 2-voice, 3-lending, 1-find, 4-trip, 5-pro. `simctl` saves the capture with an alpha channel, which App Store Connect can refuse, so the files here are redrawn onto an opaque canvas (every pixel was already opaque, so nothing changes visually).
 - **Reminders:** the test turns reminders on before the first shot, so Settings carries no warning badge. On a simulator where notifications were already denied, run `xcrun simctl uninstall <device> dev.hereabouts.app` first.
-- **Sizes:** the 6.9-inch set is the only required iPhone size, and App Store Connect scales it down for smaller iPhones. The app runs on iPad, so the 13-inch iPad set (2064 × 2752) is required too, and App Store Connect scales it down for smaller iPads.
+- **Sizes:** the 6.9-inch set is the only required iPhone size, and App Store Connect scales it down for smaller iPhones. The app runs on iPad, so the 13-inch iPad set (2064 × 2752) is required too, and App Store Connect scales it down for smaller iPads. App Store Connect also has an iPhone Duo slot, which takes 2853 × 2007 (landscape) or 2007 × 2853.
 
 `night-review/` holds the same five screens in dark mode, downscaled, for checking against the night board. They are not for the store.
