@@ -104,7 +104,7 @@ struct OnboardingView: View {
                 Text("You can hide names in reminders in Settings.").font(.wbCaption).foregroundStyle(Theme.ink)
             }
         }
-        Text("You can also ask Siri where things are.").font(.wbCaption).foregroundStyle(Theme.pencil)
+        Text("Or ask Siri: “Where's my passport in Hereabouts?”").font(.wbCaption).foregroundStyle(Theme.pencil)
     }
 
     @ViewBuilder private var actions: some View {

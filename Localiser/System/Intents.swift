@@ -59,8 +59,30 @@ struct ThingQuery: EntityStringQuery {
             .prefix(12).map { $0 }
     }
     @MainActor func suggestedEntities() async throws -> [ThingEntity] {
-        let store = try IntentLibrary.open()
-        return store.items.filter { !$0.archived && !$0.isDeleted && !$0.isPrivate }.sorted { $0.lastConfirmed > $1.lastConfirmed }.prefix(12).map(ThingEntity.init)
+        try Self.shareable(in: IntentLibrary.open()).map(ThingEntity.init)
+    }
+    /// The names handed to Siri and the Shortcuts picker: most recently confirmed first, never private, archived or deleted.
+    @MainActor static func shareable(in store: LocaliserStore, limit: Int = ShortcutParameters.cap) -> [Belonging] {
+        Array(store.items.filter { !$0.archived && !$0.isDeleted && !$0.isPrivate }.sorted { $0.lastConfirmed > $1.lastConfirmed }.prefix(limit))
+    }
+}
+
+/// Siri only knows the thing names it was last told. This tells it again after the notebook changes.
+@MainActor enum ShortcutParameters {
+    /// Xcode's App Intents notes say the system serves about 1,000 expanded phrases per language and truncates beyond that.
+    /// Seven phrases take a thing, so 100 names use 700 of them and leave room for the rest.
+    static let cap = 100
+    /// A restore or an import saves many times in a row; the system hears about it once, a moment after the last save.
+    static var delay: Duration = .seconds(2)
+    static var update: @MainActor () -> Void = { HereaboutsShortcuts.updateAppShortcutParameters() }
+    private static var pending: Task<Void, Never>?
+    static func schedule() {
+        pending?.cancel()
+        pending = Task {
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            update()
+        }
     }
 }
 
@@ -165,7 +187,11 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
         AppShortcut(intent: FindThingIntent(), phrases: [
             "Ask \(.applicationName) where something is",
             "Where is \(\.$thing) in \(.applicationName)",
+            "Where's \(\.$thing) in \(.applicationName)",
+            "Where is my \(\.$thing) in \(.applicationName)",
+            "Where's my \(\.$thing) in \(.applicationName)",
             "Find \(\.$thing) in \(.applicationName)",
+            "Find my \(\.$thing) in \(.applicationName)",
         ], shortTitle: "Where is it?", systemImageName: "magnifyingglass")
         AppShortcut(intent: AddThingIntent(), phrases: [
             "Write something down in \(.applicationName)",

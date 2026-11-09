@@ -14891,30 +14891,30 @@
         }
       }
     },
-    "Say **“Ask Hereabouts where something is”**" : {
+    "Say **“Where's my passport in Hereabouts?”**" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Say **“Ask Hereabouts where something is”**"
+            "value" : "Say **“Where's my passport in Hereabouts?”**"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Di **«Preguntar a Hereabouts dónde está algo»**"
+            "value" : "Di **«¿Dónde está mi pasaporte en Hereabouts?»**"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dites **« Demander à Hereabouts où est quelque chose »**"
+            "value" : "Dites **« Où est mon passeport dans Hereabouts ? »**"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diga **“Perguntar ao Hereabouts onde está algo”**"
+            "value" : "Diga **“Onde está meu passaporte no Hereabouts?”**"
           }
         }
       }
@@ -20061,30 +20061,30 @@
         }
       }
     },
-    "You can also ask Siri where things are." : {
+    "Or ask Siri: “Where's my passport in Hereabouts?”" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can also ask Siri where things are."
+            "value" : "Or ask Siri: “Where's my passport in Hereabouts?”"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "También puedes preguntarle a Siri dónde están tus cosas."
+            "value" : "O pregúntale a Siri: «¿Dónde está mi pasaporte en Hereabouts?»"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous pouvez aussi demander à Siri où sont vos affaires."
+            "value" : "Ou demandez à Siri : « Où est mon passeport dans Hereabouts ? »"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você também pode perguntar à Siri onde estão suas coisas."
+            "value" : "Ou pergunte à Siri: “Onde está meu passaporte no Hereabouts?”"
           }
         }
       }

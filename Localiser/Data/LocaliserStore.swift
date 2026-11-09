@@ -136,6 +136,8 @@ final class LocaliserStore {
         tripEntries = try context.fetch(NSFetchRequest<TripEntry>(entityName: "TripEntry"))
         homes = try context.fetch(NSFetchRequest<HomeRecord>(entityName: "Home")).sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
         revision += 1
+        // Every save, restore, outside change and home switch ends here, so Siri's thing names are refreshed from one place.
+        if isUserLibrary { ShortcutParameters.schedule() }
     }
 
     /// The one place the widgets are told the notebook changed. The lent-out widget reads the notebook itself.

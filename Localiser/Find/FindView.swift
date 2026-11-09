@@ -139,7 +139,7 @@ struct FindView: View {
     }
 
     @ViewBuilder private var siriTips: some View {
-        if !whereIsTipDismissed { SiriTipRow(phrase: "Say **“Ask Hereabouts where something is”**") { whereIsTipDismissed = true } }
+        if !whereIsTipDismissed { SiriTipRow(phrase: "Say **“Where's my passport in Hereabouts?”**") { whereIsTipDismissed = true } }
         if !writeDownTipDismissed { SiriTipRow(phrase: "Say **“Write something down in Hereabouts”**") { writeDownTipDismissed = true } }
     }
 

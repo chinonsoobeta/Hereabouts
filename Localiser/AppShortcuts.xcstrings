@@ -124,6 +124,34 @@
         }
       }
     },
+    "Find my ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find my ${thing} in ${applicationName}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar mi ${thing} en ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chercher mon ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar meu ${thing} no ${applicationName}"
+          }
+        }
+      }
+    },
     "I found ${thing} in ${applicationName}" : {
       "localizations" : {
         "en-GB" : {
@@ -252,6 +280,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Onde está ${thing} no ${applicationName}"
+          }
+        }
+      }
+    },
+    "Where is my ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where is my ${thing} in ${applicationName}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dónde está mi ${thing} en ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où est mon ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onde está meu ${thing} no ${applicationName}"
+          }
+        }
+      }
+    },
+    "Where's ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where's ${thing} in ${applicationName}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dónde queda ${thing} en ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où se trouve ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onde fica ${thing} no ${applicationName}"
+          }
+        }
+      }
+    },
+    "Where's my ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where's my ${thing} in ${applicationName}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dónde queda mi ${thing} en ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où se trouve mon ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onde fica meu ${thing} no ${applicationName}"
           }
         }
       }
