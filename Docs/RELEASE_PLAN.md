@@ -143,7 +143,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [x] **O24 App Privacy.** "Data Not Collected". Voice memos are transcribed on the phone and the recording is not kept, and automatic backups go to the person's own iCloud Drive, which the developer can't see, so this answer doesn't change. Apple's own TestFlight crash reports don't count. *Published 8 November with the owner's OK: Data Not Collected, privacy policy URL https://hereaboutsapp.com/privacy in all seven listing languages.*
 - [ ] **O25 Age rating.** Expect 4+.
 - [ ] **O26 URLs.** Privacy Policy and Support URLs. The Terms of Use line goes at the end of the description.
-- [ ] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0.
+- [x] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0. *Done 8 November: both unticked under Pricing and Availability and saved (checked after a reload). iPhone and iPad stay on; iPad comes from the build (M67).*
 - [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
 - [x] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Privacy policy URL (hereaboutsapp.com/privacy) and marketing URL (hereaboutsapp.com) added the same day.*
