@@ -178,6 +178,21 @@ final class LocaliserStore {
         try save()
     }
 
+    /// Things dropped on a place in the sidebar. Each goes through `move`, as the Move sheet's choice does, so the history, the
+    /// "usually in" place, Spotlight and the widget are updated the same way. A thing already in the place, one that has gone,
+    /// and one that belongs to another home stay where they are. Returns how many moved.
+    @discardableResult
+    func moveDropped(_ ids: [UUID], to place: Place) throws -> Int {
+        var moved = 0
+        for id in ids {
+            guard let item = items.first(where: { $0.id == id }), !item.isDeleted, item.place?.id != place.id else { continue }
+            if let home = item.home, let target = place.home, home.id != target.id { continue }
+            try move(item, to: place)
+            moved += 1
+        }
+        return moved
+    }
+
     /// "Still there": the thing is where the notebook says.
     func confirm(_ item: Belonging, on date: Date = .now) throws {
         item.confirmedAt = date

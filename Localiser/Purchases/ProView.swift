@@ -89,7 +89,7 @@ struct ProView: View {
             .card()
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(selected ? Theme.purpleInk : .clear, lineWidth: 2))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plain).hoverEffect()
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }

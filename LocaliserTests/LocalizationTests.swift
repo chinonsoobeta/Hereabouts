@@ -13,8 +13,14 @@ final class LocalizationTests: XCTestCase {
     private static var root: URL { URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent() }
 
     /// Values of one localization: "" for a plain string, or the plural category names.
-    private static func values(_ localization: [String: Any]?) -> [String: String]? {
+    /// A string that varies by device is read as it is on iPhone ("other"); `device: "ipad"` reads the iPad text.
+    private static func values(_ localization: [String: Any]?, device: String = "other") -> [String: String]? {
         guard let localization else { return nil }
+        if let byDevice = (localization["variations"] as? [String: Any])?["device"] as? [String: Any] {
+            // A plural string keeps its forms under "iphone" and "ipad", with a plain "other" as the fallback.
+            let choice = device == "ipad" ? byDevice["ipad"] : byDevice["iphone"] ?? byDevice["other"]
+            return values(choice as? [String: Any], device: device)
+        }
         if let unit = localization["stringUnit"] as? [String: Any] {
             guard unit["state"] as? String == "translated", let value = unit["value"] as? String else { return nil }
             return ["": value]
@@ -22,13 +28,20 @@ final class LocalizationTests: XCTestCase {
         if let plural = (localization["variations"] as? [String: Any])?["plural"] as? [String: Any] {
             var out: [String: String] = [:]
             for (category, body) in plural {
-                guard let unit = (body as? [String: Any])?["stringUnit"] as? [String: Any],
-                      unit["state"] as? String == "translated", let value = unit["value"] as? String else { return nil }
-                out[category] = value
+                // The device variation sits inside each plural category.
+                guard let text = values(body as? [String: Any], device: device)?[""] else { return nil }
+                out[category] = text
             }
             return out
         }
         return nil
+    }
+
+    /// Whether a localization varies by device, at its top or inside its plural categories.
+    private static func variesByDevice(_ localization: [String: Any]?) -> Bool {
+        guard let variations = localization?["variations"] as? [String: Any] else { return false }
+        if variations["device"] != nil { return true }
+        return (variations["plural"] as? [String: Any])?.values.contains { variesByDevice($0 as? [String: Any]) } ?? false
     }
 
     private func entries() throws -> [Entry] {
@@ -107,6 +120,36 @@ final class LocalizationTests: XCTestCase {
                 }
             }
         }
+    }
+
+    /// Text that names the iPhone reads "iPad" on an iPad, in every language, with the same format specifiers.
+    func testIPadTextNamesTheIPadInEveryLanguage() throws {
+        var varied = 0
+        for catalog in Self.catalogs {
+            let data = try Data(contentsOf: Self.root.appendingPathComponent(catalog))
+            let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            let strings = try XCTUnwrap(json["strings"] as? [String: [String: Any]])
+            for (key, body) in strings where body["shouldTranslate"] as? Bool != false {
+                let locs = body["localizations"] as? [String: [String: Any]] ?? [:]
+                let onIPhone = Self.values(locs["en"]) ?? ["": key]
+                let namesIPhone = onIPhone.values.contains { $0.contains("iPhone") || $0.contains("this phone") || $0.contains("another phone") }
+                for language in ["en"] + Self.languages {
+                    if !namesIPhone && !Self.variesByDevice(locs[language]) { continue }
+                    let ipad = try XCTUnwrap(Self.values(locs[language], device: "ipad"), "\(catalog) \(language) has no iPad text for \(key)")
+                    let other = try XCTUnwrap(Self.values(locs[language]), "\(catalog) \(language) has no iPhone text for \(key)")
+                    XCTAssertTrue(Self.variesByDevice(locs[language]), "\(catalog) \(language) \(key) doesn't vary by device")
+                    XCTAssertEqual(Set(ipad.keys), Set(other.keys), "\(language) \(key)")
+                    for (category, text) in ipad {
+                        XCTAssertNotEqual(text, other[category], "\(language) \(key) reads the same on iPad")
+                        if key.contains("iPhone") { XCTAssertTrue(text.contains("iPad"), "\(language) \(key): \(text)") }
+                        XCTAssertEqual(Self.specifiers(text), Self.specifiers(other[category] ?? ""), "\(language) \(key): \(text)")
+                        if !key.hasPrefix("Scan with your iPhone camera") { XCTAssertFalse(text.contains("iPhone"), "\(language) \(key): \(text)") }
+                    }
+                }
+                if locs.values.contains(where: { Self.variesByDevice($0) }) { varied += 1 }
+            }
+        }
+        XCTAssertEqual(varied, 15, "13 strings that name the iPhone and 2 that say phone; the camera prompt says device, because the system reads it without device variations")
     }
 
     func testRoomIconsMatchEveryLanguage() {

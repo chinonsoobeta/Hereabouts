@@ -2663,28 +2663,94 @@
     },
     "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A backup holds your places, things, history, dates, kits and trips. You choose which photos and documents to include. Backups aren't encrypted. Anyone with the file can read it. Save it somewhere private, like iCloud Drive or Files on this iPhone."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Una copia de seguridad guarda tus lugares, objetos, historial, fechas, kits y viajes. Tú eliges qué fotos y documentos incluir. Las copias no están cifradas: cualquiera con el archivo puede leerlo. Guárdala en un sitio privado, como iCloud Drive o Archivos en este iPhone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Una copia de seguridad guarda tus lugares, objetos, historial, fechas, kits y viajes. Tú eliges qué fotos y documentos incluir. Las copias no están cifradas: cualquiera con el archivo puede leerlo. Guárdala en un sitio privado, como iCloud Drive o Archivos en este iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Una copia de seguridad guarda tus lugares, objetos, historial, fechas, kits y viajes. Tú eliges qué fotos y documentos incluir. Las copias no están cifradas: cualquiera con el archivo puede leerlo. Guárdala en un sitio privado, como iCloud Drive o Archivos en este iPhone."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Une sauvegarde contient vos endroits, objets, historique, dates, kits et voyages. Vous choisissez les photos et documents à inclure. Les sauvegardes ne sont pas chiffrées : toute personne qui a le fichier peut le lire. Gardez-le en lieu sûr, par exemple dans iCloud Drive ou Fichiers sur cet iPhone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Une sauvegarde contient vos endroits, objets, historique, dates, kits et voyages. Vous choisissez les photos et documents à inclure. Les sauvegardes ne sont pas chiffrées : toute personne qui a le fichier peut le lire. Gardez-le en lieu sûr, par exemple dans iCloud Drive ou Fichiers sur cet iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Une sauvegarde contient vos endroits, objets, historique, dates, kits et voyages. Vous choisissez les photos et documents à inclure. Les sauvegardes ne sont pas chiffrées : toute personne qui a le fichier peut le lire. Gardez-le en lieu sûr, par exemple dans iCloud Drive ou Fichiers sur cet iPhone."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um backup guarda seus lugares, objetos, histórico, datas, kits e viagens. Você escolhe quais fotos e documentos incluir. Backups não são criptografados: qualquer pessoa com o arquivo pode lê-lo. Guarde-o em um lugar privado, como o iCloud Drive ou o app Arquivos neste iPhone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Um backup guarda seus lugares, objetos, histórico, datas, kits e viagens. Você escolhe quais fotos e documentos incluir. Backups não são criptografados: qualquer pessoa com o arquivo pode lê-lo. Guarde-o em um lugar privado, como o iCloud Drive ou o app Arquivos neste iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Um backup guarda seus lugares, objetos, histórico, datas, kits e viagens. Você escolhe quais fotos e documentos incluir. Backups não são criptografados: qualquer pessoa com o arquivo pode lê-lo. Guarde-o em um lugar privado, como o iCloud Drive ou o app Arquivos neste iPhone."
+                }
+              }
+            }
           }
         }
       }
@@ -8819,28 +8885,94 @@
     },
     "It may have been deleted, or the label was made on another phone." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It may have been deleted, or the label was made on another device."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It may have been deleted, or the label was made on another phone."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "It may have been deleted, or the label was made on another phone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It may have been deleted, or the label was made on another device."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It may have been deleted, or the label was made on another phone."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puede que se haya eliminado, o que la etiqueta se hiciera en otro teléfono."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Puede que se haya eliminado, o que la etiqueta se hiciera en otro dispositivo."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Puede que se haya eliminado, o que la etiqueta se hiciera en otro teléfono."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il a peut-être été supprimé, ou l’étiquette a été créée sur un autre téléphone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il a peut-être été supprimé, ou l’étiquette a été créée sur un autre appareil."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il a peut-être été supprimé, ou l’étiquette a été créée sur un autre téléphone."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pode ter sido apagado, ou a etiqueta foi feita em outro telefone."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pode ter sido apagado, ou a etiqueta foi feita em outro dispositivo."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pode ter sido apagado, ou a etiqueta foi feita em outro telefone."
+                }
+              }
+            }
           }
         }
       }
@@ -11289,28 +11421,94 @@
     },
     "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing has been deleted. Try restarting your iPad. If you still need help, save your notebook file and send it to support."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing has been deleted. Try restarting your iPad. If you still need help, save your notebook file and send it to support."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se ha eliminado nada. Prueba a reiniciar tu iPhone. Si aún necesitas ayuda, guarda el archivo de tu libreta y envíalo a soporte."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No se ha eliminado nada. Prueba a reiniciar tu iPad. Si aún necesitas ayuda, guarda el archivo de tu libreta y envíalo a soporte."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "No se ha eliminado nada. Prueba a reiniciar tu iPhone. Si aún necesitas ayuda, guarda el archivo de tu libreta y envíalo a soporte."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rien n’a été supprimé. Essayez de redémarrer votre iPhone. Si besoin, enregistrez le fichier de votre carnet et envoyez-le à l’assistance."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Rien n’a été supprimé. Essayez de redémarrer votre iPad. Si besoin, enregistrez le fichier de votre carnet et envoyez-le à l’assistance."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Rien n’a été supprimé. Essayez de redémarrer votre iPhone. Si besoin, enregistrez le fichier de votre carnet et envoyez-le à l’assistance."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nada foi apagado. Tente reiniciar seu iPhone. Se ainda precisar de ajuda, salve o arquivo do seu caderno e envie ao suporte."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada foi apagado. Tente reiniciar seu iPad. Se ainda precisar de ajuda, salve o arquivo do seu caderno e envie ao suporte."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada foi apagado. Tente reiniciar seu iPhone. Se ainda precisar de ajuda, salve o arquivo do seu caderno e envie ao suporte."
+                }
+              }
+            }
           }
         }
       }
@@ -11373,28 +11571,94 @@
     },
     "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing leaves this iPad except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing leaves this iPad except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nada sale de este iPhone salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada sale de este iPad salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada sale de este iPhone salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rien ne quitte cet iPhone, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Rien ne quitte cet iPad, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Rien ne quitte cet iPhone, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nada sai deste iPhone, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada sai deste iPad, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada sai deste iPhone, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
+                }
+              }
+            }
           }
         }
       }
@@ -13405,28 +13669,94 @@
     },
     "Reading your photo on this iPhone…" : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Reading your photo on this iPad…"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Reading your photo on this iPhone…"
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reading your photo on this iPhone…"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Reading your photo on this iPad…"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Reading your photo on this iPhone…"
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Leyendo tu foto en este iPhone…"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Leyendo tu foto en este iPad…"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Leyendo tu foto en este iPhone…"
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture de votre photo sur cet iPhone…"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Lecture de votre photo sur cet iPad…"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Lecture de votre photo sur cet iPhone…"
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lendo sua foto neste iPhone…"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Lendo sua foto neste iPad…"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Lendo sua foto neste iPhone…"
+                }
+              }
+            }
           }
         }
       }
@@ -14413,28 +14743,94 @@
     },
     "Save the notebook file (photos stay on this iPhone)" : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Save the notebook file (photos stay on this iPad)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Save the notebook file (photos stay on this iPhone)"
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save the notebook file (photos stay on this iPhone)"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Save the notebook file (photos stay on this iPad)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Save the notebook file (photos stay on this iPhone)"
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardar el archivo de la libreta (las fotos se quedan en este iPhone)"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Guardar el archivo de la libreta (las fotos se quedan en este iPad)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Guardar el archivo de la libreta (las fotos se quedan en este iPhone)"
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrer le fichier du carnet (les photos restent sur cet iPhone)"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Enregistrer le fichier du carnet (les photos restent sur cet iPad)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Enregistrer le fichier du carnet (les photos restent sur cet iPhone)"
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvar o arquivo do caderno (as fotos ficam neste iPhone)"
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Salvar o arquivo do caderno (as fotos ficam neste iPad)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Salvar o arquivo do caderno (as fotos ficam neste iPhone)"
+                }
+              }
+            }
           }
         }
       }
@@ -14665,28 +15061,94 @@
     },
     "Scan with your iPhone camera to open in Hereabouts." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scan with your iPhone or iPad camera to open in Hereabouts."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scan with your iPhone camera to open in Hereabouts."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan with your iPhone camera to open in Hereabouts."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scan with your iPhone or iPad camera to open in Hereabouts."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scan with your iPhone camera to open in Hereabouts."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escanea con la cámara de tu iPhone para abrir en Hereabouts."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Escanea con la cámara de tu iPhone o iPad para abrir en Hereabouts."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Escanea con la cámara de tu iPhone para abrir en Hereabouts."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scannez avec l’appareil photo de votre iPhone pour ouvrir dans Hereabouts."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scannez avec l’appareil photo de votre iPhone ou iPad pour ouvrir dans Hereabouts."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Scannez avec l’appareil photo de votre iPhone pour ouvrir dans Hereabouts."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escaneie com a câmera do iPhone para abrir no Hereabouts."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Escaneie com a câmera do iPhone ou iPad para abrir no Hereabouts."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Escaneie com a câmera do iPhone para abrir no Hereabouts."
+                }
+              }
+            }
           }
         }
       }
@@ -16945,28 +17407,94 @@
     },
     "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This replaces the notebook on this iPad. If anything goes wrong, it stays exactly as it is."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This replaces the notebook on this iPad. If anything goes wrong, it stays exactly as it is."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This replaces the notebook on this phone. If anything goes wrong, it stays exactly as it is."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esto reemplaza la libreta de este teléfono. Si algo falla, se queda exactamente como está."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Esto reemplaza la libreta de este iPad. Si algo falla, se queda exactamente como está."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Esto reemplaza la libreta de este teléfono. Si algo falla, se queda exactamente como está."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cela remplace le carnet de ce téléphone. En cas de problème, il reste exactement tel quel."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Cela remplace le carnet de cet iPad. En cas de problème, il reste exactement tel quel."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Cela remplace le carnet de ce téléphone. En cas de problème, il reste exactement tel quel."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Isto substitui o caderno deste telefone. Se algo der errado, ele fica exatamente como está."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Isto substitui o caderno deste iPad. Se algo der errado, ele fica exatamente como está."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Isto substitui o caderno deste telefone. Se algo der errado, ele fica exatamente como está."
+                }
+              }
+            }
           }
         }
       }
@@ -17925,28 +18453,94 @@
     },
     "Voice memos don't work on this iPhone. Type instead." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Voice memos don't work on this iPad. Type instead."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Voice memos don't work on this iPhone. Type instead."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voice memos don't work on this iPhone. Type instead."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Voice memos don't work on this iPad. Type instead."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Voice memos don't work on this iPhone. Type instead."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las notas de voz no funcionan en este iPhone. Escribe."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Las notas de voz no funcionan en este iPad. Escribe."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Las notas de voz no funcionan en este iPhone. Escribe."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les mémos vocaux ne fonctionnent pas sur cet iPhone. Tapez plutôt."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Les mémos vocaux ne fonctionnent pas sur cet iPad. Tapez plutôt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Les mémos vocaux ne fonctionnent pas sur cet iPhone. Tapez plutôt."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As anotações por voz não funcionam neste iPhone. Digite."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "As anotações por voz não funcionam neste iPad. Digite."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "As anotações por voz não funcionam neste iPhone. Digite."
+                }
+              }
+            }
           }
         }
       }
@@ -18883,28 +19477,94 @@
     },
     "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPad so you don't need an account."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPad so you don't need an account."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Write down where you keep things, and find them later. Your notebook is saved on this iPhone so you don't need an account."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anota dónde guardas tus cosas y encuéntralas después. Tu libreta se guarda en este iPhone, así que no necesitas una cuenta."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Anota dónde guardas tus cosas y encuéntralas después. Tu libreta se guarda en este iPad, así que no necesitas una cuenta."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Anota dónde guardas tus cosas y encuéntralas después. Tu libreta se guarda en este iPhone, así que no necesitas una cuenta."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notez où vous rangez vos affaires et retrouvez-les plus tard. Votre carnet est enregistré sur cet iPhone, donc aucun compte n’est nécessaire."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Notez où vous rangez vos affaires et retrouvez-les plus tard. Votre carnet est enregistré sur cet iPad, donc aucun compte n’est nécessaire."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Notez où vous rangez vos affaires et retrouvez-les plus tard. Votre carnet est enregistré sur cet iPhone, donc aucun compte n’est nécessaire."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anote onde você guarda suas coisas e encontre-as depois. Seu caderno fica neste iPhone, então você não precisa de conta."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Anote onde você guarda suas coisas e encontre-as depois. Seu caderno fica neste iPad, então você não precisa de conta."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Anote onde você guarda suas coisas e encontre-as depois. Seu caderno fica neste iPhone, então você não precisa de conta."
+                }
+              }
+            }
           }
         }
       }
@@ -19769,11 +20429,41 @@
       "localizations" : {
         "en" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "You have %lld reminder scheduled on this iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminder scheduled on this iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminders scheduled on this iPad."
+                      }
+                    }
+                  }
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminder scheduled on this iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminders scheduled on this iPhone."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
@@ -19787,11 +20477,41 @@
         },
         "en-GB" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "You have %lld reminder scheduled on this iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminder scheduled on this iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminders scheduled on this iPad."
+                      }
+                    }
+                  }
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminder scheduled on this iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "You have %lld reminders scheduled on this iPhone."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
@@ -19805,11 +20525,41 @@
         },
         "es" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Tienes %lld recordatorio programado en este iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Tienes %lld recordatorio programado en este iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Tienes %lld recordatorios programados en este iPad."
+                      }
+                    }
+                  }
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Tienes %lld recordatorio programado en este iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Tienes %lld recordatorios programados en este iPhone."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
@@ -19823,11 +20573,41 @@
         },
         "fr" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Vous avez %lld rappel programmé sur cet iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Vous avez %lld rappel programmé sur cet iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Vous avez %lld rappels programmés sur cet iPad."
+                      }
+                    }
+                  }
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Vous avez %lld rappel programmé sur cet iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Vous avez %lld rappels programmés sur cet iPhone."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
@@ -19841,11 +20621,41 @@
         },
         "pt-BR" : {
           "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Você tem %lld lembrete agendado neste iPhone."
+            "device" : {
+              "ipad" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Você tem %lld lembrete agendado neste iPad."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Você tem %lld lembretes agendados neste iPad."
+                      }
+                    }
+                  }
+                }
+              },
+              "iphone" : {
+                "variations" : {
+                  "plural" : {
+                    "one" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Você tem %lld lembrete agendado neste iPhone."
+                      }
+                    },
+                    "other" : {
+                      "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "Você tem %lld lembretes agendados neste iPhone."
+                      }
+                    }
+                  }
                 }
               },
               "other" : {
@@ -20029,28 +20839,94 @@
     },
     "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You'll erase this notebook on your iPad. You'll confirm twice. Your saved backups stay where you put them."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You'll erase this notebook on your iPad. You'll confirm twice. Your saved backups stay where you put them."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You'll erase this notebook on your iPhone. You'll confirm twice. Your saved backups stay where you put them."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vas a borrar esta libreta en tu iPhone. Lo confirmarás dos veces. Tus copias guardadas se quedan donde las pusiste."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vas a borrar esta libreta en tu iPad. Lo confirmarás dos veces. Tus copias guardadas se quedan donde las pusiste."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vas a borrar esta libreta en tu iPhone. Lo confirmarás dos veces. Tus copias guardadas se quedan donde las pusiste."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous allez effacer ce carnet sur votre iPhone. Vous confirmerez deux fois. Vos sauvegardes restent là où vous les avez mises."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vous allez effacer ce carnet sur votre iPad. Vous confirmerez deux fois. Vos sauvegardes restent là où vous les avez mises."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vous allez effacer ce carnet sur votre iPhone. Vous confirmerez deux fois. Vos sauvegardes restent là où vous les avez mises."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Você vai apagar este caderno no seu iPhone. Você vai confirmar duas vezes. Seus backups salvos ficam onde você os colocou."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Você vai apagar este caderno no seu iPad. Você vai confirmar duas vezes. Seus backups salvos ficam onde você os colocou."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Você vai apagar este caderno no seu iPhone. Você vai confirmar duas vezes. Seus backups salvos ficam onde você os colocou."
+                }
+              }
+            }
           }
         }
       }
@@ -20337,28 +21213,94 @@
     },
     "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your backups go to iCloud Drive, or this iPad if it's off. You keep the newest five."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your backups go to iCloud Drive, or this iPad if it's off. You keep the newest five."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your backups go to iCloud Drive, or this iPhone if it's off. You keep the newest five."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus copias van a iCloud Drive, o a este iPhone si está desactivado. Conservas las cinco más recientes."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tus copias van a iCloud Drive, o a este iPad si está desactivado. Conservas las cinco más recientes."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tus copias van a iCloud Drive, o a este iPhone si está desactivado. Conservas las cinco más recientes."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vos sauvegardes vont dans iCloud Drive, ou sur cet iPhone s’il est désactivé. Vous gardez les cinq plus récentes."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vos sauvegardes vont dans iCloud Drive, ou sur cet iPad s’il est désactivé. Vous gardez les cinq plus récentes."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vos sauvegardes vont dans iCloud Drive, ou sur cet iPhone s’il est désactivé. Vous gardez les cinq plus récentes."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seus backups vão para o iCloud Drive, ou para este iPhone se ele estiver desativado. Os cinco mais recentes ficam guardados."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seus backups vão para o iCloud Drive, ou para este iPad se ele estiver desativado. Os cinco mais recentes ficam guardados."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seus backups vão para o iCloud Drive, ou para este iPhone se ele estiver desativado. Os cinco mais recentes ficam guardados."
+                }
+              }
+            }
           }
         }
       }
@@ -20505,28 +21447,94 @@
     },
     "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your iPad limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your iPad limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your iPhone limits how many reminders you can schedule at once. Open Hereabouts to schedule the rest."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu iPhone limita cuántos recordatorios puedes programar a la vez. Abre Hereabouts para programar el resto."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu iPad limita cuántos recordatorios puedes programar a la vez. Abre Hereabouts para programar el resto."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu iPhone limita cuántos recordatorios puedes programar a la vez. Abre Hereabouts para programar el resto."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre iPhone limite le nombre de rappels programmés à la fois. Ouvrez Hereabouts pour programmer les autres."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre iPad limite le nombre de rappels programmés à la fois. Ouvrez Hereabouts pour programmer les autres."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre iPhone limite le nombre de rappels programmés à la fois. Ouvrez Hereabouts pour programmer les autres."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seu iPhone limita quantos lembretes podem ser agendados de uma vez. Abra o Hereabouts para agendar o resto."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu iPad limita quantos lembretes podem ser agendados de uma vez. Abra o Hereabouts para agendar o resto."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu iPhone limita quantos lembretes podem ser agendados de uma vez. Abra o Hereabouts para agendar o resto."
+                }
+              }
+            }
           }
         }
       }
@@ -20561,28 +21569,94 @@
     },
     "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics." : {
       "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook is saved on this iPad. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics."
+                }
+              }
+            }
+          }
+        },
         "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook is saved on this iPad. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook is saved on this iPhone. With Pro, weekly backups go to your own iCloud Drive. You don't need an account. There's no advertising or analytics."
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu libreta se guarda en este iPhone. Con Pro, las copias semanales van a tu propio iCloud Drive. No necesitas una cuenta. Sin publicidad ni analíticas."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu libreta se guarda en este iPad. Con Pro, las copias semanales van a tu propio iCloud Drive. No necesitas una cuenta. Sin publicidad ni analíticas."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu libreta se guarda en este iPhone. Con Pro, las copias semanales van a tu propio iCloud Drive. No necesitas una cuenta. Sin publicidad ni analíticas."
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre carnet est enregistré sur cet iPhone. Avec Pro, des sauvegardes hebdomadaires vont dans votre iCloud Drive. Aucun compte nécessaire. Ni publicité ni statistiques."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre carnet est enregistré sur cet iPad. Avec Pro, des sauvegardes hebdomadaires vont dans votre iCloud Drive. Aucun compte nécessaire. Ni publicité ni statistiques."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre carnet est enregistré sur cet iPhone. Avec Pro, des sauvegardes hebdomadaires vont dans votre iCloud Drive. Aucun compte nécessaire. Ni publicité ni statistiques."
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seu caderno fica neste iPhone. Com o Pro, os backups semanais vão para o seu próprio iCloud Drive. Não precisa de conta. Sem anúncios nem análises."
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu caderno fica neste iPad. Com o Pro, os backups semanais vão para o seu próprio iCloud Drive. Não precisa de conta. Sem anúncios nem análises."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu caderno fica neste iPhone. Com o Pro, os backups semanais vão para o seu próprio iCloud Drive. Não precisa de conta. Sem anúncios nem análises."
+                }
+              }
+            }
           }
         }
       }

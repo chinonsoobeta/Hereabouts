@@ -107,32 +107,32 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone."
+            "state" : "translated",
+            "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this device."
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone."
+            "value" : "You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this device."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Puedes hacer una foto de un objeto o un estante, o escanear la etiqueta de una caja. Tus fotos se quedan en este iPhone."
+            "value" : "Puedes hacer una foto de un objeto o un estante, o escanear la etiqueta de una caja. Tus fotos se quedan en este dispositivo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous pouvez photographier un objet ou une étagère, ou scanner l’étiquette d’une boîte. Vos photos restent sur cet iPhone."
+            "value" : "Vous pouvez photographier un objet ou une étagère, ou scanner l’étiquette d’une boîte. Vos photos restent sur cet appareil."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você pode tirar uma foto de um objeto ou de uma prateleira, ou escanear a etiqueta de uma caixa. Suas fotos ficam neste iPhone."
+            "value" : "Você pode tirar uma foto de um objeto ou de uma prateleira, ou escanear a etiqueta de uma caixa. Suas fotos ficam neste dispositivo."
           }
         }
       }

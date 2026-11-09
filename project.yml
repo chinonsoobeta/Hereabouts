@@ -55,6 +55,11 @@ targets:
           - UIApplicationShortcutItemType: hereabouts://putaway
             UIApplicationShortcutItemTitle: Put something away
             UIApplicationShortcutItemIconSymbolName: tray.and.arrow.down
+        # What a dragged thing travels as, so only Hereabouts takes a drop of it (ThingDrag).
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: dev.hereabouts.app.thing
+            UTTypeDescription: A Hereabouts thing
+            UTTypeConformsToTypes: [public.data]
         CFBundleURLTypes:
           - CFBundleURLName: dev.hereabouts.app
             CFBundleURLSchemes: [hereabouts]
@@ -76,7 +81,7 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: You can add a photo to show what a thing looks like. Hereabouts uses only the photos you choose.
-        INFOPLIST_KEY_NSCameraUsageDescription: You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this iPhone.
+        INFOPLIST_KEY_NSCameraUsageDescription: You can take a photo of a thing or shelf, or scan a box label. Your photos stay on this device.
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Use the microphone to say where you keep a thing. Hold to talk, and let go when you're done. Nothing is recorded.
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         MARKETING_VERSION: '1.0'

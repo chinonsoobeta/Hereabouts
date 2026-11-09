@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 import TipKit
 import AppIntents
+import UniformTypeIdentifiers
 
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
@@ -65,7 +66,7 @@ struct FindView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Theme.ground)
-        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused && !(regular && ui.sidebar != .detailOnly) { addBar.frame(maxWidth: regular ? Self.readingWidth : .infinity) } }
+        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused && !ui.sheetOpen && !(regular && ui.sidebar != .detailOnly) { addBar.frame(maxWidth: regular ? Self.readingWidth : .infinity) } }
         .navigationTitle("Hereabouts")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(removing: .title)
@@ -165,7 +166,7 @@ struct FindView: View {
         }.padding(.top, 8)
         VStack(spacing: 0) {
             ForEach(store.placesHere.filter { $0.parent == nil }.prefix(3)) { place in
-                NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
+                NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain).hoverEffect()
             }
             NewPlaceTile { ui.addingPlace = true }
         }
@@ -180,7 +181,7 @@ struct FindView: View {
                 ItemRow(item: item, query: query)
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.secondary).accessibilityHidden(true)
             }.card()
-        }.buttonStyle(.plain)
+        }.buttonStyle(.plain).hoverEffect().thingDraggable(item)
     }
 }
 
@@ -208,6 +209,37 @@ struct NewThing: Identifiable {
     var photoFirst = false
     var placeID: UUID?
     var spokenPlace: SpokenPlace?
+}
+
+/// A thing being dragged to a place in the sidebar. Only its id travels, and only to Hereabouts itself.
+struct ThingDrag: Codable, Transferable {
+    let id: UUID
+    static var transferRepresentation: some TransferRepresentation { CodableRepresentation(contentType: .hereaboutsThing) }
+}
+
+extension UTType {
+    /// Declared in Info.plist (project.yml), so no other app takes a dropped thing.
+    static let hereaboutsThing = UTType(exportedAs: "dev.hereabouts.app.thing")
+}
+
+extension View {
+    /// Lifts a thing's row to drop on a place in the sidebar, which only a wide window has. A private thing's name
+    /// stays out of the preview, as it does everywhere outside the app.
+    func thingDraggable(_ item: Belonging) -> some View { modifier(ThingDragModifier(item: item)) }
+}
+
+private struct ThingDragModifier: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    let item: Belonging
+    func body(content: Content) -> some View {
+        if WindowLayout.isWide(sizeClass) {
+            content.draggable(ThingDrag(id: item.id)) {
+                Text(item.isPrivate ? String(localized: "Private") : item.name)
+                    .font(.wbItem).foregroundStyle(Theme.ink).padding(12)
+                    .background(Theme.paper, in: RoundedRectangle(cornerRadius: 8))
+            }
+        } else { content }
+    }
 }
 
 struct PlaceTile: View {

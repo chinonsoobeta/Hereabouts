@@ -36,7 +36,7 @@ struct PlacesView: View {
                 } else {
                     VStack(spacing: 0) {
                         ForEach(rooms) { place in
-                            RouteLink(route: .place(place.id)) { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
+                            RouteLink(route: .place(place.id)) { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain).hoverEffect()
                         }
                         NewPlaceTile { ui.addingPlace = true }
                     }
@@ -46,7 +46,7 @@ struct PlacesView: View {
                 if !store.lentItems.isEmpty {
                     SectionHeading(title: String(localized: "Lent out")).padding(.top, 8)
                     ForEach(store.lentItems) { item in
-                        RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain)
+                        RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item).card() }.buttonStyle(.plain).hoverEffect().thingDraggable(item)
                     }
                 }
             }
@@ -107,7 +107,7 @@ struct NewPlaceTile: View {
                 .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.plain).hoverEffect()
     }
 }
 
@@ -241,11 +241,11 @@ struct PlaceDetailView: View {
                         if picksThingsBeside {
                             // On a wide screen the thing opens in the next column, and stays picked when the layout changes.
                             Button { ui.selectedItem = item.id } label: { ItemRow(item: item).frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle()) }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.plain).thingDraggable(item)
                                 .listRowBackground(ui.selectedItem == item.id ? Theme.highlighter : Theme.sheet)
                                 .accessibilityAddTraits(ui.selectedItem == item.id ? .isSelected : [])
                         } else {
-                            RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item) }
+                            RouteLink(route: .item(item.id)) { ItemDetailView(item: item) } label: { ItemRow(item: item) }.thingDraggable(item)
                         }
                     }
                 } header: { Text("Things here").foregroundStyle(Theme.secondary) }

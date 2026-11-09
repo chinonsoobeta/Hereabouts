@@ -279,6 +279,8 @@ struct PrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity, minHeight: 52)
             .padding(.horizontal, 20)
             .background(Theme.purpleFill.opacity(isEnabled ? (configuration.isPressed ? 0.85 : 1) : 0.45), in: RoundedRectangle(cornerRadius: 10))
+            .contentShape(.hoverEffect, RoundedRectangle(cornerRadius: 10))
+            .hoverEffect()
     }
 }
 
@@ -291,6 +293,8 @@ struct SoftButtonStyle: ButtonStyle {
             .frame(maxWidth: compact ? nil : .infinity, minHeight: compact ? 44 : 52)
             .padding(.horizontal, compact ? 16 : 20)
             .background(Theme.mist.opacity(configuration.isPressed ? 0.7 : 1), in: RoundedRectangle(cornerRadius: 6))
+            .contentShape(.hoverEffect, RoundedRectangle(cornerRadius: 6))
+            .hoverEffect()
     }
 }
 

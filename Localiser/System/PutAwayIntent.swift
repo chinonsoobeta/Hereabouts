@@ -1,6 +1,6 @@
 import AppIntents
 
-/// Opens Hereabouts on the put-away screen, camera first. The Action button, Siri and the
+/// Opens Hereabouts on the put-away screen, camera first. Siri, Shortcuts and the
 /// Control Centre button all run this; the control extension shares this file.
 struct PutAwayIntent: AppIntent {
     static var title: LocalizedStringResource { "Put something away" }

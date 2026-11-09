@@ -6,7 +6,7 @@
 #
 # Fails unless: the free plan holds 15 things and 1 packing kit, the App Group matches project.yml,
 # every bundle (the app and each extension) carries a PrivacyInfo.xcprivacy, and the licence texts
-# for both typefaces (Atkinson Hyperlegible and Fraunces) are present.
+# for both typefaces (Atkinson Hyperlegible and Fraunces) are present, and the app is built for iPhone and iPad.
 
 set -u
 
@@ -98,6 +98,16 @@ for font in "Atkinson Hyperlegible" "Fraunces"; do
     if [[ -n "$found" ]]; then pass "licence text for $font (${found#"$search_dir"/})"
     else fail "no licence text for $font in ${search_dir#"$ROOT"/}"; fi
 done
+
+# 6. The app is built for iPhone and iPad: every TARGETED_DEVICE_FAMILY in project.yml is 1,2, and a built app lists both.
+families="$(sed -n "s/^ *TARGETED_DEVICE_FAMILY: *'\{0,1\}\([^']*\)'\{0,1\} *$/\1/p" "$ROOT/project.yml")"
+if [[ -n "$families" && -z "$(echo "$families" | grep -v '^1,2$')" ]]; then pass "TARGETED_DEVICE_FAMILY is 1,2 in project.yml ($(echo "$families" | wc -l | tr -d ' ') settings)"
+else fail "TARGETED_DEVICE_FAMILY in project.yml is '$(echo "$families" | tr '\n' ' ' | sed 's/ $//')', want 1,2 everywhere"; fi
+if [[ -n "$APP" ]]; then
+    device_family="$(plist_value "$APP/Info.plist" UIDeviceFamily | tr -d ' \n')"
+    if [[ "$device_family" == *1* && "$device_family" == *2* ]]; then pass "UIDeviceFamily in the app holds iPhone (1) and iPad (2)"
+    else fail "UIDeviceFamily in the app is '${device_family:-missing}', want both 1 and 2"; fi
+fi
 
 echo
 if (( failures == 0 )); then echo "All release checks passed."; exit 0

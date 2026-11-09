@@ -1,7 +1,7 @@
 import AppIntents
 import Foundation
 
-/// Siri, Shortcuts, Spotlight actions and the Action button all reach the notebook through these.
+/// Siri, Shortcuts and Spotlight actions all reach the notebook through these.
 /// They run inside the app's process and use the same store the screens use.
 @MainActor enum IntentLibrary {
     static var store: LocaliserStore?

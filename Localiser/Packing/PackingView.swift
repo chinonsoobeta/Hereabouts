@@ -35,13 +35,13 @@ struct PackingView: View {
                     ForEach(Array(active.enumerated()), id: \.element.id) { index, trip in
                         NavigationLink { TripDetailView(trip: trip) } label: {
                             if index == 0 { TripProgressCard(trip: trip) } else { TripRow(trip: trip) }
-                        }.buttonStyle(.plain)
+                        }.buttonStyle(.plain).hoverEffect()
                     }
                     Button("Plan a trip", systemImage: "plus") { newTrip = true }.buttonStyle(SoftButtonStyle())
                     if !past.isEmpty {
                         DisclosureGroup(isExpanded: $showPast) {
                             VStack(spacing: 12) {
-                                ForEach(past) { trip in NavigationLink { TripDetailView(trip: trip) } label: { TripRow(trip: trip) }.buttonStyle(.plain) }
+                                ForEach(past) { trip in NavigationLink { TripDetailView(trip: trip) } label: { TripRow(trip: trip) }.buttonStyle(.plain).hoverEffect() }
                             }.padding(.top, 8)
                         } label: { Text("Past trips (\(past.count))").font(.wbItem).foregroundStyle(Theme.ink) }
                         .tint(Theme.purpleInk)
@@ -53,7 +53,7 @@ struct PackingView: View {
                     ForEach(store.kitsHere) { kit in
                         NavigationLink { KitDetailView(kit: kit) } label: {
                             NotebookLine(name: kit.name, detail: String(localized: "\(kit.entries.count) things")).card()
-                        }.buttonStyle(.plain)
+                        }.buttonStyle(.plain).hoverEffect()
                     }
                     Button("New kit", systemImage: "plus") { newKit = true }.buttonStyle(SoftButtonStyle())
                 }
@@ -498,7 +498,7 @@ struct TripDetailView: View {
             }
             if sideBySide {
                 // Inside a two-column row a link would claim the whole row, so each entry is its own button.
-                Button { openedEntry = entry } label: { label.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle()) }.buttonStyle(.plain)
+                Button { openedEntry = entry } label: { label.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle()) }.buttonStyle(.plain).hoverEffect()
             } else {
                 NavigationLink { TripEntryDetailView(entry: entry) } label: { label }
             }

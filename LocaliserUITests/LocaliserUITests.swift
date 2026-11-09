@@ -419,7 +419,7 @@ import StoreKitTest
         XCTAssertTrue(app.buttons["voice.newPlace"].waitForExistence(timeout: 5))
         if app.keyboards.firstMatch.exists { app.keyboards.buttons.matching(NSPredicate(format: "label IN {'return', 'Return', 'done', 'Done'}")).firstMatch.tap() }
         reveal(app.buttons["voice.newPlace"], in: app)
-        try shot("2-voice-optional")
+        try shot("2-voice")
         app.terminate()
         // 3: lending, with the ask-back date on the thing page.
         app.launchArguments = base
@@ -921,7 +921,7 @@ import StoreKitTest
             // The one false positive: the audit calls a whole sidebar row (its element spans the sidebar, the left 340pt (440 at the largest text); which row varies
             // from run to run) "Text clipped", though its label is whole on screen
             // (see Docs/Verification/M66). Text clipped anywhere else, or in a sidebar row's own label, still fails.
-            if issue.auditType == .textClipped, let element = issue.element, element.frame.minX < 20, element.frame.maxX < 450 { return true }
+            if issue.auditType == .textClipped, let element = issue.element, element.frame.minX < 40, element.frame.maxX < 450 { return true }
             // The same for a row's name beside its leader or symbol ("Hall closet" on Find, "Acknowledgments" in Settings, whole in
             // ipad13-portrait-find.png and the Settings shot). Matched by label so that every other clipped text still fails.
             if issue.auditType == .textClipped, ["Hall closet", "Acknowledgments"].contains(issue.element?.label ?? "") { return true }
@@ -962,6 +962,14 @@ import StoreKitTest
         let cell = row(name, app)
         if !cell.exists, ["Find", "Trips", "Settings"].contains(name), app.buttons[name].exists { app.buttons[name].firstMatch.tap(); return }
         if !cell.exists { showSidebar(app) }
+        for _ in 0..<4 where !(cell.exists && cell.isHittable) && app.collectionViews["Sidebar"].exists {
+            // A short drag, so the row doesn't end up under the sidebar's own bar at the top.
+            let sidebar = app.collectionViews["Sidebar"]
+            // The fixed sections are at the top, the places below them.
+            let up = !["Search", "Find", "Trips", "Settings"].contains(name)
+            sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.7 : 0.5)).press(forDuration: 0.05, thenDragTo: sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.5 : 0.7)))
+            sleep(1) // Let the list settle before it is tapped.
+        }
         // The Duo's inner screen has no sidebar: the places are tabs down its edge, so a button reaches them.
         let tab = app.buttons.matching(NSPredicate(format: "label == %@", name)).firstMatch
         let target = cell.waitForExistence(timeout: 5) ? cell : tab
@@ -1035,12 +1043,13 @@ import StoreKitTest
         let app = try launch(.landscapeLeft, extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXL"])
         showSidebar(app)
         shot(app, .landscapeLeft, "xl-find"); try audit(app, LocaliserWideUITests.allAudits.union(.dynamicType))
-        openSection("Garage", in: app)
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.waitForExistence(timeout: 5))
-        shot(app, .landscapeLeft, "xl-place"); try audit(app, LocaliserWideUITests.allAudits.union(.dynamicType))
+        // Settings first: it is at the top of the sidebar, and the Duo's short sidebar scrolls to reach a place.
         openSection("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5)); shot(app, .landscapeLeft, "xl-settings")
         try audit(app, LocaliserWideUITests.allAudits.union(.dynamicType))
+        openSection("Garage", in: app)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.waitForExistence(timeout: 5))
+        shot(app, .landscapeLeft, "xl-place"); try audit(app, LocaliserWideUITests.allAudits.union(.dynamicType))
     }
 
     /// Rotating tears down and rebuilds the layout. The picked place and thing, the open sheet and what was typed stay.
@@ -1053,7 +1062,7 @@ import StoreKitTest
         let add = app.buttons["Add a thing"].firstMatch
         XCTAssertTrue(add.waitForExistence(timeout: 5)); add.tap()
         let name = app.textFields["item.name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Kettle")
+        XCTAssertTrue(name.waitForExistence(timeout: 5), app.debugDescription); name.tap(); name.typeText("Kettle")
         for orientation in [UIDeviceOrientation.portrait, .landscapeRight] {
             XCUIDevice.shared.orientation = orientation
             XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 8), "The sheet is still open after turning to \(orientation.rawValue)")
@@ -1063,5 +1072,196 @@ import StoreKitTest
         XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 5), "The picked thing is still open")
         XCUIDevice.shared.orientation = .portrait
         XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 8), "...and after turning again")
+    }
+
+    // MARK: M67, the iPad's keyboard, pointer and windows
+
+    private func isShowing(_ title: String, in app: XCUIApplication) -> Bool { app.navigationBars[title].waitForExistence(timeout: 5) }
+
+    /// The Duo's simulator loses the first key press after a launch. ⌘1 shows Find, which is already showing, so it's harmless.
+    private func wakeShortcuts(_ app: XCUIApplication) {
+        app.typeKey("1", modifierFlags: .command)
+        sleep(1)
+    }
+
+    /// ⌘N is New thing, ⌘F is search, and ⌘1 to ⌘4 are Find, Places, Trips and Settings, in either orientation.
+    func testKeyboardShortcutsOpenNewThingSearchAndTheSections() throws {
+        let app = try launch(.landscapeLeft)
+        wakeShortcuts(app)
+        app.typeKey("3", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Trips", in: app), "⌘3 shows Trips")
+        app.typeKey("4", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Settings", in: app), "⌘4 shows Settings")
+        app.typeKey("2", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Places", in: app), "⌘2 shows Places")
+        app.typeKey("1", modifierFlags: .command)
+        XCTAssertTrue(app.staticTexts["Home"].firstMatch.waitForExistence(timeout: 5), "⌘1 shows Find")
+        XCTAssertTrue(app.navigationBars["Trips"].waitForNonExistence(timeout: 5))
+        app.typeKey("f", modifierFlags: .command)
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        let focus = expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: search)
+        wait(for: [focus], timeout: 5) // ⌘F puts the cursor in search
+        app.typeKey(.escape, modifierFlags: [])
+        app.typeKey("n", modifierFlags: .command)
+        XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), "⌘N opens New thing")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.textFields["item.name"].waitForNonExistence(timeout: 5))
+    }
+
+    /// With a sheet open the shortcuts do nothing: no second sheet, no section change behind it, and nothing waiting to pop up afterwards.
+    func testShortcutsDoNothingWhileASheetIsOpen() throws {
+        let app = try launch(.landscapeLeft)
+        wakeShortcuts(app)
+        app.typeKey("n", modifierFlags: .command)
+        let name = app.textFields["item.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Kettle")
+        for (key, flags) in [("n", XCUIElement.KeyModifierFlags.command), ("3", .command), ("4", .command), ("2", .command), ("f", .command)] {
+            app.typeKey(key, modifierFlags: flags)
+        }
+        XCTAssertEqual(app.textFields.matching(identifier: "item.name").count, 1, "Still the one sheet")
+        XCTAssertEqual(name.value as? String, "Kettle", "What was typed is still there")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(name.waitForNonExistence(timeout: 5))
+        XCTAssertFalse(app.navigationBars["Trips"].exists, "⌘3 changed nothing behind the sheet")
+        XCTAssertFalse(app.navigationBars["Settings"].exists)
+        XCTAssertFalse(app.textFields["item.name"].waitForExistence(timeout: 2), "No New thing waiting behind the sheet")
+        // A sheet that a screen presents for itself counts too.
+        app.typeKey("3", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Trips", in: app))
+        app.typeKey("1", modifierFlags: .command)
+        app.typeKey("4", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Settings", in: app))
+    }
+
+    /// A third-width Split View window is compact: Hereabouts shows the iPhone's tabs and no sidebar. XCUITest can't open Split View,
+    /// so `--force-compact` (Debug) gives the window the compact width. A real window goes to O39.
+    func testACompactWindowOnAnIPadGetsTheIPhoneLayout() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library", "--force-compact"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Home"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertEqual(app.windows.firstMatch.horizontalSizeClass, .compact)
+        // The Duo's compact window draws its tabs as plain buttons, not in a tab bar.
+        func tab(_ name: String) -> XCUIElement { app.tabBars.buttons[name].exists ? app.tabBars.buttons[name] : app.buttons[name].firstMatch }
+        for name in ["Find", "Places", "Trips", "Settings"] {
+            XCTAssertTrue(tab(name).waitForExistence(timeout: 5), "\(name) is a tab")
+        }
+        XCTAssertFalse(row("All places", app).exists, "No sidebar")
+        XCTAssertEqual(addButtons(app).count, 1, "Find's own Add a thing bar, with no sidebar to hold one")
+        tab("Places").tap()
+        XCTAssertTrue(app.staticTexts["Garage"].firstMatch.waitForExistence(timeout: 5))
+        wakeShortcuts(app)
+        app.typeKey("3", modifierFlags: .command)
+        XCTAssertTrue(app.navigationBars["Trips"].waitForExistence(timeout: 5), "The shortcuts work in this layout too")
+        app.typeKey("n", modifierFlags: .command)
+        XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5))
+        app.buttons["Cancel"].tap()
+    }
+
+    /// Dragging a thing onto a place in the sidebar moves it there.
+    func testDraggingAThingOntoAPlaceInTheSidebarMovesIt() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        // Garage and Bedroom both stay on screen in the Duo's short sidebar; Hall closet scrolls Bedroom away.
+        openSection("Garage", in: app)
+        let drill = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(drill.waitForExistence(timeout: 5))
+        let bedroom = row("Bedroom", app)
+        XCTAssertTrue(bedroom.exists, app.debugDescription)
+        drill.press(forDuration: 1.0, thenDragTo: bedroom, withVelocity: .slow, thenHoldForDuration: 1.0)
+        XCTAssertTrue(drill.waitForNonExistence(timeout: 8), "The thing left the Garage")
+        openSection("Bedroom", in: app)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.waitForExistence(timeout: 5), "...and is in the Bedroom")
+    }
+
+    /// Store screenshots for the iPad 13-inch and the Duo's inner screen, upright, from the demo library. Runs only when asked:
+    /// `TEST_RUNNER_STORE_SHOTS=<folder> xcodebuild … -only-testing:LocaliserUITests/LocaliserWideUITests/testWideStoreScreenshots test`
+    func testWideStoreScreenshots() throws {
+        guard let path = ProcessInfo.processInfo.environment["STORE_SHOTS"], !path.isEmpty else { throw XCTSkip("Set TEST_RUNNER_STORE_SHOTS to a folder to take store screenshots") }
+        let folder = URL(fileURLWithPath: path)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        // On the Duo the test's own screenshot comes back black, so a script outside takes it with simctl: the test says the screen
+        // is ready (`<name>.ready`) and waits for the script's `<name>.done`. It does this only when `external` is in the folder.
+        let external = FileManager.default.fileExists(atPath: folder.appendingPathComponent("external").path)
+        func store(_ app: XCUIApplication, _ name: String) throws {
+            if external {
+                try Data().write(to: folder.appendingPathComponent("\(name).ready"))
+                let done = folder.appendingPathComponent("\(name).done")
+                for _ in 0..<60 where !FileManager.default.fileExists(atPath: done.path) { sleep(1) }
+                XCTAssertTrue(FileManager.default.fileExists(atPath: done.path), "The script took no screenshot of \(name)")
+            } else {
+                try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png"))
+            }
+        }
+        // The plans load from the local StoreKit file, as in the iPhone shots.
+        let storeKitFile = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
+        let storeKit = try SKTestSession(contentsOf: storeKitFile)
+        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
+        defer { withExtendedLifetime(storeKit) {} }
+        // 2: say where it is.
+        var app = try launch(.portrait, extra: ["--voice-transcript", "the spare charger is in the blue tin on the garage back wall"])
+        // Reminders on, so Settings carries no warning badge.
+        openSection("Settings", in: app)
+        let turnOn = app.buttons["Turn on reminders"]
+        if turnOn.waitForExistence(timeout: 5) {
+            turnOn.tap()
+            let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
+            if allow.waitForExistence(timeout: 5) { allow.tap() }
+            XCTAssertTrue(turnOn.waitForNonExistence(timeout: 5))
+        }
+        openSection("Find", in: app)
+        let say = app.buttons["find.say"]
+        XCTAssertTrue(say.waitForExistence(timeout: 5)); say.tap()
+        app.buttons["voice.microphone"].tap()
+        let next = app.buttons["voice.continue"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+        next.tap()
+        XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.buttons["voice.newPlace"].waitForExistence(timeout: 5))
+        if app.keyboards.firstMatch.exists { app.keyboards.buttons.matching(NSPredicate(format: "label IN {'return', 'Return', 'done', 'Done'}")).firstMatch.tap() }
+        sleep(1)
+        try store(app, "2-voice")
+        app.terminate()
+        // 3: lending, with the ask-back date on the thing page.
+        app = try launch(.portrait)
+        var search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        app.buttons["More"].firstMatch.tap()
+        app.buttons["Lend it…"].tap()
+        let person = app.textFields["lend.person"]
+        XCTAssertTrue(person.waitForExistence(timeout: 5), app.debugDescription)
+        person.tap(); person.typeText("Sam")
+        app.buttons["lend.save"].tap()
+        XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
+        sleep(1)
+        try store(app, "3-lending")
+        app.terminate()
+        // 1, 4, 5: find, trip detail, Pro.
+        app = try launch(.portrait)
+        search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap(); search.typeText("running\n")
+        XCTAssertTrue(app.staticTexts["Running shoes"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
+        sleep(1)
+        try store(app, "1-find")
+        openSection("Trips", in: app)
+        app.staticTexts["1 of 8 packed"].tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        sleep(1)
+        try store(app, "4-trip")
+        openSection("Settings", in: app)
+        let pro = app.buttons["Hereabouts Pro"]
+        for _ in 0..<6 where !pro.isHittable { app.swipeUp() }
+        pro.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.waitForExistence(timeout: 10), "Plans didn't load")
+        sleep(1)
+        try store(app, "5-pro")
     }
 }

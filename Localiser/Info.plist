@@ -83,5 +83,18 @@
 			<string>hereabouts://putaway</string>
 		</dict>
 	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsToTypes</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>A Hereabouts thing</string>
+			<key>UTTypeIdentifier</key>
+			<string>dev.hereabouts.app.thing</string>
+		</dict>
+	</array>
 </dict>
 </plist>

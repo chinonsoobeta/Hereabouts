@@ -51,6 +51,57 @@ struct LocaliserApp: App {
             }
             .environment(reminders)
             .tint(Theme.purple)
+            #if DEBUG
+            .background { if ProcessInfo.processInfo.arguments.contains("--force-compact") { CompactWindow() } }
+            #endif
+        }
+        .commands { HereaboutsCommands() }
+    }
+}
+
+#if DEBUG
+/// UI tests on an iPad: `--force-compact` gives the window the compact width a third-width Split View window or Slide Over has.
+private struct CompactWindow: UIViewRepresentable {
+    final class Probe: UIView {
+        override func didMoveToWindow() { super.didMoveToWindow(); window?.traitOverrides.horizontalSizeClass = .compact }
+    }
+    func makeUIView(context: Context) -> Probe { Probe() }
+    func updateUIView(_ view: Probe, context: Context) {}
+}
+#endif
+
+/// Which layout a window gets. Every iPad window, in any Split View, Slide Over or Stage Manager size, and the Duo's inner
+/// screen get the sidebar layout while the system says the width is regular, and the iPhone's tabs whenever it is compact.
+enum WindowLayout {
+    static func isWide(_ horizontal: UserInterfaceSizeClass?) -> Bool { horizontal == .regular }
+}
+
+/// What the menu bar and the hardware keyboard do in the window that has focus.
+struct WindowShortcuts {
+    var newThing: () -> Void
+    var search: () -> Void
+    var show: (AppTab) -> Void
+}
+
+extension FocusedValues {
+    @Entry var windowShortcuts: WindowShortcuts?
+}
+
+/// New thing (⌘N), search (⌘F) and the four sections (⌘1 to ⌘4), in the iPadOS menu bar and the ⌘-hold overlay.
+struct HereaboutsCommands: Commands {
+    @FocusedValue(\.windowShortcuts) private var shortcuts
+
+    var body: some Commands {
+        CommandGroup(replacing: .newItem) {
+            Button("New thing") { shortcuts?.newThing() }.keyboardShortcut("n")
+        }
+        CommandMenu("Go") {
+            Button("Search") { shortcuts?.search() }.keyboardShortcut("f")
+            Divider()
+            Button("Find") { shortcuts?.show(.find) }.keyboardShortcut("1")
+            Button("Places") { shortcuts?.show(.places) }.keyboardShortcut("2")
+            Button("Trips") { shortcuts?.show(.packing) }.keyboardShortcut("3")
+            Button("Settings") { shortcuts?.show(.settings) }.keyboardShortcut("4")
         }
     }
 }
@@ -125,6 +176,9 @@ enum ItemSheet: Hashable, Identifiable {
     /// Whether the wide layout's sidebar is showing. Find draws its own Add a thing bar only when it isn't.
     var sidebar = NavigationSplitViewVisibility.all
 
+    /// Whether a sheet that the window itself presents is open.
+    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || ritual != nil || itemSheet != nil || upgrading }
+
     var tab: AppTab {
         get { destination.tab }
         set { destination = Destination(tab: newValue, keeping: destination) }
@@ -195,7 +249,8 @@ struct RootView: View {
     @State private var pro = ProAccess()
     @State private var ui = WindowState()
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = false
-    private var wide: Bool { sizeClass == .regular }
+    @State private var dropTarget: UUID?
+    private var wide: Bool { WindowLayout.isWide(sizeClass) }
 
     var body: some View {
         @Bindable var ui = ui
@@ -275,6 +330,28 @@ struct RootView: View {
         // Last, so the sheets and the cover above are inside it and see these too.
         .environment(pro)
         .environment(self.ui)
+        .focusedSceneValue(\.windowShortcuts, shortcuts)
+    }
+
+    /// The keyboard shortcuts do nothing while anything is presented over the window: one of its own sheets, the
+    /// introduction, or a sheet, alert or cover that a screen presents for itself.
+    private var shortcuts: WindowShortcuts {
+        func allowed() -> Bool { seenOnboarding && !ui.sheetOpen && !Self.somethingIsPresented() }
+        return WindowShortcuts(
+            newThing: { if allowed() { ui.newThing = NewThing() } },
+            search: { if allowed() { open(.find) } },
+            show: { tab in if allowed() { ui.tab = tab } })
+    }
+
+    /// Whether UIKit has a sheet, alert or cover up in the active window. A search that is open is not one: it is how
+    /// the search field is shown, and the shortcuts still work while someone is searching.
+    static func somethingIsPresented() -> Bool {
+        func presenting(_ controller: UIViewController) -> Bool {
+            if let shown = controller.presentedViewController, !(shown is UISearchController) { return true }
+            return controller.children.contains(where: presenting)
+        }
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first { $0.activationState == .foregroundActive }
+        return scene?.keyWindow?.rootViewController.map(presenting) ?? false
     }
 
     /// Four tabs: every iPhone, and the Duo's outer screen.
@@ -323,7 +400,23 @@ struct RootView: View {
             if let count { Spacer(minLength: 8); Text("\(count)").foregroundStyle(Theme.secondary) }
         }
         .tag(destination)
-        .listRowBackground(ui.destination == destination ? Theme.highlighter : Color.clear)
+        .listRowBackground(ui.destination == destination || isDropTarget(destination) ? Theme.highlighter : Color.clear)
+    }
+
+    private func isDropTarget(_ destination: Destination) -> Bool {
+        if case .place(let id) = destination { return dropTarget == id }
+        return false
+    }
+
+    /// A place in the sidebar takes the things dropped on it and moves them there, as the Move sheet would.
+    private func placeRow(_ place: Place) -> some View {
+        row(.place(place.id), place.name, PlaceTile.symbol(for: place.name), count: place.activeItemCount)
+            .dropDestination(for: ThingDrag.self) { drops, _ in
+                do { return try store.moveDropped(drops.map(\.id), to: place) > 0 }
+                catch { reminders.error = error.localizedDescription; return false }
+            } isTargeted: { over in
+                if over { dropTarget = place.id } else if dropTarget == place.id { dropTarget = nil }
+            }
     }
 
     private var sidebar: some View {
@@ -336,7 +429,7 @@ struct RootView: View {
             row(.settings, String(localized: "Settings"), "gear")
             Section("Places") {
                 row(.places, String(localized: "All places"), "shippingbox")
-                ForEach(places) { place in row(.place(place.id), place.name, PlaceTile.symbol(for: place.name), count: place.activeItemCount) }
+                ForEach(places) { place in placeRow(place) }
             }
             if !trips.isEmpty {
                 Section("Coming up") { ForEach(trips) { trip in row(.trip(trip.id), trip.name, "suitcase") } }
