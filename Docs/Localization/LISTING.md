@@ -33,7 +33,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 > PRÊTER UN OBJET
 > Notez qui a votre perceuse. Choisissez une date pour la réclamer. Recevez un rappel ce jour-là.
 >
-> DIRE OÙ (SI LES NOTES VOCALES SONT INCLUSES)
+> DIRE OÙ
 > Maintenez le micro ou touchez Dire où sur le widget. Dites où se trouve l’objet, puis vérifiez l’objet et l’endroit avant d’enregistrer. Hereabouts vous écoute sur votre iPhone et ne garde pas l’enregistrement. Rien n’est enregistré avant que vous touchiez. En anglais uniquement pour l’instant.
 >
 > PRÉPARER UN VOYAGE
@@ -84,7 +84,7 @@ Same as French, with these changes for Canadian readers:
 > PRESTAR UN OBJETO
 > Anota quién tiene tu taladro. Elige una fecha para pedir que te lo devuelvan. Recibe un recordatorio ese día.
 >
-> DECIR DÓNDE (SI SE INCLUYEN LAS NOTAS DE VOZ)
+> DECIR DÓNDE
 > Mantén pulsado el micrófono o toca Decir dónde en el widget. Di dónde está el objeto y revisa el objeto y el lugar antes de guardar. Hereabouts te escucha en tu iPhone y no conserva la grabación. No se guarda nada hasta que tocas. Por ahora solo en inglés.
 >
 > PREPARAR UN VIAJE
@@ -135,7 +135,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 > EMPRESTAR UM OBJETO
 > Anote quem está com sua furadeira. Escolha uma data para pedir de volta. Receba um lembrete nesse dia.
 >
-> DIZER ONDE (SE AS ANOTAÇÕES POR VOZ FOREM INCLUÍDAS)
+> DIZER ONDE
 > Mantenha o microfone pressionado ou toque em Dizer onde no widget. Diga onde está o objeto e confira o objeto e o lugar antes de salvar. O Hereabouts ouve você no seu iPhone e não guarda a gravação. Nada é salvo até você tocar. Só em inglês por enquanto.
 >
 > FAZER A MALA
@@ -161,4 +161,5 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 
 - Lifetime is shown in the app as "À vie" (French), "De por vida" (Spanish) and "Vitalício" (Portuguese); the listings use the same words. The App Store Connect product display names should match.
 - The Canadian French and Mexican Spanish entries reuse the main translation with the listed changes; a native reviewer should look at both before publishing.
-- Review the voice paragraph against the shipped build in each language: the voice parser understands English only.
+- Review the voice paragraph against the shipped build in each language: the voice parser understands English only. Voice ships (owner, 8 November); the paragraph is in all seven descriptions in App Store Connect.
+- The product display names in App Store Connect match: "Hereabouts Pro À vie / Annuel / Mensuel", "Hereabouts Pro De por vida / Anual / Mensual" and "Hereabouts Pro Vitalício / Anual / Mensal" (saved 8 November).

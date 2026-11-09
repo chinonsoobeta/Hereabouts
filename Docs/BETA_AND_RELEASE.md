@@ -10,7 +10,7 @@ Start with a small consented group of household organizers, frequent shoppers an
 | --- | --- | --- |
 | Save one real item | Save by name, optionally choose a place, find it again after a restart | Time, search phrase, whether help was needed |
 | Find after moving | Move an item or a box and find its new place | Wrong or ambiguous suggestions, corrections |
-| Say it | Hold the microphone (if voice memos ship), say where a thing is, check the name and place, save | Wrong names or places, corrections, whether a place was ever filled in unseen |
+| Say it | Hold the microphone, say where a thing is, check the name and place, save | Wrong names or places, corrections, whether a place was ever filled in unseen |
 | Lend and get it back | Lend a thing with an ask-back date, get the reminder, mark it back | Reminder timing, wrong names, accidental archiving |
 | Complete a packing cycle | Plan a trip from a kit, pack, check off tasks, "I'm leaving", "I'm coming home", put things back, "Finish trip" | Missing rows, quantities, unresolved things |
 | Recover a library | Back up with selected files, restore into a fresh install | Record counts, attachments, trip progress |
@@ -78,7 +78,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > LEND A THING
 > Write down who has your drill. Choose a date to ask for it back. Get a reminder that day.
 >
-> SAY WHERE (IF VOICE MEMOS SHIP)
+> SAY WHERE
 > Hold the microphone or tap Say where on the widget. Say "the spare key's in the blue tin on the hall shelf". Check the thing and place before you save. Hereabouts hears you on your iPhone. It doesn't keep the recording. Nothing is saved until you tap. English only for now.
 >
 > PACK FOR A TRIP
@@ -98,7 +98,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 >
 > Your subscription renews automatically unless you cancel at least 24 hours before the period ends. To manage or cancel it, open the Settings app. Tap your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereaboutsapp.com/privacy.
 
-Leave the voice paragraph out if voice memos don't ship (voice rule, `RELEASE_PLAN.md` section 1). The listing carries no price, because prices differ by country. Description and subtitle are for the owner to approve in O7, after the wording pass.
+Voice memos ship (owner, 8 November), so the voice paragraph stays. The listing carries no price, because prices differ by country. Description and subtitle are for the owner to approve in O7, after the wording pass.
 
 Before publishing, check each sentence against the shipped build. Do not claim sync, sharing between people or guaranteed reminders.
 
@@ -107,12 +107,12 @@ Before publishing, check each sentence against the shipped build. Do not claim s
 Use the demo library with the Debug-only launch argument `--demo-library` on the 6.9-inch iPhone 17 Pro Max simulator. App Store Connect scales the 6.9-inch set for smaller iPhones, so no 6.5-inch set is needed. Light mode, default text size, status bar at 9:41.
 
 1. **Find** showing "Running shoes" and its place path. Caption: "Find your things by place".
-2. **Voice memo** with the heard sentence and the filled-in Put away screen (if voice memos ship). Caption: "Say where it is. Check it. Save it."
+2. **Voice memo** with the heard sentence and the filled-in Put away screen. Caption: "Say where it is. Check it. Save it."
 3. **Lending** showing a lent thing with its ask-back date. Caption: "Know who to ask for it back".
 4. **Trip detail** with packing progress. Caption: "Reuse your packing list".
 5. **Pro screen** (Settings tab, Hereabouts Pro), with no price visible that isn't the App Store's. Caption: "No account. Always yours to export".
 
-If voice memos don't ship, drop shot 2 and keep four.
+Voice memos ship (owner, 8 November), so shot 2 stays.
 
 Simulator QA screenshots in `Docs/Verification` are not store screenshots. Remove any real names or numbers from documents shown on screen.
 
