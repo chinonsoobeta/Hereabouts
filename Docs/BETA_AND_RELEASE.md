@@ -126,7 +126,7 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 >
 > Pro includes automatic weekly backups of the whole notebook. They're on by default and go to the person's own iCloud Drive, or the device if iCloud Drive is off. The newest five are kept. Subscriptions also include regular updates. Household sharing is planned for version 1.1. If Pro ends, saved data remains visible, editable and exportable.
 >
-> To reach the paywall, open Settings at the bottom right, then tap Hereabouts Pro. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
+> To reach the paywall, open Settings (the tab at the bottom right on iPhone, or in the sidebar on iPad), then tap Hereabouts Pro. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
 >
 > Shelf photos and voice understanding use Apple's on-device model on devices that support Apple Intelligence. On other devices, the app uses simpler rules. Voice memos are transcribed on the device with Apple's Speech framework. The recording isn't kept. Nothing is saved until the person taps Save.
 >
