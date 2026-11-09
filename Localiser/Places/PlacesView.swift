@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PlacesView: View {
     @Environment(LocaliserStore.self) private var store
-    @State private var adding = false
+    @Environment(WindowState.self) private var ui
     @State private var error: String?
     @State private var printing = false
     @State private var scanning = false
@@ -32,13 +32,13 @@ struct PlacesView: View {
                 if store.placesHere.isEmpty {
                     LibraryEmptyState(title: String(localized: "Where do you keep things?"), systemImage: "house", description: String(localized: "Add a room, then the drawers, shelves and boxes inside it."))
                     quickStart(starters)
-                    Button("Add a place") { adding = true }.buttonStyle(PrimaryButtonStyle())
+                    Button("Add a place") { ui.addingPlace = true }.buttonStyle(PrimaryButtonStyle())
                 } else {
                     VStack(spacing: 0) {
                         ForEach(rooms) { place in
                             NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
                         }
-                        NewPlaceTile { adding = true }
+                        NewPlaceTile { ui.addingPlace = true }
                     }
                     // Quick start stays for the first few rooms, so more than one can be picked.
                     if rooms.count < 3, !unusedStarters.isEmpty { quickStart(unusedStarters) }
@@ -60,9 +60,8 @@ struct PlacesView: View {
                     if LabelScanner.isAvailable { Button("Scan a label", systemImage: "qrcode.viewfinder") { scanning = true } }
                 } label: { Image(systemName: "qrcode") }.accessibilityLabel("Box labels")
             }
-            Button("Add a place", systemImage: "plus") { adding = true }
+            Button("Add a place", systemImage: "plus") { ui.addingPlace = true }
         }
-        .sheet(isPresented: $adding) { NavigationStack { PlaceEditor() } }
         .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: []) } }
         .fullScreenCover(isPresented: $scanning) {
             NavigationStack {
@@ -182,13 +181,14 @@ struct PlaceEditor: View {
 struct PlaceDetailView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
+    @Environment(WindowState.self) private var ui
+    @Environment(\.picksThingsBeside) private var picksThingsBeside
     let place: Place
     /// Opened by scanning its label: lead with putting things in.
     var fromLabel = false
     @State private var editing = false
     @State private var printing = false
     @State private var adding = false
-    @State private var addingItem = false
     @State private var deleting = false
     @State private var movingHome = false
     @State private var error: String?
@@ -199,6 +199,9 @@ struct PlaceDetailView: View {
         store.items.filter { !$0.archived && ($0.place.map { $0.isWithin(place) } ?? false) }
             .sorted { ($0.place == place ? 0 : 1, $0.name) < ($1.place == place ? 0 : 1, $1.name) }
     }
+
+    private var addThing: some View { Button("Add a thing", systemImage: "plus") { ui.newThing = NewThing(placeID: place.id) }.buttonStyle(SoftButtonStyle(compact: true)) }
+    private var addPlace: some View { Button("Add a place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true)) }
 
     var body: some View {
         let _ = store.revision
@@ -212,12 +215,13 @@ struct PlaceDetailView: View {
                         Text(count == 1 ? "1 thing" : "\(count) things").font(.wbCaption).foregroundStyle(Theme.purpleInk)
                     }.plainRow()
                     if fromLabel {
-                        Button("Put things in this box", systemImage: "tray.and.arrow.down") { addingItem = true }
+                        Button("Put things in this box", systemImage: "tray.and.arrow.down") { ui.newThing = NewThing(placeID: place.id) }
                             .buttonStyle(PrimaryButtonStyle()).plainRow()
                     }
-                    HStack(spacing: 10) {
-                        Button("Add a thing", systemImage: "plus") { addingItem = true }.buttonStyle(SoftButtonStyle(compact: true))
-                        Button("Add a place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true))
+                    // Stacked in the narrow column beside the things, where two soft buttons would wrap their words.
+                    Group {
+                        if picksThingsBeside { VStack(alignment: .leading, spacing: 10) { addThing; addPlace } }
+                        else { HStack(spacing: 10) { addThing; addPlace } }
                     }.plainRow()
                 }
                 if !place.children.isEmpty {
@@ -234,7 +238,15 @@ struct PlaceDetailView: View {
                         Text("Nothing here yet.").foregroundStyle(Theme.secondary)
                     }
                     ForEach(nestedItems) { item in
-                        NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item) }
+                        if picksThingsBeside {
+                            // On a wide screen the thing opens in the next column, and stays picked when the layout changes.
+                            Button { ui.selectedItem = item.id } label: { ItemRow(item: item).frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle()) }
+                                .buttonStyle(.plain)
+                                .listRowBackground(ui.selectedItem == item.id ? Theme.highlighter : Theme.sheet)
+                                .accessibilityAddTraits(ui.selectedItem == item.id ? .isSelected : [])
+                        } else {
+                            NavigationLink { ItemDetailView(item: item) } label: { ItemRow(item: item) }
+                        }
                     }
                 } header: { Text("Things here").foregroundStyle(Theme.secondary) }
                   footer: { if !place.children.isEmpty && !nestedItems.isEmpty { Text("You also see things in the places inside.").foregroundStyle(Theme.secondary) } }
@@ -256,7 +268,6 @@ struct PlaceDetailView: View {
         .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: [place]) } }
         .sheet(isPresented: $editing) { NavigationStack { PlaceEditor(place: place) } }
         .sheet(isPresented: $adding) { NavigationStack { PlaceEditor(parent: place) } }
-        .sheet(isPresented: $addingItem) { NavigationStack { ItemEditor(place: place) } }
         .sheet(isPresented: $movingHome) { NavigationStack { MoveToHomeSheet(subject: .place(place)) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? place.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
@@ -268,5 +279,20 @@ struct PlaceDetailView: View {
                  ?? "Things directly here will have no place set. Places inside it move to the top level. Nothing else is deleted.")
         }
         .alert("Couldn't delete", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
+    }
+}
+
+extension EnvironmentValues {
+    /// True inside the wide layout's places column, where picking a thing opens it in the column beside.
+    @Entry var picksThingsBeside = false
+}
+
+extension Place {
+    /// The room at the top of the places this one is inside. The wide layout lists these in its sidebar.
+    var topLevel: Place {
+        var current = self
+        var seen: Set<UUID> = [id]
+        while let parent = current.parent, seen.insert(parent.id).inserted { current = parent }
+        return current
     }
 }

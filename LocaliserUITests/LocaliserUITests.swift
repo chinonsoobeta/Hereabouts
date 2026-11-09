@@ -2,6 +2,11 @@ import XCTest
 import StoreKitTest
 
 @MainActor final class LocaliserUITests: XCTestCase {
+    /// These drive the compact layout's tab bar. An iPad shows the wide layout, which LocaliserWideUITests covers.
+    override func setUpWithError() throws {
+        if UIDevice.current.userInterfaceIdiom == .pad { throw XCTSkip("The iPhone tests drive the compact tab bar; the wide layout has its own tests.") }
+    }
+
     func testSettingsExportsAndProAreReachable() throws {
         continueAfterFailure = false
         let storeKit = try openLocalStoreKit()
@@ -889,4 +894,105 @@ import StoreKitTest
         XCTFail("Could not reach \(element)\n\(app.debugDescription)", file: file, line: line)
     }
 
+}
+
+/// M66: the wide layout (the Duo's inner screen and every iPad). Each test skips when the width is compact.
+@MainActor final class LocaliserWideUITests: XCTestCase {
+    private func launch(_ orientation: UIDeviceOrientation, demo: Bool = true) throws -> XCUIApplication {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = orientation
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString] + (demo ? ["--demo-library"] : [])
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Home"].firstMatch.waitForExistence(timeout: 10))
+        guard app.windows.firstMatch.horizontalSizeClass == .regular else { throw XCTSkip("This window is compact; the wide layout isn't shown.") }
+        sleep(2) // Let the turn finish before anything is photographed.
+        return app
+    }
+
+    private func audit(_ app: XCUIApplication) throws {
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription, .trait]) { issue in
+            print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero)")
+            // "Potentially inaccessible text" with no element is the audit's image scan guessing at the sheet's pale
+            // placeholder text behind the dimmed sidebar; it names nothing to fix. Everything that names an element fails.
+            return issue.auditType == .elementDetection && issue.element == nil
+        }
+    }
+
+    /// The screenshot is attached to the result. (Docs/Verification/M66 has simctl captures: a UI test's own screenshot
+    /// comes back unrotated and cropped when the device is turned.)
+    private func shot(_ app: XCUIApplication, _ orientation: UIDeviceOrientation, _ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot()); attachment.name = "\(orientation.isLandscape ? "landscape" : "portrait") \(name)"; attachment.lifetime = .keepAlways; add(attachment)
+    }
+
+    private var sidebarToggle: NSPredicate { NSPredicate(format: "label CONTAINS[c] 'sidebar'") }
+
+    /// Shows the sidebar when it is hidden. It stays hidden or shown between launches, so a test can't assume either.
+    private func showSidebar(_ app: XCUIApplication) {
+        if app.cells["Find"].exists { return }
+        let toggle = app.buttons.matching(sidebarToggle).firstMatch
+        if toggle.waitForExistence(timeout: 3) { toggle.tap() }
+        _ = app.cells["Find"].waitForExistence(timeout: 5)
+    }
+
+    /// Opens a sidebar entry. With the sidebar hidden, the tabs across the top reach Find, Trips and Settings; the rest need the sidebar.
+    private func openSection(_ name: String, in app: XCUIApplication) {
+        let cell = app.cells.matching(NSPredicate(format: "label BEGINSWITH %@", name)).firstMatch
+        if !cell.exists, ["Find", "Trips", "Settings"].contains(name), app.buttons[name].exists { app.buttons[name].firstMatch.tap(); return }
+        if !cell.exists { showSidebar(app) }
+        // The Duo's inner screen has no sidebar: the places are tabs down its edge, so a button reaches them.
+        let tab = app.buttons.matching(NSPredicate(format: "label == %@", name)).firstMatch
+        let target = cell.waitForExistence(timeout: 5) ? cell : tab
+        XCTAssertTrue(target.exists, "\(name) is in the sidebar or the tab bar")
+        target.tap()
+    }
+
+    private func walk(_ orientation: UIDeviceOrientation) throws {
+        let app = try launch(orientation)
+        if orientation.isLandscape { showSidebar(app) }
+        shot(app, orientation, "find"); try audit(app)
+        openSection("Trips", in: app)
+        XCTAssertTrue(app.navigationBars["Trips"].waitForExistence(timeout: 5)); shot(app, orientation, "trips"); try audit(app)
+        openSection("Settings", in: app)
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5)); shot(app, orientation, "settings"); try audit(app)
+        openSection("Garage", in: app)
+        let drill = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(drill.waitForExistence(timeout: 5), "A place shows its things")
+        shot(app, orientation, "places"); try audit(app)
+        drill.tap()
+        XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 5), "A picked thing opens")
+        XCTAssertFalse(app.staticTexts["Pick a thing"].exists, "The empty third column gave way to the thing")
+        shot(app, orientation, "thing"); try audit(app)
+        let add = app.buttons["Add a thing"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), "New thing opens")
+        shot(app, orientation, "new-thing"); try audit(app)
+        app.buttons["Cancel"].tap()
+    }
+
+    func testEverySectionAndAThingSideways() throws { try walk(.landscapeLeft) }
+    func testEverySectionAndAThingUpright() throws { try walk(.portrait) }
+
+    /// Rotating tears down and rebuilds the layout. The picked place and thing, the open sheet and what was typed stay.
+    func testSelectionAndSheetSurviveARotation() throws {
+        let app = try launch(.landscapeLeft)
+        openSection("Garage", in: app)
+        let drill = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(drill.waitForExistence(timeout: 5)); drill.tap()
+        XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 5))
+        let add = app.buttons["Add a thing"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5)); add.tap()
+        let name = app.textFields["item.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Kettle")
+        for orientation in [UIDeviceOrientation.portrait, .landscapeRight] {
+            XCUIDevice.shared.orientation = orientation
+            XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 8), "The sheet is still open after turning to \(orientation.rawValue)")
+            XCTAssertEqual(app.textFields["item.name"].value as? String, "Kettle")
+        }
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 5), "The picked thing is still open")
+        XCUIDevice.shared.orientation = .portrait
+        XCTAssertTrue(app.staticTexts["Cordless drill"].firstMatch.waitForExistence(timeout: 8), "...and after turning again")
+    }
 }

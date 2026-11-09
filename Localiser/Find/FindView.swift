@@ -5,19 +5,21 @@ import AppIntents
 
 struct FindView: View {
     @Environment(LocaliserStore.self) private var store
-    @State private var query = ""
-    @State private var newThing: NewThing?
+    /// The search, the modes, the sheets and the opened thing live in the window's state, so they survive the
+    /// layout swapping between tabs and sidebar when the Duo folds or an iPad window is resized.
+    @Environment(WindowState.self) private var ui
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @FocusState private var searchFocused: Bool
-    @State private var showArchived = false
-    @State private var putAway = false
-    @State private var addingPlace = false
-    @State private var openedItem: Belonging?
     @Environment(ReminderService.self) private var reminders
-    @State private var ritual: Ritual?
-    @State private var speaking = false
-    @State private var spoken: NewThing?
     @AppStorage(SiriTip.whereIs.key) private var whereIsTipDismissed = false
     @AppStorage(SiriTip.writeDown.key) private var writeDownTipDismissed = false
+
+    private var query: String { ui.query }
+    private var showArchived: Bool { ui.showArchived }
+    private var putAway: Bool { ui.putAway }
+    private var regular: Bool { sizeClass == .regular }
+    /// Find keeps one comfortable column on a wide screen.
+    static let readingWidth: CGFloat = 640
 
     private var results: [Belonging] {
         _ = store.revision
@@ -27,11 +29,15 @@ struct FindView: View {
     private var browsing: Bool { query.isEmpty && !putAway && !showArchived }
 
 
+    /// On a wide screen the Siri tips sit beside the streak card rather than above it.
+    private var tipsBesideStreak: Bool { regular && browsing && !store.items.isEmpty }
+
     var body: some View {
+        @Bindable var ui = ui
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 if browsing || store.items.isEmpty { titleCard }
-                if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting { siriTips }
+                if (browsing || store.items.isEmpty) && !SiriTip.hiddenForTesting && !tipsBesideStreak { siriTips }
                 if store.items.isEmpty {
                     LibraryEmptyState(title: String(localized: "Nothing here yet"), systemImage: "magnifyingglass", description: String(localized: "Write down a thing and where you keep it."))
                 } else if browsing {
@@ -46,7 +52,7 @@ struct FindView: View {
                     if results.isEmpty {
                         ContentUnavailableView.search(text: query)
                         if !putAway {
-                            Button("Write down where it is") { newThing = NewThing(name: query.trimmingCharacters(in: .whitespacesAndNewlines)) }
+                            Button("Write down where it is") { ui.newThing = NewThing(name: query.trimmingCharacters(in: .whitespacesAndNewlines)) }
                                 .buttonStyle(SoftButtonStyle()).accessibilityIdentifier("find.writeDown")
                         }
                     }
@@ -55,26 +61,30 @@ struct FindView: View {
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
+            .frame(maxWidth: regular ? Self.readingWidth : .infinity)
+            .frame(maxWidth: .infinity)
         }
         .background(Theme.ground)
-        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused { addBar } }
+        .safeAreaBar(edge: .bottom) { if (browsing || store.items.isEmpty) && !searchFocused { addBar.frame(maxWidth: regular ? Self.readingWidth : .infinity) } }
         .navigationTitle("Hereabouts")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(removing: .title)
-        .navigationDestination(item: $openedItem) { item in ItemDetailView(item: item) }
+        .navigationDestination(item: Binding(get: { ui.findItem.flatMap { id in store.items.first { $0.id == id } } }, set: { ui.findItem = $0?.id })) { item in ItemDetailView(item: item) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }
-            openedItem = store.items.first { $0.id == id }
+            // On a wide screen a thing with a place opens beside its place instead (RootView does that).
+            if regular, store.items.first(where: { $0.id == id })?.place != nil { return }
+            ui.findItem = store.items.first { $0.id == id }?.id
             store.openedItem = nil
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Where is…")
+        .searchable(text: $ui.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Where is…")
         .searchFocused($searchFocused)
         .onChange(of: store.findRequest, initial: true) { _, request in
             switch request {
             case .find?: searchFocused = true
-            case .new?: newThing = NewThing()
-            case .putAway?: newThing = NewThing(photoFirst: true)
-            case .say?: speaking = VoiceCapture.isAvailable()
+            case .new?: ui.newThing = NewThing()
+            case .putAway?: ui.newThing = NewThing(photoFirst: true)
+            case .say?: ui.speaking = VoiceCapture.isAvailable()
             default: return
             }
             store.findRequest = nil
@@ -82,31 +92,20 @@ struct FindView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Toggle("Show archived things", systemImage: "archivebox", isOn: $showArchived)
-                    Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $putAway)
+                    Toggle("Show archived things", systemImage: "archivebox", isOn: $ui.showArchived)
+                    Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $ui.putAway)
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
                 .popoverTip(PutAwayTip())
             }
             if VoiceCapture.isAvailable() {
-                ToolbarItem(placement: .topBarTrailing) { Button("Say where", systemImage: "mic") { speaking = true }.accessibilityIdentifier("find.say") }
+                ToolbarItem(placement: .topBarTrailing) { Button("Say where", systemImage: "mic") { ui.speaking = true }.accessibilityIdentifier("find.say") }
             }
         }
         .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
-        .sheet(item: $newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
-        .sheet(isPresented: $speaking, onDismiss: { if let spoken { newThing = spoken; self.spoken = nil } }) { NavigationStack { VoiceSheet { spoken = $0 } } }
-        .sheet(isPresented: $addingPlace) { NavigationStack { PlaceEditor() } }
-        .sheet(item: $ritual) { ritual in
-            NavigationStack {
-                switch ritual {
-                case .recap: RecapView(startStocktake: { Task { @MainActor in self.ritual = .stocktake } })
-                case .stocktake: StocktakeView()
-                }
-            }
-        }
         .onChange(of: reminders.openedRitual, initial: true) { _, value in
             guard let value, let opened = Ritual(rawValue: value) else { return }
-            ritual = opened
+            ui.ritual = opened
             reminders.openedRitual = nil
         }
     }
@@ -127,14 +126,14 @@ struct FindView: View {
 
     /// Wide and low on the screen, where a thumb reaches it. Touch and hold to start with a photo.
     private var addBar: some View {
-        Button { newThing = NewThing() } label: { Label("Add a thing", systemImage: "plus").fixedSize(horizontal: false, vertical: true) }
+        Button { ui.newThing = NewThing() } label: { Label("Add a thing", systemImage: "plus").fixedSize(horizontal: false, vertical: true) }
             .buttonStyle(PrimaryButtonStyle())
             .contextMenu {
-                Button("Start with a name", systemImage: "character.cursor.ibeam") { newThing = NewThing() }
-                Button("Start with a photo", systemImage: "camera") { newThing = NewThing(photoFirst: true) }
+                Button("Start with a name", systemImage: "character.cursor.ibeam") { ui.newThing = NewThing() }
+                Button("Start with a photo", systemImage: "camera") { ui.newThing = NewThing(photoFirst: true) }
             }
             .accessibilityHint("Touch and hold to start with a photo")
-            .accessibilityAction(named: "Start with a photo") { newThing = NewThing(photoFirst: true) }
+            .accessibilityAction(named: "Start with a photo") { ui.newThing = NewThing(photoFirst: true) }
             .padding(.horizontal, 20).padding(.vertical, 8)
     }
 
@@ -145,7 +144,16 @@ struct FindView: View {
 
     @ViewBuilder private var dashboard: some View {
         HomeSwitcher()
-        RitualBanners { ritual = $0 }
+        if tipsBesideStreak {
+            HStack(alignment: .top, spacing: 12) {
+                if !SiriTip.hiddenForTesting && (!whereIsTipDismissed || !writeDownTipDismissed) {
+                    VStack(spacing: 12) { siriTips }.frame(maxWidth: .infinity)
+                }
+                RitualBanners { ui.ritual = $0 }.frame(maxWidth: .infinity, alignment: .leading)
+            }
+        } else {
+            RitualBanners { ui.ritual = $0 }
+        }
         if !store.missingItems.isEmpty {
             SectionHeading(title: String(localized: "Looking for")).padding(.top, 4)
             ForEach(store.missingItems) { item in itemCard(item) }
@@ -153,13 +161,13 @@ struct FindView: View {
         HStack {
             SectionHeading(title: String(localized: "Places"))
             Spacer()
-            if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink("All places") { PlacesView() }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
+            if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink { PlacesView() } label: { Text("All places").frame(minHeight: regular ? 44 : nil).contentShape(Rectangle()) }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
         VStack(spacing: 0) {
             ForEach(store.placesHere.filter { $0.parent == nil }.prefix(3)) { place in
                 NavigationLink { PlaceDetailView(place: place) } label: { PlaceTile(place: place) }.buttonStyle(.plain)
             }
-            NewPlaceTile { addingPlace = true }
+            NewPlaceTile { ui.addingPlace = true }
         }
         SectionHeading(title: String(localized: "Recently put away")).padding(.top, 8)
         let lately = results.filter { !store.hasSeveralHomes || $0.home == store.currentHome }.map { ($0, $0.movements.map(\.date).max() ?? $0.createdAt) }.sorted { $0.1 > $1.1 }.prefix(3).map(\.0)
@@ -306,8 +314,12 @@ struct ItemEditor: View {
         _isPrivate = State(initialValue: item?.isPrivate ?? false)
     }
 
-    var body: some View {
-        SheetForm {
+    /// The sheet's width decides the layout: two columns once it is wide enough, one column otherwise.
+    @State private var sheetWidth: CGFloat = 0
+    static let twoColumnWidth: CGFloat = 600
+    private var twoColumns: Bool { sheetWidth >= Self.twoColumnWidth }
+
+    private var photoSection: some View {
             Section {
                 Menu {
                     if CameraPicker.isAvailable { Button("Take photo", systemImage: "camera") { takingPhoto = true } }
@@ -338,6 +350,9 @@ struct ItemEditor: View {
                         .font(.subheadline).accessibilityIdentifier("item.several").padding(.horizontal, 20).padding(.vertical, 10)
                 }
             }.listRowBackground(Color.clear).listRowInsets(EdgeInsets())
+    }
+
+    private var nameSection: some View {
             Section {
                 TextField("Name", text: $name).focused($nameFocused).submitLabel(.done).onSubmit { nameFocused = false }.accessibilityIdentifier("item.name")
                 if name.count > TextLimit.name - 20 { counter(name, TextLimit.name) }
@@ -367,10 +382,16 @@ struct ItemEditor: View {
                     }
                 }
             } header: { Text("What is it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
+    }
+
+    private var placeSection: some View {
             Section {
                 PlacePicker(selection: $placeID, recent: item == nil ? store.recentPlaces() : [], home: item?.home)
                 if let spokenPlace, placeID == nil { NewPlaceSuggestion(spoken: spokenPlace) { placeID = $0 } }
             } header: { Text("Where do you keep it?").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
+    }
+
+    private var detailsSection: some View {
             Section {
                 TextField("Notes", text: $notes, axis: .vertical).lineLimit(2...8)
                 if notes.count > TextLimit.notes - 500 { counter(notes, TextLimit.notes) }
@@ -378,11 +399,27 @@ struct ItemEditor: View {
                 if aliases.count > TextLimit.aliases - 200 { counter(aliases, TextLimit.aliases) }
             } header: { Text("Optional details").font(.wbLabel).foregroundStyle(Theme.ink).textCase(nil) }
               footer: { Text("Add names you might search for, like \u{201C}ID\u{201D} for a passport.").foregroundStyle(Theme.secondary) }
+    }
+
+    private var privateSection: some View {
             Section {
                 Toggle("Keep private", isOn: $isPrivate).accessibilityIdentifier("item.private")
             } footer: { Text("Hidden from Spotlight, Siri, notifications and widgets. Included in backups and exports.").foregroundStyle(Theme.secondary) }
+    }
+
+    var body: some View {
+        Group {
+            if twoColumns {
+                HStack(alignment: .top, spacing: 0) {
+                    SheetForm { photoSection; nameSection }.groundBackground()
+                    SheetForm { placeSection; detailsSection; privateSection }.groundBackground()
+                }
+            } else {
+                SheetForm { photoSection; nameSection; placeSection; detailsSection; privateSection }.groundBackground()
+            }
         }
-        .groundBackground()
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { sheetWidth = $0 }
+        .presentationSizing(.page)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
                 if let left = freeLeft { Text(left).font(.wbCaption).foregroundStyle(Theme.pencil).frame(maxWidth: .infinity, alignment: .leading) }

@@ -51,3 +51,56 @@ final class AppLinkTests: XCTestCase {
     }
 
 }
+
+/// What is open in the window must outlive the layout swapping between tabs and sidebar (M66).
+@MainActor
+final class WindowStateTests: XCTestCase {
+    func testTabsKeepAnOpenPlaceTripOrKit() {
+        let id = UUID()
+        XCTAssertEqual(Destination.place(id).tab, .places)
+        XCTAssertEqual(Destination(tab: .places, keeping: .place(id)), .place(id))
+        XCTAssertEqual(Destination(tab: .packing, keeping: .trip(id)), .trip(id))
+        XCTAssertEqual(Destination(tab: .packing, keeping: .place(id)), .trips)
+        XCTAssertEqual(Destination(tab: .find, keeping: .kit(id)), .find)
+        let ui = WindowState()
+        ui.destination = .kit(id)
+        XCTAssertEqual(ui.tab, .packing)
+        ui.tab = .settings
+        XCTAssertEqual(ui.destination, .settings)
+    }
+
+    func testRevealOpensTheTopLevelPlaceWithTheThing() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let garage = try store.addPlace(name: "Garage")
+        let rack = try store.addPlace(name: "Rack", parent: garage)
+        let drill = try store.addItem(name: "Drill", place: rack)
+        XCTAssertEqual(rack.topLevel, garage)
+        let ui = WindowState()
+        ui.reveal(rack, item: drill.id)
+        XCTAssertEqual(ui.destination, .place(garage.id))
+        XCTAssertEqual(ui.selectedItem, drill.id)
+    }
+
+    func testStaleSelectionIsDroppedButLiveSelectionSurvives() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let kitchen = try store.addPlace(name: "Kitchen")
+        let garage = try store.addPlace(name: "Garage")
+        let kettle = try store.addItem(name: "Kettle", place: kitchen)
+        let ui = WindowState()
+        ui.reveal(kitchen, item: kettle.id)
+        ui.query = "ket"; ui.newThing = NewThing(name: "x"); ui.speaking = true
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.selectedItem, kettle.id)
+        XCTAssertEqual(ui.query, "ket")
+        XCTAssertNotNil(ui.newThing)
+        XCTAssertTrue(ui.speaking)
+        // The thing moves to another room: it is no longer the one beside the Kitchen.
+        try store.move(kettle, to: garage)
+        ui.dropStaleSelection(in: store)
+        XCTAssertNil(ui.selectedItem)
+        // The place itself is deleted: the window goes back to Find.
+        try store.deletePlace(kitchen, clearContents: true)
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.destination, .find)
+    }
+}

@@ -57,41 +57,134 @@ struct LocaliserApp: App {
 
 enum AppTab: Hashable { case find, places, packing, settings }
 
+/// Where the window is. The compact layout shows four tabs; the wide layout also lists each place, trip and kit.
+enum Destination: Hashable {
+    case find, search, places, place(UUID), trips, trip(UUID), kit(UUID), settings
+
+    /// The tab this destination belongs to, which is all the compact layout can show.
+    var tab: AppTab {
+        switch self {
+        case .find, .search: .find
+        case .places, .place: .places
+        case .trips, .trip, .kit: .packing
+        case .settings: .settings
+        }
+    }
+
+    /// Picking a tab keeps a place, trip or kit that is already open in it.
+    init(tab: AppTab, keeping current: Destination) {
+        if current.tab == tab { self = current; return }
+        switch tab {
+        case .find: self = .find
+        case .places: self = .places
+        case .packing: self = .trips
+        case .settings: self = .settings
+        }
+    }
+}
+
+/// What is open in the window, kept above the part of the view tree that swaps between the compact tabs and the
+/// wide sidebar. Folding the Duo or resizing an iPad window tears that part down, so nothing here may live inside it.
+@MainActor @Observable final class WindowState {
+    var destination = Destination.find
+    /// The thing open beside its place (wide) or over its place's things.
+    var selectedItem: UUID?
+    /// The thing open on Find.
+    var findItem: UUID?
+    var query = ""
+    var showArchived = false
+    var putAway = false
+    var newThing: NewThing?
+    var speaking = false
+    /// What the voice sheet heard, held until the sheet has gone and New thing can open.
+    var spoken: NewThing?
+    var addingPlace = false
+    var ritual: Ritual?
+
+    var tab: AppTab {
+        get { destination.tab }
+        set { destination = Destination(tab: newValue, keeping: destination) }
+    }
+
+    /// Opens a place in the wide layout, with the thing beside it if one is given.
+    func reveal(_ place: Place, item: UUID? = nil) {
+        destination = .place(place.topLevel.id)
+        selectedItem = item
+    }
+
+    /// Forgets what has been deleted or no longer belongs where it was picked.
+    func dropStaleSelection(in store: LocaliserStore) {
+        switch destination {
+        case .place(let id) where !store.placesHere.contains { $0.id == id }: destination = .find
+        case .trip(let id) where !store.tripsHere.contains { $0.id == id }: destination = .trips
+        case .kit(let id) where !store.kitsHere.contains { $0.id == id }: destination = .trips
+        default: break
+        }
+        if let id = selectedItem {
+            guard let item = store.items.first(where: { $0.id == id }), !item.isDeleted else { selectedItem = nil; return }
+            if case .place(let placeID) = destination, item.place?.topLevel.id != placeID { selectedItem = nil }
+        }
+        if let id = findItem, !store.items.contains(where: { $0.id == id }) { findItem = nil }
+    }
+}
+
 struct RootView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(ReminderService.self) private var reminders
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var pro = ProAccess()
-    @State var tab = AppTab.find
+    @State private var ui = WindowState()
     @AppStorage(OnboardingView.seenKey) private var seenOnboarding = false
+    private var wide: Bool { sizeClass == .regular }
+
     var body: some View {
-        TabView(selection: $tab) {
-            Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.places) { NavigationStack { PlacesView() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.packing) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.settings) { NavigationStack { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
-                .badge(reminders.coverageGap ? Text("!") : nil)
+        @Bindable var ui = ui
+        Group {
+            if wide { wideTabs } else { compactTabs }
         }
         .tint(Theme.purpleInk)
         .tipViewStyle(NotebookTipStyle())
         .tipBackground(Theme.lilacPaper)
-        .environment(pro)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {
             OnboardingView { seenOnboarding = true }.environment(pro)
         }
+        // These sheets are presented from here, above the layouts, so they stay open when the layout changes.
+        .sheet(item: $ui.newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
+        .sheet(isPresented: $ui.speaking, onDismiss: { if let spoken = ui.spoken { ui.newThing = spoken; ui.spoken = nil } }) { NavigationStack { VoiceSheet { ui.spoken = $0 } } }
+        .sheet(isPresented: $ui.addingPlace) { NavigationStack { PlaceEditor() } }
+        .sheet(item: $ui.ritual) { ritual in
+            NavigationStack {
+                switch ritual {
+                case .recap: RecapView(startStocktake: { Task { @MainActor in ui.ritual = .stocktake } })
+                case .stocktake: StocktakeView()
+                }
+            }
+        }
         .task { await pro.observeTransactions() }
         .task { await pro.refresh(); await backUpIfDue() }
-        .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store) }
+        .onChange(of: store.revision, initial: true) { _, _ in reminders.store = store; reminders.refresh(store.deadlines); reminders.refreshRituals(store); Spotlight.index(store); ui.dropStaleSelection(in: store) }
         .onChange(of: reminders.openedRitual) { _, ritual in
             switch ritual {
-            case "trip": tab = .packing; reminders.openedRitual = nil
-            case .some: tab = .find
+            case "trip": ui.tab = .packing; reminders.openedRitual = nil
+            case .some: ui.tab = .find
             case nil: break
             }
         }
-        .onChange(of: store.openedItem) { _, id in if id != nil { tab = .find } }
-        .onChange(of: seenOnboarding) { _, seen in if !seen { tab = .find } }
+        .onChange(of: store.openedItem) { _, id in
+            guard let id else { return }
+            // On a wide screen a thing with a place opens beside that place.
+            if wide, let item = store.items.first(where: { $0.id == id }), let place = item.place {
+                ui.reveal(place, item: id); store.openedItem = nil
+            } else { ui.tab = .find }
+        }
+        .onChange(of: ui.destination) { _, destination in
+            if destination == .search { ui.destination = .find; store.findRequest = .find }
+            // A different place starts with nothing picked.
+            if case .place(let id) = destination, let picked = ui.selectedItem, store.items.first(where: { $0.id == picked })?.place?.topLevel.id != id { ui.selectedItem = nil }
+        }
+        .onChange(of: seenOnboarding) { _, seen in if !seen { ui.tab = .find } }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let raw = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { store.openedItem = UUID(uuidString: raw) }
         }
@@ -111,6 +204,114 @@ struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange).receive(on: RunLoop.main)) { _ in
             do { try store.mergeOutsideChanges(); try store.refresh() } catch { reminders.error = error.localizedDescription }
         }
+        // Last, so the sheets and the cover above are inside it and see these too.
+        .environment(pro)
+        .environment(self.ui)
+    }
+
+    /// Four tabs: every iPhone, and the Duo's outer screen.
+    private var compactTabs: some View {
+        @Bindable var ui = ui
+        return TabView(selection: $ui.tab) {
+            Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.places) { NavigationStack { PlacesView() } } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.packing) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.settings) { NavigationStack { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
+                .badge(reminders.coverageGap ? Text("!") : nil)
+        }
+    }
+
+    /// A sidebar beside the content: the Duo's inner screen and every iPad.
+    private var wideTabs: some View {
+        @Bindable var ui = ui
+        let _ = store.revision
+        return TabView(selection: $ui.destination) {
+            Tab(value: Destination.search, role: .search) { Color.clear } label: { Label("Search", systemImage: "magnifyingglass") }
+            Tab(value: Destination.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "house") }
+            Tab(value: Destination.trips) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase") }
+            Tab(value: Destination.settings) { NavigationStack { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear") }
+                .badge(reminders.coverageGap ? Text("!") : nil)
+            TabSection("Places") {
+                Tab(value: Destination.places) { NavigationStack { PlacesView() } } label: { Label("All places", systemImage: "shippingbox") }
+                ForEach(store.placesHere.filter { $0.parent == nil }) { place in
+                    Tab(value: Destination.place(place.id)) { WidePlaceView(place: place) } label: { Label(place.name, systemImage: PlaceTile.symbol(for: place.name)) }
+                        .badge(place.activeItemCount)
+                }
+            }
+            .expandedByDefault()
+            TabSection("Coming up") {
+                ForEach(store.tripsHere.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay }) { trip in
+                    Tab(value: Destination.trip(trip.id)) { NavigationStack { TripDetailView(trip: trip) } } label: { Label(trip.name, systemImage: "suitcase") }
+                }
+            }
+            .expandedByDefault()
+            TabSection("Kits") {
+                ForEach(store.kitsHere) { kit in
+                    Tab(value: Destination.kit(kit.id)) { NavigationStack { KitDetailView(kit: kit) } } label: { Label(kit.name, systemImage: "checklist") }
+                }
+            }
+            .expandedByDefault()
+        }
+        .tabViewStyle(.sidebarAdaptable)
+        .tabViewSidebarHeader {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(store.currentHome?.name ?? Home.defaultName).font(.wbTitle).foregroundStyle(Theme.ink)
+                Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide))).font(.wbCaption).foregroundStyle(Theme.pencil)
+            }
+            .accessibilityElement(children: .combine)
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
+        }
+        .tabViewSidebarBottomBar {
+            Button { ui.newThing = NewThing() } label: { Label("Add a thing", systemImage: "plus").fixedSize(horizontal: false, vertical: true) }
+                .buttonStyle(PrimaryButtonStyle()).padding(12)
+        }
+    }
+}
+
+extension TabContent {
+    /// The sidebar opens its sections on iOS 27; earlier systems keep their own default.
+    @TabContentBuilder<TabValue> func expandedByDefault() -> some TabContent<TabValue> {
+        if #available(iOS 27, *) { defaultSectionExpansion(.expanded) } else { self }
+    }
+}
+
+/// A place's things, with the thing you pick opening in the column beside when the screen is wide enough
+/// and sliding over the things when it isn't.
+struct WidePlaceView: View {
+    @Environment(LocaliserStore.self) private var store
+    @Environment(WindowState.self) private var ui
+    let place: Place
+    /// The things column keeps this width when a third column fits.
+    static let thingsWidth: CGFloat = 410
+    static let splitWidth: CGFloat = 760
+
+    private var selected: Belonging? { ui.selectedItem.flatMap { id in store.items.first { $0.id == id } } }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let split = geometry.size.width >= Self.splitWidth
+            HStack(spacing: 0) {
+                NavigationStack {
+                    PlaceDetailView(place: place)
+                        .navigationDestination(item: Binding(get: { split ? nil : selected }, set: { if !split { ui.selectedItem = $0?.id } })) { ItemDetailView(item: $0) }
+                }
+                .frame(minWidth: split ? Self.thingsWidth : 0, maxWidth: split ? Self.thingsWidth : .infinity)
+                if split {
+                    Divider()
+                    detail.frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .environment(\.picksThingsBeside, true)
+    }
+
+    @ViewBuilder private var detail: some View {
+        if let selected {
+            NavigationStack { ItemDetailView(item: selected) }.id(selected.id)
+        } else {
+            LibraryEmptyState(title: String(localized: "Pick a thing"), systemImage: "shippingbox", description: String(localized: "It opens here."))
+                .frame(maxWidth: .infinity, maxHeight: .infinity).background(Theme.ground)
+        }
     }
 }
 
@@ -124,8 +325,10 @@ extension RootView {
     func open(_ link: AppLink) {
         switch link {
         case .item(let id): store.openedItem = id
-        case .place(let id): tab = .places; store.openedPlace = id
-        case .find, .new, .putAway, .say: tab = .find; store.findRequest = link
+        case .place(let id):
+            if wide, let place = store.places.first(where: { $0.id == id }) { ui.reveal(place) }
+            else { ui.tab = .places; store.openedPlace = id }
+        case .find, .new, .putAway, .say: ui.tab = .find; store.findRequest = link
         }
     }
 }

@@ -364,6 +364,11 @@ struct TripDetailView: View {
     @State private var notReady: String?
     @State private var lentPacking: TripEntry?
     @State private var error: String?
+    @State private var openedEntry: TripEntry?
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    /// On a wide screen a trip being packed lists what's left beside what's done.
+    private var sideBySide: Bool { sizeClass == .regular && trip.state == .packing }
+    private func isPacked(_ entry: TripEntry) -> Bool { entry.requiredCount == 0 || Int(entry.packedCount) >= entry.requiredCount }
     private var groups: [String] { Set(trip.entries.map { $0.item?.place?.path ?? String(localized: "Anywhere") }).sorted() }
     /// Says exactly what is left before the trip can be marked away.
     private var departureBlocker: String? {
@@ -394,9 +399,18 @@ struct TripDetailView: View {
             if trip.state == .packing {
                 Section { Button("Add something to pack", systemImage: "plus") { adding = true } }
             }
-            ForEach(groups, id: \.self) { group in
-                Section(group) {
-                    ForEach(trip.entries.filter { ($0.item?.place?.path ?? String(localized: "Anywhere")) == group }.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
+            if sideBySide {
+                Section {
+                    HStack(alignment: .top, spacing: 24) {
+                        packingColumn(String(localized: "Still to pack"), entries: trip.entries.filter { !isPacked($0) })
+                        packingColumn(String(localized: "Packed"), entries: trip.entries.filter { isPacked($0) })
+                    }.plainRow()
+                }
+            } else {
+                ForEach(groups, id: \.self) { group in
+                    Section(group) {
+                        ForEach(trip.entries.filter { ($0.item?.place?.path ?? String(localized: "Anywhere")) == group }.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
+                    }
                 }
             }
             if trip.state == .packing {
@@ -428,6 +442,7 @@ struct TripDetailView: View {
                 .accessibilityLabel("Trip options")
             }
         }
+        .navigationDestination(item: $openedEntry) { TripEntryDetailView(entry: $0) }
         .sheet(isPresented: $edit) { NavigationStack { TripEditor(trip: trip) } }
         .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("You keep its packing list. Your things stay in their places.") }
@@ -474,16 +489,28 @@ struct TripDetailView: View {
                 .buttonStyle(.borderless)
                 .accessibilityLabel(done ? "Unpack \(entry.title)" : "Pack \(entry.title)")
             }
-            NavigationLink { TripEntryDetailView(entry: entry) } label: {
-                VStack(alignment: .leading, spacing: 2) {
-                    NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? String(localized: "Not needed for this trip") : String(localized: "\(entry.packedCount) of \(entry.requiredCount) packed"))
-                    if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
-                    if let item = entry.item, item.isLent { Text("With \(item.lentTo)").font(.wbCaption).foregroundStyle(Theme.warning) }
-                    if entry.unlinked && entry.item == nil { Text("You deleted this thing. Its name stays on the list.").font(.wbCaption).foregroundStyle(Theme.secondary) }
-                    if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
-                }
+            let label = VStack(alignment: .leading, spacing: 2) {
+                NotebookLine(name: entry.title, detail: entry.requiredCount == 0 ? String(localized: "Not needed for this trip") : String(localized: "\(entry.packedCount) of \(entry.requiredCount) packed"))
+                if entry.item?.archived == true { Text("Archived or returned. Remove it or mark it no longer here.").font(.wbCaption).foregroundStyle(Theme.warning) }
+                if let item = entry.item, item.isLent { Text("With \(item.lentTo)").font(.wbCaption).foregroundStyle(Theme.warning) }
+                if entry.unlinked && entry.item == nil { Text("You deleted this thing. Its name stays on the list.").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                if trip.state == .comingHome, entry.packedCount > 0 { Text(entry.resolution?.title ?? "").font(.wbCaption).foregroundStyle(entry.resolution == .pending || entry.resolution == .unresolved ? Theme.warning : Theme.sageInk) }
+            }
+            if sideBySide {
+                // Inside a two-column row a link would claim the whole row, so each entry is its own button.
+                Button { openedEntry = entry } label: { label.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle()) }.buttonStyle(.plain)
+            } else {
+                NavigationLink { TripEntryDetailView(entry: entry) } label: { label }
             }
         }
+    }
+
+    private func packingColumn(_ title: String, entries: [TripEntry]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title).font(.wbTitle).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
+            ForEach(entries.sorted { $0.title < $1.title }) { entry in entryRow(entry) }
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
     private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
 }
