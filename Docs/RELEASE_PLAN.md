@@ -144,7 +144,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [x] **O25 Age rating.** Expect 4+. *Saved 8 November with the owner's OK: 4+ (see O20).*
 - [ ] **O26 URLs.** Privacy Policy and Support URLs. The Terms of Use line goes at the end of the description.
 - [x] **O27 Availability.** Turn off Mac and Apple Vision Pro for 1.0. *Done 8 November: both unticked under Pricing and Availability and saved (checked after a reload). iPhone and iPad stay on; iPad comes from the build (M67).*
-- [ ] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed.
+- [x] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed. *Pasted 9 November from `Docs/BETA_AND_RELEASE.md` (1,693 characters, with the iPad and Family Sharing lines), saved and checked after a reload. Paste again if the notes change.*
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
 - [x] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Privacy policy URL (hereaboutsapp.com/privacy) and marketing URL (hereaboutsapp.com) added the same day.*
 - [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
@@ -169,6 +169,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - On the lending shot, the history line says 6:56 PM while the status bar says 9:41.
   - Voice memos ship, so the voice shot is now `2-voice.png`.
   - The 13-inch iPad set from M67 (`Docs/Store/iPad-13`, 2064 × 2752) and the Duo set (`Docs/Store/Duo`, 2853 × 2007, the inner screen). The Pro shots now show "Share Pro with your family" and "2 weeks free".
+  - *Uploaded 9 November to English (U.S.), in order 1 to 5: the 6.9-inch set to "iPhone with Dynamic Island (large display)", the iPad set to "iPad 13-inch display" and the Duo set to "iPhone Duo". App Store Connect now lists the 6.1/6.3-inch iPhone (1206 × 2622) as the required size, and it fills that slot from the 6.9-inch set ("Using Existing Assets"). Not submitted. Points above are still yours; a change means a retake and a re-upload.*
 - [x] **O38 Codex's wording.** Read the before-and-after list from M41 and M42, and mark anything that doesn't sound like you. *Approved 7 November: "I'm happy with the wording."*
 - [ ] **O39 Physical-device checks**, one tick each:
   - [ ] iOS 26 on the smallest supported phone you can borrow, and phones with and without Apple Intelligence.
@@ -197,7 +198,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [ ] **O43** Invite each tester. External testers need O30 and Apple's beta review.
 - [ ] **O44** Upload each later build.
 - [ ] **O45** Submit 1.0 for review.
-- [ ] **O46** Release it, on manual release.
+- [ ] **O46** Release it, on manual release. *The version was set to manual release in App Store Connect on 9 November.*
 
 ## 5. Checklist B: everything else
 
