@@ -91,7 +91,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > Get one quiet recap on Sunday evenings. Once a month, check a few things you haven't looked at lately. You can turn off both reminders.
 >
 > ASK SIRI
-> Ask "Where is my passport?" to get an answer from your notebook. Write things down and put them away hands-free.
+> Ask "Where's my passport in Hereabouts?" to get an answer from your notebook. Write things down and put them away hands-free.
 >
 > FREE, OR PRO
 > Save 15 things, 1 kit and 2 homes for free. Pro removes the limits. Weekly notebook backups to your own iCloud Drive are on by default. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, you can still see, edit and export everything you saved.

@@ -46,7 +46,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 > Recevez un récapitulatif discret le dimanche soir. Une fois par mois, vérifiez quelques objets que vous n’avez pas regardés depuis un moment. Vous pouvez désactiver ces deux rappels.
 >
 > DEMANDER À SIRI
-> Demandez « Où est mon passeport ? » pour obtenir la réponse de votre carnet. Notez et rangez vos objets sans les mains.
+> Demandez « Où est mon passeport dans Hereabouts ? » pour obtenir la réponse de votre carnet. Notez et rangez vos objets sans les mains.
 >
 > GRATUIT, OU PRO
 > Enregistrez 15 objets, 1 kit et 2 maisons gratuitement. Pro supprime les limites. Les sauvegardes hebdomadaires du carnet dans votre propre iCloud Drive sont activées par défaut. Choisissez mensuel ou annuel avec deux semaines d’essai gratuit, ou achetez À vie une fois. Le partage avec votre foyer arrivera plus tard. Si Pro se termine, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré.
@@ -97,7 +97,7 @@ Same as French, with these changes for Canadian readers:
 > Recibe un resumen tranquilo el domingo por la tarde. Una vez al mes, revisa algunas cosas que hace tiempo que no miras. Puedes desactivar ambos recordatorios.
 >
 > PREGUNTAR A SIRI
-> Pregunta “¿Dónde está mi pasaporte?” para obtener la respuesta de tu libreta. Anota y guarda cosas sin usar las manos.
+> Pregunta “¿Dónde está mi pasaporte en Hereabouts?” para obtener la respuesta de tu libreta. Anota y guarda cosas sin usar las manos.
 >
 > GRATIS, O PRO
 > Guarda 15 objetos, 1 kit y 2 casas gratis. Pro quita los límites. Las copias semanales de la libreta en tu propio iCloud Drive están activadas de serie. Elige mensual o anual con dos semanas de prueba gratis, o compra De por vida una sola vez. Compartir con tu hogar llegará más adelante. Si Pro termina, puedes seguir viendo, editando y exportando todo lo que guardaste.
@@ -148,7 +148,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 > Receba um resumo tranquilo no domingo à noite. Uma vez por mês, confira algumas coisas que você não olha há algum tempo. Você pode desativar os dois lembretes.
 >
 > PERGUNTAR À SIRI
-> Pergunte “Onde está meu passaporte?” para ter a resposta do seu caderno. Anote e guarde coisas sem usar as mãos.
+> Pergunte “Onde está meu passaporte no Hereabouts?” para ter a resposta do seu caderno. Anote e guarde coisas sem usar as mãos.
 >
 > GRÁTIS, OU PRO
 > Salve 15 objetos, 1 kit e 2 casas grátis. O Pro tira os limites. Os backups semanais do caderno no seu próprio iCloud Drive vêm ativados. Escolha mensal ou anual com duas semanas de teste grátis, ou compre o Vitalício uma vez. O compartilhamento com a família chega depois. Se o Pro acabar, você ainda pode ver, editar e exportar tudo o que salvou.

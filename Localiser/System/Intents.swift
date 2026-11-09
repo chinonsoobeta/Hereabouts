@@ -72,7 +72,8 @@ struct ThingQuery: EntityStringQuery {
     /// Xcode's App Intents notes say the system serves about 1,000 expanded phrases per language and truncates beyond that.
     /// Seven phrases take a thing, so 100 names use 700 of them and leave room for the rest.
     static let cap = 100
-        static let shared = ShortcutParameters()
+    /// The app's own debouncer. A test makes its own, so the test host's saves don't add to its count.
+    static let shared = ShortcutParameters()
     static func schedule() { shared.schedule() }
 
     /// A restore or an import saves many times in a row; the system hears about it once, a moment after the last save.
