@@ -153,7 +153,19 @@ enum ItemSheet: Hashable, Identifiable {
 /// What is open in the window, kept above the part of the view tree that swaps between the compact tabs and the
 /// wide sidebar. Folding the Duo or resizing an iPad window tears that part down, so nothing here may live inside it.
 @MainActor @Observable final class WindowState {
-    var destination = Destination.find
+    /// Whether the window is showing the wide layout. Set by the root view.
+    var wide = false
+    var destination = Destination.find {
+        didSet {
+            guard wide, destination != oldValue else { return }
+            // The wide layout's Settings and place stacks have their paths bound to this state. SwiftUI quits the app if
+            // one is taken out of the detail column with a page still pushed, so the page goes in the same change.
+            // (The pages stay open across a fold or a resize: neither changes the destination.)
+            if oldValue == .settings { settingsPath = [] }
+            if case .place(let id) = oldValue { roomPaths[id] = nil }
+            forgetLabel()
+        }
+    }
     /// The thing open beside its place (wide) or over its place's things.
     var selectedItem: UUID?
     /// The thing open on Find.
@@ -191,62 +203,124 @@ enum ItemSheet: Hashable, Identifiable {
 
     /// Opens a place in the wide layout, with the thing beside it if one is given.
     func reveal(_ place: Place, item: UUID? = nil) {
-        destination = .place(place.topLevel.id)
+        let room = place.topLevel.id
+        destination = .place(room)
+        roomPaths[room] = nil
         selectedItem = item
+        labelled = nil
     }
 
-    /// A thing opened from a link, Spotlight, a reminder or the widget.
-    func openThing(_ id: UUID, wide: Bool, in store: LocaliserStore) {}
+    /// Opens a place inside its room in the wide layout, as the compact Places tab does: the places down to it are pushed.
+    func reveal(inside place: Place, fromLabel: Bool) {
+        let room = place.topLevel
+        destination = .place(room.id)
+        var down: [PlaceRoute] = []
+        var current: Place? = place
+        var seen: Set<UUID> = []
+        while let here = current, here.id != room.id, seen.insert(here.id).inserted { down.append(.place(here.id)); current = here.parent }
+        roomPaths[room.id] = down.isEmpty ? nil : down.reversed()
+        selectedItem = nil
+        labelled = fromLabel ? place.id : nil
+    }
 
-    /// A place opened from a link or a box label.
-    func openPlace(_ id: UUID, wide: Bool, in store: LocaliserStore) {}
+    /// A thing opened from a link, Spotlight, a reminder or the widget. On the compact layout Find takes it. On the wide
+    /// layout a thing with a place in this home opens beside that place, and any other opens in Find, where it is.
+    func openThing(_ id: UUID, wide: Bool, in store: LocaliserStore) {
+        guard wide, let item = store.items.first(where: { $0.id == id }) else { tab = .find; return }
+        if let place = item.place, store.placesHere.contains(place) { reveal(place, item: id) }
+        else { destination = .find; findItem = id }
+        store.openedItem = nil
+    }
 
-    /// The compact Places stack for what the wide layout has open: the room, the places down to the thing, then the thing.
+    /// A place opened from a link or a box label. On the compact layout the Places tab takes it. On the wide layout it opens
+    /// inside its room, in that place's home: the window moves to it if it is another home's.
+    func openPlace(_ id: UUID, wide: Bool, in store: LocaliserStore) {
+        guard wide, let place = store.places.first(where: { $0.id == id }) else { tab = .places; store.openedPlace = id; return }
+        if let home = place.home, home != store.currentHome { store.switchHome(to: home) }
+        reveal(inside: place, fromLabel: true)
+    }
+
+    /// The compact Places stack for what the wide layout has open: the room, the places pushed in it, the places down to the thing, then the thing.
     func routes(in store: LocaliserStore) -> [PlaceRoute] {
         guard case .place(let id) = destination else { return [] }
-        var routes: [PlaceRoute] = [.place(id)]
-        if let picked = selectedItem, let item = store.items.first(where: { $0.id == picked }), let place = item.place {
+        var routes: [PlaceRoute] = [.place(id)] + roomPaths[id, default: []]
+        if let picked = selectedItem, let item = store.items.first(where: { $0.id == picked }) {
             var inside: [PlaceRoute] = []
-            var current: Place? = place
+            var current = item.place
             var seen: Set<UUID> = []
-            while let here = current, here.id != id, seen.insert(here.id).inserted { inside.append(.place(here.id)); current = here.parent }
-            routes += inside.reversed()
+            // Walk up from the thing's place to the nearest place that is already on the stack.
+            while let here = current, !routes.contains(.place(here.id)), seen.insert(here.id).inserted { inside.append(.place(here.id)); current = here.parent }
+            if let here = current, let index = routes.firstIndex(of: .place(here.id)) {
+                routes.removeSubrange((index + 1)...)
+                routes += inside.reversed()
+            }
             routes.append(.item(picked))
         }
         return routes
     }
 
-    /// Makes what the compact Places stack has open the wide layout's room and thing.
+    /// Makes what the compact Places stack has open the wide layout's room, places and thing.
     func adopt(_ routes: [PlaceRoute], in store: LocaliserStore) {
-        guard case .place(let first)? = routes.first, let place = store.places.first(where: { $0.id == first }) else {
-            if destination.tab == .places { destination = .places; selectedItem = nil }
-            return
+        let thing: UUID? = if case .item(let id)? = routes.last { id } else { nil }
+        let deepest = routes.reversed().lazy.compactMap { route -> Place? in
+            guard case .place(let id) = route else { return nil }
+            return store.places.first { $0.id == id }
+        }.first
+        if let deepest {
+            let kept = labelled
+            reveal(inside: deepest, fromLabel: false)
+            labelled = kept
+            selectedItem = thing
+        } else if let thing, let item = store.items.first(where: { $0.id == thing }) {
+            // A thing opened on its own, from Lent out: beside its place if this home has it, otherwise in Find.
+            if let place = item.place, store.placesHere.contains(place) { reveal(place, item: thing) }
+            else { destination = .find; findItem = thing }
+        } else if destination.tab == .places {
+            destination = .places; selectedItem = nil
         }
-        destination = .place(place.topLevel.id)
-        if case .item(let id)? = routes.last { selectedItem = id } else { selectedItem = nil }
+    }
+
+    /// The label's "Put things in this box" goes when the box it was for is no longer open.
+    func forgetLabel() {
+        guard let id = labelled else { return }
+        let open: Bool
+        if wide {
+            guard case .place(let room) = destination else { labelled = nil; return }
+            open = room == id || roomPaths[room, default: []].contains(.place(id))
+        } else {
+            open = placesPath.contains(.place(id))
+        }
+        if !open { labelled = nil }
     }
 
     /// Forgets what has been deleted or no longer belongs where it was picked.
     func dropStaleSelection(in store: LocaliserStore) {
+        let here = Set(store.placesHere.map(\.id))
         switch destination {
-        case .place(let id) where !store.placesHere.contains { $0.id == id }: destination = .find
+        case .place(let id) where !here.contains(id): destination = .find
         case .trip(let id) where !store.tripsHere.contains { $0.id == id }: destination = .trips
         case .kit(let id) where !store.kitsHere.contains { $0.id == id }: destination = .trips
         default: break
         }
         if let id = selectedItem {
-            if let item = store.items.first(where: { $0.id == id }), !item.isDeleted {
+            if let item = store.items.first(where: { $0.id == id }), !item.isDeleted, store.itemsHere.contains(item) {
                 if case .place(let placeID) = destination, item.place?.topLevel.id != placeID { selectedItem = nil }
             } else { selectedItem = nil }
         }
         if let id = findItem, !store.items.contains(where: { $0.id == id }) { findItem = nil }
+        // A place stays only while it is in the current home. A thing on its own (from Lent out) may be from any home.
         let gone = placesPath.firstIndex { route in
             switch route {
-            case .place(let id): !store.places.contains { $0.id == id }
+            case .place(let id): !here.contains(id)
             case .item(let id): !store.items.contains { $0.id == id && !$0.isDeleted }
             }
         }
         if let gone { placesPath.removeSubrange(gone...) }
+        for (room, path) in roomPaths {
+            if !here.contains(room) { roomPaths[room] = nil; continue }
+            if let index = path.firstIndex(where: { if case .place(let id) = $0 { !here.contains(id) } else { true } }) { roomPaths[room] = index == 0 ? nil : Array(path[..<index]) }
+        }
+        if let id = labelled, !here.contains(id) { labelled = nil }
         if let sheet = itemSheet, !store.items.contains(where: { $0.id == sheet.itemID }) { itemSheet = nil }
     }
 }
@@ -303,16 +377,15 @@ struct RootView: View {
         }
         .onChange(of: store.openedItem) { _, id in
             guard let id else { return }
-            // On a wide screen a thing with a place opens beside that place.
-            if wide, let item = store.items.first(where: { $0.id == id }), let place = item.place {
-                ui.reveal(place, item: id); store.openedItem = nil
-            } else { ui.tab = .find }
+            ui.openThing(id, wide: wide, in: store)
         }
         .onChange(of: ui.destination) { _, destination in
             if destination == .search { ui.destination = .find; store.findRequest = .find }
             // A different place starts with nothing picked.
             if case .place(let id) = destination, let picked = ui.selectedItem, store.items.first(where: { $0.id == picked })?.place?.topLevel.id != id { ui.selectedItem = nil }
         }
+        .onChange(of: wide, initial: true) { _, nowWide in ui.wide = nowWide }
+        .onChange(of: ui.placesPath) { _, _ in ui.forgetLabel() }
         .onChange(of: wide) { _, nowWide in
             // A place or thing open on one layout is open on the other.
             guard ui.destination.tab == .places else { return }
@@ -390,7 +463,7 @@ struct RootView: View {
             PlacesView()
                 .navigationDestination(for: PlaceRoute.self) { route in
                     switch route {
-                    case .place(let id): if let place = store.places.first(where: { $0.id == id }) { PlaceDetailView(place: place) }
+                    case .place(let id): if let place = store.places.first(where: { $0.id == id }) { PlaceDetailView(place: place, fromLabel: ui.labelled == id) }
                     case .item(let id): if let item = store.items.first(where: { $0.id == id }) { ItemDetailView(item: item) }
                     }
                 }
@@ -519,10 +592,15 @@ struct WidePlaceView: View {
         GeometryReader { geometry in
             let split = geometry.size.width >= Self.splitWidth
             HStack(spacing: 0) {
-                NavigationStack {
-                    PlaceDetailView(place: place)
+                NavigationStack(path: Binding(get: { ui.roomPaths[place.id, default: []] }, set: { ui.roomPaths[place.id] = $0.isEmpty ? nil : $0 })) {
+                    PlaceDetailView(place: place, fromLabel: ui.labelled == place.id)
+                        .navigationDestination(for: PlaceRoute.self) { route in
+                            // The places pushed inside this one. A thing is never pushed by value here: it opens beside.
+                            if case .place(let id) = route, let inside = store.places.first(where: { $0.id == id }) { PlaceDetailView(place: inside, fromLabel: ui.labelled == id) }
+                        }
                         .navigationDestination(item: Binding(get: { split ? nil : selected }, set: { if !split { ui.selectedItem = $0?.id } })) { ItemDetailView(item: $0) }
                 }
+                .environment(\.pushesRoutes, true)
                 .frame(minWidth: split ? Self.thingsWidth : 0, maxWidth: split ? Self.thingsWidth : .infinity)
                 if split {
                     Divider()
@@ -554,8 +632,7 @@ extension RootView {
         switch link {
         case .item(let id): store.openedItem = id
         case .place(let id):
-            if wide, let place = store.places.first(where: { $0.id == id }) { ui.reveal(place) }
-            else { ui.tab = .places; store.openedPlace = id }
+            ui.openPlace(id, wide: wide, in: store)
         case .find, .new, .putAway, .say: ui.tab = .find; store.findRequest = link
         }
     }

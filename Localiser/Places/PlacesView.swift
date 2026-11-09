@@ -6,7 +6,6 @@ struct PlacesView: View {
     @State private var error: String?
     @State private var printing = false
     @State private var scanning = false
-    @State private var labelled: Place?
     @State private var unknownLabel = false
     @State private var tidying = false
     private let starters = [String(localized: "Kitchen"), String(localized: "Bedroom"), String(localized: "Garage"), String(localized: "Hall closet"), String(localized: "Office"), String(localized: "Attic")]
@@ -69,11 +68,10 @@ struct PlacesView: View {
                     .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { scanning = false } } }
             }
         }
-        .navigationDestination(item: $labelled) { place in PlaceDetailView(place: place, fromLabel: true) }
         .onChange(of: store.openedPlace, initial: true) { _, id in
             guard let id else { return }
             store.openedPlace = nil
-            if let place = store.places.first(where: { $0.id == id }) { labelled = place } else { unknownLabel = true }
+            if store.places.contains(where: { $0.id == id }) { ui.labelled = id; ui.placesPath.append(.place(id)) } else { unknownLabel = true }
         }
         .alert("This label's box isn't in your notebook", isPresented: $unknownLabel) { Button("OK") {} } message: { Text("It may have been deleted, or the label was made on another phone.") }
         .alert("Couldn't add that place", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }

@@ -215,10 +215,61 @@ final class AuditWideTests: XCTestCase {
         let h = try twoHomes()
         let ui = WindowState()
         ui.openPlace(h.rack.id, wide: true, in: h.store)
+        XCTAssertNotNil(ui.roomPaths[h.garage.id])
         h.store.switchHome(to: try XCTUnwrap(h.pantry.home))
         ui.dropStaleSelection(in: h.store)
         XCTAssertEqual(ui.destination, .find)
         XCTAssertNil(ui.roomPaths[h.garage.id], "Nothing left of the old home's places")
+        XCTAssertNil(ui.labelled)
+    }
+
+    func testAPlaceOrThingFromAnotherHomeSurvivesCleanup() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.tab = .places
+        ui.placesPath = [.item(h.jam.id)] // Lent out lists things from every home
+        ui.dropStaleSelection(in: h.store)
+        XCTAssertEqual(ui.placesPath, [.item(h.jam.id)])
+    }
+
+    // MARK: Leaving a stack with a bound path
+
+    func testLeavingSettingsOnTheWideLayoutClosesItsPage() {
+        let ui = WindowState()
+        ui.wide = true
+        ui.destination = .settings
+        ui.settingsPath = [.homes]
+        ui.destination = .find
+        XCTAssertTrue(ui.settingsPath.isEmpty, "A page can't stay pushed in a stack that leaves the detail column")
+    }
+
+    func testAFoldOrResizeKeepsTheSettingsPageOpen() {
+        let ui = WindowState()
+        ui.wide = true
+        ui.destination = .settings
+        ui.settingsPath = [.acknowledgements]
+        ui.wide = false
+        ui.wide = true
+        ui.tab = .settings // asking for the tab already showing changes nothing
+        XCTAssertEqual(ui.settingsPath, [.acknowledgements])
+    }
+
+    func testTheCompactLayoutKeepsASettingsPageWhenAnotherTabIsShown() {
+        let ui = WindowState()
+        ui.tab = .settings
+        ui.settingsPath = [.pro]
+        ui.tab = .find
+        ui.tab = .settings
+        XCTAssertEqual(ui.settingsPath, [.pro], "Unchanged: the tabs keep their pages")
+    }
+
+    func testLeavingARoomOnTheWideLayoutClosesTheBoxesPushedInIt() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.wide = true
+        ui.openPlace(h.rack.id, wide: true, in: h.store)
+        ui.destination = .find
+        XCTAssertNil(ui.roomPaths[h.garage.id])
         XCTAssertNil(ui.labelled)
     }
 }

@@ -1180,11 +1180,14 @@ import StoreKitTest
     // MARK: M65 fixes: leaving a Settings page, and links
 
     /// Opens a page in Settings by the identifier of its row, scrolling to it.
-    private func openSettingsPage(_ identifier: String, in app: XCUIApplication) {
+    private func openSettingsPage(_ identifier: String, label: String? = nil, in app: XCUIApplication) {
         openSection("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
-        let row = app.buttons[identifier]
-        for _ in 0..<8 where !(row.exists && row.isHittable) { app.swipeUp() }
+        let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == %@ OR label == %@", identifier, label ?? identifier)).firstMatch
+        for _ in 0..<12 where !(row.exists && row.isHittable) {
+            // A drag in the detail column, to the right of the sidebar.
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.7)).press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.2)))
+        }
         XCTAssertTrue(row.isHittable, "\(identifier) is in Settings")
         row.tap()
     }
@@ -1204,7 +1207,7 @@ import StoreKitTest
         openSection("Garage", in: app)
         XCTAssertTrue(drill(app).waitForExistence(timeout: 5), "Garage shows after leaving Homes")
         XCTAssertEqual(app.state, .runningForeground)
-        openSettingsPage("settings.acknowledgements", in: app)
+        openSettingsPage("settings.acknowledgements", label: "Acknowledgments", in: app)
         XCTAssertTrue(app.navigationBars["Acknowledgments"].waitForExistence(timeout: 5))
         openSection("Find", in: app)
         XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5), "Find shows after leaving Acknowledgments")
@@ -1252,6 +1255,25 @@ import StoreKitTest
         XCTAssertTrue(app.navigationBars["Rack 2"].waitForExistence(timeout: 8), "Rack 2 itself opens")
         XCTAssertTrue(app.buttons["Put things in this box"].waitForExistence(timeout: 5))
         XCTAssertTrue(drill(app).waitForExistence(timeout: 5))
+    }
+
+    /// A box that is open inside its room is another stack with a bound path: leaving it for another room must not quit the app.
+    func testLeavingABoxThroughTheSidebarKeepsTheAppRunning() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openLink("place/Rack%202", in: app)
+        XCTAssertTrue(app.navigationBars["Rack 2"].waitForExistence(timeout: 8))
+        openSection("Bedroom", in: app)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Base layers'")).firstMatch.waitForExistence(timeout: 5), "Bedroom shows")
+        XCTAssertEqual(app.state, .runningForeground)
+        // Tapping through Places inside is the same stack.
+        openSection("Garage", in: app)
+        let wall = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Back wall'")).firstMatch
+        XCTAssertTrue(wall.waitForExistence(timeout: 5)); wall.tap()
+        XCTAssertTrue(app.navigationBars["Back wall"].waitForExistence(timeout: 5))
+        openSection("Find", in: app)
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.state, .runningForeground)
     }
 
     /// Store screenshots for the iPad 13-inch and the Duo's inner screen, upright, from the demo library. Runs only when asked:
