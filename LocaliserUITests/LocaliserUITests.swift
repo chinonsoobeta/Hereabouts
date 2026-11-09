@@ -330,6 +330,39 @@ import StoreKitTest
         XCTAssertTrue(tidy.waitForNonExistence(timeout: 5))
     }
 
+    /// The place editors are presented by the window (so a fold keeps them): they still open, cancel and save on the tabs.
+    /// A trip and a Find result are pushed by value or by the window's selection, so they still open too.
+    func testPlaceEditorsTripsAndFindResultsOpenFromTheirTabs() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 10))
+        app.searchFields.firstMatch.tap(); app.searchFields.firstMatch.typeText("drill")
+        let result = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5)); result.tap()
+        XCTAssertTrue(app.navigationBars["Cordless drill"].waitForExistence(timeout: 5), "A Find result opens the thing")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.tabBars.buttons["Trips"].tap()
+        let trip = app.staticTexts["Ski trip"].firstMatch
+        XCTAssertTrue(trip.waitForExistence(timeout: 5)); trip.tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5), "A trip opens from the list")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.tabBars.buttons["Places"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Garage'")).firstMatch.tap()
+        app.buttons["Edit"].firstMatch.tap()
+        let name = app.textFields["place.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        XCTAssertEqual(name.value as? String, "Garage")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(name.waitForNonExistence(timeout: 5), "Cancel closes the editor")
+        app.buttons["Add a place"].firstMatch.tap()
+        let inner = app.textFields["place.name"]
+        XCTAssertTrue(inner.waitForExistence(timeout: 5)); inner.tap(); inner.typeText("Tool chest")
+        app.buttons["Save"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Tool chest'")).firstMatch.waitForExistence(timeout: 5), "The new place is inside the Garage")
+    }
+
     func testAppLinksOpenWritingDownAndPuttingAway() {
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
@@ -1274,6 +1307,93 @@ import StoreKitTest
         XCTAssertTrue(app.navigationBars["Back wall"].waitForExistence(timeout: 5))
         openSection("Find", in: app)
         XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.state, .runningForeground)
+    }
+
+    // MARK: M65 fixes: editors in the window, trips and Find results kept across a fold
+
+    /// The place editor and Add a place are presented by the window: they still open, cancel and save. (A real fold is O39.)
+    func testThePlaceEditorsStillOpenCancelAndSave() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSection("Garage", in: app)
+        XCTAssertTrue(app.navigationBars["Garage"].waitForExistence(timeout: 5))
+        app.buttons["Place options"].tap()
+        app.buttons["Edit"].tap()
+        let name = app.textFields["place.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        XCTAssertEqual(name.value as? String, "Garage")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(name.waitForNonExistence(timeout: 5), "Cancel closes the editor")
+        app.buttons["Place options"].tap()
+        app.buttons["Edit"].tap()
+        XCTAssertTrue(app.textFields["place.name"].waitForExistence(timeout: 5))
+        app.buttons["Save"].tap()
+        XCTAssertTrue(app.textFields["place.name"].waitForNonExistence(timeout: 5), "Save closes the editor")
+        let add = app.buttons["Add a place"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5)); add.tap()
+        let inner = app.textFields["place.name"]
+        XCTAssertTrue(inner.waitForExistence(timeout: 5)); inner.tap(); inner.typeText("Tool chest")
+        app.buttons["Save"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Tool chest'")).firstMatch.waitForExistence(timeout: 5), "The new place is inside the Garage")
+    }
+
+    /// Plan a trip, New kit, Edit trip and Edit kit are presented by the window too.
+    func testTheTripAndKitEditorsStillOpenCancelAndSave() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSection("Trips", in: app)
+        XCTAssertTrue(app.navigationBars["Trips"].waitForExistence(timeout: 5))
+        app.buttons["Plan a trip"].firstMatch.tap()
+        let tripName = app.textFields["trip.name"]
+        XCTAssertTrue(tripName.waitForExistence(timeout: 5)); tripName.tap(); tripName.typeText("Lake weekend")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(tripName.waitForNonExistence(timeout: 5))
+        let newKit = app.buttons["New kit"].firstMatch
+        XCTAssertTrue(newKit.waitForExistence(timeout: 5)); newKit.tap()
+        let kitName = app.textFields["kit.name"]
+        XCTAssertTrue(kitName.waitForExistence(timeout: 5)); kitName.tap(); kitName.typeText("Beach kit")
+        app.buttons["kit.save"].tap()
+        XCTAssertTrue(app.staticTexts["Beach kit"].firstMatch.waitForExistence(timeout: 5), "The kit is saved")
+        // Edit kit, from the kit's own page.
+        app.staticTexts["Beach kit"].firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Beach kit"].waitForExistence(timeout: 5))
+        app.buttons["Edit"].firstMatch.tap()
+        XCTAssertTrue(app.textFields["kit.name"].waitForExistence(timeout: 5))
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.textFields["kit.name"].waitForNonExistence(timeout: 5))
+    }
+
+    /// A trip opened from the Trips list is a page in a stack with a bound path. Leaving it for a place in the sidebar must not quit the app.
+    func testLeavingATripThroughTheSidebarKeepsTheAppRunning() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSection("Trips", in: app)
+        let trip = app.staticTexts["Ski trip"].firstMatch
+        XCTAssertTrue(trip.waitForExistence(timeout: 5)); trip.tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        openSection("Garage", in: app)
+        XCTAssertTrue(drill(app).waitForExistence(timeout: 5), "Garage shows after leaving the trip")
+        XCTAssertEqual(app.state, .runningForeground)
+        // The trip the sidebar lists opens directly; leaving that is the same.
+        openSection("Trips", in: app)
+        XCTAssertTrue(app.navigationBars["Trips"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.navigationBars["Ski trip"].exists, "Coming back to Trips starts at the list")
+        openSection("Find", in: app)
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.state, .runningForeground)
+    }
+
+    /// A result in Find opens the thing, with its name in the bar.
+    func testAFindResultOpensTheThing() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSection("Find", in: app)
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5)); field.tap(); field.typeText("drill")
+        let result = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5)); result.tap()
+        XCTAssertTrue(app.navigationBars["Cordless drill"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.state, .runningForeground)
     }
 

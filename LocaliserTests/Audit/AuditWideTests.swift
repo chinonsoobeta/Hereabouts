@@ -272,4 +272,107 @@ final class AuditWideTests: XCTestCase {
         XCTAssertNil(ui.roomPaths[h.garage.id])
         XCTAssertNil(ui.labelled)
     }
+
+    // MARK: Editors and trips survive a fold
+
+    private func beach() -> TripDetails { TripDetails(name: "Beach", start: CalendarDay(.now), end: CalendarDay(.now)) }
+
+    func testTheEditorsSheetsAreHeldByTheWindowSoAFoldKeepsThem() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Room")
+        let kit = try store.addKit(name: "Weekend")
+        let trip = try store.addTrip(beach(), kit: kit)
+        let ui = WindowState()
+        XCTAssertFalse(ui.sheetOpen)
+        for sheet in [PlaceSheet.edit(room.id), .addInside(room.id)] {
+            ui.placeSheet = sheet
+            XCTAssertTrue(ui.sheetOpen, "\(sheet) is presented by the window, so the keyboard shortcuts wait for it")
+            ui.wide = true; ui.wide = false
+            XCTAssertEqual(ui.placeSheet, sheet, "A fold leaves it open")
+            ui.placeSheet = nil
+        }
+        for sheet in [PackingSheet.newTrip, .newKit, .editTrip(trip.id), .editKit(kit.id), .tripWithKit(kit.id), .addToTrip(trip.id), .addToKit(kit.id)] {
+            ui.packingSheet = sheet
+            XCTAssertTrue(ui.sheetOpen)
+            ui.wide = true; ui.wide = false
+            XCTAssertEqual(ui.packingSheet, sheet)
+            ui.packingSheet = nil
+        }
+        XCTAssertFalse(ui.sheetOpen)
+    }
+
+    func testAnEditorSheetForSomethingThatIsGoneCloses() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Room")
+        let kit = try store.addKit(name: "Weekend")
+        let ui = WindowState()
+        ui.placeSheet = .edit(room.id)
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.placeSheet, .edit(room.id), "Still there")
+        try store.deletePlace(room, clearContents: true)
+        ui.dropStaleSelection(in: store)
+        XCTAssertNil(ui.placeSheet)
+        ui.packingSheet = .editKit(kit.id)
+        try store.deleteKit(kit)
+        ui.dropStaleSelection(in: store)
+        XCTAssertNil(ui.packingSheet)
+        ui.packingSheet = .newTrip
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.packingSheet, .newTrip, "A new trip has nothing to be gone")
+    }
+
+    func testAnOpenTripOrKitSurvivesAFoldBothWays() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let kit = try store.addKit(name: "Weekend")
+        let trip = try store.addTrip(beach(), kit: kit)
+        // Wide to compact: the trip or the kit the sidebar picked is pushed on the Trips tab.
+        let wide = WindowState()
+        wide.destination = .trip(trip.id)
+        XCTAssertEqual(wide.tripRoutes(), [.trip(trip.id)])
+        wide.destination = .kit(kit.id)
+        XCTAssertEqual(wide.tripRoutes(), [.kit(kit.id)])
+        wide.destination = .trips
+        wide.tripsPath = [.trip(trip.id)]
+        XCTAssertEqual(wide.tripRoutes(), [.trip(trip.id)], "A trip opened from the list stays open")
+        wide.destination = .find
+        XCTAssertEqual(wide.tripRoutes(), [])
+        // Compact to wide: the trip pushed is the sidebar's pick, and the path is not kept twice.
+        let phone = WindowState()
+        phone.tab = .packing
+        phone.tripsPath = [.trip(trip.id)]
+        phone.adoptTrips(phone.tripsPath, in: store)
+        XCTAssertEqual(phone.destination, .trip(trip.id))
+        phone.tripsPath = [.kit(kit.id)]
+        phone.adoptTrips(phone.tripsPath, in: store)
+        XCTAssertEqual(phone.destination, .kit(kit.id))
+        phone.adoptTrips([], in: store)
+        XCTAssertEqual(phone.destination, .trips, "Back at the list")
+        // A round trip returns to the same page.
+        let round = WindowState()
+        round.destination = .trip(trip.id)
+        let there = round.tripRoutes()
+        let back = WindowState()
+        back.tab = .packing
+        back.adoptTrips(there, in: store)
+        XCTAssertEqual(back.destination, .trip(trip.id))
+        // A trip that has gone is cut off the path.
+        back.tripsPath = there
+        try store.deleteTrip(trip)
+        back.dropStaleSelection(in: store)
+        XCTAssertEqual(back.tripsPath, [])
+        XCTAssertEqual(back.destination, .trips)
+    }
+
+    func testLeavingTheTripsListOnTheWideLayoutClosesATripPushedInIt() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let trip = try store.addTrip(beach(), kit: nil)
+        let ui = WindowState()
+        ui.wide = true
+        ui.destination = .trips
+        ui.tripsPath = [.trip(trip.id)]
+        ui.wide = false; ui.wide = true
+        XCTAssertEqual(ui.tripsPath, [.trip(trip.id)], "A fold doesn't change the destination")
+        ui.destination = .find
+        XCTAssertEqual(ui.tripsPath, [], "The bound stack leaves the detail column with no page pushed")
+    }
 }
