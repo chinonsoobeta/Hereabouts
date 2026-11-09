@@ -1353,15 +1353,17 @@ import StoreKitTest
         XCTAssertTrue(newKit.waitForExistence(timeout: 5)); newKit.tap()
         let kitName = app.textFields["kit.name"]
         XCTAssertTrue(kitName.waitForExistence(timeout: 5)); kitName.tap(); kitName.typeText("Beach kit")
-        app.buttons["kit.save"].tap()
-        XCTAssertTrue(app.staticTexts["Beach kit"].firstMatch.waitForExistence(timeout: 5), "The kit is saved")
-        // Edit kit, from the kit's own page.
-        app.staticTexts["Beach kit"].firstMatch.tap()
-        XCTAssertTrue(app.navigationBars["Beach kit"].waitForExistence(timeout: 5))
-        app.buttons["Edit"].firstMatch.tap()
-        XCTAssertTrue(app.textFields["kit.name"].waitForExistence(timeout: 5))
+        // The demo library already has the free plan's one kit, so Save would offer Pro: Cancel is the path to check.
         app.buttons["Cancel"].tap()
-        XCTAssertTrue(app.textFields["kit.name"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(kitName.waitForNonExistence(timeout: 5))
+        // Edit trip, from the trip's own page.
+        app.staticTexts["Ski trip"].firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
+        app.buttons["Trip options"].tap()
+        app.buttons["Edit trip"].tap()
+        XCTAssertTrue(app.textFields["trip.name"].waitForExistence(timeout: 5))
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.textFields["trip.name"].waitForNonExistence(timeout: 5))
     }
 
     /// A trip opened from the Trips list is a page in a stack with a bound path. Leaving it for a place in the sidebar must not quit the app.
