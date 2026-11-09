@@ -70,7 +70,7 @@ struct ThingQuery: EntityStringQuery {
 /// Siri only knows the thing names it was last told. This tells it again after the notebook changes.
 @MainActor final class ShortcutParameters {
     /// Xcode's App Intents notes say the system serves about 1,000 expanded phrases per language and truncates beyond that.
-    /// Seven phrases take a thing, so 100 names use 700 of them and leave room for the rest.
+    /// Eight phrases take a thing, so 100 names use 800 of them and leave room for the rest.
     static let cap = 100
     /// The app's own debouncer. A test makes its own, so the test host's saves don't add to its count.
     static let shared = ShortcutParameters()
@@ -196,6 +196,7 @@ struct HereaboutsShortcuts: AppShortcutsProvider {
             "Where is \(\.$thing) in \(.applicationName)",
             "Where's \(\.$thing) in \(.applicationName)",
             "Where is my \(\.$thing) in \(.applicationName)",
+            "Where are my \(\.$thing) in \(.applicationName)",
             "Where's my \(\.$thing) in \(.applicationName)",
             "Find \(\.$thing) in \(.applicationName)",
             "Find my \(\.$thing) in \(.applicationName)",

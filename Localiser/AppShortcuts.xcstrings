@@ -256,6 +256,34 @@
         }
       }
     },
+    "Where are my ${thing} in ${applicationName}" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where are my ${thing} in ${applicationName}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dónde están mis ${thing} en ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où sont mes ${thing} dans ${applicationName}"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onde estão minhas ${thing} no ${applicationName}"
+          }
+        }
+      }
+    },
     "Where is ${thing} in ${applicationName}" : {
       "localizations" : {
         "en-GB" : {
@@ -357,13 +385,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Où se trouve mon ${thing} dans ${applicationName}"
+            "value" : "Où est ma ${thing} dans ${applicationName}"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Onde fica meu ${thing} no ${applicationName}"
+            "value" : "Onde está minha ${thing} no ${applicationName}"
           }
         }
       }
