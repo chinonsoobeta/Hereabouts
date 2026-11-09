@@ -69,15 +69,13 @@ final class IntentsTests: XCTestCase {
 
     func testSiriIsToldOnceAfterABurstOfChanges() async throws {
         var calls = 0
-        let (savedDelay, savedUpdate) = (ShortcutParameters.delay, ShortcutParameters.update)
-        defer { ShortcutParameters.delay = savedDelay; ShortcutParameters.update = savedUpdate }
-        ShortcutParameters.delay = .milliseconds(100)
-        ShortcutParameters.update = { calls += 1 }
-        for _ in 0..<200 { ShortcutParameters.schedule() }
+        // Its own instance, so the app running as the test host can't add calls.
+        let parameters = ShortcutParameters(delay: .milliseconds(100)) { calls += 1 }
+        for _ in 0..<200 { parameters.schedule() }
         XCTAssertEqual(calls, 0, "Nothing is sent in the middle of the burst")
         try await Task.sleep(for: .milliseconds(400))
         XCTAssertEqual(calls, 1)
-        ShortcutParameters.schedule()
+        parameters.schedule()
         try await Task.sleep(for: .milliseconds(400))
         XCTAssertEqual(calls, 2, "A later change is sent again")
     }
