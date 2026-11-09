@@ -70,7 +70,7 @@ struct FindView: View {
         .navigationTitle("Hereabouts")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(removing: .title)
-        .navigationDestination(item: Binding(get: { ui.findItem.flatMap { id in store.items.first { $0.id == id } } }, set: { ui.findItem = $0?.id })) { item in ItemDetailView(item: item) }
+        .navigationDestination(item: Binding(get: { ui.findItem.flatMap { id in store.items.first { $0.id == id } } }, set: { ui.findItem = $0?.id })) { item in ItemDetailView(item: item, putAway: putAway) }
         .onChange(of: store.openedItem, initial: true) { _, id in
             guard let id else { return }
             // On a wide screen a thing with a place opens beside its place instead (RootView does that).
@@ -176,7 +176,8 @@ struct FindView: View {
     }
 
     private func itemCard(_ item: Belonging) -> some View {
-        NavigationLink { ItemDetailView(item: item, putAway: putAway) } label: {
+        // Opens through the window, so the thing stays open when the layout changes.
+        Button { ui.findItem = item.id } label: {
             HStack(spacing: 12) {
                 ItemRow(item: item, query: query)
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.secondary).accessibilityHidden(true)
@@ -214,11 +215,11 @@ struct NewThing: Identifiable {
 /// A thing being dragged to a place in the sidebar. Only its id travels, and only to Hereabouts itself.
 struct ThingDrag: Codable, Transferable {
     let id: UUID
-    static var transferRepresentation: some TransferRepresentation { CodableRepresentation(contentType: .hereaboutsThing) }
+    static var transferRepresentation: some TransferRepresentation { CodableRepresentation(contentType: .hereaboutsThing).visibility(.ownProcess) }
 }
 
 extension UTType {
-    /// Declared in Info.plist (project.yml), so no other app takes a dropped thing.
+    /// Declared in Info.plist (project.yml) and offered to this app's own process only (ThingDrag), so no other app sees a dragged thing or can offer one.
     static let hereaboutsThing = UTType(exportedAs: "dev.hereabouts.app.thing")
 }
 

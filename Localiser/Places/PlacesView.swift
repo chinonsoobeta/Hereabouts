@@ -184,9 +184,7 @@ struct PlaceDetailView: View {
     let place: Place
     /// Opened by scanning its label: lead with putting things in.
     var fromLabel = false
-    @State private var editing = false
     @State private var printing = false
-    @State private var adding = false
     @State private var deleting = false
     @State private var movingHome = false
     @State private var error: String?
@@ -199,7 +197,7 @@ struct PlaceDetailView: View {
     }
 
     private var addThing: some View { Button("Add a thing", systemImage: "plus") { ui.newThing = NewThing(placeID: place.id) }.buttonStyle(SoftButtonStyle(compact: true)) }
-    private var addPlace: some View { Button("Add a place", systemImage: "square.stack") { adding = true }.buttonStyle(SoftButtonStyle(compact: true)) }
+    private var addPlace: some View { Button("Add a place", systemImage: "square.stack") { ui.placeSheet = .addInside(place.id) }.buttonStyle(SoftButtonStyle(compact: true)) }
 
     var body: some View {
         let _ = store.revision
@@ -263,18 +261,16 @@ struct PlaceDetailView: View {
                     // The thing beside has its own Edit in the same bar, so the place's actions share one menu.
                     Menu {
                         Button("Print a label", systemImage: "printer") { printing = true }
-                        Button("Edit", systemImage: "pencil") { editing = true }
+                        Button("Edit", systemImage: "pencil") { ui.placeSheet = .edit(place.id) }
                     } label: { Image(systemName: "ellipsis.circle") }
                     .accessibilityLabel("Place options")
                 } else {
                     Button("Print a label", systemImage: "printer") { printing = true }
-                    Button("Edit") { editing = true }
+                    Button("Edit") { ui.placeSheet = .edit(place.id) }
                 }
             }
         }
         .sheet(isPresented: $printing) { NavigationStack { LabelSheetView(places: [place]) } }
-        .sheet(isPresented: $editing) { NavigationStack { PlaceEditor(place: place) } }
-        .sheet(isPresented: $adding) { NavigationStack { PlaceEditor(parent: place) } }
         .sheet(isPresented: $movingHome) { NavigationStack { MoveToHomeSheet(subject: .place(place)) } }
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? place.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {

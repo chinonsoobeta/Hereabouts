@@ -150,6 +150,21 @@ enum ItemSheet: Hashable, Identifiable {
     }
 }
 
+/// A trip or kit pushed on the Trips tab. The window keeps the path, so a fold can carry it to the wide layout and back.
+enum TripRoute: Hashable { case trip(UUID), kit(UUID) }
+
+/// The place editors, presented from the root so what was typed in them survives a fold.
+enum PlaceSheet: Hashable, Identifiable {
+    case edit(UUID), addInside(UUID)
+    var id: Self { self }
+}
+
+/// The trip and kit editors, presented from the root for the same reason.
+enum PackingSheet: Hashable, Identifiable {
+    case newTrip, newKit, editTrip(UUID), editKit(UUID), tripWithKit(UUID), addToTrip(UUID), addToKit(UUID), editKitEntry(kit: UUID, entry: UUID)
+    var id: Self { self }
+}
+
 /// What is open in the window, kept above the part of the view tree that swaps between the compact tabs and the
 /// wide sidebar. Folding the Duo or resizing an iPad window tears that part down, so nothing here may live inside it.
 @MainActor @Observable final class WindowState {
@@ -162,6 +177,7 @@ enum ItemSheet: Hashable, Identifiable {
             // one is taken out of the detail column with a page still pushed, so the page goes in the same change.
             // (The pages stay open across a fold or a resize: neither changes the destination.)
             if oldValue == .settings { settingsPath = [] }
+            if oldValue == .trips { tripsPath = [] }
             if case .place(let id) = oldValue { roomPaths[id] = nil }
             forgetLabel()
         }
@@ -182,11 +198,15 @@ enum ItemSheet: Hashable, Identifiable {
     /// The places and things pushed on the compact Places tab.
     var placesPath: [PlaceRoute] = []
     var settingsPath: [SettingsPage] = []
+    /// The trips and kits pushed on the Trips tab, or on the wide Trips list.
+    var tripsPath: [TripRoute] = []
     /// The places pushed inside each room on the wide layout.
     var roomPaths: [UUID: [PlaceRoute]] = [:]
     /// The place a box label opened, which leads with putting things in.
     var labelled: UUID?
     var itemSheet: ItemSheet?
+    var placeSheet: PlaceSheet?
+    var packingSheet: PackingSheet?
     var upgrading = false
     /// "Moved to the shelf" after Found it, shown on the thing it was said about.
     var foundNote: (item: UUID, text: String)?
@@ -194,7 +214,7 @@ enum ItemSheet: Hashable, Identifiable {
     var sidebar = NavigationSplitViewVisibility.all
 
     /// Whether a sheet that the window itself presents is open.
-    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || ritual != nil || itemSheet != nil || upgrading }
+    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || ritual != nil || itemSheet != nil || placeSheet != nil || packingSheet != nil || upgrading }
 
     var tab: AppTab {
         get { destination.tab }
@@ -280,6 +300,25 @@ enum ItemSheet: Hashable, Identifiable {
         }
     }
 
+    /// The compact Trips stack for what the wide layout has open: the trip or kit the sidebar picked, or what the Trips list pushed.
+    func tripRoutes() -> [TripRoute] {
+        switch destination {
+        case .trip(let id): [.trip(id)]
+        case .kit(let id): [.kit(id)]
+        case .trips: tripsPath
+        default: []
+        }
+    }
+
+    /// Makes the trip or kit the compact Trips stack has open the wide layout's pick. The wide Trips list keeps no copy of the path.
+    func adoptTrips(_ routes: [TripRoute], in store: LocaliserStore) {
+        switch routes.last {
+        case .trip(let id)?: destination = .trip(id); tripsPath = []
+        case .kit(let id)?: destination = .kit(id); tripsPath = []
+        case nil: if destination.tab == .packing { destination = .trips }
+        }
+    }
+
     /// The label's "Put things in this box" goes when the box it was for is no longer open.
     func forgetLabel() {
         guard let id = labelled else { return }
@@ -321,7 +360,22 @@ enum ItemSheet: Hashable, Identifiable {
             if let index = path.firstIndex(where: { if case .place(let id) = $0 { !here.contains(id) } else { true } }) { roomPaths[room] = index == 0 ? nil : Array(path[..<index]) }
         }
         if let id = labelled, !here.contains(id) { labelled = nil }
+        let kits = Set(store.kitsHere.map(\.id)), trips = Set(store.tripsHere.map(\.id))
+        if let gone = tripsPath.firstIndex(where: { route in
+            switch route { case .trip(let id): !trips.contains(id); case .kit(let id): !kits.contains(id) }
+        }) { tripsPath.removeSubrange(gone...) }
         if let sheet = itemSheet, !store.items.contains(where: { $0.id == sheet.itemID }) { itemSheet = nil }
+        // An editor stays only while what it edits is still there.
+        if let sheet = placeSheet {
+            switch sheet {
+            case .edit(let id), .addInside(let id): if !store.places.contains(where: { $0.id == id }) { placeSheet = nil }
+            }
+        }
+        switch packingSheet {
+        case .editTrip(let id), .addToTrip(let id): if !trips.contains(id) { packingSheet = nil }
+        case .editKit(let id), .tripWithKit(let id), .addToKit(let id), .editKitEntry(let id, _): if !kits.contains(id) { packingSheet = nil }
+        default: break
+        }
     }
 }
 
@@ -356,6 +410,8 @@ struct RootView: View {
         .sheet(item: $ui.itemSheet) { sheet in
             NavigationStack { ItemSheetView(sheet: sheet) }
         }
+        .sheet(item: $ui.placeSheet) { sheet in NavigationStack { placeEditor(sheet) } }
+        .sheet(item: $ui.packingSheet) { sheet in NavigationStack { packingEditor(sheet) } }
         .sheet(isPresented: $ui.upgrading) { NavigationStack { ProView() } }
         .sheet(item: $ui.ritual) { ritual in
             NavigationStack {
@@ -387,9 +443,12 @@ struct RootView: View {
         .onChange(of: wide, initial: true) { _, nowWide in ui.wide = nowWide }
         .onChange(of: ui.placesPath) { _, _ in ui.forgetLabel() }
         .onChange(of: wide) { _, nowWide in
-            // A place or thing open on one layout is open on the other.
-            guard ui.destination.tab == .places else { return }
-            if nowWide { ui.adopt(ui.placesPath, in: store) } else { ui.placesPath = ui.routes(in: store) }
+            // A place, thing, trip or kit open on one layout is open on the other.
+            switch ui.destination.tab {
+            case .places: if nowWide { ui.adopt(ui.placesPath, in: store) } else { ui.placesPath = ui.routes(in: store) }
+            case .packing: if nowWide { ui.adoptTrips(ui.tripsPath, in: store) } else { ui.tripsPath = ui.tripRoutes() }
+            default: break
+            }
         }
         .onChange(of: seenOnboarding) { _, seen in if !seen { ui.tab = .find } }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
@@ -450,9 +509,44 @@ struct RootView: View {
         return TabView(selection: $ui.tab) {
             Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.places) { placesStack } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
-            Tab(value: AppTab.packing) { NavigationStack { PackingView() } } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.packing) { tripsStack } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.settings) { NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
                 .badge(reminders.coverageGap ? Text("!") : nil)
+        }
+    }
+
+    /// The Trips list with the trips and kits it pushes, with its path kept in the window state. Both layouts use it.
+    private var tripsStack: some View {
+        @Bindable var ui = ui
+        return NavigationStack(path: $ui.tripsPath) {
+            PackingView()
+                .navigationDestination(for: TripRoute.self) { route in
+                    switch route {
+                    case .trip(let id): if let trip = store.trips.first(where: { $0.id == id }) { TripDetailView(trip: trip) }
+                    case .kit(let id): if let kit = store.kits.first(where: { $0.id == id }) { KitDetailView(kit: kit) }
+                    }
+                }
+        }
+    }
+
+    @ViewBuilder private func placeEditor(_ sheet: PlaceSheet) -> some View {
+        switch sheet {
+        case .edit(let id): if let place = store.places.first(where: { $0.id == id }) { PlaceEditor(place: place) }
+        case .addInside(let id): if let parent = store.places.first(where: { $0.id == id }) { PlaceEditor(parent: parent) }
+        }
+    }
+
+    @ViewBuilder private func packingEditor(_ sheet: PackingSheet) -> some View {
+        switch sheet {
+        case .newTrip: TripEditor()
+        case .newKit: KitEditor()
+        case .editTrip(let id): if let trip = store.trips.first(where: { $0.id == id }) { TripEditor(trip: trip) }
+        case .editKit(let id): if let kit = store.kits.first(where: { $0.id == id }) { KitEditor(kit: kit) }
+        case .tripWithKit(let id): if let kit = store.kits.first(where: { $0.id == id }) { TripEditor(kit: kit) }
+        case .addToTrip(let id): if let trip = store.trips.first(where: { $0.id == id }) { TripEntryAdder(trip: trip) }
+        case .addToKit(let id): if let kit = store.kits.first(where: { $0.id == id }) { KitEntryEditor(kit: kit) }
+        case .editKitEntry(let id, let entry):
+            if let kit = store.kits.first(where: { $0.id == id }), let found = kit.entries.first(where: { $0.id == entry }) { KitEntryEditor(kit: kit, entry: found) }
         }
     }
 
@@ -557,7 +651,7 @@ struct RootView: View {
         case .place(let id):
             if let place = store.placesHere.first(where: { $0.id == id }) { WidePlaceView(place: place).id(id) }
             else { NavigationStack { FindView() } }
-        case .trips: NavigationStack { PackingView() }
+        case .trips: tripsStack
         case .trip(let id):
             if let trip = store.tripsHere.first(where: { $0.id == id }) { NavigationStack { TripDetailView(trip: trip) }.id(id) }
             else { NavigationStack { PackingView() } }

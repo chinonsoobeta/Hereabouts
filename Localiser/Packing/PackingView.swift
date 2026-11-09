@@ -3,8 +3,7 @@ import TipKit
 
 struct PackingView: View {
     @Environment(LocaliserStore.self) private var store
-    @State private var newTrip = false
-    @State private var newKit = false
+    @Environment(WindowState.self) private var ui
     @State private var showPast = false
     private var active: [TripRecord] { store.tripsHere.filter { [.packing, .away, .comingHome].contains($0.state) }.sorted { $0.startDay < $1.startDay } }
     private var past: [TripRecord] { store.tripsHere.filter { $0.state == .finished || $0.state == .canceled }.sorted { $0.startDay > $1.startDay } }
@@ -21,27 +20,27 @@ struct PackingView: View {
                         }.font(.wbTitle)
                         Text("Make a checklist for a trip, check off things as you pack, and put them away when you're home.")
                             .font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
-                        Button("Plan a trip") { newTrip = true }.buttonStyle(PrimaryButtonStyle())
+                        Button("Plan a trip") { ui.packingSheet = .newTrip }.buttonStyle(PrimaryButtonStyle())
                         HStack(spacing: 12) {
                             Text("Take the same things each time? Save them as a kit.").font(.wbCaption).foregroundStyle(Theme.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                             Spacer(minLength: 0)
-                            Button { newKit = true } label: { Label("New kit", systemImage: "plus").font(.wbItem) }
+                            Button { ui.packingSheet = .newKit } label: { Label("New kit", systemImage: "plus").font(.wbItem) }
                                 .buttonStyle(SoftButtonStyle(compact: true))
                         }
                     }.card(padding: 16)
                 } else {
                     SectionHeading(title: String(localized: "Trips"))
                     ForEach(Array(active.enumerated()), id: \.element.id) { index, trip in
-                        NavigationLink { TripDetailView(trip: trip) } label: {
+                        NavigationLink(value: TripRoute.trip(trip.id)) {
                             if index == 0 { TripProgressCard(trip: trip) } else { TripRow(trip: trip) }
                         }.buttonStyle(.plain).hoverEffect()
                     }
-                    Button("Plan a trip", systemImage: "plus") { newTrip = true }.buttonStyle(SoftButtonStyle())
+                    Button("Plan a trip", systemImage: "plus") { ui.packingSheet = .newTrip }.buttonStyle(SoftButtonStyle())
                     if !past.isEmpty {
                         DisclosureGroup(isExpanded: $showPast) {
                             VStack(spacing: 12) {
-                                ForEach(past) { trip in NavigationLink { TripDetailView(trip: trip) } label: { TripRow(trip: trip) }.buttonStyle(.plain).hoverEffect() }
+                                ForEach(past) { trip in NavigationLink(value: TripRoute.trip(trip.id)) { TripRow(trip: trip) }.buttonStyle(.plain).hoverEffect() }
                             }.padding(.top, 8)
                         } label: { Text("Past trips (\(past.count))").font(.wbItem).foregroundStyle(Theme.ink) }
                         .tint(Theme.purpleInk)
@@ -51,19 +50,17 @@ struct PackingView: View {
                         Text("Save a kit to reuse a list, like \u{201C}Weekend away\u{201D}. Use it to plan a trip.").font(.wbCaption).foregroundStyle(Theme.secondary)
                     }
                     ForEach(store.kitsHere) { kit in
-                        NavigationLink { KitDetailView(kit: kit) } label: {
+                        NavigationLink(value: TripRoute.kit(kit.id)) {
                             NotebookLine(name: kit.name, detail: String(localized: "\(kit.entries.count) things")).card()
                         }.buttonStyle(.plain).hoverEffect()
                     }
-                    Button("New kit", systemImage: "plus") { newKit = true }.buttonStyle(SoftButtonStyle())
+                    Button("New kit", systemImage: "plus") { ui.packingSheet = .newKit }.buttonStyle(SoftButtonStyle())
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
         .background(Theme.ground).navigationTitle("Trips")
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Plan a trip", systemImage: "plus") { newTrip = true } } }
-        .sheet(isPresented: $newTrip) { NavigationStack { TripEditor() } }
-        .sheet(isPresented: $newKit) { NavigationStack { KitEditor() } }
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Plan a trip", systemImage: "plus") { ui.packingSheet = .newTrip } } }
     }
 }
 
@@ -178,11 +175,8 @@ struct KitEditor: View {
 struct KitDetailView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
+    @Environment(WindowState.self) private var ui
     let kit: Kit
-    @State private var edit = false
-    @State private var addEntry = false
-    @State private var editingEntry: KitEntry?
-    @State private var trip = false
     @State private var deleting = false
     @State private var taskTitle = ""
     @State private var error: String?
@@ -190,11 +184,11 @@ struct KitDetailView: View {
         let _ = store.revision
         SheetList {
             Section {
-                Button("Plan a trip with this kit", systemImage: "suitcase") { trip = true }.buttonStyle(PrimaryButtonStyle()).plainRow()
+                Button("Plan a trip with this kit", systemImage: "suitcase") { ui.packingSheet = .tripWithKit(kit.id) }.buttonStyle(PrimaryButtonStyle()).plainRow()
             }
             Section {
                 ForEach(kit.entries.sorted { $0.title < $1.title }) { entry in
-                    Button { editingEntry = entry } label: {
+                    Button { ui.packingSheet = .editKitEntry(kit: kit.id, entry: entry.id) } label: {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(entry.title).font(.wbItem).foregroundStyle(Theme.ink)
                             Text(entry.ruleSummary).font(.wbCaption).foregroundStyle(Theme.secondary)
@@ -203,7 +197,7 @@ struct KitDetailView: View {
                         }
                     }.swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitEntry(entry) } } }
                 }
-                Button("Add something to pack", systemImage: "plus") { addEntry = true }
+                Button("Add something to pack", systemImage: "plus") { ui.packingSheet = .addToKit(kit.id) }
             } header: { Text("What to pack").foregroundStyle(Theme.secondary) }
             Section {
                 ForEach(kit.tasks.sorted { $0.title < $1.title }) { task in Text(task.title).swipeActions { Button("Delete", role: .destructive) { attempt { try store.deleteKitTask(task) } } } }
@@ -213,15 +207,11 @@ struct KitDetailView: View {
         }
         .groundBackground().navigationTitle(kit.name).navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { Button("Edit") { edit = true } }
+            ToolbarItem(placement: .topBarTrailing) { Button("Edit") { ui.packingSheet = .editKit(kit.id) } }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu { Button("Delete kit", systemImage: "trash", role: .destructive) { deleting = true } } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Kit options")
             }
         }
-        .sheet(isPresented: $edit) { NavigationStack { KitEditor(kit: kit) } }
-        .sheet(isPresented: $addEntry) { NavigationStack { KitEntryEditor(kit: kit) } }
-        .sheet(item: $editingEntry) { entry in NavigationStack { KitEntryEditor(kit: kit, entry: entry) } }
-        .sheet(isPresented: $trip) { NavigationStack { TripEditor(kit: kit) } }
         .confirmationDialog("Delete \u{201C}\(kit.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete kit", role: .destructive) { attempt { try store.deleteKit(kit); dismiss() } } } message: { Text("Trips you've already planned keep their own lists.") }
         .alert("Couldn't update the kit", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
@@ -356,8 +346,7 @@ struct TripDetailView: View {
     @Environment(LocaliserStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     let trip: TripRecord
-    @State private var edit = false
-    @State private var adding = false
+    @Environment(WindowState.self) private var ui
     @State private var deleting = false
     @State private var canceling = false
     @State private var taskTitle = ""
@@ -397,7 +386,7 @@ struct TripDetailView: View {
             }
             // A card of its own. As the only ordinary row under the plain header, it had square top corners.
             if trip.state == .packing {
-                Section { Button("Add something to pack", systemImage: "plus") { adding = true } }
+                Section { Button("Add something to pack", systemImage: "plus") { ui.packingSheet = .addToTrip(trip.id) } }
             }
             if sideBySide {
                 Section {
@@ -433,7 +422,7 @@ struct TripDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    if trip.state == .packing || trip.state == .away { Button("Edit trip", systemImage: "pencil") { edit = true } }
+                    if trip.state == .packing || trip.state == .away { Button("Edit trip", systemImage: "pencil") { ui.packingSheet = .editTrip(trip.id) } }
                     if trip.state == .packing { Button("Skip to coming home", systemImage: "house") { attempt { try store.changeTripState(trip, to: .comingHome) } } }
                     if trip.state != .canceled && trip.state != .finished { Button("Call off trip", systemImage: "xmark.circle") { canceling = true } }
                     Divider()
@@ -443,8 +432,6 @@ struct TripDetailView: View {
             }
         }
         .navigationDestination(item: $openedEntry) { TripEntryDetailView(entry: $0) }
-        .sheet(isPresented: $edit) { NavigationStack { TripEditor(trip: trip) } }
-        .sheet(isPresented: $adding) { NavigationStack { TripEntryAdder(trip: trip) } }
         .confirmationDialog("Call off \u{201C}\(trip.name)\u{201D}?", isPresented: $canceling, titleVisibility: .visible) { Button("Call off trip", role: .destructive) { attempt { try store.changeTripState(trip, to: .canceled) } } } message: { Text("You keep its packing list. Your things stay in their places.") }
         .confirmationDialog("Delete \u{201C}\(trip.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete trip", role: .destructive) { attempt { try store.deleteTrip(trip); dismiss() } } } message: { Text("You delete the trip and its lists. You keep your things and their places.") }
         .confirmationDialog("\(lentPacking?.title ?? String(localized: "It")) is with \(lentPacking?.item?.lentTo ?? String(localized: "someone"))", isPresented: Binding(get: { lentPacking != nil }, set: { if !$0 { lentPacking = nil } }), titleVisibility: .visible, presenting: lentPacking) { entry in
