@@ -110,6 +110,21 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    /// Things come in plurals ("my keys") and French and Portuguese nouns are feminine ("ma clé", "minha chave"),
+    /// so each language asks for the plural and for both genders.
+    func testEachLanguageAsksForPluralAndFeminineThings() throws {
+        let phrases = try entries().filter { $0.catalog.hasSuffix("AppShortcuts.xcstrings") }
+        func values(_ language: String) -> [String] { phrases.compactMap { $0.translations[language]?[""] } }
+        let plural = ["en-GB": "Where are my ${thing} in ${applicationName}", "es": "Dónde están mis ${thing} en ${applicationName}",
+                      "fr": "Où sont mes ${thing} dans ${applicationName}", "pt-BR": "Onde estão minhas ${thing} no ${applicationName}"]
+        for (language, phrase) in plural { XCTAssertTrue(values(language).contains(phrase), "\(language) has no plural phrase: \(phrase)") }
+        XCTAssertTrue(values("fr").contains("Où est ma ${thing} dans ${applicationName}"), "fr covers the feminine")
+        XCTAssertTrue(values("fr").contains("Où est mon ${thing} dans ${applicationName}"), "...and the masculine")
+        XCTAssertTrue(values("pt-BR").contains("Onde está minha ${thing} no ${applicationName}"), "pt-BR covers the feminine")
+        XCTAssertTrue(values("pt-BR").contains("Onde está meu ${thing} no ${applicationName}"), "...and the masculine")
+        XCTAssertEqual(phrases.filter { $0.key.contains("${thing}") }.count, 8, "ShortcutParameters.cap counts these")
+    }
+
     /// Siri only opens the app for a sentence with its name in it, so the example each tip teaches must be one
     /// of that language's phrases, with a thing's name where "${thing}" is.
     func testSiriTipExamplesAreSiriPhrases() throws {
