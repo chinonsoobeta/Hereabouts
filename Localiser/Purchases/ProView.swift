@@ -17,6 +17,7 @@ struct ProView: View {
                     allowance(String(localized: "Things you can write down"), free: CreationKind.item.freeLimit.description)
                     allowance(String(localized: "Packing kits"), free: CreationKind.kit.freeLimit.description)
                     allowance(String(localized: "Homes"), free: CreationKind.home.freeLimit.description)
+                    NotebookLine(name: String(localized: "Share Pro with your family"), detail: String(localized: "Included"), strongDetail: true).card()
                     NotebookLine(name: String(localized: "Share with your household"), detail: String(localized: "Coming later"), strongDetail: true).card()
                     NotebookLine(name: String(localized: "Everything else"), detail: String(localized: "Already free"), strongDetail: true).card()
                 }

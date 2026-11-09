@@ -8705,6 +8705,34 @@
         }
       }
     },
+    "Included" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Included"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluído"
+          }
+        }
+      }
+    },
     "Inside" : {
       "localizations" : {
         "en-GB" : {
@@ -14883,6 +14911,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compartilhar ou imprimir a etiqueta"
+          }
+        }
+      }
+    },
+    "Share Pro with your family" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Pro with your family"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparte Pro con tu familia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partagez Pro avec votre famille"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhe o Pro com sua família"
           }
         }
       }
