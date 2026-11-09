@@ -48,5 +48,26 @@ enum DemoLibrary {
         let trip = try store.addTrip(TripDetails(name: "Ski trip", start: day(10), end: day(14)), kit: kit)
         if let entry = trip.entries.first(where: { $0.item?.id == goggles.id }) { try store.pack(entry, count: entry.requiredCount) }
     }
+
+    /// A second home, "Cabin", with a Pantry and some jam in it, for links that cross homes. The first home stays current.
+    @MainActor static func addSecondHome(_ store: LocaliserStore) throws {
+        guard let first = store.currentHome, store.homes.count == 1 else { return }
+        _ = try store.addHome(name: "Cabin")
+        let pantry = try store.addPlace(name: "Pantry")
+        try store.addItem(name: "Jam", place: pantry)
+        store.switchHome(to: first)
+    }
+
+    /// hereabouts://demo/item/<name> and hereabouts://demo/place/<name>: the link to the thing or place with that name.
+    @MainActor static func link(for url: URL, in store: LocaliserStore) -> AppLink? {
+        guard url.scheme == "hereabouts", url.host() == "demo" else { return nil }
+        let parts = url.pathComponents.filter { $0 != "/" }
+        guard parts.count == 2 else { return nil }
+        switch parts[0] {
+        case "item": return store.items.first { $0.name == parts[1] }.map { .item($0.id) }
+        case "place": return store.places.first { $0.name == parts[1] }.map { .place($0.id) }
+        default: return nil
+        }
+    }
 }
 #endif

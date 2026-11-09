@@ -1,0 +1,224 @@
+import XCTest
+@testable import Localiser
+
+/// The wide layout's window state: what a fold carries across, and where links land.
+@MainActor
+final class AuditWideTests: XCTestCase {
+    // Some tests add or switch homes, which writes the current home to the standard defaults.
+    private nonisolated(unsafe) var savedHomeDefaults: [String: Any] = [:]
+
+    override func setUpWithError() throws {
+        for key in [LocaliserStore.currentHomeKey, Home.nameKey] { savedHomeDefaults[key] = UserDefaults.standard.object(forKey: key) }
+    }
+
+    override func tearDownWithError() throws {
+        for key in [LocaliserStore.currentHomeKey, Home.nameKey] {
+            if let value = savedHomeDefaults[key] { UserDefaults.standard.set(value, forKey: key) } else { UserDefaults.standard.removeObject(forKey: key) }
+        }
+        savedHomeDefaults = [:]
+    }
+
+    /// Two homes: "Home" has Garage > Back wall > Rack 2 with a drill in it; "Cabin" has Pantry with jam. Home is current.
+    private func twoHomes() throws -> (store: LocaliserStore, garage: Place, wall: Place, rack: Place, drill: Belonging, pantry: Place, jam: Belonging) {
+        let store = try LocaliserStore(inMemory: true)
+        let first = try XCTUnwrap(store.currentHome)
+        let garage = try store.addPlace(name: "Garage")
+        let wall = try store.addPlace(name: "Back wall", parent: garage)
+        let rack = try store.addPlace(name: "Rack 2", parent: wall)
+        let drill = try store.addItem(name: "Drill", place: rack)
+        _ = try store.addHome(name: "Cabin")
+        let pantry = try store.addPlace(name: "Pantry")
+        let jam = try store.addItem(name: "Jam", place: pantry)
+        store.switchHome(to: first)
+        return (store, garage, wall, rack, drill, pantry, jam)
+    }
+
+    // MARK: Codex's tests
+
+    func testNestedPlaceSurvivesACompactWideCompactRoundTrip() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Room")
+        let drawer = try store.addPlace(name: "Drawer", parent: room)
+        let original: [PlaceRoute] = [.place(room.id), .place(drawer.id)]
+        let ui = WindowState()
+        ui.tab = .places
+        ui.placesPath = original
+        // These are the two conversions used by RootView when the width class changes.
+        ui.adopt(ui.placesPath, in: store)
+        ui.placesPath = ui.routes(in: store)
+        XCTAssertEqual(ui.placesPath, original, "Return to the open drawer, not its room")
+    }
+
+    func testThingOpenedDirectlyFromPlacesSurvivesUnfolding() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Room")
+        let drill = try store.addItem(name: "Drill", place: room)
+        try store.lend(drill, to: "Sam", askBackOn: nil)
+        let ui = WindowState()
+        ui.tab = .places
+        // The Lent out row uses RouteLink(.item) directly, without a preceding place.
+        ui.placesPath = [.item(drill.id)]
+        ui.adopt(ui.placesPath, in: store)
+        XCTAssertTrue(ui.selectedItem == drill.id || ui.findItem == drill.id,
+                      "The open thing must still have a visible selection after unfolding")
+    }
+
+    func testHomeSwitchClearsThePreviousHomesCompactSelection() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let room = try store.addPlace(name: "Old home room")
+        let drill = try store.addItem(name: "Drill", place: room)
+        let ui = WindowState()
+        ui.reveal(room, item: drill.id)
+        ui.placesPath = ui.routes(in: store)
+        _ = try store.addHome(name: "Other home") // Also switches the current home.
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.destination, .find)
+        XCTAssertNil(ui.selectedItem, "Do not retain a selection from the previous home")
+        XCTAssertTrue(ui.placesPath.isEmpty, "Do not reopen the previous home's place on the compact Places tab")
+    }
+
+    // MARK: Links on a wide layout
+
+    func testAThingInTheCurrentHomeOpensBesideItsRoomWhenWide() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        h.store.openedItem = h.drill.id
+        ui.openThing(h.drill.id, wide: true, in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.garage.id))
+        XCTAssertEqual(ui.selectedItem, h.drill.id)
+        XCTAssertNil(h.store.openedItem)
+    }
+
+    func testAThingInAnotherHomeOpensInFindWithoutSwitchingHomes() throws {
+        let h = try twoHomes()
+        let before = h.store.currentHome
+        let ui = WindowState()
+        h.store.openedItem = h.jam.id
+        ui.openThing(h.jam.id, wide: true, in: h.store)
+        XCTAssertEqual(ui.destination, .find)
+        XCTAssertEqual(ui.findItem, h.jam.id)
+        XCTAssertNil(ui.selectedItem)
+        XCTAssertEqual(h.store.currentHome, before, "A thing opens where it is, in Find")
+        XCTAssertNil(h.store.openedItem, "Consumed here, so Find doesn't open it a second time")
+    }
+
+    func testAThingWithNoPlaceOpensInFindWhenWide() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let loose = try store.addItem(name: "Loose")
+        let ui = WindowState()
+        ui.openThing(loose.id, wide: true, in: store)
+        XCTAssertEqual(ui.destination, .find)
+        XCTAssertEqual(ui.findItem, loose.id)
+    }
+
+    func testAThingLinkOnACompactLayoutIsLeftToFind() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        h.store.openedItem = h.jam.id
+        ui.openThing(h.jam.id, wide: false, in: h.store)
+        XCTAssertEqual(ui.destination, .find)
+        XCTAssertNil(ui.findItem, "Find's own view takes it")
+        XCTAssertEqual(h.store.openedItem, h.jam.id)
+    }
+
+    func testAPlaceInAnotherHomeSwitchesHomesAndOpensWhenWide() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.openPlace(h.pantry.id, wide: true, in: h.store)
+        XCTAssertEqual(h.store.currentHome, h.pantry.home)
+        XCTAssertEqual(ui.destination, .place(h.pantry.id))
+        XCTAssertTrue(ui.roomPaths[h.pantry.id, default: []].isEmpty)
+        ui.dropStaleSelection(in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.pantry.id), "...and the open place isn't mistaken for a stale one")
+    }
+
+    func testANestedPlaceLinkOpensTheBoxInsideItsRoomWhenWide() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.openPlace(h.rack.id, wide: true, in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.garage.id))
+        XCTAssertEqual(ui.roomPaths[h.garage.id], [.place(h.wall.id), .place(h.rack.id)])
+        XCTAssertEqual(ui.labelled, h.rack.id, "From a box label: Put things in this box")
+        // The compact Places tab gets the same places when the window folds.
+        XCTAssertEqual(ui.routes(in: h.store), [.place(h.garage.id), .place(h.wall.id), .place(h.rack.id)])
+    }
+
+    func testARoomLinkOpensTheRoomWhenWide() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.openPlace(h.garage.id, wide: true, in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.garage.id))
+        XCTAssertTrue(ui.roomPaths[h.garage.id, default: []].isEmpty)
+        XCTAssertEqual(ui.labelled, h.garage.id)
+    }
+
+    func testAPlaceLinkOnACompactLayoutIsLeftToPlaces() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.openPlace(h.rack.id, wide: false, in: h.store)
+        XCTAssertEqual(ui.destination, .places)
+        XCTAssertEqual(h.store.openedPlace, h.rack.id)
+    }
+
+    func testAPlaceThatIsNotInTheNotebookIsLeftToPlacesToSay() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        let unknown = UUID()
+        ui.openPlace(unknown, wide: true, in: h.store)
+        XCTAssertEqual(ui.destination, .places)
+        XCTAssertEqual(h.store.openedPlace, unknown)
+    }
+
+    // MARK: What a fold carries
+
+    func testANestedPlaceOpenOnTheWideLayoutFoldsToTheCompactPath() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.reveal(h.garage)
+        ui.roomPaths[h.garage.id] = [.place(h.wall.id)]
+        XCTAssertEqual(ui.routes(in: h.store), [.place(h.garage.id), .place(h.wall.id)])
+        ui.selectedItem = h.drill.id
+        XCTAssertEqual(ui.routes(in: h.store), [.place(h.garage.id), .place(h.wall.id), .place(h.rack.id), .item(h.drill.id)])
+    }
+
+    func testAPlaceOpenedDirectlyOnCompactUnfoldsInsideItsRoom() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.tab = .places
+        ui.placesPath = [.place(h.rack.id)] // a box label opened it, with no room before it
+        ui.adopt(ui.placesPath, in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.garage.id))
+        XCTAssertEqual(ui.roomPaths[h.garage.id], [.place(h.wall.id), .place(h.rack.id)])
+    }
+
+    func testAThingOpenedFromLentOutBesideItsRoomOrInFindWhenUnfolding() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.tab = .places
+        ui.placesPath = [.item(h.drill.id)]
+        ui.adopt(ui.placesPath, in: h.store)
+        XCTAssertEqual(ui.destination, .place(h.garage.id))
+        XCTAssertEqual(ui.selectedItem, h.drill.id)
+
+        let loose = try h.store.addItem(name: "Loose")
+        let again = WindowState()
+        again.tab = .places
+        again.placesPath = [.item(loose.id)]
+        again.adopt(again.placesPath, in: h.store)
+        XCTAssertEqual(again.destination, .find)
+        XCTAssertEqual(again.findItem, loose.id)
+    }
+
+    // MARK: Stale selections
+
+    func testAHomeSwitchTrimsTheNestedPlacesOfTheOldHome() throws {
+        let h = try twoHomes()
+        let ui = WindowState()
+        ui.openPlace(h.rack.id, wide: true, in: h.store)
+        h.store.switchHome(to: try XCTUnwrap(h.pantry.home))
+        ui.dropStaleSelection(in: h.store)
+        XCTAssertEqual(ui.destination, .find)
+        XCTAssertNil(ui.roomPaths[h.garage.id], "Nothing left of the old home's places")
+        XCTAssertNil(ui.labelled)
+    }
+}

@@ -34,6 +34,7 @@ struct LocaliserApp: App {
             let store = try LocaliserStore(url: url)
             #if DEBUG
             if url != nil, ProcessInfo.processInfo.arguments.contains("--demo-library") { try MainActor.assumeIsolated { try DemoLibrary.seed(store) } }
+            if url != nil, ProcessInfo.processInfo.arguments.contains("--second-home") { try MainActor.assumeIsolated { try DemoLibrary.addSecondHome(store) } }
             #endif
             IntentLibrary.store = store
             _store = State(initialValue: store); loadError = nil
@@ -169,6 +170,10 @@ enum ItemSheet: Hashable, Identifiable {
     /// The places and things pushed on the compact Places tab.
     var placesPath: [PlaceRoute] = []
     var settingsPath: [SettingsPage] = []
+    /// The places pushed inside each room on the wide layout.
+    var roomPaths: [UUID: [PlaceRoute]] = [:]
+    /// The place a box label opened, which leads with putting things in.
+    var labelled: UUID?
     var itemSheet: ItemSheet?
     var upgrading = false
     /// "Moved to the shelf" after Found it, shown on the thing it was said about.
@@ -189,6 +194,12 @@ enum ItemSheet: Hashable, Identifiable {
         destination = .place(place.topLevel.id)
         selectedItem = item
     }
+
+    /// A thing opened from a link, Spotlight, a reminder or the widget.
+    func openThing(_ id: UUID, wide: Bool, in store: LocaliserStore) {}
+
+    /// A place opened from a link or a box label.
+    func openPlace(_ id: UUID, wide: Bool, in store: LocaliserStore) {}
 
     /// The compact Places stack for what the wide layout has open: the room, the places down to the thing, then the thing.
     func routes(in store: LocaliserStore) -> [PlaceRoute] {
@@ -311,7 +322,13 @@ struct RootView: View {
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             if let raw = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String { store.openedItem = UUID(uuidString: raw) }
         }
-        .onOpenURL { url in if let link = AppLink(url: url) { open(link) } }
+        .onOpenURL { url in
+            #if DEBUG
+            // UI tests don't know the demo library's ids: hereabouts://demo/item/Cordless%20drill finds the thing by its name.
+            if let link = DemoLibrary.link(for: url, in: store) { open(link); return }
+            #endif
+            if let link = AppLink(url: url) { open(link) }
+        }
         .onChange(of: QuickActions.shared.link, initial: true) { _, link in
             guard let link else { return }
             open(link)

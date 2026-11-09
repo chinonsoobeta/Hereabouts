@@ -11,6 +11,7 @@
 		0C2D38C52E116788EF8CC193 /* VoiceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276117AD1674424E9142CC40 /* VoiceSheet.swift */; };
 		0E9475EE8DCE1B3A21747770 /* Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E822257E4E7F4DD2DD6454C /* Finding.swift */; };
 		11D83AE2104A48A89AA72550 /* LocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA49F8884CD7669CDEE53960 /* LocalizationTests.swift */; };
+		13CA2032B90A325525DCEE5B /* AuditWideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11208D277E5F890A721ABAC /* AuditWideTests.swift */; };
 		17A3067D0A104EFF1BCC30D7 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */; };
 		1B49871AFDAA83DEE0936687 /* PutAway.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5125DB3495BBECED9AFA8D3 /* PutAway.swift */; };
 		1E00789AD31D3C6550A6764C /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B3A2E5D7F947EFEE5443E348 /* AtkinsonHyperlegible-BoldItalic.ttf */; };
@@ -271,6 +272,7 @@
 		EC6C80AA77D0B264F990FBE9 /* LocaliserV3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LocaliserV3.xcdatamodel; sourceTree = "<group>"; };
 		EFE72C59BE477B9747AE92EA /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
 		F055320E55E0FD6AE0DF3A68 /* ModelV7Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelV7Tests.swift; sourceTree = "<group>"; };
+		F11208D277E5F890A721ABAC /* AuditWideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditWideTests.swift; sourceTree = "<group>"; };
 		F5D369B54AEB1DE8D34F38D1 /* PlaceChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceChooser.swift; sourceTree = "<group>"; };
 		F6AA094CEBFFF1BC4AB8349F /* LocaliserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaliserTests.swift; sourceTree = "<group>"; };
 		F78D7DD00872972F7C3608BE /* NotebookFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookFile.swift; sourceTree = "<group>"; };
@@ -435,6 +437,7 @@
 			children = (
 				E6D63B74DC84D59B96A0723F /* AuditClaudeTests.swift */,
 				6BF15B05402A7E660301BF00 /* AuditCodexTests.swift */,
+				F11208D277E5F890A721ABAC /* AuditWideTests.swift */,
 				FD7990A4745AA14EA2878EA3 /* DeletedReturnPlaceTests.swift */,
 				6D7E352782C883558D949F1F /* IntentHomeAnswerTests.swift */,
 				933AE9F4ECD0A220B119A0CE /* MigrationFallbackTests.swift */,
@@ -793,6 +796,7 @@
 				4636EB3F5C930EA1A8B0DFF0 /* AppLinkTests.swift in Sources */,
 				5B718B50AD711FC7E185188F /* AuditClaudeTests.swift in Sources */,
 				D02F5A5032021FDD1E6A8B34 /* AuditCodexTests.swift in Sources */,
+				13CA2032B90A325525DCEE5B /* AuditWideTests.swift in Sources */,
 				CBE7A67F93F5679BB5F0627E /* BoxLabelTests.swift in Sources */,
 				3A35D4256EB35E0DB4AEA9D6 /* DeletedReturnPlaceTests.swift in Sources */,
 				9CD309E6883093FB8EA60265 /* DuplicatePlacesTests.swift in Sources */,

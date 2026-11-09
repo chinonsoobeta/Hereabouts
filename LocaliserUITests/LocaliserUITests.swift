@@ -1177,6 +1177,83 @@ import StoreKitTest
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.waitForExistence(timeout: 5), "...and is in the Bedroom")
     }
 
+    // MARK: M65 fixes: leaving a Settings page, and links
+
+    /// Opens a page in Settings by the identifier of its row, scrolling to it.
+    private func openSettingsPage(_ identifier: String, in app: XCUIApplication) {
+        openSection("Settings", in: app)
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        let row = app.buttons[identifier]
+        for _ in 0..<8 where !(row.exists && row.isHittable) { app.swipeUp() }
+        XCTAssertTrue(row.isHittable, "\(identifier) is in Settings")
+        row.tap()
+    }
+
+    private func openLink(_ path: String, in app: XCUIApplication) {
+        app.open(URL(string: "hereabouts://demo/\(path)")!)
+    }
+
+    private func drill(_ app: XCUIApplication) -> XCUIElement { app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch }
+
+    /// Leaving an open Settings page through the sidebar used to quit the app.
+    func testLeavingASettingsPageThroughTheSidebarKeepsTheAppRunning() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSettingsPage("settings.homes", in: app)
+        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
+        openSection("Garage", in: app)
+        XCTAssertTrue(drill(app).waitForExistence(timeout: 5), "Garage shows after leaving Homes")
+        XCTAssertEqual(app.state, .runningForeground)
+        openSettingsPage("settings.acknowledgements", in: app)
+        XCTAssertTrue(app.navigationBars["Acknowledgments"].waitForExistence(timeout: 5))
+        openSection("Find", in: app)
+        XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 5), "Find shows after leaving Acknowledgments")
+        XCTAssertEqual(app.state, .runningForeground)
+        // Coming back to Settings starts at the list, not on the page that was left.
+        openSection("Settings", in: app)
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.navigationBars["Acknowledgments"].exists)
+    }
+
+    /// A link that arrives while a Settings page is open does the same.
+    func testALinkWhileASettingsPageIsOpenKeepsTheAppRunning() throws {
+        let app = try launch(.landscapeLeft)
+        showSidebar(app)
+        openSettingsPage("settings.homes", in: app)
+        XCTAssertTrue(app.navigationBars["Homes"].waitForExistence(timeout: 5))
+        openLink("item/Cordless%20drill", in: app)
+        XCTAssertTrue(app.navigationBars["Rack 2"].waitForExistence(timeout: 8) || drill(app).waitForExistence(timeout: 8), "The linked thing's room opens")
+        XCTAssertTrue(app.navigationBars["Homes"].waitForNonExistence(timeout: 5), "...and the Settings page has gone")
+        XCTAssertEqual(app.state, .runningForeground)
+    }
+
+    /// With two homes, a link to a thing in the other home opens the thing in Find and stays in this home.
+    func testALinkToAThingInAnotherHomeOpensItInFind() throws {
+        let app = try launch(.landscapeLeft, extra: ["--second-home"])
+        openLink("item/Jam", in: app)
+        XCTAssertTrue(app.staticTexts["Jam"].firstMatch.waitForExistence(timeout: 8), "Jam opens")
+        XCTAssertTrue(app.staticTexts["Home"].firstMatch.exists, "...and this is still Home")
+        XCTAssertEqual(app.state, .runningForeground)
+    }
+
+    /// A link to a place in the other home switches to that home and opens the place.
+    func testALinkToAPlaceInAnotherHomeSwitchesHomes() throws {
+        let app = try launch(.landscapeLeft, extra: ["--second-home"])
+        openLink("place/Pantry", in: app)
+        XCTAssertTrue(app.navigationBars["Pantry"].waitForExistence(timeout: 8), "The Pantry opens")
+        XCTAssertTrue(app.staticTexts["Cabin"].firstMatch.exists, "...in the Cabin")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Jam'")).firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// A box label for a place inside a room opens that box, with Put things in this box, not the room.
+    func testABoxLabelForANestedPlaceOpensTheBox() throws {
+        let app = try launch(.landscapeLeft)
+        openLink("place/Rack%202", in: app)
+        XCTAssertTrue(app.navigationBars["Rack 2"].waitForExistence(timeout: 8), "Rack 2 itself opens")
+        XCTAssertTrue(app.buttons["Put things in this box"].waitForExistence(timeout: 5))
+        XCTAssertTrue(drill(app).waitForExistence(timeout: 5))
+    }
+
     /// Store screenshots for the iPad 13-inch and the Duo's inner screen, upright, from the demo library. Runs only when asked:
     /// `TEST_RUNNER_STORE_SHOTS=<folder> xcodebuild … -only-testing:LocaliserUITests/LocaliserWideUITests/testWideStoreScreenshots test`
     func testWideStoreScreenshots() throws {
