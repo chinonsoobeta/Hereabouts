@@ -187,6 +187,14 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - [ ] Widgets: both buttons at small size and on the Lock Screen; the lent-out widget if it ships.
   - [ ] On an iPad, if you have one or can borrow one: the sidebar sideways and upright; Split View, Slide Over and Stage Manager at a third of the width (the iPhone layout); ⌘N, ⌘F and ⌘1 to ⌘4 and the ⌘-hold list; pointer hover; dragging a thing onto a place; the camera prompt (it says "this device"); camera and shelf photos; voice memos; a purchase. Otherwise the simulator runs in M67 stand in.
   - [ ] On an iPhone Duo, if you can try one: fold and unfold mid-task, and check the places and things stay put.
+  - [ ] Fold or resize with things open (M65 audit, 9 November). On the Duo, or an iPad window dragged between a third and full width, check that each stays open:
+    - a half-typed place name in Edit or Add a place;
+    - a half-typed trip in Plan a trip;
+    - a half-typed kit in New kit;
+    - a thing opened from a Find result;
+    - a trip opened from the Trips list;
+    - a box opened from its label.
+  - [ ] Siri, plural and feminine (M65 audit): "Where are my keys in Hereabouts?"; in French "Où est ma valise dans Hereabouts?"; in Portuguese "Onde está minha mala no Hereabouts?".
 - [ ] **O40 Quality-check examples.** 200 capture sentences, written as people would say them, and 100 search pairs, from people who didn't write the code. I freeze the commit and score them (M47).
 - [ ] **O41 Ask Angela** whether she'll be the second tester.
 - [x] **O47 Voice memos in other languages.** Decided 7 November: English only in 1.0. The microphone and Say it buttons show only when the app's language is English; French, Spanish and Portuguese voice memos come in 1.1, each with its own practice sentences and the voice rule.
@@ -372,7 +380,15 @@ Decided 8 November: both in 1.0. Built during the beta week, before the TestFlig
 - [ ] **M56 Each archive** (after O42 or O44). Raise `CURRENT_PROJECT_VERSION` at `project.yml:69` and `:92`, archive with Xcode 27.2, run `scripts/check-release.sh`, upload only on the go-ahead. · P, X1
 - [ ] **M57 Sync week** (only if B4 is tried for 1.0). · P
 - [ ] **M58 CloudKit schema** to production, for a release with sync. · P, X1
-- [ ] **M65 Adversarial check of the late changes** (owner, 7 November), just before the submission archive (M56 for O45). Code that lands after M64 because it waits on an owner step (M50 to M54, and any beta fixes) gets the same treatment as M64, limited to the diff since M64: I try to break it, each finding needs a failing test, fixes are checked, and all tests run again. · D
+- [ ] **M65 Adversarial check of the late changes** (owner, 7 November), just before the submission archive (M56 for O45). Code that lands after M64 because it waits on an owner step (M50 to M54, and any beta fixes) gets the same treatment as M64, limited to the diff since M64: I try to break it, each finding needs a failing test, fixes are checked, and all tests run again. · D *9 November, M66 to M68 done: see `AUDIT_M65_WIDE_CLAUDE.md` and `AUDIT_M65_WIDE_CODEX.md`. Found and fixed:*
+  - *a crash when leaving a Settings page through the iPad sidebar;*
+  - *links to another home's things and places;*
+  - *box labels opening the room instead of the box;*
+  - *half-typed editors and open trips lost on a fold;*
+  - *drag data visible outside the app;*
+  - *a missing "Where are my" Siri phrase, and feminine forms in French and Portuguese.*
+
+  *All tests pass on main at fb32dd7. Run this check again on anything that lands before the submission archive.*
 
 ### Set aside for the owner
 

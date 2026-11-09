@@ -53,4 +53,25 @@ The adversarial check (M65) of M66, M67 and M68: `8665b49..9271306`. Codex's hal
 
 ## Status
 
-Fixes go to builders, then every test runs again: unit tests on the iPad and both iPhones, the full UI suite on iPhone 27, and the wide tests on the iPad and the Duo. Each fix gets a failing test first. Codex's tests for 3, 5, 6 and 7 come in with the fixes, not before. Its two Siri tests are dropped, because finding 1 isn't a bug.
+All fixed on 9 November, in two rounds. Codex's tests for 5, 6 and 7 came in with the fixes, compiled and seen failing first. Its drag test was dropped for the platform's own check (below), and its two Siri tests were dropped because finding 1 isn't a bug.
+
+| Finding | Fix | Commits |
+| --- | --- | --- |
+| C1 | `WindowState.destination` clears a bound path (Settings, a room's places, and later the Trips list) in the same change that leaves it, on a wide layout only. A page that's open still survives a fold or a resize, since neither changes the destination. The UI test crashed before the fix and passes after it. | a580930, f289c9f |
+| F1, 4 | Links go through `WindowState.openThing` and `openPlace`. A thing in another home opens in Find without a home switch. A place in another home switches to that home, then opens. The iPhone is unchanged. | f289c9f |
+| F2, 6 | Each room on the wide layout keeps the places pushed inside it (`roomPaths`), and a label opens the box inside its room with "Put things in this box". Nested places survive a fold both ways. | f289c9f |
+| 5 | A home switch trims the old home's places, thing and label from both layouts. A thing opened on its own from Lent out is kept, since that list covers every home. | f289c9f |
+| 7 | A thing opened from Lent out opens beside its place after unfolding, or in Find if its place is in another home. | f289c9f |
+| 2 | The place editor, Add a place, Plan a trip, New kit, and the trip and kit editors inside a trip or kit are presented from the root, so what was typed survives a fold. Printing labels, moving to another home and the Homes manager stay where they were. | c74c0d4, 0c784b8 |
+| 8 | Find's results open through `ui.findItem`. The Trips list keeps its path in `WindowState` (`tripsPath`), and a trip or kit is carried across a fold both ways. | c74c0d4, 0c784b8 |
+| 3 | A thing's drag data is visible to this app's own process only (`.visibility(.ownProcess)`). Dragging onto a sidebar place still works on the iPad and the Duo. | 0c784b8 |
+| Also found | "Where are my … in Hereabouts" in all five languages. In French and Portuguese, "Where's my" now has the feminine form ("Où est ma", "Onde está minha"), and "Where is my" keeps the masculine. Eight phrases take a thing, so 100 names use 800. | 09b3e17, bd7dbf0 |
+
+Tests after both rounds, on main at fb32dd7:
+- Unit tests: 208 pass on the iPad and on iPhone iOS 27.0. On iPhone iOS 26.5, 208 run with 6 skipped and none failing.
+- Full UI suite: passes on iPhone iOS 27.0 and the iPad. The iPad's one failure was in a new kit-editor test, which was fixed and passed when run again on its own.
+- Duo: all 21 wide tests pass.
+- No crash report appeared after the first fix.
+- I also checked by hand on the iPad: open a trip from the Trips list, then tap Garage in the sidebar. The app keeps running. The new UI test may tap the sidebar's trip instead, which takes the other path.
+
+Still open, for a real device (O39): folding or resizing with an editor open or a trip open. UI tests can't change the layout while the app runs, so those are covered by unit tests on `WindowState` only. A trip entry pushed inside a trip (`TripEntryDetailView`) still closes on a fold.
