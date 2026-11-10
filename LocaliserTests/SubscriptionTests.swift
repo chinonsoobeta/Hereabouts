@@ -25,12 +25,14 @@ final class SubscriptionTests: XCTestCase {
 
     /// StoreKit remembers that an Apple Account used its intro offer for about 15 seconds after `clearTransactions()`
     /// and `resetToDefaultState()` (measured on iOS 27; eligibility flipped back at 15.0 s every time). A trial test that runs
-    /// after a purchase test would otherwise see "no trial", so wait here until both plans report eligible again.
+    /// after a purchase test would otherwise see "no trial", so wait here until the plan with a trial reports eligible again.
     private func waitForTrialEligibility() async throws {
         for _ in 0..<400 {
             let products = try await Product.products(for: ProPlan.allCases.map(\.productID))
             var eligible = !products.isEmpty
-            for product in products { if let subscription = product.subscription, await !subscription.isEligibleForIntroOffer { eligible = false } }
+            for product in products {
+                if let subscription = product.subscription, subscription.introductoryOffer != nil, await !subscription.isEligibleForIntroOffer { eligible = false }
+            }
             if eligible { return }
             try await Task.sleep(for: .milliseconds(100))
         }
@@ -43,18 +45,18 @@ final class SubscriptionTests: XCTestCase {
         let pro = ProAccess()
         await pro.loadProduct(); await pro.refresh()
         XCTAssertEqual(Set(pro.products.keys), Set(ProPlan.allCases))
-        XCTAssertEqual(pro.trial(.monthly), "2 weeks", "Each plan is asked about its own trial")
-        XCTAssertEqual(pro.trial(.yearly), "2 weeks")
+        XCTAssertEqual(pro.trial(.yearly), "1 week", "Only the yearly plan has a free trial (owner, 10 Nov)")
+        XCTAssertNil(pro.trial(.monthly), "Each plan is asked about its own trial, and monthly has none")
         XCTAssertNil(pro.trial(.lifetime))
 
-        await pro.purchase(.monthly)
+        await pro.purchase(.yearly)
         XCTAssertTrue(pro.unlocked, pro.message ?? "No purchase message")
-        XCTAssertEqual(pro.standing?.plan, .monthly)
+        XCTAssertEqual(pro.standing?.plan, .yearly)
         XCTAssertEqual(pro.standing?.inTrial, true)
         XCTAssertTrue(pro.message?.hasPrefix("Your free trial has started.") == true, pro.message ?? "")
         try await eventually(pro) { !pro.trialEligible }
         XCTAssertFalse(pro.trialEligible, "The trial is once per Apple Account")
-        XCTAssertNil(pro.trial(.yearly), "Used on monthly, so yearly no longer offers it either")
+        XCTAssertNil(pro.trial(.yearly), "Used once, so yearly no longer offers it")
 
         let store = try LocaliserStore(inMemory: true)
         for index in 0..<(CreationKind.item.freeLimit + 2) {
@@ -63,7 +65,7 @@ final class SubscriptionTests: XCTestCase {
         }
 
         // The local test store's expiry doesn't reach StoreKit's status in unit tests; a refund ends it the same way.
-        let trial = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == ProPlan.monthly.productID })
+        let trial = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == ProPlan.yearly.productID })
         try session.refundTransaction(identifier: trial.identifier)
         try await eventually(pro) { !pro.unlocked }
         XCTAssertFalse(pro.unlocked)
@@ -128,12 +130,13 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(ProPricing.saving(yearly: Decimal(string: "19.99")!, monthly: Decimal(string: "2.99")!), 44)
         XCTAssertNil(ProPricing.saving(yearly: 40, monthly: 2.99))
         XCTAssertEqual(ProPricing.monthly(Decimal(string: "19.99")!), Decimal(string: "1.67")!)
-        XCTAssertEqual(ProPricing.terms(plan: .yearly, price: "$19.99", period: "a year", trial: "2 weeks"),
-                       "Free for 2 weeks, then $19.99 a year. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
+        XCTAssertEqual(ProPricing.terms(plan: .yearly, price: "$19.99", period: "a year", trial: "1 week"),
+                       "Free for 1 week, then $19.99 a year. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
         XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: nil),
                        "$2.99 a month. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
         XCTAssertEqual(ProPricing.terms(plan: .monthly, price: "$2.99", period: "a month", trial: "1 month"),
                        "Free for 1 month, then $2.99 a month. Renews automatically until you cancel. Cancel in Settings at least a day before it renews.")
+        XCTAssertEqual(ProPricing.trialLength(value: 1, unit: .week), "1 week")
         XCTAssertEqual(ProPricing.trialLength(value: 2, unit: .week), "2 weeks")
         XCTAssertEqual(ProPricing.trialLength(value: 1, unit: .month), "1 month")
         XCTAssertEqual(ProPricing.trialLength(value: 3, unit: .day), "3 days")

@@ -30,7 +30,7 @@ import StoreKitTest
         if yearly.waitForExistence(timeout: 10) {
             XCTAssertTrue(yearly.isSelected)
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch.exists)
-            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 1 week' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
             app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Lifetime'")).firstMatch.tap()
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Buy once for'")).firstMatch.waitForExistence(timeout: 3))
         } else if #available(iOS 27, *) {
@@ -579,7 +579,7 @@ import StoreKitTest
         let plans = ["Yearly", "Monthly", "Lifetime"].map { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", $0)).firstMatch }
         XCTAssertTrue(plans[0].waitForExistence(timeout: 20), app.debugDescription)
         for plan in plans { XCTAssertTrue(plan.exists, "\(plan) is missing\n\(app.debugDescription)") }
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 2 weeks' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists, "No trial button\n\(app.debugDescription)")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 1 week' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists, "No trial button\n\(app.debugDescription)")
         try shot("3-pro")
         app.navigationBars["Pro"].buttons["Settings"].tap()
         // 3. Add things one at a time until there are 15.
