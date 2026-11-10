@@ -6,7 +6,8 @@
 #
 # Fails unless: the free plan holds 15 things and 1 packing kit, the App Group matches project.yml,
 # every bundle (the app and each extension) carries a PrivacyInfo.xcprivacy, and the licence texts
-# for both typefaces (Atkinson Hyperlegible and Fraunces) are present, and the app is built for iPhone and iPad.
+# for both typefaces (Atkinson Hyperlegible and Fraunces) are present, the app is built for iPhone and iPad,
+# and the app is named Hereabouts in every language.
 
 set -u
 
@@ -107,6 +108,42 @@ if [[ -n "$APP" ]]; then
     device_family="$(plist_value "$APP/Info.plist" UIDeviceFamily | tr -d ' \n')"
     if [[ "$device_family" == *1* && "$device_family" == *2* ]]; then pass "UIDeviceFamily in the app holds iPhone (1) and iPad (2)"
     else fail "UIDeviceFamily in the app is '${device_family:-missing}', want both 1 and 2"; fi
+fi
+
+# 7. The app's bundle name and display name are Hereabouts in every language. App Store Connect refused
+#    build 1 (error 90129) while the bundle name was still Localiser, a name another app already uses.
+WANT_NAME=Hereabouts
+#    A language whose InfoPlist.strings leaves a key out falls back to the app's Info.plist, as iOS does.
+if [[ -n "$APP" ]]; then
+    wrong=0; langs=0
+    for dir in "$APP"/*.lproj; do
+        [[ -d "$dir" ]] || continue
+        lang="$(basename "$dir" .lproj)"; langs=$((langs + 1))
+        for key in CFBundleName CFBundleDisplayName; do
+            value="$(plist_value "$dir/InfoPlist.strings" "$key")"; from="$lang"
+            [[ -z "$value" ]] && { value="$(plist_value "$APP/Info.plist" "$key")"; from="$lang, from Info.plist"; }
+            if [[ "$value" != "$WANT_NAME" ]]; then fail "$key is '${value:-missing}' ($from), want $WANT_NAME"; wrong=$((wrong + 1)); fi
+        done
+    done
+    if (( langs == 0 )); then fail "no .lproj folders in the app to check its name"
+    elif (( wrong == 0 )); then pass "the app is named $WANT_NAME in all $langs languages"; fi
+else
+    # Xcode compiles a source-language (English) entry only once it is marked translated.
+    wrong="$(/usr/bin/python3 - "$ROOT/Localiser/InfoPlist.xcstrings" "$WANT_NAME" <<'PY'
+import json, sys
+catalog, want = json.load(open(sys.argv[1])), sys.argv[2]
+source = catalog.get("sourceLanguage", "en")
+for key in ("CFBundleName", "CFBundleDisplayName"):
+    langs = catalog.get("strings", {}).get(key, {}).get("localizations", {})
+    if source not in langs: print(f"{key} has no {source} entry")
+    for lang, entry in sorted(langs.items()):
+        unit = entry.get("stringUnit", {})
+        if unit.get("value") != want: print(f"{key} in {lang} is '{unit.get('value')}'")
+        elif unit.get("state") != "translated": print(f"{key} in {lang} is marked '{unit.get('state')}', so Xcode leaves it out")
+PY
+)"
+    if [[ -z "$wrong" ]]; then pass "the app is named $WANT_NAME in every language (InfoPlist.xcstrings)"
+    else while IFS= read -r line; do fail "$line, want $WANT_NAME (InfoPlist.xcstrings)"; done <<< "$wrong"; fi
 fi
 
 echo
