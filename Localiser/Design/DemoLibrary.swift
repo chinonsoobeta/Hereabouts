@@ -38,7 +38,9 @@ enum DemoLibrary {
 
         let today = CalendarDay(.now)
         func day(_ offset: Int) -> CalendarDay { today.adding(days: offset) ?? today }
-        try store.lend(drill, to: "Sam", askBackOn: day(5))
+        // Lent two evenings ago, so its history line and "Moved 2 days ago" fit the store shots' 9:41 status bar.
+        let lentEvening = Calendar.current.date(bySettingHour: 18, minute: 30, second: 0, of: ago(days: 2)) ?? .now
+        try store.lend(drill, to: "Sam", askBackOn: day(5), on: lentEvening)
 
         let kit = try store.addKit(name: "Ski trip")
         _ = try store.setKitEntry(kit: kit, name: "", item: goggles, unit: 1, perNight: false, condition: .always)

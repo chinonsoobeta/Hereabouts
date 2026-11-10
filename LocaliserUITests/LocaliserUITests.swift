@@ -454,24 +454,18 @@ import StoreKitTest
         reveal(app.buttons["voice.newPlace"], in: app)
         try shot("2-voice")
         app.terminate()
-        // 3: lending, with the ask-back date on the thing page.
+        // 3: lending. The demo's drill was lent to Sam two evenings ago, so its history line fits the 9:41 status bar.
         app.launchArguments = base
         app.launch()
         var search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("Winter")
-        app.staticTexts["Winter tires"].firstMatch.tap()
-        app.buttons["More"].firstMatch.tap()
-        app.buttons["Lend it…"].tap()
-        let person = app.textFields["lend.person"]
-        XCTAssertTrue(person.waitForExistence(timeout: 5), app.debugDescription)
-        person.tap(); person.typeText("Sam")
-        app.buttons["lend.save"].tap()
+        search.tap(); search.typeText("drill")
+        app.staticTexts["Cordless drill"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
         try shot("3-lending")
         app.terminate()
-        // 1, 4, 5: find, trip detail, Pro.
+        // 1, 4, 5: find, trip detail, a room with a box inside. Then the Pro screen, for the products' review screenshots.
         app.launch()
         search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -488,6 +482,14 @@ import StoreKitTest
         for label in ["Close", "Cancel"] where app.navigationBars.buttons[label].exists || app.buttons[label].exists {
             app.buttons[label].firstMatch.tap()
         }
+        // 5: no prices, since the English shots stand in for every country.
+        let places = app.tabBars.buttons["Places"]
+        XCTAssertTrue(places.waitForExistence(timeout: 5), app.debugDescription)
+        places.tap()
+        app.staticTexts["Garage"].firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Garage"].waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Back wall"].firstMatch.waitForExistence(timeout: 5))
+        try shot("5-places")
         let settings = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 5), app.debugDescription)
         settings.tap()
@@ -495,7 +497,7 @@ import StoreKitTest
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.waitForExistence(timeout: 10), "Plans didn't load")
-        try shot("5-pro")
+        try shot("review-pro")
         // Design review: the grouped lists and forms, which change the most between light and dark.
         app.navigationBars["Pro"].buttons["Settings"].tap()
         try shot("review-settings")
@@ -1418,11 +1420,6 @@ import StoreKitTest
                 try app.screenshot().pngRepresentation.write(to: folder.appendingPathComponent("\(name).png"))
             }
         }
-        // The plans load from the local StoreKit file, as in the iPhone shots.
-        let storeKitFile = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("LocaliserTests/Localiser.storekit")
-        let storeKit = try SKTestSession(contentsOf: storeKitFile)
-        storeKit.resetToDefaultState(); storeKit.disableDialogs = true; storeKit.clearTransactions()
-        defer { withExtendedLifetime(storeKit) {} }
         // 2: say where it is.
         var app = try launch(.portrait, extra: ["--voice-transcript", "the spare charger is in the blue tin on the garage back wall"])
         // Reminders on, so Settings carries no warning badge.
@@ -1447,24 +1444,18 @@ import StoreKitTest
         sleep(1)
         try store(app, "2-voice")
         app.terminate()
-        // 3: lending, with the ask-back date on the thing page.
+        // 3: lending. The demo's drill was lent to Sam two evenings ago, so its history line fits the 9:41 status bar.
         app = try launch(.portrait)
         var search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("Winter")
-        app.staticTexts["Winter tires"].firstMatch.tap()
-        app.buttons["More"].firstMatch.tap()
-        app.buttons["Lend it…"].tap()
-        let person = app.textFields["lend.person"]
-        XCTAssertTrue(person.waitForExistence(timeout: 5), app.debugDescription)
-        person.tap(); person.typeText("Sam")
-        app.buttons["lend.save"].tap()
+        search.tap(); search.typeText("drill")
+        app.staticTexts["Cordless drill"].firstMatch.tap()
         XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
         sleep(1)
         try store(app, "3-lending")
         app.terminate()
-        // 1, 4, 5: find, trip detail, Pro.
+        // 1, 4, 5: find, trip detail, a room with a box inside.
         app = try launch(.portrait)
         search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -1478,12 +1469,10 @@ import StoreKitTest
         XCTAssertTrue(app.navigationBars["Ski trip"].waitForExistence(timeout: 5))
         sleep(1)
         try store(app, "4-trip")
-        openSection("Settings", in: app)
-        let pro = app.buttons["Hereabouts Pro"]
-        for _ in 0..<6 where !pro.isHittable { app.swipeUp() }
-        pro.tap()
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.waitForExistence(timeout: 10), "Plans didn't load")
+        // 5: no prices, since the English shots stand in for every country.
+        openSection("Garage", in: app)
+        XCTAssertTrue(app.staticTexts["Back wall"].firstMatch.waitForExistence(timeout: 5), app.debugDescription)
         sleep(1)
-        try store(app, "5-pro")
+        try store(app, "5-places")
     }
 }
