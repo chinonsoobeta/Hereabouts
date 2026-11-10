@@ -147,7 +147,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 - [x] **O28 Review notes.** Paste the rewritten notes (M34). No demo account is needed. *Pasted 9 November from `Docs/BETA_AND_RELEASE.md` (1,693 characters, with the iPad and Family Sharing lines), saved and checked after a reload. Paste again if the notes change.*
 - [ ] **O29 Attach the products to the 1.0 version** before submitting.
 - [x] **O30 TestFlight test information**: a beta description, a feedback email and a review contact. *Saved 8 November: beta description, feedback email, review contact and review notes. Privacy policy URL (hereaboutsapp.com/privacy) and marketing URL (hereaboutsapp.com) added the same day.*
-- [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). Create them in Users and Access, Sandbox, Test Accounts, before O35: at least two, one to buy and restore on a second device and one more as a family member for Family Sharing.
+- [ ] **O50 Sandbox test accounts** (added 8 November; none exist yet). *Optional (10 November): neither TestFlight nor App Review needs them, since TestFlight purchases are free with the tester's own Apple Account and App Review uses Apple's own accounts. Create one in Users and Access, Sandbox, Test Accounts, only for what a real account can't repeat in O35: the trial a second time, a failed purchase. The owner may add someone else as a sandbox tester later.*
 
 ### Hands-on checks
 
@@ -197,7 +197,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
     - a box opened from its label.
   - [ ] Siri, plural and feminine (M65 audit): "Where are my keys in Hereabouts?"; in French "Où est ma valise dans Hereabouts?"; in Portuguese "Onde está minha mala no Hereabouts?".
 - [ ] **O40 Quality-check examples.** 200 capture sentences, written as people would say them, and 100 search pairs, from people who didn't write the code. I freeze the commit and score them (M47).
-- [ ] **O41 Ask Angela** whether she'll be the second tester.
+- [ ] **O41 Ask Angela** whether she'll be the second tester. *10 November: Angela isn't available for now; the owner may add someone else later.*
 - [x] **O47 Voice memos in other languages.** Decided 7 November: English only in 1.0. The microphone and Say it buttons show only when the app's language is English; French, Spanish and Portuguese voice memos come in 1.1, each with its own practice sentences and the voice rule.
 - [ ] **O48 A fluent reader for each language.** Have someone who speaks French, Spanish, Portuguese and British English read the app in that language (the screenshots from M63 are enough to start), and mark anything that sounds machine-made. Defaults chosen for you, change any: international French (serves France and Canada), one neutral Spanish (Spain and Latin America), Brazilian Portuguese (Portugal falls back to it).
 - [x] **O49 Listing languages in App Store Connect.** Approved 7 November; I add them in App Store Connect once O20 and M63 are done. Add English (U.K.), French, French (Canada), Spanish (Spain), Spanish (Mexico) and Portuguese (Brazil) to the listing, and paste the text from `Docs/Localization/LISTING.md` (M63). Screenshots can stay English at first; App Store Connect uses them for every language that has none. *Done 8 November on the 1.0 version page, all seven languages: promotional text, description, keywords, support URL (hereaboutsapp.com/support) and marketing URL (hereaboutsapp.com), checked after a reload. The descriptions leave out the voice paragraph until the voice rule passes; if voice memos ship, add it back in every language before submission. Still empty on that page: screenshots, copyright, the build, and App Review contact and notes.*
@@ -205,7 +205,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
 ### Go-aheads (each one separately, at the time)
 
 - [x] **O42** Upload the first build to TestFlight. *Go-ahead 10 November. Build 1.0 (1) failed Apple's processing (90129, "bundle name or display name that is already taken"): its bundle name was still Localiser. Build 1.0 (2) names the bundle Hereabouts in every language, uploaded 10 November, processed: "Ready to Submit" in TestFlight. Not given to any tester yet (O43).*
-- [ ] **O43** Invite each tester. External testers need O30 and Apple's beta review.
+- [ ] **O43** Invite each tester. External testers need O30 and Apple's beta review. *10 November (owner's OK): internal group "Internal" in TestFlight with the owner (Account Holder) as its one tester, invited, and build 1.0 (2) in it. Automatic distribution is on (it can't be changed later), so each build uploaded on the owner's go-ahead (O44) reaches the group once processed. No one else invited.*
 - [ ] **O44** Upload each later build.
 - [ ] **O45** Submit 1.0 for review.
 - [ ] **O46** Release it, on manual release. *The version was set to manual release in App Store Connect on 9 November.*
