@@ -27,7 +27,7 @@ Effort is in working sessions, as in `AUDIT_AND_LAUNCH_PLAN.md`. Each step is co
 
 | | Decision |
 | --- | --- |
-| Pricing | Subscription: US$2.99 a month or US$19.99 a year, each with a two-week free trial. Or US$49.99 once for lifetime. |
+| Pricing | Subscription: US$2.99 a month, or US$19.99 a year with a one-week free trial (owner, 10 November; it was two weeks on both). Or US$49.99 once for lifetime. |
 | Free plan | 20 things (was 200). Kits stay at 2 and receipt scans at 5 a month. |
 | Features | Household sharing and iCloud sync; the Due widget; faster capture (share sheet, a "Put away…" button for Control Centre, the Lock Screen and the Action button, and naming things from a shelf photo); "Lent to…"; box labels; "Found it"; Private things; quick wins (send where it is by Messages, shortcuts on the app icon). |
 | Not chosen | iPad and Mac. |
@@ -37,7 +37,7 @@ Effort is in working sessions, as in `AUDIT_AND_LAUNCH_PLAN.md`. Each step is co
 Say if any should change. Each is cheap to change before its step starts.
 
 1. **Pro removes the limits now and adds household sharing when that ships.** Everything else stays free, including iCloud sync to your own devices. Sync runs on each person's own iCloud storage, so it costs nothing to run, and it protects their notebook. Cubby charges for it, which makes free sync a selling point. The 20-thing limit is what makes people pay.
-2. **The trial is Apple's free-trial offer.** People choose monthly or yearly and pay nothing for two weeks. They can cancel in Settings before it ends. If reminders are on, the app says two days before the trial ends.
+2. **The trial is Apple's free-trial offer.** People who choose yearly pay nothing for the first week; monthly starts paid. They can cancel in Settings before it ends. If reminders are on, the app says two days before the trial ends.
 3. **Yearly is the plan shown first.** The app works out its saving from the store prices (44% at US prices).
 4. **Nobody loses anything.** Over the limit, every thing stays findable, editable and exportable, and only adding new things stops. The app already behaves this way at the limit.
 5. **The builds I put on phones keep a 200-thing limit.** They can't buy Pro. TestFlight and the App Store use 20, and TestFlight purchases are free test purchases.
@@ -76,7 +76,7 @@ Phase A is about 9 sessions and Phase B about 10, plus the testing weeks. A1 com
 
 ### A1. Subscription
 
-**What people see.** The Pro screen offers three plans: yearly first, then monthly, then lifetime. Its main button says "Try free for 2 weeks" when the person can still have the trial; otherwise it gives the plan's price. Under the button, the screen says what the plan costs after the trial and that it renews until cancelled. It links to the Terms of Use, the privacy policy, Restore purchases and, for subscribers, Manage subscription. Once someone has Pro, the screen shows their status. For example:
+**What people see.** The Pro screen offers three plans: yearly first, then monthly, then lifetime. Its main button says "Try free for 1 week" on the yearly plan when the person can still have the trial; otherwise it gives the plan's price. Under the button, the screen says what the plan costs after the trial and that it renews until cancelled. It links to the Terms of Use, the privacy policy, Restore purchases and, for subscribers, Manage subscription. Once someone has Pro, the screen shows their status. For example:
 - "Pro, renews 12 Nov"
 - "Free trial, ends 26 Oct"
 - "Lifetime. Thank you."
@@ -98,7 +98,7 @@ Settings keeps "Free plan · 14 of 20 things". The thing editor adds a quiet lin
   - The "Founder's price" stamp and the struck-through price go, and so does the `HereaboutsFoundersPricing` key in `project.yml`.
   - "Pay once. Keep it forever." and "No subscription, ever." go too.
   - Prices always come from StoreKit, never from the code.
-- `LocaliserTests/Localiser.storekit` gets the subscription group, both plans with a two-week free trial, and lifetime at 49.99.
+- `LocaliserTests/Localiser.storekit` gets the subscription group, yearly with a one-week free trial, monthly with none, and lifetime at 49.99.
 - These need updating to match:
   - the free-limit message in `System/Intents.swift`;
   - the onboarding limit check;
@@ -374,8 +374,8 @@ In order:
 
    | Product | Type | Product ID | Price | Free trial | Family Sharing |
    | --- | --- | --- | --- | --- | --- |
-   | Pro monthly | Auto-renewable, group "Hereabouts Pro" | `<id>.pro.monthly` | US$2.99 | 2 weeks | On |
-   | Pro yearly | Same group, same level | `<id>.pro.yearly` | US$19.99 | 2 weeks | On |
+   | Pro monthly | Auto-renewable, group "Hereabouts Pro" | `<id>.pro.monthly` | US$2.99 | None | On |
+   | Pro yearly | Same group, same level | `<id>.pro.yearly` | US$19.99 | 1 week | On |
    | Pro lifetime | Non-consumable | `<id>.pro.lifetime` | US$49.99 | — | On |
 
    Then turn on the billing grace period (16 days). Family Sharing can't be turned off once it's on.

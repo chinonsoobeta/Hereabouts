@@ -11,7 +11,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 - **Name** (28): Hereabouts: Find Your Things
 - **Subtitle** (25): Remember where you put it
 - **Keywords** (98): `where,find,belongings,inventory,home,organiser,packing,list,storage,lost,lend,borrow,keys,notebook`
-- **Promotional text:** Keep up to 15 things for free. Try Pro free for two weeks or buy Lifetime once. No account, ads or tracking.
+- **Promotional text:** Keep up to 15 things for free. Try Pro free for a week on the yearly plan, or buy Lifetime once. No account, ads or tracking.
 - **Description:** the English description with these changes only: "Export a backup or spreadsheet any time." (for "anytime"). Everything else reads the same in British English.
 - **Review notes, first line:** Hereabouts needs no account or login. The notebook is stored on the device.
 
@@ -20,7 +20,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 - **Name** (30): Hereabouts : Où est-ce rangé ? (App Store Connect refused "Hereabouts : Retrouvez tout" and "Hereabouts – Retrouvez tout" for French as already used; French (Canada) kept "Retrouvez tout")
 - **Subtitle** (29): N'oubliez plus où c'est rangé
 - **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
-- **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
+- **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement une semaine avec l’annuel, ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:**
 
 > Notez où vous rangez vos affaires. Retrouvez-les plus tard.
@@ -49,7 +49,7 @@ App Store Connect locales covered: English (U.K.), French, French (Canada), Span
 > Demandez « Où est mon passeport dans Hereabouts ? » pour obtenir la réponse de votre carnet. Notez et rangez vos objets sans les mains.
 >
 > GRATUIT, OU PRO
-> Enregistrez 15 objets, 1 kit et 2 maisons gratuitement. Pro supprime les limites. Les sauvegardes hebdomadaires du carnet dans votre propre iCloud Drive sont activées par défaut. Choisissez mensuel ou annuel avec deux semaines d’essai gratuit, ou achetez À vie une fois. Le partage avec votre foyer arrivera plus tard. Si Pro se termine, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré.
+> Enregistrez 15 objets, 1 kit et 2 maisons gratuitement. Pro supprime les limites. Les sauvegardes hebdomadaires du carnet dans votre propre iCloud Drive sont activées par défaut. Choisissez mensuel ou annuel, ou achetez À vie une fois. L’annuel commence par une semaine d’essai gratuit. Le partage avec votre foyer arrivera plus tard. Si Pro se termine, vous pouvez toujours voir, modifier et exporter tout ce que vous avez enregistré.
 >
 > Votre abonnement se renouvelle automatiquement, sauf si vous l’annulez au moins 24 heures avant la fin de la période. Pour le gérer ou l’annuler, ouvrez l’app Réglages, touchez votre nom, puis Abonnements. Conditions d’utilisation : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Politique de confidentialité : https://hereaboutsapp.com/privacy.
 
@@ -62,7 +62,7 @@ Same as French, with these changes for Canadian readers:
 - **Name** (27): Hereabouts : Retrouvez tout
 - **Subtitle** (29): N'oubliez plus où c'est rangé
 - **Keywords** (93): `où,trouver,objets,inventaire,maison,rangement,valise,liste,perdu,prêter,emprunter,clés,carnet`
-- **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement pendant deux semaines ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
+- **Promotional text:** Notez jusqu’à 15 objets gratuitement. Essayez Pro gratuitement une semaine avec l’annuel, ou achetez À vie une fois. Sans compte, sans publicité, sans pistage.
 - **Description:** French description, with "tableur" changed to "chiffrier". "Réglages" stays, as iOS uses it in Canada too. The French text already uses a plain space before ? and :, which suits Canadian style.
 - **Review notes, first line:** Hereabouts ne nécessite ni compte ni connexion. Le carnet est enregistré sur l’appareil.
 
@@ -71,7 +71,7 @@ Same as French, with these changes for Canadian readers:
 - **Name** (26): Hereabouts: Encuentra todo
 - **Subtitle** (27): Recuerda dónde lo guardaste
 - **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
-- **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
+- **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis una semana con el plan anual o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:**
 
 > Anota dónde guardas las cosas. Encuéntralas después.
@@ -100,7 +100,7 @@ Same as French, with these changes for Canadian readers:
 > Pregunta “¿Dónde está mi pasaporte en Hereabouts?” para obtener la respuesta de tu libreta. Anota y guarda cosas sin usar las manos.
 >
 > GRATIS, O PRO
-> Guarda 15 objetos, 1 kit y 2 casas gratis. Pro quita los límites. Las copias semanales de la libreta en tu propio iCloud Drive están activadas de serie. Elige mensual o anual con dos semanas de prueba gratis, o compra De por vida una sola vez. Compartir con tu hogar llegará más adelante. Si Pro termina, puedes seguir viendo, editando y exportando todo lo que guardaste.
+> Guarda 15 objetos, 1 kit y 2 casas gratis. Pro quita los límites. Las copias semanales de la libreta en tu propio iCloud Drive están activadas de serie. Elige mensual o anual, o compra De por vida una sola vez. El anual empieza con una semana de prueba gratis. Compartir con tu hogar llegará más adelante. Si Pro termina, puedes seguir viendo, editando y exportando todo lo que guardaste.
 >
 > Tu suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes de que termine el periodo. Para gestionarla o cancelarla, abre la app Ajustes, toca tu nombre y luego Suscripciones. Condiciones de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de privacidad: https://hereaboutsapp.com/privacy.
 
@@ -113,7 +113,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 - **Name** (26): Hereabouts: Encuentra todo
 - **Subtitle** (27): Recuerda dónde lo guardaste
 - **Keywords** (94): `dónde,buscar,objetos,inventario,casa,orden,maleta,lista,guardar,perdido,prestar,llaves,libreta`
-- **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis dos semanas o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
+- **Promotional text:** Anota hasta 15 objetos gratis. Prueba Pro gratis una semana con el plan anual o compra De por vida una sola vez. Sin cuenta, sin anuncios y sin rastreo.
 - **Description:** Spanish (Spain) description with "Mantén pulsado" changed to "Mantén presionado", "de serie" to "de forma predeterminada", "el domingo por la tarde" to "el domingo en la noche", and "abre la app Ajustes" to "abre la app Configuración" (the iOS name in Latin America).
 - **Review notes, first line:** Hereabouts no necesita cuenta ni inicio de sesión. La libreta se guarda en el dispositivo.
 
@@ -122,7 +122,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 - **Name** (25): Hereabouts: Onde guardei? ("Hereabouts: Encontre tudo" was refused as already used)
 - **Subtitle** (24): Lembre onde você guardou
 - **Keywords** (96): `onde,achar,objetos,inventário,casa,organizar,mala,lista,guardar,perdido,emprestar,chaves,caderno`
-- **Promotional text:** Anote até 15 objetos grátis. Teste o Pro grátis por duas semanas ou compre o Vitalício uma vez. Sem conta, sem anúncios e sem rastreamento.
+- **Promotional text:** Anote até 15 objetos grátis. Teste o Pro grátis por uma semana no plano anual ou compre o Vitalício uma vez. Sem conta, sem anúncios e sem rastreamento.
 - **Description:**
 
 > Anote onde você guarda as coisas. Encontre-as depois.
@@ -151,7 +151,7 @@ Same as Spanish (Spain), with these changes for Latin American readers:
 > Pergunte “Onde está meu passaporte no Hereabouts?” para ter a resposta do seu caderno. Anote e guarde coisas sem usar as mãos.
 >
 > GRÁTIS, OU PRO
-> Salve 15 objetos, 1 kit e 2 casas grátis. O Pro tira os limites. Os backups semanais do caderno no seu próprio iCloud Drive vêm ativados. Escolha mensal ou anual com duas semanas de teste grátis, ou compre o Vitalício uma vez. O compartilhamento com a família chega depois. Se o Pro acabar, você ainda pode ver, editar e exportar tudo o que salvou.
+> Salve 15 objetos, 1 kit e 2 casas grátis. O Pro tira os limites. Os backups semanais do caderno no seu próprio iCloud Drive vêm ativados. Escolha mensal ou anual, ou compre o Vitalício uma vez. O anual começa com uma semana de teste grátis. O compartilhamento com a família chega depois. Se o Pro acabar, você ainda pode ver, editar e exportar tudo o que salvou.
 >
 > Sua assinatura renova automaticamente, a menos que você a cancele pelo menos 24 horas antes do fim do período. Para gerenciar ou cancelar, abra o app Ajustes, toque no seu nome e depois em Assinaturas. Termos de Uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Política de Privacidade: https://hereaboutsapp.com/privacy.
 

@@ -38,7 +38,7 @@ These match O39 in `RELEASE_PLAN.md`; check them off there.
 - Review every tab, Settings and Pro in light and dark mode, at the largest text size and with VoiceOver. Check focus order, error announcements and labels.
 - Check that tips appear once and in order.
 - Notifications: deny, revoke, act on an ask-back reminder, force-quit, leave the phone idle for days, change time zone. The Settings tab's warning shows when notifications are off.
-- Purchases: StoreKit sandbox buy of each product, start both trials and cancel, restore on a second device, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
+- Purchases: StoreKit sandbox buy of each product, start the yearly trial and cancel, restore on a second device, failure, Ask to Buy and refund. Family Sharing unlocks a family member. After a refund, existing data, editing and export still work.
 - Voice: microphone denied, then allowed; a long sentence; a place the notebook doesn't know is left blank.
 - Siri: "Where is <thing> in Hereabouts" and "Write something down in Hereabouts", with the phone locked and unlocked. The 16th free thing is refused politely. A private thing's place is never spoken. A missing thing is reported as missing.
 - Sunday recap and stocktake: leave the phone through a Sunday 18:00 and a first Saturday with things not checked for three months. Tap each notification and check it opens the right sheet. Turn both off in Settings and check nothing more arrives. Check the trip-eve reminder the evening before a trip that isn't fully packed.
@@ -57,14 +57,14 @@ No public launch with an open data-loss defect, a place filled in without the pe
 | Primary category | Productivity | |
 | Secondary category | Utilities | |
 | Age rating | 4+ | |
-| Price | Free, with Hereabouts Pro as a monthly or yearly plan (two weeks free) or Lifetime. No price is written in the listing; the App Store shows each country's | |
+| Price | Free, with Hereabouts Pro as a monthly plan, a yearly plan (the first week free) or Lifetime. No price is written in the listing; the App Store shows each country's | |
 | Keywords | `where,find,belongings,inventory,home,organizer,packing,list,storage,lost,lend,borrow,keys,notebook` | 100 |
 
 The keywords leave out "Hereabouts", plurals and category names because the App Store already indexes those.
 
 **Promotional text** (170 characters, editable without review):
 
-> Keep up to 15 things for free. Try Pro free for two weeks or buy Lifetime once. No account, ads or tracking.
+> Keep up to 15 things for free. Try Pro free for a week on the yearly plan, or buy Lifetime once. No account, ads or tracking.
 
 **Description:**
 
@@ -94,7 +94,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > Ask "Where's my passport in Hereabouts?" to get an answer from your notebook. Write things down and put them away hands-free.
 >
 > FREE, OR PRO
-> Save 15 things, 1 kit and 2 homes for free. Pro removes the limits. Weekly notebook backups to your own iCloud Drive are on by default. Choose monthly or yearly with a two-week free trial, or buy Lifetime once. Household sharing is coming later. If Pro ends, you can still see, edit and export everything you saved.
+> Save 15 things, 1 kit and 2 homes for free. Pro removes the limits. Weekly notebook backups to your own iCloud Drive are on by default. Choose monthly or yearly, or buy Lifetime once. Yearly starts with a one-week free trial. Household sharing is coming later. If Pro ends, you can still see, edit and export everything you saved.
 >
 > Your subscription renews automatically unless you cancel at least 24 hours before the period ends. To manage or cancel it, open the Settings app. Tap your name, then Subscriptions. Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/. Privacy Policy: https://hereaboutsapp.com/privacy.
 
@@ -122,7 +122,7 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 
 > Hereabouts needs no account or login. The notebook is stored on the device.
 >
-> The free plan allows 15 things, 1 kit and 2 homes. Pro removes those limits. There are monthly and yearly subscriptions, each with a two-week free trial, and a one-time Lifetime purchase. The products are dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly and dev.hereabouts.pro.lifetime in the group "Hereabouts Pro". All three support Family Sharing.
+> The free plan allows 15 things, 1 kit and 2 homes. Pro removes those limits. There are monthly and yearly subscriptions and a one-time Lifetime purchase. The yearly subscription has a one-week free trial; the monthly one has none. The products are dev.hereabouts.pro.monthly, dev.hereabouts.pro.yearly and dev.hereabouts.pro.lifetime in the group "Hereabouts Pro". All three support Family Sharing.
 >
 > Pro includes automatic weekly backups of the whole notebook. They're on by default and go to the person's own iCloud Drive, or the device if iCloud Drive is off. The newest five are kept. Subscriptions also include regular updates. Household sharing is planned for version 1.1. If Pro ends, saved data remains visible, editable and exportable.
 >

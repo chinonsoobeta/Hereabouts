@@ -67,7 +67,7 @@ The test turns reminders on before the first shot, so Due shows no warning. The 
 
 ## Purchases
 
-`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.hereabouts.pro.monthly` at US$2.99 and `dev.hereabouts.pro.yearly` at US$19.99, each with a two-week free trial) and `dev.hereabouts.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 15 things, 1 packing kit and 2 homes; the thing limit is set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
+`LocaliserTests/Localiser.storekit` is a local StoreKit configuration for testing. It defines the Hereabouts Pro subscription group (`dev.hereabouts.pro.monthly` at US$2.99 and `dev.hereabouts.pro.yearly` at US$19.99, with a one-week free trial on yearly only) and `dev.hereabouts.pro.lifetime` at US$49.99, all with Family Sharing. The real products must be created in App Store Connect before release; see `Docs/FEATURE_PLAN.md`. The free plan holds 15 things, 1 packing kit and 2 homes; the thing limit is set by `HEREABOUTS_FREE_THINGS` in `project.yml`.
 
 ## Notebook data
 
