@@ -7,7 +7,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "Hereabouts"
           }
         },
@@ -43,32 +43,32 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Localiser"
+            "state" : "translated",
+            "value" : "Hereabouts"
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Localiser"
+            "value" : "Hereabouts"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Localiser"
+            "value" : "Hereabouts"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Localiser"
+            "value" : "Hereabouts"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Localiser"
+            "value" : "Hereabouts"
           }
         }
       }

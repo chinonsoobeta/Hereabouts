@@ -25,6 +25,9 @@ targets:
     info:
       path: Localiser/Info.plist
       properties:
+        # CFBundleName stays $(PRODUCT_NAME), Localiser, which is also the module name, because Xcode's generated
+        # Info.plist would override it anyway. Every language names the bundle Hereabouts in InfoPlist.xcstrings,
+        # and scripts/check-release.sh checks it: App Store Connect refused a build named Localiser (90129).
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         HereaboutsSiteURL: $(HEREABOUTS_SITE_URL)
@@ -85,7 +88,7 @@ targets:
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Use the microphone to say where you keep a thing. Hold to talk, and let go when you're done. Nothing is recorded.
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '1'
+        CURRENT_PROJECT_VERSION: '2'
         CODE_SIGN_ENTITLEMENTS: Localiser/Localiser.entitlements
     dependencies:
       - target: HereaboutsControls
@@ -109,7 +112,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app.controls
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '1'
+        CURRENT_PROJECT_VERSION: '2'
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) HEREABOUTS_CONTROLS
         GENERATE_INFOPLIST_FILE: YES
   # Home screen and Lock Screen buttons (Find and Say it), and the lent-out widget. The buttons read nothing from the
@@ -135,7 +138,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app.widget
         CODE_SIGN_ENTITLEMENTS: HereaboutsWidget/HereaboutsWidget.entitlements
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '1'
+        CURRENT_PROJECT_VERSION: '2'
         GENERATE_INFOPLIST_FILE: YES
   LocaliserTests:
     type: bundle.unit-test
