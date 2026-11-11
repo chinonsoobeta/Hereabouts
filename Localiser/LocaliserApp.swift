@@ -467,14 +467,14 @@ struct RootView: View {
             QuickActions.shared.link = nil
         }
         .onChange(of: scenePhase) { _, value in
-            if value == .active { do { try store.refresh() } catch { reminders.error = error.localizedDescription }; Task { await pro.refresh(); await backUpIfDue() } }
+            if value == .active { store.catchUp(); Task { await pro.refresh(); await backUpIfDue() } }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             // Midnight or a time-zone change: regroup the dates and requeue reminders (the revision change does both).
-            do { try store.refresh() } catch { reminders.error = error.localizedDescription }
+            store.catchUp()
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange).receive(on: RunLoop.main)) { _ in
-            do { try store.mergeOutsideChanges(); try store.refresh() } catch { reminders.error = error.localizedDescription }
+            store.catchUp(mergingOutside: true)
         }
         // Last, so the sheets and the cover above are inside it and see these too.
         .environment(pro)
@@ -511,7 +511,7 @@ struct RootView: View {
             Tab(value: AppTab.places) { placesStack } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.packing) { tripsStack } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.settings) { NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
-                .badge(reminders.coverageGap ? Text("!") : nil)
+                .badge(reminders.coverageGap || store.isStale ? Text("!") : nil)
         }
     }
 
@@ -597,7 +597,7 @@ struct RootView: View {
         row(.place(place.id), place.name, PlaceTile.symbol(for: place.name), count: place.activeItemCount)
             .dropDestination(for: ThingDrag.self) { drops, _ in
                 do { return try store.moveDropped(drops.map(\.id), to: place) > 0 }
-                catch { reminders.error = error.localizedDescription; return false }
+                catch { return false }
             } isTargeted: { over in
                 if over { dropTarget = place.id } else if dropTarget == place.id { dropTarget = nil }
             }

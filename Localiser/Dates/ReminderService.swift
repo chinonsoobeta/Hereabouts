@@ -6,7 +6,18 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     var permission = "Not checked"
     var scheduled: [PlannedReminder] = []
     var candidateCount = 0
-    var error: String?
+    /// What Settings says under Reminders when turning them on or setting one fails. Always the app's own
+    /// words: the system's error text ("Cocoa error 134501") never reaches the screen.
+    enum Problem: CaseIterable {
+        case notTurnedOn, notSet
+        var message: String {
+            switch self {
+            case .notTurnedOn: String(localized: "Reminders couldn't be turned on. Try again.")
+            case .notSet: String(localized: "Some reminders couldn't be set. Close Hereabouts and open it again.")
+            }
+        }
+    }
+    var problem: Problem?
     @ObservationIgnored private var updateTask: Task<Void, Never>?
     @ObservationIgnored weak var store: LocaliserStore? {
         didSet { replayPendingActions() }
@@ -29,8 +40,8 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func enable() async {
-        do { _ = try await center.requestAuthorization(options: [.alert, .sound]); error = nil }
-        catch { self.error = error.localizedDescription }
+        do { _ = try await center.requestAuthorization(options: [.alert, .sound]); problem = nil }
+        catch { problem = .notTurnedOn }
         if let store { refresh(store.deadlines); refreshRituals(store) }
     }
 
@@ -62,7 +73,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         let pending = await center.pendingNotificationRequests()
         guard !Task.isCancelled else { return }
         center.removePendingNotificationRequests(withIdentifiers: pending.filter { $0.identifier.hasPrefix("localiser.deadline.") }.map(\.identifier))
-        scheduled = []; error = nil
+        scheduled = []; problem = nil
         guard authorized else { return }
         for reminder in candidates.prefix(50) {
             guard !Task.isCancelled else { return }
@@ -79,7 +90,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
             do {
                 try await center.add(UNNotificationRequest(identifier: reminder.id, content: content, trigger: trigger))
                 scheduled.append(reminder)
-            } catch { self.error = error.localizedDescription }
+            } catch { problem = .notSet }
         }
     }
 

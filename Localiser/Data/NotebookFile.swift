@@ -148,6 +148,14 @@ struct HistoryLedger {
         defaults.set(dates, forKey: Self.datesKey)
     }
 
+    /// Drops a reader's saved place, so its next read starts from the beginning.
+    func forget(_ reader: String) {
+        defaults.removeObject(forKey: Self.tokenKey(reader))
+        var dates = defaults.dictionary(forKey: Self.datesKey) as? [String: Date] ?? [:]
+        dates[reader] = nil
+        defaults.set(dates, forKey: Self.datesKey)
+    }
+
     /// The point every reader has reached, or nil before any has read.
     var everyoneRead: Date? { (defaults.dictionary(forKey: Self.datesKey) as? [String: Date])?.values.min() }
 }
@@ -156,16 +164,36 @@ struct HistoryLedger {
     /// Brings in what another process (the widget, the share sheet) saved to the notebook since this
     /// reader last looked. Returns how many outside changes arrived.
     @discardableResult func mergeOutsideChanges(reader: String = LocaliserStore.appAuthor, ledger: HistoryLedger = HistoryLedger()) throws -> Int {
-        let request = NSPersistentHistoryChangeRequest.fetchHistory(after: ledger.token(for: reader))
-        request.resultType = .transactionsAndChanges
-        let result = try context.execute(request) as? NSPersistentHistoryResult
-        let transactions = result?.result as? [NSPersistentHistoryTransaction] ?? []
+        let saved = ledger.token(for: reader)
+        let transactions: [NSPersistentHistoryTransaction]
+        do { transactions = try history(after: saved) }
+        catch where saved != nil {
+            // The saved place is from another notebook file, or that stretch of history was trimmed. Read it all again.
+            ledger.forget(reader)
+            transactions = try history(after: nil)
+        }
         guard let last = transactions.last else { return 0 }
         let outside = transactions.filter { $0.author != reader }
         for transaction in outside { context.mergeChanges(fromContextDidSave: transaction.objectIDNotification()) }
         ledger.record(last.token, at: last.timestamp, for: reader)
         if !outside.isEmpty { try refresh() }
         return outside.count
+    }
+
+    private func history(after token: NSPersistentHistoryToken?) throws -> [NSPersistentHistoryTransaction] {
+        let request = NSPersistentHistoryChangeRequest.fetchHistory(after: token)
+        request.resultType = .transactionsAndChanges
+        return (try context.execute(request) as? NSPersistentHistoryResult)?.result as? [NSPersistentHistoryTransaction] ?? []
+    }
+
+    /// Brings what's on screen up to date. If that fails the screen keeps what it had, and Settings says so
+    /// in the app's own words.
+    func catchUp(mergingOutside: Bool = false, ledger: HistoryLedger = HistoryLedger()) {
+        do {
+            if mergingOutside { try mergeOutsideChanges(ledger: ledger) }
+            try refresh()
+            isStale = false
+        } catch { isStale = true }
     }
 
     /// The trim cutoff: a week back, but never past a reader that hasn't caught up.

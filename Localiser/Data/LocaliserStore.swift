@@ -53,6 +53,8 @@ final class LocaliserStore {
     var author = ""
     var currentHomeID = UserDefaults.standard.string(forKey: LocaliserStore.currentHomeKey).flatMap(UUID.init(uuidString:))
     var revision = 0
+    /// True while the last attempt to bring the notebook up to date failed (see `catchUp`).
+    var isStale = false
     /// Name of the most recent permanent deletion that can still be undone.
     var undoableDeletion: String?
     /// Item to show on the Find tab, set by Spotlight, Siri or a widget.

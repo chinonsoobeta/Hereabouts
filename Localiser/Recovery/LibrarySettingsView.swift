@@ -36,6 +36,12 @@ struct LibrarySettingsView: View {
 
     var body: some View {
         SheetList {
+            if store.isStale {
+                Section {
+                    Label("Hereabouts couldn't refresh your notebook. Close the app and open it again. Nothing has been deleted.", systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(Theme.warning).fixedSize(horizontal: false, vertical: true)
+                }
+            }
             Section {
                 NavigationLink(value: SettingsPage.pro) {
                     NotebookLine(name: String(localized: "Hereabouts Pro"), detail: pro.standing?.summary ?? String(localized: "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
@@ -57,7 +63,7 @@ struct LibrarySettingsView: View {
                 } else {
                     Button("Turn on reminders", systemImage: "bell.badge") { Task { await reminders.enable() } }
                 }
-                if let error = reminders.error { Text(error).font(.wbCaption).foregroundStyle(Theme.warning) }
+                if let problem = reminders.problem { Text(problem.message).font(.wbCaption).foregroundStyle(Theme.warning).fixedSize(horizontal: false, vertical: true) }
                 Toggle("Show names in reminders", isOn: $showItemNames)
                     .onChange(of: showItemNames) { _, _ in reminders.refresh(store.deadlines); reminders.refreshRituals(store) }
                 Toggle("Sunday recap", isOn: $recapOn)

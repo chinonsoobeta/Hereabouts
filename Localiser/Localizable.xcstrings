@@ -8217,6 +8217,34 @@
         }
       }
     },
+    "Hereabouts couldn't refresh your notebook. Close the app and open it again. Nothing has been deleted." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts couldn't refresh your notebook. Close the app and open it again. Nothing has been deleted."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts no pudo actualizar tu libreta. Cierra la app y ábrela de nuevo. No se ha eliminado nada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts n’a pas pu actualiser votre carnet. Fermez l’app, puis rouvrez-la. Rien n’a été supprimé."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Hereabouts não conseguiu atualizar seu caderno. Feche o app e abra de novo. Nada foi apagado."
+          }
+        }
+      }
+    },
     "Hereabouts keeps only the name. It doesn't read your contacts." : {
       "localizations" : {
         "en-GB" : {
@@ -14187,6 +14215,34 @@
         }
       }
     },
+    "Reminders couldn't be turned on. Try again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders couldn't be turned on. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron activar los recordatorios. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’activer les rappels. Réessayez."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível ativar os lembretes. Tente de novo."
+          }
+        }
+      }
+    },
     "Reminders when you need them." : {
       "localizations" : {
         "en-GB" : {
@@ -15939,6 +15995,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faltavam entradas de %@ no backup. Seu caderno original foi mantido."
+          }
+        }
+      }
+    },
+    "Some reminders couldn't be set. Close Hereabouts and open it again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some reminders couldn't be set. Close Hereabouts and open it again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron programar algunos recordatorios. Cierra Hereabouts y ábrelo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains rappels n’ont pas pu être programmés. Fermez Hereabouts, puis rouvrez-le."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível agendar alguns lembretes. Feche o Hereabouts e abra de novo."
           }
         }
       }
