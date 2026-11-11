@@ -1497,7 +1497,13 @@ import StoreKitTest
         XCTAssertTrue(app.staticTexts["Free and Pro"].waitForExistence(timeout: 5), app.debugDescription)
         sleep(2)
         try store(app, "review-pro")
-        app.swipeUp(); sleep(1)
+        // On the Duo's inner screen a swipe on the app's own frame lands elsewhere, so drag headings up to the bar instead.
+        let bar = app.navigationBars["Pro"]
+        for label in ["Free and Pro", "Three ways to pay for Pro"] {
+            let heading = app.staticTexts[label]
+            if heading.exists && heading.isHittable { heading.press(forDuration: 0.05, thenDragTo: bar, withVelocity: .slow, thenHoldForDuration: 0.3) }
+        }
+        sleep(1)
         try store(app, "review-pro-more")
     }
 }
