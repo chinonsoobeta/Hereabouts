@@ -155,6 +155,21 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertNil(unreachable.message, "The Pro screen has its own line when there is nothing to buy")
     }
 
+    /// Restore purchases can ask for the Apple Account password. Closing that prompt isn't a failure, so nothing is
+    /// reported as one. (A canceled purchase never arrives as an error: it is one of the purchase's own results.)
+    func testCancelingTheAppleAccountPromptIsNotAFailure() async throws {
+        let session = try session()
+        defer { session.clearTransactions(); session.resetToDefaultState() }
+        let pro = ProAccess()
+        await pro.loadProduct()
+
+        try await session.setSimulatedError(.generic(.userCancelled), forAPI: .appStoreSync)
+        await pro.restorePurchases()
+        try await session.setSimulatedError(nil, forAPI: .appStoreSync)
+        XCTAssertNil(pro.message, "Nothing went wrong, so there is nothing to say")
+        XCTAssertFalse(pro.unlocked)
+    }
+
     func testPricingSentences() {
         XCTAssertEqual(ProPricing.saving(yearly: Decimal(string: "19.99")!, monthly: Decimal(string: "2.99")!), 44)
         XCTAssertNil(ProPricing.saving(yearly: 40, monthly: 2.99))
