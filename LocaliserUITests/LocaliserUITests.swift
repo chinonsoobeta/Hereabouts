@@ -24,11 +24,17 @@ import StoreKitTest
         XCTAssertTrue(pro.waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Reminders"].exists, "Settings explains reminders and offers to turn them on")
         pro.tap()
+        // The plan you're on, then Free and Pro side by side (owner, 10 Nov).
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Your plan'")).firstMatch.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.staticTexts["Free and Pro"].exists)
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Things' AND value BEGINSWITH 'Free: '")).firstMatch.exists, "The table's rows read both columns\n\(app.debugDescription)")
         // Three plans, yearly chosen first, and the trial button, from the local StoreKit configuration.
         // iOS 26.5's local StoreKit service doesn't serve products, so the plan checks run on iOS 27.
         let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
         if yearly.waitForExistence(timeout: 10) {
             XCTAssertTrue(yearly.isSelected)
+            XCTAssertTrue(app.staticTexts["Three ways to pay for Pro"].exists)
+            XCTAssertFalse(yearly.label.contains("·"), "Each price on its own line, no middle dots: \(yearly.label)")
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch.exists)
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label == 'Try free for 1 week' OR label BEGINSWITH 'Subscribe for'")).firstMatch.exists)
             app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Lifetime'")).firstMatch.tap()
@@ -80,6 +86,8 @@ import StoreKitTest
         let room = app.textFields["Where do you keep it?"]
         room.tap(); room.typeText("Hall closet\n")
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 5))
+        // No plan to choose here, only a line about the free plan (owner, 10 Nov).
+        XCTAssertTrue(app.staticTexts["Your first 15 things are free. You can change your plan anytime in Settings."].exists, app.debugDescription)
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         app.buttons["Write it down"].tap()
         XCTAssertTrue(app.staticTexts["Reminders when you need them."].waitForExistence(timeout: 5))
@@ -497,6 +505,14 @@ import StoreKitTest
         reveal(pro, in: app); pro.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.waitForExistence(timeout: 10), "Plans didn't load")
+        // The products' review screenshot shows the plans and their prices, so the ways to pay go to the top of the screen.
+        let ways = app.staticTexts["Three ways to pay for Pro"]
+        reveal(ways, in: app)
+        let top = app.navigationBars["Pro"].frame.maxY + 24
+        ways.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: app.frame.midX, dy: top)), withVelocity: .slow, thenHoldForDuration: 0.5)
+        sleep(1)
+        XCTAssertTrue(app.buttons["Try free for 1 week"].isHittable, "The trial button is on the review screenshot\n\(app.debugDescription)")
         try shot("review-pro")
         // Design review: the grouped lists and forms, which change the most between light and dark.
         app.navigationBars["Pro"].buttons["Settings"].tap()
@@ -1474,5 +1490,14 @@ import StoreKitTest
         XCTAssertTrue(app.staticTexts["Back wall"].firstMatch.waitForExistence(timeout: 5), app.debugDescription)
         sleep(1)
         try store(app, "5-places")
+        // The Pro screen, to check its wide layout. Not for the store: the English shots stand in for every country, and it shows prices.
+        openSection("Settings", in: app)
+        let pro = app.buttons["Hereabouts Pro"]
+        XCTAssertTrue(pro.waitForExistence(timeout: 5), app.debugDescription); pro.tap()
+        XCTAssertTrue(app.staticTexts["Free and Pro"].waitForExistence(timeout: 5), app.debugDescription)
+        sleep(2)
+        try store(app, "review-pro")
+        app.swipeUp(); sleep(1)
+        try store(app, "review-pro-more")
     }
 }

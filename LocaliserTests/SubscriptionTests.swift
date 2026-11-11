@@ -157,6 +157,64 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(ProStanding(plan: .monthly, periodEnd: end, inTrial: true).summary, "Free trial, ends \(day)")
     }
 
+    /// The "Your plan" card on the Pro screen: which plan, and its facts one to a line (owner, 10 Nov).
+    func testPlanCard() throws {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = .current
+        let end = try XCTUnwrap(calendar.date(from: DateComponents(year: 2027, month: 11, day: 12, hour: 12)))
+        let day = PlanCard.date(end)
+        let things = CreationKind.item.freeLimit
+
+        let free = PlanCard.make(standing: nil, lapsed: false, counts: .init(things: 9, kits: 1, homes: 1), price: nil)
+        XCTAssertEqual(free.title, "Free")
+        XCTAssertEqual(free.facts.map(\.name), ["Things", "Packing kits", "Homes"])
+        XCTAssertEqual(free.facts.map(\.value), ["9 of \(things)", "1 of 1", "1 of 2"])
+        XCTAssertEqual(free.facts.map(\.warning), [false, false, false], "At a limit isn't over it")
+        XCTAssertNil(free.note)
+
+        let lapsed = PlanCard.make(standing: nil, lapsed: true, counts: .init(things: things + 8, kits: 3, homes: 2), price: nil)
+        XCTAssertEqual(lapsed.title, "Free")
+        XCTAssertEqual(lapsed.facts.map(\.warning), [true, true, false])
+        XCTAssertEqual(lapsed.note, "Your subscription ended. Everything you saved is still here. You can still find, edit and export it.")
+
+        let yearly = PlanCard.make(standing: ProStanding(plan: .yearly, periodEnd: end), lapsed: false, counts: .init(), price: "$19.99 a year")
+        XCTAssertEqual(yearly.title, "Pro")
+        XCTAssertEqual(yearly.facts.map(\.name), ["Paid", "Renews", "Price"])
+        XCTAssertEqual(yearly.facts.map(\.value), ["Yearly", day, "$19.99 a year"])
+        XCTAssertNil(yearly.note)
+
+        let trial = PlanCard.make(standing: ProStanding(plan: .yearly, periodEnd: end, inTrial: true), lapsed: false, counts: .init(), price: "$19.99 a year")
+        XCTAssertEqual(trial.title, "Pro, free trial")
+        XCTAssertEqual(trial.facts.map(\.name), ["Trial ends", "Then"])
+        XCTAssertEqual(trial.facts.map(\.value), [day, "$19.99 a year"])
+        XCTAssertEqual(trial.note, "Cancel at least a day before it ends and you pay nothing.")
+
+        let cancelledTrial = PlanCard.make(standing: ProStanding(plan: .yearly, periodEnd: end, inTrial: true, willRenew: false), lapsed: false, counts: .init(), price: "$19.99 a year")
+        XCTAssertEqual(cancelledTrial.facts.map(\.name), ["Trial ends"], "Nothing follows a trial that won't renew")
+        XCTAssertEqual(cancelledTrial.note, "It won't renew. After that you're on Free, and everything you've saved stays.")
+
+        let ending = PlanCard.make(standing: ProStanding(plan: .monthly, periodEnd: end, willRenew: false), lapsed: false, counts: .init(), price: "$2.99 a month")
+        XCTAssertEqual(ending.facts.map(\.name), ["Paid", "Ends"])
+        XCTAssertEqual(ending.facts.map(\.value), ["Monthly", day])
+        XCTAssertEqual(ending.facts.map(\.warning), [false, true])
+        XCTAssertEqual(ending.note, "It won't renew. After that you're on Free, and everything you've saved stays.")
+
+        let lifetime = PlanCard.make(standing: ProStanding(plan: .lifetime), lapsed: false, counts: .init(), price: nil)
+        XCTAssertEqual(lifetime.title, "Pro")
+        XCTAssertEqual(lifetime.facts.map(\.value), ["Lifetime, once", "Never"])
+        XCTAssertNil(lifetime.note)
+
+        let family = PlanCard.make(standing: ProStanding(plan: .yearly, periodEnd: end, familyShared: true), lapsed: false, counts: .init(), price: "$19.99 a year")
+        XCTAssertEqual(family.facts.map(\.name), ["Shared by", "Paid", "Renews"], "The family organizer pays, so no price")
+        XCTAssertEqual(family.facts.first?.value, "Your family")
+        let familyTrial = PlanCard.make(standing: ProStanding(plan: .yearly, periodEnd: end, inTrial: true, familyShared: true), lapsed: false, counts: .init(), price: "$19.99 a year")
+        XCTAssertNil(familyTrial.note, "Only the organizer can cancel")
+
+        for card in [free, lapsed, yearly, trial, cancelledTrial, ending, lifetime, family, familyTrial] {
+            let text = ([card.title, card.note ?? ""] + card.facts.flatMap { [$0.name, $0.value] }).joined(separator: "\n")
+            XCTAssertFalse(text.contains("·"), "No middle dots on the card (owner, 10 Nov): \(text)")
+        }
+    }
+
     func testPlansAndTrialReminder() throws {
         XCTAssertEqual(ProPlan(productID: "dev.hereabouts.pro.yearly"), .yearly)
         XCTAssertNil(ProPlan(productID: "dev.hereabouts.pro.weekly"))
