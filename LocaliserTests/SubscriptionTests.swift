@@ -126,6 +126,35 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertTrue(pro.unlocked, "A card problem during the grace period doesn't take Pro away")
     }
 
+    /// When the App Store itself fails, the Pro screen says so in the app's words, never the system's.
+    func testAppStoreFailuresUseTheAppsOwnWords() async throws {
+        let session = try session()
+        defer { session.clearTransactions(); session.resetToDefaultState() }
+        let offline = StoreKitError.networkError(URLError(.notConnectedToInternet))
+        let pro = ProAccess()
+        await pro.loadProduct()
+        XCTAssertNotNil(pro.product(.monthly))
+
+        try await session.setSimulatedError(.generic(offline), forAPI: .purchase)
+        await pro.purchase(.monthly)
+        try await session.setSimulatedError(nil, forAPI: .purchase)
+        XCTAssertEqual(pro.message, PlainWords.purchaseNotFinished.text)
+        XCTAssertFalse(pro.unlocked)
+
+        try await session.setSimulatedError(.generic(offline), forAPI: .appStoreSync)
+        await pro.restorePurchases()
+        try await session.setSimulatedError(nil, forAPI: .appStoreSync)
+        XCTAssertEqual(pro.message, PlainWords.storeNotReached.text)
+
+        try await session.setSimulatedError(.generic(offline), forAPI: .loadProducts)
+        let unreachable = ProAccess()
+        await unreachable.loadProduct()
+        try await session.setSimulatedError(nil, forAPI: .loadProducts)
+        XCTAssertTrue(unreachable.productChecked)
+        XCTAssertTrue(unreachable.products.isEmpty)
+        XCTAssertNil(unreachable.message, "The Pro screen has its own line when there is nothing to buy")
+    }
+
     func testPricingSentences() {
         XCTAssertEqual(ProPricing.saving(yearly: Decimal(string: "19.99")!, monthly: Decimal(string: "2.99")!), 44)
         XCTAssertNil(ProPricing.saving(yearly: 40, monthly: 2.99))
