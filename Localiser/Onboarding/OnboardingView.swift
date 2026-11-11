@@ -206,6 +206,6 @@ struct OnboardingView: View {
                 written = try store.addItem(name: thing, place: place)
             }
             go(to: 2)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }

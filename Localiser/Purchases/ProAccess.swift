@@ -127,11 +127,10 @@ struct ProStanding: Equatable, Sendable {
     func loadProduct() async {
         defer { productChecked = true }
         do {
-            // When the products are missing, the Pro screen says so itself.
             let loaded = try await Product.products(for: Self.productIDs)
             products = Dictionary(loaded.compactMap { product in ProPlan(productID: product.id).map { ($0, product) } }, uniquingKeysWith: { first, _ in first })
             await checkTrials()
-        } catch { message = error.localizedDescription }
+        } catch {} // Missing or unreachable products: the Pro screen says so itself.
     }
 
     func purchase(_ plan: ProPlan = .yearly) async {
@@ -150,7 +149,7 @@ struct ProStanding: Equatable, Sendable {
             case .pending: message = String(localized: "Waiting for approval. You can still use your free plan.")
             @unknown default: message = String(localized: "Couldn't confirm what happened. Try Restore purchases.")
             }
-        } catch { message = error.localizedDescription }
+        } catch { message = error.plainMessage(or: .purchaseNotFinished) }
     }
 
     func restorePurchases() async {
@@ -158,7 +157,7 @@ struct ProStanding: Equatable, Sendable {
         busy = true; message = nil
         defer { busy = false }
         do { try await AppStore.sync(); await refresh(); message = unlocked ? String(localized: "Hereabouts Pro restored.") : String(localized: "No Pro purchase was found for this Apple Account.") }
-        catch { message = error.localizedDescription }
+        catch { message = error.plainMessage(or: .storeNotReached) }
     }
 
     /// Someone with lifetime who still has a subscription renewing is paying twice.

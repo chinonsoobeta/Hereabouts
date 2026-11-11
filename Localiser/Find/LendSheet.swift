@@ -49,7 +49,7 @@ struct LendSheet: View {
         do {
             try store.lend(item, to: person, askBackOn: askBack ? CalendarDay(day) : nil)
             dismiss()
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }
 

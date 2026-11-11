@@ -107,7 +107,7 @@ struct HomesView: View {
     }
 
     private func attempt(_ work: () throws -> Void) {
-        do { try work() } catch { self.error = error.localizedDescription }
+        do { try work() } catch { self.error = error.plainMessage() }
     }
 }
 
@@ -159,6 +159,6 @@ struct MoveToHomeSheet: View {
             case .place(let moving): try store.movePlace(moving, toHome: home, under: place)
             }
             dismiss()
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }

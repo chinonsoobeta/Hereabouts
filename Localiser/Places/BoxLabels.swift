@@ -160,7 +160,7 @@ struct LabelSheetView: View {
 
     private func render() {
         guard !selected.isEmpty else { file = nil; return }
-        do { file = try BoxLabels.file(for: selected, paper: paper, listContents: listContents) } catch { self.error = error.localizedDescription }
+        do { file = try BoxLabels.file(for: selected, paper: paper, listContents: listContents) } catch { self.error = error.plainMessage() }
     }
 }
 

@@ -164,7 +164,7 @@ struct KitEditor: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) { Button("Save") {
                     if kit == nil && !pro.allows(.kit, count: store.kits.count) { upgrade = true; return }
-                    do { if let kit { try store.editKit(kit, name: name) } else { try store.addKit(name: name) }; dismiss() } catch { self.error = error.localizedDescription }
+                    do { if let kit { try store.editKit(kit, name: name) } else { try store.addKit(name: name) }; dismiss() } catch { self.error = error.plainMessage() }
                 }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.save") }
             }
             .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -215,7 +215,7 @@ struct KitDetailView: View {
         .confirmationDialog("Delete \u{201C}\(kit.name)\u{201D}?", isPresented: $deleting, titleVisibility: .visible) { Button("Delete kit", role: .destructive) { attempt { try store.deleteKit(kit); dismiss() } } } message: { Text("Trips you've already planned keep their own lists.") }
         .alert("Couldn't update the kit", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
-    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
+    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.plainMessage() } }
 }
 
 /// A single row that adds a task when you press Return.
@@ -285,7 +285,7 @@ struct KitEntryEditor: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
-                do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.localizedDescription }
+                do { try store.setKitEntry(kit: kit, existing: entry, name: name, item: store.items.first { $0.id == itemID }, unit: quantity, perNight: scale.perNight, perDay: scale.perDay, condition: condition); dismiss() } catch { self.error = error.plainMessage() }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty).accessibilityIdentifier("kit.entry.save") }
         }
         .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -335,7 +335,7 @@ struct TripEditor: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
-                do { if let trip { try store.editTrip(trip, details: details) } else { try store.addTrip(details, kit: store.kits.first { $0.id == kitID }) }; dismiss() } catch { self.error = error.localizedDescription }
+                do { if let trip { try store.editTrip(trip, details: details) } else { try store.addTrip(details, kit: store.kits.first { $0.id == kitID }) }; dismiss() } catch { self.error = error.plainMessage() }
             }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || details.end < details.start).accessibilityIdentifier("trip.save") }
         }
         .alert("Couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -499,7 +499,7 @@ struct TripDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
-    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
+    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.plainMessage() } }
 }
 
 struct TripEntryAdder: View {
@@ -519,7 +519,7 @@ struct TripEntryAdder: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
             ToolbarItem(placement: .confirmationAction) { Button("Save") {
-                do { try store.addTripEntry(trip, name: name, item: store.items.first { $0.id == itemID }); dismiss() } catch { self.error = error.localizedDescription }
+                do { try store.addTripEntry(trip, name: name, item: store.items.first { $0.id == itemID }); dismiss() } catch { self.error = error.plainMessage() }
             }.disabled(itemID == nil && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
         }
         .alert("Couldn't add it", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -580,5 +580,5 @@ struct TripEntryDetailView: View {
         .confirmationDialog("Remove it from this trip? Where it lives doesn't change.", isPresented: $deleting, titleVisibility: .visible) { Button("Remove", role: .destructive) { attempt { try store.deleteTripEntry(entry); dismiss() } } }
         .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
     }
-    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.localizedDescription } }
+    private func attempt(_ action: () throws -> Void) { do { try action() } catch { self.error = error.plainMessage() } }
 }

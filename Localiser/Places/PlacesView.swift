@@ -24,7 +24,7 @@ struct PlacesView: View {
                     }
                     .confirmationDialog("Remove empty copies of places?", isPresented: $tidying, titleVisibility: .visible) {
                         Button(spares.count == 1 ? "Remove 1 copy" : "Remove \(spares.count) copies") {
-                            do { try store.mergeSparePlaces() } catch { self.error = error.localizedDescription }
+                            do { try store.mergeSparePlaces() } catch { self.error = error.plainMessage() }
                         }
                     } message: { Text("Only empty copies are removed. Places inside them move into the place you're keeping.") }
                 }
@@ -91,7 +91,7 @@ struct PlacesView: View {
     }
 
     private func addStarter(_ name: String) {
-        do { try store.addPlace(name: name) } catch { self.error = error.localizedDescription }
+        do { try store.addPlace(name: name) } catch { self.error = error.plainMessage() }
     }
 }
 
@@ -169,7 +169,7 @@ struct PlaceEditor: View {
                     if let place { try store.editPlace(place, name: name, parent: parent) }
                     else { try store.addPlace(name: name, parent: parent) }
                     dismiss()
-                } catch { self.error = error.localizedDescription }
+                } catch { self.error = error.plainMessage() }
             }.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
         }
         .alert("That didn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -275,7 +275,7 @@ struct PlaceDetailView: View {
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? place.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete place", role: .destructive) {
-                do { try store.deletePlace(place, clearContents: true); dismiss() } catch { self.error = error.localizedDescription }
+                do { try store.deletePlace(place, clearContents: true); dismiss() } catch { self.error = error.plainMessage() }
             }
         } message: {
             Text(place.parent.map { "Everything inside moves to \u{201C}\($0.name)\u{201D}. Nothing else is deleted." }

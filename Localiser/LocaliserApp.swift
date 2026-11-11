@@ -8,7 +8,8 @@ struct LocaliserApp: App {
     /// Created at launch so a notification tapped while the app was closed is not lost.
     @State private var reminders = ReminderService()
     @UIApplicationDelegateAdaptor(HereaboutsAppDelegate.self) private var appDelegate
-    private let loadError: String?
+    /// Why the notebook didn't open: the kind of failure and the system's own description, both for support.
+    private let loadFailure: (detail: String, systemText: String)?
 
     init() {
         do {
@@ -37,9 +38,9 @@ struct LocaliserApp: App {
             if url != nil, ProcessInfo.processInfo.arguments.contains("--second-home") { try MainActor.assumeIsolated { try DemoLibrary.addSecondHome(store) } }
             #endif
             IntentLibrary.store = store
-            _store = State(initialValue: store); loadError = nil
+            _store = State(initialValue: store); loadFailure = nil
         }
-        catch { loadError = error.localizedDescription }
+        catch { loadFailure = (error.supportDetail, error.systemDescription) }
         Appearance.apply()
         HereaboutsTips.configure()
     }
@@ -48,7 +49,7 @@ struct LocaliserApp: App {
         WindowGroup {
             Group {
                 if let store { RootView().environment(store) }
-                else { StoreFailureView(reason: loadError) }
+                else { StoreFailureView(detail: loadFailure?.detail, systemText: loadFailure?.systemText) }
             }
             .environment(reminders)
             .tint(Theme.purple)
@@ -734,7 +735,9 @@ extension RootView {
 
 /// Shown when the library file cannot be opened. Offers the raw file so nothing is lost.
 struct StoreFailureView: View {
-    let reason: String?
+    /// The kind of failure, shown small for support. The system's own sentence goes in the support email only.
+    let detail: String?
+    var systemText: String?
     private var files: [URL] {
         guard let legacy = try? LocaliserStore.defaultStoreURL() else { return [] }
         let base = NotebookFile.groupStoreURL().flatMap { FileManager.default.fileExists(atPath: $0.path) ? $0 : nil } ?? legacy
@@ -747,11 +750,11 @@ struct StoreFailureView: View {
                     Image(systemName: "externaldrive.badge.exclamationmark").font(.system(size: 44)).foregroundStyle(Theme.purple).accessibilityHidden(true)
                     Text("Hereabouts couldn't open your notebook").font(.wbTitle).foregroundStyle(Theme.ink)
                     Text("Nothing has been deleted. Try restarting your iPhone. If you still need help, save your notebook file and send it to support.").font(.wbBody).foregroundStyle(Theme.secondary)
-                    if let reason { Text(reason).font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
+                    if let detail { Text("Details for support: \(detail)").font(.wbCaption).foregroundStyle(Theme.secondary).textSelection(.enabled) }
                     if !files.isEmpty {
                         ShareLink(items: files) { Label("Save the notebook file (photos stay on this iPhone)", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryButtonStyle())
                     }
-                    Link(destination: Support.mail(subject: "Notebook won't open", body: reason ?? "")) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
+                    Link(destination: Support.mail(subject: "Notebook won't open", body: [detail, systemText].compactMap { $0 }.joined(separator: "\n"))) { Label("Contact support", systemImage: "envelope") }.buttonStyle(SoftButtonStyle())
                 }
                 .padding(20)
             }

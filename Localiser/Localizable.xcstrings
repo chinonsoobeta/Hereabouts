@@ -5847,6 +5847,34 @@
         }
       }
     },
+    "Couldn't check with the App Store. Try again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't check with the App Store. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo consultar el App Store. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre l’App Store. Réessayez."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível consultar a App Store. Tente de novo."
+          }
+        }
+      }
+    },
     "Couldn't confirm what happened. Try Restore purchases." : {
       "localizations" : {
         "en-GB" : {
@@ -6155,30 +6183,30 @@
         }
       }
     },
-    "Couldn't start listening. %@" : {
+    "Couldn't start listening. Try again, or type instead." : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn't start listening. %@"
+            "value" : "Couldn't start listening. Try again, or type instead."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo empezar a escuchar. %@"
+            "value" : "No se pudo empezar a escuchar. Inténtalo de nuevo, o escribe."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Écoute impossible. %@"
+            "value" : "Écoute impossible. Réessayez, ou tapez plutôt."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível começar a ouvir. %@"
+            "value" : "Não foi possível começar a ouvir. Tente de novo, ou digite."
           }
         }
       }
@@ -6627,6 +6655,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“%@” apagado"
+          }
+        }
+      }
+    },
+    "Details for support: %@" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details for support: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalles para soporte: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détails pour l’assistance : %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalhes para o suporte: %@"
           }
         }
       }
@@ -8157,6 +8213,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Backup do Hereabouts %@"
+          }
+        }
+      }
+    },
+    "Hereabouts couldn't open that backup. Try again, or choose another one." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts couldn't open that backup. Try again, or choose another one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts no pudo abrir esa copia. Inténtalo de nuevo, o elige otra."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hereabouts n’a pas pu ouvrir cette sauvegarde. Réessayez, ou choisissez-en une autre."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Hereabouts não conseguiu abrir esse backup. Tente de novo, ou escolha outro."
           }
         }
       }
@@ -16083,6 +16167,34 @@
         }
       }
     },
+    "Something went wrong. Try again, or close Hereabouts and open it again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Try again, or close Hereabouts and open it again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal. Inténtalo de nuevo, o cierra Hereabouts y ábrelo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un problème est survenu. Réessayez, ou fermez Hereabouts, puis rouvrez-le."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo deu errado. Tente de novo, ou feche o Hereabouts e abra de novo."
+          }
+        }
+      }
+    },
     "Source or terms" : {
       "localizations" : {
         "en-GB" : {
@@ -17159,6 +17271,34 @@
         }
       }
     },
+    "The App Store couldn't finish that. Try again, or try Restore purchases." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The App Store couldn't finish that. Try again, or try Restore purchases."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El App Store no pudo completar la compra. Inténtalo de nuevo, o prueba Restaurar compras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’App Store n’a pas pu finaliser l’achat. Réessayez, ou essayez Restaurer les achats."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A App Store não conseguiu concluir a compra. Tente de novo, ou tente Restaurar compras."
+          }
+        }
+      }
+    },
     "The App Store hasn't confirmed Pro yet. Try Restore purchases in a moment." : {
       "localizations" : {
         "en-GB" : {
@@ -17183,6 +17323,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A App Store ainda não confirmou o Pro. Tente Restaurar compras daqui a pouco."
+          }
+        }
+      }
+    },
+    "The backup wasn't restored. Your notebook is exactly as it was." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup wasn't restored. Your notebook is exactly as it was."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La copia no se restauró. Tu libreta está exactamente como estaba."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde n’a pas été restaurée. Votre carnet est exactement comme avant."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O backup não foi restaurado. Seu caderno está exatamente como estava."
+          }
+        }
+      }
+    },
+    "The backup wasn't saved. Try again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backup wasn't saved. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La copia no se guardó. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde n’a pas été enregistrée. Réessayez."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O backup não foi salvo. Tente de novo."
           }
         }
       }
@@ -17407,6 +17603,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A chave reserva está na lata azul da prateleira do corredor"
+          }
+        }
+      }
+    },
+    "The spreadsheet wasn't saved. Try again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The spreadsheet wasn't saved. Try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La hoja de cálculo no se guardó. Inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le tableau n’a pas été enregistré. Réessayez."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A planilha não foi salva. Tente de novo."
           }
         }
       }

@@ -171,6 +171,6 @@ struct ShelfNamesView: View {
             UserDefaults.standard.set(Date.now, forKey: ItemEditor.lastPlaceTimeKey)
             dismiss()
             onSaved()
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }

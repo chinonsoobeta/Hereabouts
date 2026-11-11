@@ -143,7 +143,7 @@ struct StocktakeView: View {
                 }
                 if let lastArchived, !lastArchived.isDeleted, lastArchived.archived {
                     Button("Undo: keep \(lastArchived.name)") {
-                        do { try store.setArchived(lastArchived, false); self.lastArchived = nil } catch { self.error = error.localizedDescription }
+                        do { try store.setArchived(lastArchived, false); self.lastArchived = nil } catch { self.error = error.plainMessage() }
                     }.font(.wbCaption).foregroundStyle(Theme.purpleInk).frame(minHeight: 44)
                 }
             }
@@ -214,7 +214,7 @@ struct StocktakeView: View {
             if !queue.isEmpty { queue.removeFirst() }
             answered += 1
             if queue.isEmpty { doneMonth = Rituals.monthKey(.now) }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }
 
@@ -282,11 +282,11 @@ struct StillThereRow: View {
                     .font(.wbCaption).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 10) {
                     Button("Still there") {
-                        do { try store.confirm(item) } catch { self.error = error.localizedDescription }
+                        do { try store.confirm(item) } catch { self.error = error.plainMessage() }
                     }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.stillThere")
                     Button("Moved", action: move).buttonStyle(SoftButtonStyle(compact: true))
                     Button("Not there") {
-                        do { try store.markMissing(item) } catch { self.error = error.localizedDescription }
+                        do { try store.markMissing(item) } catch { self.error = error.plainMessage() }
                     }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.notThere")
                 }
             }

@@ -77,7 +77,7 @@ import Speech
             try await analyzer.start(inputSequence: stream)
             phase = .listening
         } catch {
-            message = (error as? VoiceError)?.text ?? String(localized: "Couldn't start listening. \(error.localizedDescription)")
+            message = (error as? VoiceError)?.text ?? PlainWords.notListening.text
             teardown()
             phase = .idle
         }

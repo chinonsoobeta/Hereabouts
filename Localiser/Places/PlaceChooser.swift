@@ -170,6 +170,6 @@ struct PlaceChooser: View {
         do {
             if let excluded, store.deepestExistingPlace(forPath: query, home: scopeHome)?.isWithin(excluded) == true { throw LocaliserError.placeCycle }
             choose(try store.place(forPath: query, under: nil, home: scopeHome).id)
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }

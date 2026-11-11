@@ -535,7 +535,7 @@ struct ItemEditor: View {
                 UserDefaults.standard.set(Date.now, forKey: Self.lastPlaceTimeKey)
             }
             dismiss()
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage() }
     }
 }
 
@@ -596,7 +596,7 @@ struct ItemDetailView: View {
                                     .popoverTip(MoveTip())
                                 if putAway {
                                     Button("Put away here") {
-                                        do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.localizedDescription }
+                                        do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.plainMessage() }
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
@@ -606,11 +606,11 @@ struct ItemDetailView: View {
                                     Text("Ask for it back · \(day.formatted)").font(.wbCaption).foregroundStyle(Theme.ink).accessibilityIdentifier("item.askBack")
                                 }
                                 Button("It's back") {
-                                    do { try store.gotBack(item) } catch { self.error = error.localizedDescription }
+                                    do { try store.gotBack(item) } catch { self.error = error.plainMessage() }
                                 }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.back")
                                 if let askBack = item.openAskBack {
                                     Button("Ask again next week") {
-                                        do { try store.askAgainNextWeek(askBack) } catch { self.error = error.localizedDescription }
+                                        do { try store.askAgainNextWeek(askBack) } catch { self.error = error.plainMessage() }
                                     }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.askAgain")
                                 }
                             } else if item.isMissing, !item.archived {
@@ -669,7 +669,7 @@ struct ItemDetailView: View {
                             Button(item.isMissing ? "Found it…" : "Found it somewhere else…", systemImage: "sparkle.magnifyingglass") { ui.itemSheet = .found(item.id) }
                             if !item.isMissing {
                                 Button("Can't find it", systemImage: "questionmark.circle") {
-                                    do { try store.markMissing(item); ui.foundNote = nil } catch { self.error = error.localizedDescription }
+                                    do { try store.markMissing(item); ui.foundNote = nil } catch { self.error = error.plainMessage() }
                                 }
                             }
                         }
@@ -684,7 +684,7 @@ struct ItemDetailView: View {
         .onChange(of: store.revision) { _, _ in if !available { dismiss() } }
         .confirmationDialog("Delete \u{201C}\(available ? item.name : "")\u{201D}?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
-                do { try store.deleteItem(item); dismiss() } catch { self.error = error.localizedDescription }
+                do { try store.deleteItem(item); dismiss() } catch { self.error = error.plainMessage() }
             }
             if !item.archived { Button("Archive instead") { toggleArchive() } }
         } message: {
@@ -695,7 +695,7 @@ struct ItemDetailView: View {
 
     private func toggleArchive() {
         if item.archived && !pro.allows(.item, count: store.activeItemCount) { ui.upgrading = true; return }
-        do { try store.setArchived(item, !item.archived) } catch { self.error = error.localizedDescription }
+        do { try store.setArchived(item, !item.archived) } catch { self.error = error.plainMessage() }
     }
 }
 
@@ -714,14 +714,14 @@ struct ItemSheetView: View {
             case .lend: LendSheet(item: item)
             case .move:
                 PlaceChooser(selection: Binding(get: { item.place?.id }, set: { id in
-                    do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.localizedDescription }
+                    do { try store.move(item, to: store.places.first { $0.id == id }) } catch { self.error = error.plainMessage() }
                 }), home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { ui.itemSheet = nil } } }
                 .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
             case .found:
                 PlaceChooser(selection: Binding(get: { nil }, set: { id in
                     let place = store.places.first { $0.id == id }
-                    do { try store.found(item, at: place); ui.foundNote = (item.id, Movement.foundSentence(place)) } catch { self.error = error.localizedDescription }
+                    do { try store.found(item, at: place); ui.foundNote = (item.id, Movement.foundSentence(place)) } catch { self.error = error.plainMessage() }
                 }), noneTitle: String(localized: "No place yet"), suggested: store.foundSuggestions(for: item), title: String(localized: "Where was it?"), home: item.home)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { ui.itemSheet = nil } } }
                 .alert("Couldn't update", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }

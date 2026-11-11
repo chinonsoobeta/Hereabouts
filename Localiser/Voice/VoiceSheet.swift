@@ -94,7 +94,7 @@ struct NewPlaceSuggestion: View {
     var body: some View {
         let parent = spoken.parentID.flatMap { id in store.places.first { $0.id == id } }
         Button {
-            do { made(try store.addPlace(name: spoken.name, parent: parent).id) } catch { self.error = error.localizedDescription }
+            do { made(try store.addPlace(name: spoken.name, parent: parent).id) } catch { self.error = error.plainMessage() }
         } label: {
             Label(parent.map { "New place: \(spoken.name) in \($0.name)" } ?? "New place: \(spoken.name)", systemImage: "plus.circle")
         }

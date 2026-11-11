@@ -10,7 +10,7 @@ struct UndoDeletionToast: View {
                 Text("Deleted \u{201C}\(name)\u{201D}").font(.wbBody).foregroundStyle(Theme.ink).lineLimit(2)
                 Spacer(minLength: 8)
                 Button("Undo") {
-                    do { try store.undoLastDeletion() } catch { self.error = error.localizedDescription }
+                    do { try store.undoLastDeletion() } catch { self.error = error.plainMessage() }
                 }
                 .font(.wbItem).foregroundStyle(Theme.purpleInk).frame(minWidth: 44, minHeight: 44)
             }

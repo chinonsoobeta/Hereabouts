@@ -187,7 +187,7 @@ struct LeavingView: View {
         .task { savedBackups = await AutomaticBackups.savedEverywhere() }
         .onChange(of: selectedFiles) { _, ids in AutomaticBackups.saveSelection(ids) }
         .fileExporter(isPresented: $exporting, document: document, contentType: exportType, defaultFilename: exportType == .json ? String(localized: "Hereabouts backup \(Date.now.formatted(.iso8601.year().month().day()))") : String(localized: "Hereabouts things")) { result in
-            switch result { case .success: notice = exportType == .json ? String(localized: "Backup saved.") : String(localized: "Spreadsheet saved."); case .failure(let failure): error = failure.localizedDescription }
+            switch result { case .success: notice = exportType == .json ? String(localized: "Backup saved.") : String(localized: "Spreadsheet saved."); case .failure(let failure): error = failure.plainMessage(or: exportType == .json ? .backupNotSaved : .spreadsheetNotSaved) }
             document = nil
         }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
@@ -200,7 +200,7 @@ struct LeavingView: View {
                 let file = try LibraryBackup.decoded(Data(contentsOf: url))
                 try store.validateBackup(file)
                 pendingRestore = file; confirmingRestore = true
-            } catch { self.error = error.localizedDescription }
+            } catch { self.error = error.plainMessage(or: .backupNotOpened) }
         }
         .alert("Restore backup?", isPresented: $confirmingRestore) {
             Button("Cancel", role: .cancel) { pendingRestore = nil }
@@ -220,7 +220,7 @@ struct LeavingView: View {
             TextField("Type ERASE", text: $erasePhrase).textInputAutocapitalization(.characters)
             Button("Cancel", role: .cancel) { erasePhrase = "" }
             Button("Erase", role: .destructive) {
-                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = String(localized: "Notebook erased.") } catch { self.error = error.localizedDescription }
+                do { try store.resetLibrary(); Spotlight.clear(); selectedFiles = []; notice = String(localized: "Notebook erased.") } catch { self.error = error.plainMessage() }
             }.disabled(erasePhrase != "ERASE")
         } message: { Text("This can't be undone without a backup. Type ERASE to confirm.") }
         .alert("Couldn't finish that", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) { Button("OK") { error = nil } } message: { Text(error ?? "") }
@@ -240,7 +240,7 @@ struct LeavingView: View {
         defer { pendingRestore = nil }
         do {
             if let pendingRestore { try store.restore(pendingRestore, replacingExisting: replacing); notice = String(localized: "Backup restored.") }
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage(or: .notRestored) }
     }
     /// A saved backup goes through the same check and confirmation as one chosen from Files.
     private func chooseSaved(_ backup: SavedBackup) async {
@@ -248,14 +248,14 @@ struct LeavingView: View {
             let file = try await AutomaticBackups.load(backup)
             try store.validateBackup(file)
             pendingRestore = file; confirmingRestore = true
-        } catch { self.error = error.localizedDescription }
+        } catch { self.error = error.plainMessage(or: .backupNotOpened) }
     }
     private func prepareCSV() {
         exportType = .commaSeparatedText; document = LibraryExportDocument(data: Data(store.inventoryCSV().utf8)); exporting = true
     }
     private func prepareBackup() {
         do { exportType = .json; document = LibraryExportDocument(data: try store.backup(attachmentIDs: selectedFiles).encoded()); exporting = true }
-        catch { self.error = error.localizedDescription }
+        catch { self.error = error.plainMessage(or: .notBackedUp) }
     }
 }
 
