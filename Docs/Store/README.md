@@ -12,9 +12,9 @@ xcrun simctl ui <device> appearance light
 TEST_RUNNER_STORE_SHOTS=/private/tmp/hb-store xcodebuild -project Localiser.xcodeproj -scheme Localiser -testPlan Localiser -destination 'platform=iOS Simulator,id=<device>' -only-testing:LocaliserUITests/LocaliserUITests/testStoreScreenshots test
 ```
 
-The test also writes `review-*` design-review shots to the same folder. They are not for the store, except `review-pro.png`, which becomes `Review/pro.png`.
+The test also writes `review-*` design-review shots to the same folder. They are not for the store, except `review-pro.png`, which becomes `Review/pro.png`. Since the Pro screen was redesigned (10 November) it opens on your plan and Free and Pro side by side, so for this shot the test scrolls the ways to pay to the top: App Review checks the plans, the prices and the trial terms.
 
-The iPad and Duo shots come from a separate test, in portrait. `STORE_SHOTS` is the folder, and the test writes the five files straight into it:
+The iPad and Duo shots come from a separate test, in portrait. `STORE_SHOTS` is the folder, and the test writes the five files straight into it, then `review-pro.png` and `review-pro-more.png` of the Pro screen for checking the wide layout (not for the store):
 
 ```bash
 xcrun simctl ui <ipad> appearance light

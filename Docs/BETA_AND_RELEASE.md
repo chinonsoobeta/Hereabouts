@@ -110,7 +110,7 @@ Use the demo library with the Debug-only launch argument `--demo-library` on the
 2. **Voice memo** with the heard sentence and the filled-in Put away screen. Caption: "Say where it is. Check it. Save it."
 3. **Lending** showing a lent thing with its ask-back date. Caption: "Know who to ask for it back".
 4. **Trip detail** with packing progress. Caption: "Reuse your packing list".
-5. **Pro screen** (Settings tab, Hereabouts Pro), with no price visible that isn't the App Store's. Caption: "No account. Always yours to export".
+5. **Places** showing a room with a box inside. Caption: "Every room, shelf and box". *(Changed 10 November: the Pro screen showed US prices in every country's listing, so it is kept only as the products' review screenshot, `Docs/Store/Review/pro.png`.)*
 
 Voice memos ship (owner, 8 November), so shot 2 stays.
 
@@ -126,7 +126,7 @@ Paste into App Store Connect, App Review Information. These notes carry no price
 >
 > Pro includes automatic weekly backups of the whole notebook. They're on by default and go to the person's own iCloud Drive, or the device if iCloud Drive is off. The newest five are kept. Subscriptions also include regular updates. Household sharing is planned for version 1.1. If Pro ends, saved data remains visible, editable and exportable.
 >
-> To reach the paywall, open Settings (the tab at the bottom right on iPhone, or in the sidebar on iPad), then tap Hereabouts Pro. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
+> To reach the paywall, open Settings (the tab at the bottom right on iPhone, or in the sidebar on iPad), then tap Hereabouts Pro. The screen shows the current plan, what Free and Pro each include, and the three ways to pay. Restore purchases, Privacy Policy and Terms of Use are on the same screen. Purchases can be tested in the sandbox. Adding a 16th thing on the free plan also opens the paywall.
 >
 > Shelf photos and voice understanding use Apple's on-device model on devices that support Apple Intelligence. On other devices, the app uses simpler rules. Voice memos are transcribed on the device with Apple's Speech framework. The recording isn't kept. Nothing is saved until the person taps Save.
 >
@@ -143,13 +143,13 @@ Replace both links if the domain changes.
 Ten steps from a fresh install to the paywall and back, for the review notes' reader and for the owner's own rehearsal (M45):
 
 1. Install the build on a clean phone and open Hereabouts. The introduction appears.
-2. Page through the introduction and tap through to the Find tab. No account or permission is asked for.
+2. Page through the introduction and tap through to the Find tab. No account or permission is asked for, and no plan is chosen: page 2 says the first 15 things are free and that the plan can be changed in Settings.
 3. Add a first thing by name, for example "Spare key", and save it.
 4. Add a place for it, for example "Hall shelf", and put the thing there.
 5. Go back to Find and search "key". The thing appears with its place.
 6. Open the Settings tab (bottom right) and check the four tabs: Find, Places, Trips, Settings.
-7. In Settings, tap Hereabouts Pro. The paywall shows the plans with the price from the App Store, the trial terms, that it renews automatically, Restore purchases, and the Privacy Policy and Terms of Use links.
-8. In the sandbox, buy a plan (or tap Restore purchases). The screen says Pro is on.
+7. In Settings, tap Hereabouts Pro. The screen shows, from the top: your plan (Free, with how many things, kits and homes are used); Free and Pro side by side; and the three ways to pay, each with the price from the App Store, the yearly trial, that it renews automatically, Restore purchases, and the Privacy Policy and Terms of Use links.
+8. In the sandbox, buy a plan (or tap Restore purchases). The plan card at the top changes to Pro, with the plan, when it renews and the price.
 9. Go back to Find and add things until the free limit would have been reached. With Pro on there is no limit. On a fresh install without Pro, the 16th thing opens the same paywall instead.
 10. Close the paywall and return to Find. Everything saved is still there.
 

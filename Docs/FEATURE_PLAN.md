@@ -84,6 +84,13 @@ Phase A is about 9 sessions and Phase B about 10, plus the testing weeks. A1 com
 
 Settings keeps "Free plan · 14 of 20 things". The thing editor adds a quiet line when three or fewer free places are left.
 
+**Redesigned 10 November (owner).** The screen didn't make clear which plans there are, which one you're on, or what each gives, so it now has three parts, with no "·" anywhere:
+- **Your plan**, a card at the top: Free with "9 of 15" things, kits and homes (amber when over a limit, as after Pro ends), or Pro with how it was paid, when it renews or ends, and the price. A trial shows when it ends and what comes after. Family Sharing shows "Shared by: Your family".
+- **Free and Pro**, side by side: things, packing kits and homes (15, 1 and 2, or no limit), weekly automatic backups and sharing Pro with family on Pro only, and everything else on both. The column you're on is shaded and marked "Your plan". Household sharing is noted as coming later.
+- **Ways to pay** (only without Pro): yearly with its free week and its saving, monthly, and Lifetime, then the button and the terms. A subscriber sees Manage subscription instead.
+
+Settings now says "Free plan, 14 of 15 things". The introduction doesn't ask for a plan: page 2 says "Your first 15 things are free. You can change your plan anytime in Settings." The mock is on the canvas (claude.ai artifact 2TY7mZmJZJYPgm9LoNTNYW). `PlanCard.make` is tested in `SubscriptionTests.testPlanCard`.
+
 **How.**
 - `Purchases/ProAccess.swift`
   - Load three products. Pro is unlocked by any verified, unrevoked entitlement: the lifetime purchase, or a subscription that is active or in its grace period.
