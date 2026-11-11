@@ -157,6 +157,7 @@ struct ProStanding: Equatable, Sendable {
         busy = true; message = nil
         defer { busy = false }
         do { try await AppStore.sync(); await refresh(); message = unlocked ? String(localized: "Hereabouts Pro restored.") : String(localized: "No Pro purchase was found for this Apple Account.") }
+        catch StoreKitError.userCancelled {} // Closing the Apple Account prompt isn't a failure, so there is nothing to say.
         catch { message = error.plainMessage(or: .storeNotReached) }
     }
 
