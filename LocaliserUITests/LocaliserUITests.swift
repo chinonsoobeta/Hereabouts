@@ -230,7 +230,9 @@ import StoreKitTest
         try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
         save.tap()
         XCTAssertTrue(save.waitForNonExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["item.save"].exists, "The new-thing sheet closes too")
+        // The new-thing sheet closes after the one on top of it, a moment later on iOS 26.5 (one run in three there
+        // on 2026-11-11 caught it still closing), so wait for it as a person would.
+        XCTAssertTrue(app.buttons["item.save"].waitForNonExistence(timeout: 5), "The new-thing sheet closes too")
         XCTAssertTrue(app.staticTexts["Drill"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["Spirit level"].exists)
         XCTAssertFalse(app.staticTexts["Tape measure"].exists)
@@ -693,12 +695,20 @@ import StoreKitTest
 
     /// Runs an audit, ignoring Dynamic Type reports for navigation bar buttons. Those use the system's
     /// large content viewer rather than growing with the text size, which the audit flags anyway.
-    /// `unresolvedContrast`: accept a contrast issue that comes with no element. Only for a screen whose one
-    /// contrast report, when it does resolve, is a header already checked by screenshot.
+    /// `unresolvedContrast`: accept a contrast issue that comes with no element. Only for a screen whose
+    /// contrast reports, when they do resolve, are text already measured from screenshots.
     private func audit(_ app: XCUIApplication, _ types: XCUIAccessibilityAuditType, unresolvedContrast: Bool = false) throws {
         try app.performAccessibilityAudit(for: types) { issue in
             print("AUDIT-ISSUE \(issue.auditType.rawValue) | \(issue.compactDescription) | \(issue.detailedDescription) | \(issue.element?.label ?? "-") | \(issue.element?.frame ?? .zero) | \(issue.element.map { "\($0.elementType.rawValue) \($0.identifier) exists=\($0.exists)" } ?? "no element")")
             guard let element = issue.element else { return unresolvedContrast && issue.auditType == .contrast }
+            // On iOS 26.5 those same reports come with their element, a different few each run. Measured on 2026-11-11
+            // from the audit's own element screenshots (light mode, flat glyph pixels): Yearly and Monthly are ink
+            // #241B3D on paper #F6F1E9, 14.38:1; "Never renews." and the line about sharing a notebook are pencil
+            // #655C7A on paper, 5.55:1. Only contrast, only text, only below iOS 27, only where the reports with no
+            // element are already accepted.
+            if #unavailable(iOS 27) {
+                if unresolvedContrast, issue.auditType == .contrast, element.elementType == .staticText { return true }
+            }
             // Checked by eye on 2026-11-07, light and dark, default and largest size, measured from screenshot
             // pixels against the glass capsule itself: Cancel on Lend 6.8:1 light, 5.4:1 dark; Later on the monthly
             // check 6.5:1 light, 6.1:1 dark (it was 4.2:1 before Theme.barInkOnLilac). The audit samples the
