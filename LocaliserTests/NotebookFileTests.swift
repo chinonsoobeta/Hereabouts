@@ -65,6 +65,58 @@ import CoreData
         XCTAssertEqual(try app.mergeOutsideChanges(ledger: ledger), 0, "Its own saves aren't outside changes")
     }
 
+    /// A notebook with one change from the share sheet waiting, and a ledger whose saved place is from another file.
+    /// Test and demo notebooks share the app's settings, so the place can outlive the notebook it came from.
+    private func notebookWithAPlaceFromAnother() throws -> (app: LocaliserStore, ledger: HistoryLedger) {
+        let ledger = ledger()
+        let other = try LocaliserStore(url: folder.appendingPathComponent("Other/Localiser.sqlite"))
+        try other.addItem(name: "Tent")
+        try other.mergeOutsideChanges(ledger: ledger)
+        XCTAssertNotNil(ledger.token(for: LocaliserStore.appAuthor))
+        let file = folder.appendingPathComponent("Mine/Localiser.sqlite")
+        let app = try LocaliserStore(url: file)
+        let share = try LocaliserStore(url: file)
+        share.context.transactionAuthor = "share"
+        try share.addItem(name: "Receipt for kettle")
+        return (app, ledger)
+    }
+
+    func testAPlaceFromAnotherNotebooksHistoryStartsOver() throws {
+        let (app, ledger) = try notebookWithAPlaceFromAnother()
+        XCTAssertEqual(try app.mergeOutsideChanges(ledger: ledger), 1)
+        XCTAssertTrue(app.items.contains { $0.name == "Receipt for kettle" })
+        XCTAssertEqual(try app.mergeOutsideChanges(ledger: ledger), 0, "The place is in this notebook now")
+    }
+
+    func testCatchingUpSurvivesAPlaceFromAnotherNotebook() throws {
+        let (app, ledger) = try notebookWithAPlaceFromAnother()
+        app.catchUp(mergingOutside: true, ledger: ledger)
+        XCTAssertFalse(app.isStale, "Nothing for Settings to report")
+        XCTAssertTrue(app.items.contains { $0.name == "Receipt for kettle" })
+    }
+
+    func testReminderProblemsUseTheAppsOwnWords() {
+        for problem in ReminderService.Problem.allCases {
+            XCTAssertFalse(problem.message.isEmpty)
+            XCTAssertNil(problem.message.rangeOfCharacter(from: .decimalDigits), "No error codes")
+            XCTAssertFalse(problem.message.localizedCaseInsensitiveContains("error"))
+        }
+    }
+
+    func testATrimmedPlaceInTheHistoryStartsOver() throws {
+        let file = folder.appendingPathComponent("Trimmed/Localiser.sqlite")
+        let app = try LocaliserStore(url: file)
+        let ledger = ledger()
+        try app.addItem(name: "Keys")
+        try app.mergeOutsideChanges(ledger: ledger)
+        try app.trimHistory(before: .now.addingTimeInterval(1))
+        let share = try LocaliserStore(url: file)
+        share.context.transactionAuthor = "share"
+        try share.addItem(name: "Receipt for kettle")
+        XCTAssertEqual(try app.mergeOutsideChanges(ledger: ledger), 1)
+        XCTAssertTrue(app.items.contains { $0.name == "Receipt for kettle" })
+    }
+
     func testLaunchesMoveTheNotebookOnceThenRemoveTheOriginal() throws {
         let legacy = folder.appendingPathComponent("Old/Localiser.sqlite")
         let group = folder.appendingPathComponent("Group/Localiser.sqlite")

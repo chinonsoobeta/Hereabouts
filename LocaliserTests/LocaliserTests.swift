@@ -615,7 +615,7 @@ final class LocaliserTests: XCTestCase {
             XCTAssertEqual(Set(requests.filter { $0.identifier.hasPrefix("localiser.deadline.") }.map(\.identifier)), expected)
             XCTAssertEqual(Set(service.scheduled.map(\.id)), expected)
             XCTAssertEqual(service.candidateCount, candidates.count)
-            XCTAssertNil(service.error)
+            XCTAssertNil(service.problem)
             XCTAssertTrue(requests.contains { $0.identifier == foreignID })
             return requests.filter { $0.identifier.hasPrefix("localiser.deadline.") }
         }
