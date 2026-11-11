@@ -163,8 +163,10 @@ struct NotebookLine: View {
     let name: String
     let detail: String
     var query = ""
-    /// Ink rather than pencil for the detail, where it is the answer (the Pro allowance table).
+    /// Bold ink rather than pencil for the detail, where it is the answer (the Pro screen's plan card).
     var strongDetail = false
+    /// Overrides the detail's ink, as amber for a plan that is ending or over a limit.
+    var detailColor: Color?
     var body: some View {
         if detail.isEmpty {
             // "Nothing due" has nothing to point at, so it gets no leader.
@@ -186,7 +188,10 @@ struct NotebookLine: View {
     /// Name above detail, flush left. Without the full-width frame, a short pair sits in the middle of the row.
     private var stacked: some View { VStack(alignment: .leading, spacing: 6) { nameText; detailText }.frame(maxWidth: .infinity, alignment: .leading) }
     private var nameText: some View { Text(highlighted(name)).font(.wbItem).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true) }
-    private var detailText: some View { Text(highlighted(detail)).font(.wbCaption).foregroundStyle(strongDetail ? Theme.ink : Theme.pencil).fixedSize(horizontal: false, vertical: true) }
+    private var detailText: some View {
+        Text(highlighted(detail)).font(strongDetail ? .wbBody.weight(.bold) : .wbCaption)
+            .foregroundStyle(detailColor ?? (strongDetail ? Theme.ink : Theme.pencil)).fixedSize(horizontal: false, vertical: true)
+    }
     private func highlighted(_ text: String) -> AttributedString {
         var result = AttributedString(text)
         let term = query.trimmingCharacters(in: .whitespacesAndNewlines)

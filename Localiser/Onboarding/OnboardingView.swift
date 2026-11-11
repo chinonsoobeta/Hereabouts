@@ -122,6 +122,13 @@ struct OnboardingView: View {
                 .buttonStyle(PrimaryButtonStyle()).disabled(thing.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("I'll do this later") { focused = false; go(to: 2) }
                 .font(.wbBody).foregroundStyle(Theme.pencil).frame(minHeight: 44)
+            // The free plan, said once and quietly: no plan to choose before anything is written down (owner, 10 Nov).
+            if !pro.unlocked {
+                Text("Your first \(CreationKind.item.freeLimit) things are free. You can change your plan anytime in Settings.")
+                    .font(.wbCaption).foregroundStyle(Theme.pencil).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 14).padding(.vertical, 12).frame(maxWidth: .infinity)
+                    .background(Theme.lilacPaper, in: RoundedRectangle(cornerRadius: 10))
+            }
         default:
             Button { Task { await reminders.enable(); onFinish() } } label: { wrapping(String(localized: "Turn on reminders")) }
                 .buttonStyle(PrimaryButtonStyle())

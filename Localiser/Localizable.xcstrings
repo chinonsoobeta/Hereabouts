@@ -141,6 +141,40 @@
         }
       }
     },
+    "%@ a month, %lld%% less than Monthly" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a month, %lld%% less than Monthly"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ al mes, un %2$lld%% menos que Mensual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ par mois, %2$lld %% de moins que Mensuel"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ por mês, %2$lld%% a menos que o Mensal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ a month, %2$lld%% less than Monthly"
+          }
+        }
+      }
+    },
     "%@ a year" : {
       "localizations" : {
         "en-GB" : {
@@ -683,30 +717,30 @@
         }
       }
     },
-    "%@ once. Never renews." : {
+    "%@ once" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ once. Never renews."
+            "value" : "%@ once"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ un solo pago. Sin renovación."
+            "value" : "%@ un solo pago"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ une seule fois. Sans renouvellement."
+            "value" : "%@ une seule fois"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ pagamento único. Sem renovação."
+            "value" : "%@ pagamento único"
           }
         }
       }
@@ -775,34 +809,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · %2$@"
-          }
-        }
-      }
-    },
-    "%@ → No limit" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ → No limit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ → Sin límite"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ → Sans limite"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ → Sem limite"
           }
         }
       }
@@ -3539,34 +3545,6 @@
         }
       }
     },
-    "Already free" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Already free"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ya es gratis"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Déjà gratuit"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Já é grátis"
-          }
-        }
-      }
-    },
     "Also called: %@" : {
       "localizations" : {
         "en-GB" : {
@@ -4665,6 +4643,34 @@
         }
       }
     },
+    "Cancel at least a day before it ends and you pay nothing." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel at least a day before it ends and you pay nothing."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancela al menos un día antes de que termine y no pagarás nada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résiliez au moins un jour avant la fin et vous ne payez rien."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancele pelo menos um dia antes do fim e você não paga nada."
+          }
+        }
+      }
+    },
     "Change" : {
       "localizations" : {
         "en-GB" : {
@@ -5529,34 +5535,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voltando"
-          }
-        }
-      }
-    },
-    "Coming later" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coming later"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Próximamente"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bientôt"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Em breve"
           }
         }
       }
@@ -6877,6 +6855,34 @@
         }
       }
     },
+    "Ends" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ends"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termina"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termina em"
+          }
+        }
+      }
+    },
     "Enter a name." : {
       "localizations" : {
         "en-GB" : {
@@ -7633,6 +7639,62 @@
         }
       }
     },
+    "Free" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grátis"
+          }
+        }
+      }
+    },
+    "Free and Pro" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free and Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis y Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit et Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grátis e Pro"
+          }
+        }
+      }
+    },
     "Free for %@, then %@ %@." : {
       "localizations" : {
         "en" : {
@@ -7663,40 +7725,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grátis por %1$@, depois %2$@ %3$@."
-          }
-        }
-      }
-    },
-    "Free plan · %lld of %lld things" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Free plan · %1$lld of %2$lld things"
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Free plan · %lld of %lld things"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plan gratuito · %1$lld de %2$lld objetos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Formule gratuite · %1$lld objets sur %2$lld"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plano grátis · %1$lld de %2$lld objetos"
           }
         }
       }
@@ -7787,6 +7815,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teste grátis, termina em %@"
+          }
+        }
+      }
+    },
+    "Free: %@. Pro: %@." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free: %@. Pro: %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis: %1$@. Pro: %2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit : %1$@. Pro : %2$@."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grátis: %1$@. Pro: %2$@."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Free: %1$@. Pro: %2$@."
           }
         }
       }
@@ -8977,6 +9039,34 @@
         }
       }
     },
+    "It won't renew. After that you're on Free, and everything you've saved stays." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It won't renew. After that you're on Free, and everything you've saved stays."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se renovará. Después pasarás al plan gratis y todo lo que guardaste se queda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il ne sera pas renouvelé. Ensuite, vous passez à la formule gratuite et tout ce que vous avez enregistré reste là."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não vai renovar. Depois disso você passa para o plano grátis, e tudo o que salvou continua aqui."
+          }
+        }
+      }
+    },
     "It's back" : {
       "localizations" : {
         "en-GB" : {
@@ -9733,6 +9823,34 @@
         }
       }
     },
+    "Lifetime, once" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime, once"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De por vida, un solo pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vie, une seule fois"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vitalício, pagamento único"
+          }
+        }
+      }
+    },
     "Limits only apply when you add things. If Pro ends or you get a refund, you can still see, edit and export everything you've saved." : {
       "localizations" : {
         "en-GB" : {
@@ -9925,34 +10043,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gerenciar assinatura"
-          }
-        }
-      }
-    },
-    "Manual backups, reminders, Siri and Spotlight are free. Pro removes the limits and adds weekly backups." : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manual backups, reminders, Siri and Spotlight are free. Pro removes the limits and adds weekly backups."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las copias manuales, los recordatorios, Siri y Spotlight son gratis. Pro quita los límites y añade copias semanales."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les sauvegardes manuelles, les rappels, Siri et Spotlight sont gratuits. Pro supprime les limites et ajoute des sauvegardes chaque semaine."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Backups manuais, lembretes, Siri e Spotlight são grátis. O Pro tira os limites e adiciona backups semanais."
           }
         }
       }
@@ -10601,6 +10691,62 @@
         }
       }
     },
+    "Never" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jamais"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nunca"
+          }
+        }
+      }
+    },
+    "Never renews." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never renews."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin renovación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans renouvellement."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem renovação."
+          }
+        }
+      }
+    },
     "New home" : {
       "localizations" : {
         "en-GB" : {
@@ -10827,6 +10973,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Semana que vem"
+          }
+        }
+      }
+    },
+    "No limit" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No limit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin límite"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans limite"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem limite"
           }
         }
       }
@@ -11079,6 +11253,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não conferido recentemente"
+          }
+        }
+      }
+    },
+    "Not included" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not included"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No incluido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non inclus"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não incluído"
           }
         }
       }
@@ -12363,6 +12565,34 @@
         }
       }
     },
+    "Paid" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paid"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagamento"
+          }
+        }
+      }
+    },
     "Paper" : {
       "localizations" : {
         "en-GB" : {
@@ -12811,6 +13041,34 @@
         }
       }
     },
+    "Price" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Price"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prix"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preço"
+          }
+        }
+      }
+    },
     "Print a label" : {
       "localizations" : {
         "en-GB" : {
@@ -13087,6 +13345,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro até %@. Não será renovado."
+          }
+        }
+      }
+    },
+    "Pro, free trial" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro, free trial"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro, prueba gratis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro, essai gratuit"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro, teste grátis"
           }
         }
       }
@@ -14265,6 +14551,34 @@
         }
       }
     },
+    "Renews" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renews"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se renueva"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renouvellement"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renova em"
+          }
+        }
+      }
+    },
     "Restore" : {
       "localizations" : {
         "en-GB" : {
@@ -14569,34 +14883,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvar"
-          }
-        }
-      }
-    },
-    "Save %lld%%" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save %lld%%"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ahorra un %lld%%"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Économisez %lld %%"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Economize %lld%%"
           }
         }
       }
@@ -15433,30 +15719,58 @@
         }
       }
     },
-    "Share with your household" : {
+    "Shared by" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Share with your household"
+            "value" : "Shared by"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir con tu hogar"
+            "value" : "Compartido por"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partager avec votre foyer"
+            "value" : "Partagé par"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhar com a família"
+            "value" : "Compartilhado por"
+          }
+        }
+      }
+    },
+    "Sharing one notebook with your household is coming later." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing one notebook with your household is coming later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir una libreta con tu hogar llegará más adelante."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le partage d’un carnet avec votre foyer arrivera plus tard."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhar um caderno com quem mora com você chega mais tarde."
           }
         }
       }
@@ -16957,6 +17271,34 @@
         }
       }
     },
+    "The same Pro in each. Only the billing differs." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The same Pro in each. Only the billing differs."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El mismo Pro en todas. Solo cambia el cobro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le même Pro dans chaque cas. Seule la facturation change."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mesmo Pro em todas. Só muda a cobrança."
+          }
+        }
+      }
+    },
     "The spare key's in the blue tin on the hall shelf" : {
       "localizations" : {
         "en-GB" : {
@@ -16981,6 +17323,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A chave reserva está na lata azul da prateleira do corredor"
+          }
+        }
+      }
+    },
+    "Then" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Then"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Después"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ensuite"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depois"
           }
         }
       }
@@ -17041,6 +17411,34 @@
         }
       }
     },
+    "Things" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Things"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objets"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetos"
+          }
+        }
+      }
+    },
     "Things directly here will have no place set. Places inside it move to the top level. Nothing else is deleted." : {
       "localizations" : {
         "en-GB" : {
@@ -17093,34 +17491,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Objetos aqui"
-          }
-        }
-      }
-    },
-    "Things you can write down" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Things you can write down"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Objetos que puedes anotar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Objets que vous pouvez noter"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Objetos que você pode anotar"
           }
         }
       }
@@ -17583,6 +17953,34 @@
         }
       }
     },
+    "Three ways to pay for Pro" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three ways to pay for Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tres formas de pagar Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois façons de payer Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Três formas de pagar o Pro"
+          }
+        }
+      }
+    },
     "Today" : {
       "localizations" : {
         "en-GB" : {
@@ -17691,6 +18089,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toque e segure para começar com uma foto"
+          }
+        }
+      }
+    },
+    "Trial ends" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trial ends"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la prueba"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de l’essai"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fim do teste"
           }
         }
       }
@@ -18545,6 +18971,34 @@
         }
       }
     },
+    "Voice memos, lending, trips, reminders, Siri, Spotlight, the widget, manual backups and export" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voice memos, lending, trips, reminders, Siri, Spotlight, the widget, manual backups and export"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de voz, préstamos, viajes, recordatorios, Siri, Spotlight, el widget, las copias manuales y la exportación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes vocales, prêts, voyages, rappels, Siri, Spotlight, le widget, les sauvegardes manuelles et l’export"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notas de voz, empréstimos, viagens, lembretes, Siri, Spotlight, o widget, backups manuais e exportação"
+          }
+        }
+      }
+    },
     "Waiting for approval. You can still use your free plan." : {
       "localizations" : {
         "en-GB" : {
@@ -18569,6 +19023,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aguardando aprovação. Você pode continuar usando o plano grátis."
+          }
+        }
+      }
+    },
+    "Ways to pay for Pro" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ways to pay for Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formas de pagar Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Façons de payer Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formas de pagar o Pro"
+          }
+        }
+      }
+    },
+    "Weekly automatic backups" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly automatic backups"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copias automáticas semanales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegardes automatiques chaque semaine"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backups automáticos semanais"
           }
         }
       }
@@ -21151,6 +21661,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seu plano %@ começa nessa data. Cancele nos Ajustes antes disso se não quiser pagar."
+          }
+        }
+      }
+    },
+    "Your family" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your family"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu familia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre famille"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua família"
+          }
+        }
+      }
+    },
+    "Your first %lld things are free. You can change your plan anytime in Settings." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your first %lld things are free. You can change your plan any time in Settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus primeros %lld objetos son gratis. Puedes cambiar de plan cuando quieras en Ajustes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos %lld premiers objets sont gratuits. Vous pouvez changer de formule à tout moment dans Réglages."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seus primeiros %lld objetos são grátis. Você pode mudar de plano quando quiser nos Ajustes."
+          }
+        }
+      }
+    },
+    "Your plan" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your plan"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu plan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre formule"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu plano"
           }
         }
       }

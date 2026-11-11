@@ -38,7 +38,7 @@ struct LibrarySettingsView: View {
         SheetList {
             Section {
                 NavigationLink(value: SettingsPage.pro) {
-                    NotebookLine(name: String(localized: "Hereabouts Pro"), detail: pro.standing?.summary ?? String(localized: "Free plan · \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
+                    NotebookLine(name: String(localized: "Hereabouts Pro"), detail: pro.standing?.summary ?? String(localized: "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
                 }.accessibilityLabel(String(localized: "Hereabouts Pro")).accessibilityValue(pro.standing?.summary ?? String(localized: "Free plan, \(store.activeItemCount) of \(CreationKind.item.freeLimit) things"))
             }
             Section {
