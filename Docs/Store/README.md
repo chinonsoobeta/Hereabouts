@@ -4,6 +4,8 @@ The iPhone set was taken 7 November 2026 on the iPhone 17 Pro Max simulator (6.9
 
 Retaken 10 November (owner, O37): shot 5 is now a room with a box inside (`5-places.png`) instead of the Pro screen, because the English (U.S.) shots stand in for every country and the Pro screen showed US prices. The lending shot now shows the demo's drill, lent two evenings ago, so its history line no longer reads later than the 9:41 status bar. The Pro screen, with the plans from the local StoreKit file, is kept as `Review/pro.png` for the products' review screenshots (O22). All five shots in each set were retaken together, so each set comes from one run. The iPhone set was retaken on the iPhone 18 Pro Max simulator (also 1320 × 2868), because the 17 Pro Max simulator is no longer installed; the iPad set on the iPad Pro 13-inch (M5) and the Duo set on the stock iPhone Duo, all iOS 27.2.
 
+Retaken 12 November (owner, M65), all three sets and `Review/pro.png`, on the same simulators: Lent out is now its own tab (left of Settings) on the phone and its own row in the iPad sidebar, the lending shot shows the new "Text Sam" button, the New thing sheet's place row reads like a field, and the Pro screen lists lending as free.
+
 Retake them with the simulator booted and its status bar and appearance set:
 
 ```bash
