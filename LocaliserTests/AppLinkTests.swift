@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 final class AppLinkTests: XCTestCase {
     func testLinksRoundTrip() throws {
         let id = UUID()
-        for link in [AppLink.find, .new, .putAway, .item(id)] { XCTAssertEqual(AppLink(url: link.url), link) }
+        for link in [AppLink.find, .new, .putAway, .lent, .item(id)] { XCTAssertEqual(AppLink(url: link.url), link) }
         XCTAssertNil(AppLink(url: URL(string: "hereabouts://due")!), "The Due page is gone")
         XCTAssertNil(AppLink(url: URL(string: "hereabouts://item/not-an-id")!))
         XCTAssertNil(AppLink(url: URL(string: "https://find")!))
@@ -29,6 +29,12 @@ final class AppLinkTests: XCTestCase {
         XCTAssertEqual(WidgetButtons.links(for: Locale(identifier: "fr_FR")).compactMap(AppLink.init(url:)), [.find], "No voice, so Find alone")
         XCTAssertEqual(WidgetButtons.find, AppLink.find.url)
         XCTAssertEqual(WidgetButtons.say, AppLink.say.url)
+    }
+
+    /// The Lent out widget opens the Lent out tab, not Find (beta feedback, 12 Nov).
+    func testTheLentOutWidgetOpensLentOut() {
+        XCTAssertEqual(AppLink(url: WidgetButtons.lent), .lent)
+        XCTAssertEqual(WidgetButtons.lent, AppLink.lent.url)
     }
 
     func testSendWhereItIs() throws {
@@ -68,6 +74,18 @@ final class WindowStateTests: XCTestCase {
         XCTAssertEqual(ui.tab, .packing)
         ui.tab = .settings
         XCTAssertEqual(ui.destination, .settings)
+    }
+
+    /// Lent out is its own tab, between Trips and Settings (owner, 12 Nov).
+    func testLentOutIsItsOwnTab() {
+        let id = UUID()
+        XCTAssertEqual(Destination.lent.tab, .lent)
+        XCTAssertEqual(Destination(tab: .lent, keeping: .place(id)), .lent)
+        XCTAssertEqual(Destination(tab: .places, keeping: .lent), .places)
+        let ui = WindowState()
+        ui.tab = .lent
+        XCTAssertEqual(ui.destination, .lent)
+        XCTAssertEqual(AppTab.allCases, [.find, .places, .packing, .lent, .settings], "Settings stays the rightmost tab")
     }
 
     func testRevealOpensTheTopLevelPlaceWithTheThing() throws {

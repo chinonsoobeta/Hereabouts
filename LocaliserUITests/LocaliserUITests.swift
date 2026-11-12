@@ -14,7 +14,9 @@ import StoreKitTest
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Trips", "Settings"] {
+        XCTAssertTrue(app.tabBars.buttons["Find"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.tabBars.buttons.allElementsBoundByIndex.map(\.label), ["Find", "Places", "Trips", "Lent out", "Settings"], "Lent out sits left of Settings, which stays rightmost (owner, 12 Nov)")
+        for tab in ["Find", "Places", "Trips", "Lent out", "Settings"] {
             app.tabBars.buttons[tab].tap()
             let image = XCTAttachment(screenshot: app.screenshot()); image.name = "Tab \(tab)"; image.lifetime = .keepAlways; add(image)
             try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
@@ -28,6 +30,7 @@ import StoreKitTest
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Your plan'")).firstMatch.waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["Free and Pro"].exists)
         XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Things' AND value BEGINSWITH 'Free: '")).firstMatch.exists, "The table's rows read both columns\n\(app.debugDescription)")
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH 'Lending' AND value == 'Free: Included. Pro: Included.'")).firstMatch.exists, "Lending has its own row, free on both plans (beta feedback, 12 Nov)\n\(app.debugDescription)")
         // Three plans, yearly chosen first, and the trial button, from the local StoreKit configuration.
         // iOS 26.5's local StoreKit service doesn't serve products, so the plan checks run on iOS 27.
         let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
@@ -189,6 +192,74 @@ import StoreKitTest
         let newPlace = app.buttons["voice.newPlace"]
         XCTAssertTrue(newPlace.waitForExistence(timeout: 5))
         XCTAssertEqual(newPlace.label, "New place: Blue tin in Back wall")
+        // The place row reads like the Name field above it: "Place" in grey until one is chosen, then the place itself (beta feedback, 12 Nov).
+        let place = app.buttons["place.picker"]
+        XCTAssertEqual(place.label, "Place")
+        XCTAssertEqual(place.value as? String, "No place yet")
+        if app.keyboards.firstMatch.exists { app.keyboards.buttons.matching(NSPredicate(format: "label IN {'return', 'Return', 'done', 'Done'}")).firstMatch.tap() }
+        // Only the place row is checked here: the grey "Place", then the place in full.
+        func auditPlaceRow() throws {
+            try app.performAccessibilityAudit(for: [.contrast, .textClipped]) { issue in
+                guard let element = issue.element else { return true }
+                return element.identifier != "place.picker" && element.label != "Place"
+            }
+        }
+        try auditPlaceRow()
+        newPlace.tap()
+        let chosen = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value ENDSWITH 'Back wall › Blue tin'"), object: place)
+        XCTAssertEqual(XCTWaiter.wait(for: [chosen], timeout: 5), .completed, place.debugDescription)
+        XCTAssertEqual(place.label, "Place")
+        try auditPlaceRow()
+    }
+
+    /// Lent out is its own tab, left of Settings (beta feedback, the owner's call, 12 Nov): what's lent, and lending something from there.
+    func testLentOutTabListsWhatIsLentAndLendsSomething() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        let tabs = app.tabBars.buttons
+        XCTAssertTrue(tabs["Lent out"].waitForExistence(timeout: 10))
+        tabs["Lent out"].tap()
+        XCTAssertTrue(app.navigationBars["Lent out"].waitForExistence(timeout: 5))
+        let drill = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch
+        XCTAssertTrue(drill.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(drill.label.contains("With Sam"), drill.label)
+        XCTAssertTrue(drill.label.contains("Ask for it back"), "Each thing says when to ask for it back: \(drill.label)")
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        // Places no longer lists what's lent.
+        tabs["Places"].tap()
+        XCTAssertTrue(app.staticTexts["Garage"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.exists, "The Lent out section moved to its own tab")
+        // Lend something from the tab: pick the thing, then the Lend it sheet.
+        tabs["Lent out"].tap()
+        app.navigationBars["Lent out"].buttons["Lend something"].tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5), app.debugDescription)
+        let offered = app.buttons.matching(identifier: "lend.thing")
+        XCTAssertTrue(offered.firstMatch.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertEqual(offered.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).count, 0, "What's already lent isn't offered")
+        search.tap(); search.typeText("Winter")
+        let tires = offered.matching(NSPredicate(format: "label BEGINSWITH 'Winter tires'")).firstMatch
+        XCTAssertTrue(tires.waitForExistence(timeout: 5), app.debugDescription)
+        tires.tap()
+        let person = app.textFields["lend.person"]
+        XCTAssertTrue(person.waitForExistence(timeout: 5), "Picking a thing goes straight to Lend it\n\(app.debugDescription)")
+        person.tap(); person.typeText("Ana")
+        app.buttons["lend.save"].tap()
+        XCTAssertTrue(person.waitForNonExistence(timeout: 5))
+        let lentTires = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Winter tires'")).firstMatch
+        XCTAssertTrue(lentTires.waitForExistence(timeout: 5), "It's on the list now\n\(app.debugDescription)")
+        // Open it and mark it back: it leaves the list.
+        lentTires.tap()
+        let back = app.buttons["item.back"]
+        XCTAssertTrue(back.waitForExistence(timeout: 5), app.debugDescription)
+        back.tap()
+        XCTAssertTrue(app.staticTexts["Back from Ana"].waitForExistence(timeout: 5), app.debugDescription)
+        app.navigationBars.buttons["Lent out"].firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Lent out"].waitForExistence(timeout: 5))
+        XCTAssertTrue(lentTires.waitForNonExistence(timeout: 5), "Back, so no longer lent out")
+        XCTAssertTrue(drill.exists)
     }
 
     func testSeveralThingsFromOnePhoto() throws {
@@ -467,17 +538,16 @@ import StoreKitTest
         // 3: lending. The demo's drill was lent to Sam two evenings ago, so its history line fits the 9:41 status bar.
         app.launchArguments = base
         app.launch()
-        var search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("drill")
-        app.staticTexts["Cordless drill"].firstMatch.tap()
+        XCTAssertTrue(app.tabBars.buttons["Lent out"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Lent out"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.tap()
         XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
         try shot("3-lending")
         app.terminate()
         // 1, 4, 5: find, trip detail, a room with a box inside. Then the Pro screen, for the products' review screenshots.
         app.launch()
-        search = app.searchFields.firstMatch
+        let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         app.tabBars.buttons["Find"].tap()
         search.tap(); search.typeText("running\n")
@@ -630,8 +700,9 @@ import StoreKitTest
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Trips"] {
+        for tab in ["Find", "Places", "Trips", "Lent out"] {
             app.tabBars.buttons[tab].tap()
+            if tab == "Lent out" { XCTAssertTrue(app.staticTexts["Nothing lent out"].waitForExistence(timeout: 5), app.debugDescription) }
             let screenshot = XCTAttachment(screenshot: app.screenshot())
             screenshot.name = "Contrast and clipping audit \(tab)"
             screenshot.lifetime = .keepAlways
@@ -657,7 +728,7 @@ import StoreKitTest
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString]
         app.launch()
-        for tab in ["Find", "Places", "Trips"] {
+        for tab in ["Find", "Places", "Trips", "Lent out"] {
             app.tabBars.buttons[tab].tap()
             let labels: [String]
             switch tab {
@@ -984,8 +1055,9 @@ import StoreKitTest
             // (see Docs/Verification/M66). Text clipped anywhere else, or in a sidebar row's own label, still fails.
             if issue.auditType == .textClipped, let element = issue.element, element.frame.minX < 40, element.frame.maxX < 450 { return true }
             // The same for a row's name beside its leader or symbol ("Hall closet" on Find, "Acknowledgments" in Settings, whole in
-            // ipad13-portrait-find.png and the Settings shot). Matched by label so that every other clipped text still fails.
-            if issue.auditType == .textClipped, ["Hall closet", "Acknowledgments"].contains(issue.element?.label ?? "") { return true }
+            // ipad13-portrait-find.png and the Settings shot; "Lent out" beside its count in the sidebar, whole in xl-find and in
+            // the audit's own element picture, 12 Nov). Matched by label so that every other clipped text still fails.
+            if issue.auditType == .textClipped, ["Hall closet", "Acknowledgments", "Lent out"].contains(issue.element?.label ?? "") { return true }
             // The Settings footer is set in the notebook caption face, which scales (relativeTo: .footnote), and it does grow
             // at this size; the audit calls it "partially unsupported" all the same. Only this footer is excused.
             if issue.auditType == .dynamicType, (issue.element?.label ?? "").hasPrefix("Anyone who sees your Lock Screen") { return true }
@@ -1018,16 +1090,16 @@ import StoreKitTest
         _ = row("Find", app).waitForExistence(timeout: 5)
     }
 
-    /// Opens a sidebar entry. With the sidebar hidden, the tabs across the top reach Find, Trips and Settings; the rest need the sidebar.
+    /// Opens a sidebar entry. With the sidebar hidden, the tabs across the top reach Find, Trips, Lent out and Settings; the rest need the sidebar.
     private func openSection(_ name: String, in app: XCUIApplication) {
         let cell = row(name, app)
-        if !cell.exists, ["Find", "Trips", "Settings"].contains(name), app.buttons[name].exists { app.buttons[name].firstMatch.tap(); return }
+        if !cell.exists, ["Find", "Trips", "Lent out", "Settings"].contains(name), app.buttons[name].exists { app.buttons[name].firstMatch.tap(); return }
         if !cell.exists { showSidebar(app) }
         for _ in 0..<4 where !(cell.exists && cell.isHittable) && app.collectionViews["Sidebar"].exists {
             // A short drag, so the row doesn't end up under the sidebar's own bar at the top.
             let sidebar = app.collectionViews["Sidebar"]
             // The fixed sections are at the top, the places below them.
-            let up = !["Search", "Find", "Trips", "Settings"].contains(name)
+            let up = !["Search", "Find", "Trips", "Lent out", "Settings"].contains(name)
             sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.7 : 0.5)).press(forDuration: 0.05, thenDragTo: sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.5 : 0.7)))
             sleep(1) // Let the list settle before it is tapped.
         }
@@ -1045,6 +1117,8 @@ import StoreKitTest
         XCTAssertEqual(addButtons(app).count, 1, "One Add a thing at a time: the sidebar's, with the sidebar showing")
         openSection("Trips", in: app)
         XCTAssertTrue(app.navigationBars["Trips"].waitForExistence(timeout: 5)); shot(app, orientation, "trips"); try audit(app)
+        openSection("Lent out", in: app)
+        XCTAssertTrue(app.navigationBars["Lent out"].waitForExistence(timeout: 5)); shot(app, orientation, "lent"); try audit(app)
         openSection("Settings", in: app)
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5)); shot(app, orientation, "settings"); try audit(app)
         openSection("Garage", in: app)
@@ -1145,14 +1219,16 @@ import StoreKitTest
         sleep(1)
     }
 
-    /// ⌘N is New thing, ⌘F is search, and ⌘1 to ⌘4 are Find, Places, Trips and Settings, in either orientation.
+    /// ⌘N is New thing, ⌘F is search, and ⌘1 to ⌘5 are Find, Places, Trips, Lent out and Settings, in either orientation.
     func testKeyboardShortcutsOpenNewThingSearchAndTheSections() throws {
         let app = try launch(.landscapeLeft)
         wakeShortcuts(app)
         app.typeKey("3", modifierFlags: .command)
         XCTAssertTrue(isShowing("Trips", in: app), "⌘3 shows Trips")
         app.typeKey("4", modifierFlags: .command)
-        XCTAssertTrue(isShowing("Settings", in: app), "⌘4 shows Settings")
+        XCTAssertTrue(isShowing("Lent out", in: app), "⌘4 shows Lent out")
+        app.typeKey("5", modifierFlags: .command)
+        XCTAssertTrue(isShowing("Settings", in: app), "⌘5 shows Settings")
         app.typeKey("2", modifierFlags: .command)
         XCTAssertTrue(isShowing("Places", in: app), "⌘2 shows Places")
         app.typeKey("1", modifierFlags: .command)
@@ -1177,7 +1253,7 @@ import StoreKitTest
         app.typeKey("n", modifierFlags: .command)
         let name = app.textFields["item.name"]
         XCTAssertTrue(name.waitForExistence(timeout: 5)); name.tap(); name.typeText("Kettle")
-        for (key, flags) in [("n", XCUIElement.KeyModifierFlags.command), ("3", .command), ("4", .command), ("2", .command), ("f", .command)] {
+        for (key, flags) in [("n", XCUIElement.KeyModifierFlags.command), ("3", .command), ("4", .command), ("5", .command), ("2", .command), ("f", .command)] {
             app.typeKey(key, modifierFlags: flags)
         }
         XCTAssertEqual(app.textFields.matching(identifier: "item.name").count, 1, "Still the one sheet")
@@ -1185,13 +1261,14 @@ import StoreKitTest
         app.buttons["Cancel"].tap()
         XCTAssertTrue(name.waitForNonExistence(timeout: 5))
         XCTAssertFalse(app.navigationBars["Trips"].exists, "⌘3 changed nothing behind the sheet")
+        XCTAssertFalse(app.navigationBars["Lent out"].exists)
         XCTAssertFalse(app.navigationBars["Settings"].exists)
         XCTAssertFalse(app.textFields["item.name"].waitForExistence(timeout: 2), "No New thing waiting behind the sheet")
         // A sheet that a screen presents for itself counts too.
         app.typeKey("3", modifierFlags: .command)
         XCTAssertTrue(isShowing("Trips", in: app))
         app.typeKey("1", modifierFlags: .command)
-        app.typeKey("4", modifierFlags: .command)
+        app.typeKey("5", modifierFlags: .command)
         XCTAssertTrue(isShowing("Settings", in: app))
     }
 
@@ -1207,7 +1284,7 @@ import StoreKitTest
         XCTAssertEqual(app.windows.firstMatch.horizontalSizeClass, .compact)
         // The Duo's compact window draws its tabs as plain buttons, not in a tab bar.
         func tab(_ name: String) -> XCUIElement { app.tabBars.buttons[name].exists ? app.tabBars.buttons[name] : app.buttons[name].firstMatch }
-        for name in ["Find", "Places", "Trips", "Settings"] {
+        for name in ["Find", "Places", "Trips", "Lent out", "Settings"] {
             XCTAssertTrue(tab(name).waitForExistence(timeout: 5), "\(name) is a tab")
         }
         XCTAssertFalse(row("All places", app).exists, "No sidebar")
@@ -1472,10 +1549,8 @@ import StoreKitTest
         app.terminate()
         // 3: lending. The demo's drill was lent to Sam two evenings ago, so its history line fits the 9:41 status bar.
         app = try launch(.portrait)
-        var search = app.searchFields.firstMatch
-        XCTAssertTrue(search.waitForExistence(timeout: 5))
-        search.tap(); search.typeText("drill")
-        app.staticTexts["Cordless drill"].firstMatch.tap()
+        openSection("Lent out", in: app)
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.tap()
         XCTAssertTrue(app.buttons["item.back"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.staticTexts["item.askBack"].waitForExistence(timeout: 5))
         sleep(1)
@@ -1483,7 +1558,7 @@ import StoreKitTest
         app.terminate()
         // 1, 4, 5: find, trip detail, a room with a box inside.
         app = try launch(.portrait)
-        search = app.searchFields.firstMatch
+        let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         search.tap(); search.typeText("running\n")
         XCTAssertTrue(app.staticTexts["Running shoes"].firstMatch.waitForExistence(timeout: 5))

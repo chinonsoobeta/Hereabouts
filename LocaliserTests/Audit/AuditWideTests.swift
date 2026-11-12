@@ -49,18 +49,18 @@ final class AuditWideTests: XCTestCase {
         XCTAssertEqual(ui.placesPath, original, "Return to the open drawer, not its room")
     }
 
-    func testThingOpenedDirectlyFromPlacesSurvivesUnfolding() throws {
+    func testALentThingStaysOpenAcrossAFold() throws {
         let store = try LocaliserStore(inMemory: true)
-        let room = try store.addPlace(name: "Room")
-        let drill = try store.addItem(name: "Drill", place: room)
+        let drill = try store.addItem(name: "Drill", place: try store.addPlace(name: "Room"))
         try store.lend(drill, to: "Sam", askBackOn: nil)
         let ui = WindowState()
-        ui.tab = .places
-        // The Lent out row uses RouteLink(.item) directly, without a preceding place.
-        ui.placesPath = [.item(drill.id)]
-        ui.adopt(ui.placesPath, in: store)
-        XCTAssertTrue(ui.selectedItem == drill.id || ui.findItem == drill.id,
-                      "The open thing must still have a visible selection after unfolding")
+        ui.tab = .lent
+        ui.lentPath = [.item(drill.id)]
+        // Both layouts show the same Lent out stack, so a fold carries the open thing as it is.
+        ui.wide = true
+        ui.dropStaleSelection(in: store)
+        XCTAssertEqual(ui.destination, .lent)
+        XCTAssertEqual(ui.lentPath, [.item(drill.id)])
     }
 
     func testHomeSwitchClearsThePreviousHomesCompactSelection() throws {
@@ -191,24 +191,6 @@ final class AuditWideTests: XCTestCase {
         XCTAssertEqual(ui.roomPaths[h.garage.id], [.place(h.wall.id), .place(h.rack.id)])
     }
 
-    func testAThingOpenedFromLentOutBesideItsRoomOrInFindWhenUnfolding() throws {
-        let h = try twoHomes()
-        let ui = WindowState()
-        ui.tab = .places
-        ui.placesPath = [.item(h.drill.id)]
-        ui.adopt(ui.placesPath, in: h.store)
-        XCTAssertEqual(ui.destination, .place(h.garage.id))
-        XCTAssertEqual(ui.selectedItem, h.drill.id)
-
-        let loose = try h.store.addItem(name: "Loose")
-        let again = WindowState()
-        again.tab = .places
-        again.placesPath = [.item(loose.id)]
-        again.adopt(again.placesPath, in: h.store)
-        XCTAssertEqual(again.destination, .find)
-        XCTAssertEqual(again.findItem, loose.id)
-    }
-
     // MARK: Stale selections
 
     func testAHomeSwitchTrimsTheNestedPlacesOfTheOldHome() throws {
@@ -226,10 +208,13 @@ final class AuditWideTests: XCTestCase {
     func testAPlaceOrThingFromAnotherHomeSurvivesCleanup() throws {
         let h = try twoHomes()
         let ui = WindowState()
-        ui.tab = .places
-        ui.placesPath = [.item(h.jam.id)] // Lent out lists things from every home
+        ui.tab = .lent
+        ui.lentPath = [.item(h.jam.id)] // Lent out lists things from every home
         ui.dropStaleSelection(in: h.store)
-        XCTAssertEqual(ui.placesPath, [.item(h.jam.id)])
+        XCTAssertEqual(ui.lentPath, [.item(h.jam.id)])
+        try h.store.deleteItem(h.jam)
+        ui.dropStaleSelection(in: h.store)
+        XCTAssertTrue(ui.lentPath.isEmpty, "A deleted thing doesn't stay open")
     }
 
     // MARK: Leaving a stack with a bound path
@@ -241,6 +226,15 @@ final class AuditWideTests: XCTestCase {
         ui.settingsPath = [.homes]
         ui.destination = .find
         XCTAssertTrue(ui.settingsPath.isEmpty, "A page can't stay pushed in a stack that leaves the detail column")
+    }
+
+    func testLeavingLentOutOnTheWideLayoutClosesItsThing() {
+        let ui = WindowState()
+        ui.wide = true
+        ui.destination = .lent
+        ui.lentPath = [.item(UUID())]
+        ui.destination = .trips
+        XCTAssertTrue(ui.lentPath.isEmpty, "A page can't stay pushed in a stack that leaves the detail column")
     }
 
     func testAFoldOrResizeKeepsTheSettingsPageOpen() {
