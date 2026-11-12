@@ -76,7 +76,7 @@ The keywords leave out "Hereabouts", plurals and category names because the App 
 > Keep more than one home in your notebook. Move things or whole places between them. Mark a thing private to keep its place out of Spotlight and Siri's spoken answers.
 >
 > LEND A THING
-> Write down who has your drill. Choose a date to ask for it back. Get a reminder that day.
+> Write down who has your drill. Choose a date to ask for it back. Get a reminder that day. Text them a note asking for it back. You pick who gets it in Messages, so Hereabouts never keeps their number.
 >
 > SAY WHERE
 > Hold the microphone or tap Say where on the widget. Say "the spare key's in the blue tin on the hall shelf". Check the thing and place before you save. Hereabouts hears you on your iPhone. It doesn't keep the recording. Nothing is saved until you tap. English only for now.
