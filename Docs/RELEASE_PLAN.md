@@ -186,7 +186,7 @@ Codex's usage is limited, so it does only the wording pass (M41) and the fixes f
   - [ ] Sunday recap, first-Saturday stocktake and trip-eve reminder arrive, open the right sheet, and stop when turned off.
   - [ ] Automatic backups: one arrives in iCloud Drive, a restore from it brings everything back, and turning Pro off keeps the saved ones. A backup made on the other phone shows under "Saved automatically" and restores, and the sixth backup removes the oldest from iCloud Drive.
   - [ ] Widgets: both buttons at small size and on the Lock Screen; the lent-out widget if it ships.
-  - [ ] On an iPad, if you have one or can borrow one: the sidebar sideways and upright; Split View, Slide Over and Stage Manager at a third of the width (the iPhone layout); ⌘N, ⌘F and ⌘1 to ⌘4 and the ⌘-hold list; pointer hover; dragging a thing onto a place; the camera prompt (it says "this device"); camera and shelf photos; voice memos; a purchase. Otherwise the simulator runs in M67 stand in.
+  - [ ] On an iPad, if you have one or can borrow one: the sidebar sideways and upright; Split View, Slide Over and Stage Manager at a third of the width (the iPhone layout); ⌘N, ⌘F and ⌘1 to ⌘5 and the ⌘-hold list; pointer hover; dragging a thing onto a place; the camera prompt (it says "this device"); camera and shelf photos; voice memos; a purchase. Otherwise the simulator runs in M67 stand in.
   - [ ] On an iPhone Duo, if you can try one: fold and unfold mid-task, and check the places and things stay put.
   - [ ] Fold or resize with things open (M65 audit, 9 November). On the Duo, or an iPad window dragged between a third and full width, check that each stays open:
     - a half-typed place name in Edit or Add a place;
@@ -409,6 +409,12 @@ Decided 8 November: both in 1.0. Built during the beta week, before the TestFlig
 
   *All tests pass at f4221f7: 219 unit tests on iOS 27 and on iOS 26.5 (8 skipped there: the App Store tests need iOS 27), 41 UI tests on each with no failures (23 skipped on a phone: the wide-screen tests, the language tour and the store screenshots).*
 
+  *12 November, from the beta (a friend's feedback on build 4, the owner's decisions the same day):*
+  - *On New thing, the place row read as a label with the chosen place small and grey at the far end. It now reads like the Name field above it: until a place is chosen it says "Place" in grey, like Name's placeholder, and once one is chosen the place leads in body text with its last part in bold ("Garage › Back wall › **Rack 2**"). The place editor's "Inside" row keeps its label, since it sits among other labelled rows.*
+  - *Lending was hard to find at the bottom of Places. Lent out is now its own tab, left of Settings, which stays the rightmost: Find, Places, Trips, Lent out, Settings. It lists what's lent from every home with who has it, since when, where it usually lives and when to ask for it back (in the warning colour once that day has passed). "Lend something" picks a thing in this home that isn't lent out and opens Lend it for it. The section is gone from Places. On wide screens Lent out is a sidebar row with its count, ⌘4 opens it and Settings moves to ⌘5. The lent-out widget and `hereabouts://lent` open the tab.*
+  - *The Pro screen didn't make it plain that lending is free. Lending now has its own row, "Who has it, and a reminder to ask for it back", included in Free and Pro, and "Everything else" no longer lists it.*
+  - *All new words are in the five languages. The store screenshots (iPhone, iPad and Duo) and the Pro review screenshot show the old tab bar and sidebar, so they need retaking, and uploading them again needs the owner's go-ahead. So does build 5.*
+
 ### Set aside for the owner
 
 Blocked items found while building. Each waits for a talk with the owner.
@@ -417,6 +423,7 @@ Blocked items found while building. Each waits for a talk with the owner.
 - **Family Sharing for the monthly and yearly plans.** *Decided 8 November (owner): on for all three Pro products, and Pro lists family sharing as a benefit. Turned on in App Store Connect (O21). The support page, the paywall and the review notes are updated to match.*
 - **Signed builds.** An archive signed with the Apple Development certificate for team BRLCAAM57K built and verified on the Mac (M31). Installing on a phone waits for M48.
 - **Pushing.** `main` is pushed to the GitHub repository chinonsoobeta/Hereabouts as work lands. Uploads to App Store Connect still wait for the owner's go-ahead.
+- **Telling the borrower** (beta feedback, 12 November). A borrower doesn't have the app, so a notification can't reach them. One option, not built: when the ask-back reminder comes, a "Text them" button opens Messages with a note already written ("Hi Sam, could I have the drill back when you get a chance?"). The lender picks the person in Messages' own To field, so Hereabouts still keeps only the name and never reads contacts or stores a number. Waiting for the owner's answer.
 
 ## 6. Recommendations
 

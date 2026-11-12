@@ -203,7 +203,7 @@ Every new field is optional or has a default, so the model stays ready for iClou
 
 **What people see.**
 - **Lending.** A thing's page gets "Lend it…". This asks who, with a button that picks a name from Contacts. It can also set a date to ask for the thing back, which defaults to two weeks. Find shows "With Sam · since 3 Oct" in place of the place, and the thing's home stays underneath.
-- **Finding lent things.** Searching "Sam" finds everything lent to Sam. Places gets a "Lent out" list.
+- **Finding lent things.** Searching "Sam" finds everything lent to Sam. Places gets a "Lent out" list. *12 November (owner, from the beta): Lent out is its own tab instead, left of Settings, with "Lend something" to pick a thing.*
 - **Due.** The ask-back date appears in Due, with "It's back" and "Ask again next week".
 - **The reminder** says "Ask Sam for the drill back". For a private thing it says "Ask for something back".
 
