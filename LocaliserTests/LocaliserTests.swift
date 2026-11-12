@@ -226,6 +226,49 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(store.openedItem, item.id, "Tapping an ask-back reminder opens the thing")
     }
 
+    /// "Text them" on the reminder opens the thing and the note to send (owner, 12 Nov). Tapping the reminder itself opens only the thing.
+    func testTextThemOnAReminderOpensTheThingAndTheNote() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Cordless drill")
+        let deadline = try XCTUnwrap(store.lend(item, to: "Sam", askBackOn: XCTUnwrap(CalendarDay(.now).adding(days: 5))))
+        let previous = UNUserNotificationCenter.current().delegate
+        defer { UNUserNotificationCenter.current().delegate = previous }
+        let service = ReminderService()
+        service.handle(id: deadline.id, action: ReminderService.textAction)
+        XCTAssertNil(store.textRequest, "Waits for the notebook, like any other action")
+        service.store = store
+        XCTAssertEqual(store.openedItem, item.id)
+        XCTAssertEqual(store.textRequest, item.id, "Text them opens the note as well as the thing")
+        store.openedItem = nil; store.textRequest = nil
+        service.handle(id: deadline.id, action: UNNotificationDefaultActionIdentifier)
+        XCTAssertEqual(store.openedItem, item.id)
+        XCTAssertNil(store.textRequest, "Tapping the reminder itself opens only the thing")
+        store.openedItem = nil
+        service.handle(id: deadline.id, action: UNNotificationDismissActionIdentifier)
+        XCTAssertNil(store.openedItem, "Dismissing it does nothing")
+        XCTAssertNil(store.textRequest)
+    }
+
+    /// The reminder's one button. It opens the app, so it asks for the phone to be unlocked, and nothing is sent from the Lock Screen.
+    func testAskBackRemindersOfferTextThem() throws {
+        let category = ReminderService.askBackCategory
+        XCTAssertEqual(category.identifier, ReminderService.askBackCategoryID)
+        XCTAssertEqual(category.actions.map(\.identifier), [ReminderService.textAction])
+        let action = try XCTUnwrap(category.actions.first)
+        XCTAssertEqual(action.title, "Text them")
+        XCTAssertTrue(action.options.contains(.foreground), "It opens Hereabouts, where the note is written")
+        XCTAssertFalse(action.options.contains(.destructive))
+    }
+
+    /// The note Messages opens with. The lender picks who it goes to in Messages, so Hereabouts never needs a number.
+    func testTheAskBackNoteNamesThePersonAndTheThing() throws {
+        XCTAssertEqual(AskBackNote.text(person: "Sam", thing: "Cordless drill"), "Hi Sam, could I have my Cordless drill back when you get a chance?")
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Passport", isPrivate: true)
+        _ = try store.lend(item, to: "Ana", askBackOn: nil)
+        XCTAssertEqual(AskBackNote.text(for: item), "Hi Ana, could I have my Passport back when you get a chance?", "The lender reads it before sending, so a private thing keeps its name")
+    }
+
     func testReminderWordingNamesTheItemOnlyWhenAllowed() throws {
         let reminder = PlannedReminder(id: "x", deadlineID: UUID(), fireDate: .now, kind: .askBack, daysBefore: 0, itemName: "Headphones", person: "Sam")
         XCTAssertEqual(reminder.content(showingNames: true).body, "Ask Sam for Headphones back.")
@@ -625,7 +668,7 @@ final class LocaliserTests: XCTestCase {
             XCTAssertFalse(request.content.body.contains("12345")); XCTAssertFalse(request.content.body.contains("Sensitive"))
             XCTAssertEqual(request.content.title, "Lent out")
             XCTAssertEqual(request.content.body, "Ask for something back.")
-            XCTAssertEqual(request.content.categoryIdentifier, "", "No notification buttons")
+            XCTAssertEqual(request.content.categoryIdentifier, ReminderService.askBackCategoryID, "Text them is the one button")
             let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
             XCTAssertFalse(trigger.repeats); XCTAssertEqual(trigger.dateComponents.hour, 9)
         }

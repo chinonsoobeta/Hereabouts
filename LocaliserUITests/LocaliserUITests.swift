@@ -262,6 +262,37 @@ import StoreKitTest
         XCTAssertTrue(drill.exists)
     }
 
+    /// "Text Sam" on a lent thing (the owner's yes, 12 Nov). The simulator has no Messages, so the note is shared instead;
+    /// on a phone, Messages opens with it written and the lender picks who it goes to.
+    func testTextingTheBorrowerOffersTheNote() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library"]
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Lent out"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Lent out"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Cordless drill'")).firstMatch.tap()
+        let text = app.buttons["item.text"]
+        XCTAssertTrue(text.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertEqual(text.label, "Text Sam")
+        XCTAssertTrue(app.buttons["item.askAgain"].exists, "Asking again next week is still beside it")
+        // Only the two buttons are checked here; the rest of the page slides under the bars' glass.
+        try app.performAccessibilityAudit(for: [.contrast, .hitRegion, .sufficientElementDescription, .textClipped]) { issue in
+            guard let element = issue.element else { return true }
+            return !["item.text", "item.askAgain"].contains(element.identifier)
+        }
+        text.tap()
+        let sheet = app.otherElements["ActivityListView"]
+        XCTAssertTrue(sheet.waitForExistence(timeout: 8), "The share sheet opens\n\(app.debugDescription)")
+        let note = sheet.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Hi Sam, could I have my Cordless drill back when you get a chance?")).firstMatch
+        XCTAssertTrue(note.waitForExistence(timeout: 5), "...with the note written\n\(app.debugDescription)")
+        // Closing it leaves the thing as it was: still lent to Sam.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.08)).tap()
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.buttons["item.back"].exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'With Sam'")).firstMatch.exists)
+    }
+
     func testSeveralThingsFromOnePhoto() throws {
         #if targetEnvironment(simulator)
         continueAfterFailure = false
