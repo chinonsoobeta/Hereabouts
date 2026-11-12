@@ -88,7 +88,7 @@ targets:
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Use the microphone to say where you keep a thing. Hold to talk, and let go when you're done. Nothing is recorded.
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '4'
+        CURRENT_PROJECT_VERSION: '5'
         CODE_SIGN_ENTITLEMENTS: Localiser/Localiser.entitlements
     dependencies:
       - target: HereaboutsControls
@@ -112,7 +112,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app.controls
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '4'
+        CURRENT_PROJECT_VERSION: '5'
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) HEREABOUTS_CONTROLS
         GENERATE_INFOPLIST_FILE: YES
   # Home screen and Lock Screen buttons (Find and Say it), and the lent-out widget. The buttons read nothing from the
@@ -138,7 +138,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.hereabouts.app.widget
         CODE_SIGN_ENTITLEMENTS: HereaboutsWidget/HereaboutsWidget.entitlements
         MARKETING_VERSION: '1.0'
-        CURRENT_PROJECT_VERSION: '4'
+        CURRENT_PROJECT_VERSION: '5'
         GENERATE_INFOPLIST_FILE: YES
   LocaliserTests:
     type: bundle.unit-test
