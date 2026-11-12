@@ -1126,11 +1126,18 @@ import StoreKitTest
         let cell = row(name, app)
         if !cell.exists, ["Find", "Trips", "Lent out", "Settings"].contains(name), app.buttons[name].exists { app.buttons[name].firstMatch.tap(); return }
         if !cell.exists { showSidebar(app) }
-        for _ in 0..<4 where !(cell.exists && cell.isHittable) && app.collectionViews["Sidebar"].exists {
+        // The fixed sections are at the top, the places below them.
+        let up = !["Search", "Find", "Trips", "Lent out", "Settings"].contains(name)
+        // The sidebar's Add a thing button floats over its bottom rows (on the Duo's short inner screen, over Garage),
+        // so a place that low would open the New thing sheet instead. The button's own frame is wrong there, so use the sidebar's.
+        func reachable() -> Bool {
+            guard cell.exists && cell.isHittable else { return false }
+            let sidebar = app.collectionViews["Sidebar"]
+            return !up || !sidebar.exists || cell.frame.maxY < sidebar.frame.maxY - 100
+        }
+        for _ in 0..<4 where !reachable() && app.collectionViews["Sidebar"].exists {
             // A short drag, so the row doesn't end up under the sidebar's own bar at the top.
             let sidebar = app.collectionViews["Sidebar"]
-            // The fixed sections are at the top, the places below them.
-            let up = !["Search", "Find", "Trips", "Lent out", "Settings"].contains(name)
             sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.7 : 0.5)).press(forDuration: 0.05, thenDragTo: sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.5 : 0.7)))
             sleep(1) // Let the list settle before it is tapped.
         }
@@ -1574,6 +1581,9 @@ import StoreKitTest
         next.tap()
         XCTAssertTrue(app.textFields["item.name"].waitForExistence(timeout: 5), app.debugDescription)
         XCTAssertTrue(app.buttons["voice.newPlace"].waitForExistence(timeout: 5))
+        // A simulator's first keyboard can show a one-time slide-to-type tip over the sheet; close it first.
+        let tip = app.buttons.matching(NSPredicate(format: "label == 'Continue' AND identifier != 'voice.continue'")).firstMatch
+        if tip.waitForExistence(timeout: 2) { tip.tap(); XCTAssertTrue(tip.waitForNonExistence(timeout: 5)) }
         if app.keyboards.firstMatch.exists { app.keyboards.buttons.matching(NSPredicate(format: "label IN {'return', 'Return', 'done', 'Done'}")).firstMatch.tap() }
         sleep(1)
         try store(app, "2-voice")
