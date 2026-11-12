@@ -8497,6 +8497,40 @@
         }
       }
     },
+    "Hi %@, could I have my %@ back when you get a chance?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hi %1$@, could I have my %2$@ back when you get a chance?"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi %@, could I have my %@ back when you get a chance?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hola, %1$@. ¿Me devuelves %2$@ cuando tengas un momento?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salut %1$@, tu pourrais me rendre %2$@ quand tu as un moment ?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oi, %1$@! Você pode me devolver %2$@ quando puder?"
+          }
+        }
+      }
+    },
     "Hidden from Spotlight, Siri, notifications and widgets. Included in backups and exports." : {
       "localizations" : {
         "en-GB" : {
@@ -17239,6 +17273,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Termos de Uso"
+          }
+        }
+      }
+    },
+    "Text %@" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribir a %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrire à %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escrever para %@"
+          }
+        }
+      }
+    },
+    "Text them" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text them"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar mensaje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer un message"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mandar mensagem"
           }
         }
       }

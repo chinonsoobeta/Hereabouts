@@ -59,6 +59,8 @@ final class LocaliserStore {
     var undoableDeletion: String?
     /// Item to show on the Find tab, set by Spotlight, Siri or a widget.
     var openedItem: UUID?
+    /// A lent thing whose ask-back note to open in Messages, from a reminder's "Text them".
+    var textRequest: UUID?
     /// An app icon shortcut or link for Find: search, write something down, or put something away.
     var findRequest: AppLink?
     /// A place opened from a box label.

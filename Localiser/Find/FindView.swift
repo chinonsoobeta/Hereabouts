@@ -613,11 +613,7 @@ struct ItemDetailView: View {
                                 Button("It's back") {
                                     do { try store.gotBack(item) } catch { self.error = error.plainMessage() }
                                 }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.back")
-                                if let askBack = item.openAskBack {
-                                    Button("Ask again next week") {
-                                        do { try store.askAgainNextWeek(askBack) } catch { self.error = error.plainMessage() }
-                                    }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.askAgain")
-                                }
+                                askButtons(item)
                             } else if item.isMissing, !item.archived {
                                 Text("Missing since \(item.missingSince?.dayAndMonth ?? String(localized: "recently")).").font(.wbCaption).foregroundStyle(Theme.ink)
                                 Button("Found it") { ui.itemSheet = .found(item.id) }.buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("item.found")
@@ -632,10 +628,11 @@ struct ItemDetailView: View {
                     }.plainRow()
                 }
                 if !item.packedTrips.isEmpty {
-                    Section("Packed trips") { ForEach(item.packedTrips) { trip in NavigationLink(trip.name) { TripDetailView(trip: trip) } } }
+                    Section { ForEach(item.packedTrips) { trip in NavigationLink(trip.name) { TripDetailView(trip: trip) } } }
+                    header: { Text("Packed trips").foregroundStyle(Theme.secondary) }
                 }
                 if !item.movements.isEmpty {
-                    Section("Where it's been") {
+                    Section {
                         ForEach(item.movements.sorted { $0.date > $1.date }) { movement in
                             VStack(alignment: .leading) {
                                 Text(movement.summary)
@@ -643,6 +640,9 @@ struct ItemDetailView: View {
                                 Text(movement.byline.map { "\($0) · \(when)" } ?? when).font(.caption).foregroundStyle(Theme.secondary)
                             }
                         }
+                    } header: {
+                        // Pencil on paper, as the Trips headers are: the list's own grey is too faint on the notebook's paper.
+                        Text("Where it's been").foregroundStyle(Theme.secondary)
                     }
                 }
                 Section {
@@ -701,6 +701,25 @@ struct ItemDetailView: View {
     private func toggleArchive() {
         if item.archived && !pro.allows(.item, count: store.activeItemCount) { ui.upgrading = true; return }
         do { try store.setArchived(item, !item.archived) } catch { self.error = error.plainMessage() }
+    }
+
+    /// Text the borrower (the owner's yes, 12 Nov), then push the ask-back date a week. Messages opens with the note
+    /// written and the lender picks who it goes to; on a device without Messages, the note is shared instead.
+    /// One under the other: a ShareLink doesn't report its label's width, so the two can't be fitted side by side.
+    @ViewBuilder private func askButtons(_ item: Belonging) -> some View {
+        let label = Label(String(localized: "Text \(item.lentTo)"), systemImage: "message")
+        Group {
+            if AskBackNote.canText {
+                Button { ui.texting = AskBackText(body: AskBackNote.text(for: item)) } label: { label }
+            } else {
+                ShareLink(item: AskBackNote.text(for: item)) { label }
+            }
+        }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.text")
+        if let askBack = item.openAskBack {
+            Button("Ask again next week") {
+                do { try store.askAgainNextWeek(askBack) } catch { self.error = error.plainMessage() }
+            }.buttonStyle(SoftButtonStyle(compact: true)).accessibilityIdentifier("item.askAgain")
+        }
     }
 }
 

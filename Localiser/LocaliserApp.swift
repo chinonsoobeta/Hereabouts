@@ -223,13 +223,15 @@ enum PackingSheet: Hashable, Identifiable {
     var placeSheet: PlaceSheet?
     var packingSheet: PackingSheet?
     var upgrading = false
+    /// The ask-back note open in Messages.
+    var texting: AskBackText?
     /// "Moved to the shelf" after Found it, shown on the thing it was said about.
     var foundNote: (item: UUID, text: String)?
     /// Whether the wide layout's sidebar is showing. Find draws its own Add a thing bar only when it isn't.
     var sidebar = NavigationSplitViewVisibility.all
 
     /// Whether a sheet that the window itself presents is open.
-    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || choosingLend || ritual != nil || itemSheet != nil || placeSheet != nil || packingSheet != nil || upgrading }
+    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || choosingLend || ritual != nil || itemSheet != nil || placeSheet != nil || packingSheet != nil || upgrading || texting != nil }
 
     var tab: AppTab {
         get { destination.tab }
@@ -431,6 +433,8 @@ struct RootView: View {
         .sheet(item: $ui.placeSheet) { sheet in NavigationStack { placeEditor(sheet) } }
         .sheet(item: $ui.packingSheet) { sheet in NavigationStack { packingEditor(sheet) } }
         .sheet(isPresented: $ui.upgrading) { NavigationStack { ProView() } }
+        // Messages' compose sheet is its own navigation controller, so it isn't put in a NavigationStack.
+        .sheet(item: $ui.texting) { note in MessageComposer(body: note.body) { ui.texting = nil }.ignoresSafeArea() }
         .sheet(item: $ui.ritual) { ritual in
             NavigationStack {
                 switch ritual {
@@ -452,6 +456,15 @@ struct RootView: View {
         .onChange(of: store.openedItem) { _, id in
             guard let id else { return }
             ui.openThing(id, wide: wide, in: store)
+        }
+        // A reminder's "Text them": the thing opens (above), and Messages opens over it with the note written. If something
+        // else is open, such as an editor, it's left alone and the thing page's own Text button is there instead.
+        .onChange(of: store.textRequest, initial: true) { _, id in
+            guard let id else { return }
+            store.textRequest = nil
+            guard AskBackNote.canText, !ui.sheetOpen, !Self.somethingIsPresented(),
+                  let item = store.items.first(where: { $0.id == id }), item.isLent else { return }
+            ui.texting = AskBackText(body: AskBackNote.text(for: item))
         }
         .onChange(of: ui.destination) { _, destination in
             if destination == .search { ui.destination = .find; store.findRequest = .find }

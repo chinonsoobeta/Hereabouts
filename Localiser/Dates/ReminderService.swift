@@ -33,10 +33,19 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
     /// Item names appear in reminders unless turned off in Settings.
     static var showsItemNames: Bool { UserDefaults.standard.object(forKey: showNamesKey) as? Bool ?? true }
     private let center = UNUserNotificationCenter.current()
+    /// "Text them" on an ask-back reminder (the owner's yes, 12 Nov). It opens Hereabouts, so the phone is unlocked
+    /// first, and Messages opens with the note written; nothing is sent from the Lock Screen.
+    static let textAction = "localiser.askBack.text"
+    static let askBackCategoryID = "localiser.askBack"
+    static var askBackCategory: UNNotificationCategory {
+        UNNotificationCategory(identifier: askBackCategoryID, actions: [UNNotificationAction(identifier: textAction, title: String(localized: "Text them"), options: [.foreground], icon: UNNotificationActionIcon(systemImageName: "message"))], intentIdentifiers: [])
+    }
 
     override init() {
         super.init()
         center.delegate = self
+        // Without Messages on this device, ask-back reminders have no button.
+        center.setNotificationCategories([AskBackNote.canText ? Self.askBackCategory : UNNotificationCategory(identifier: Self.askBackCategoryID, actions: [], intentIdentifiers: [])])
     }
 
     func enable() async {
@@ -83,6 +92,7 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
             content.body = text.body
             content.sound = .default
             content.interruptionLevel = .active
+            if reminder.kind == .askBack { content.categoryIdentifier = Self.askBackCategoryID }
             if let itemID = reminder.itemID { content.threadIdentifier = itemID.uuidString }
             content.userInfo = ["deadlineID": reminder.deadlineID.uuidString]
             let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: reminder.fireDate)
@@ -147,9 +157,11 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
 
     func handle(id: UUID, action: String) {
         guard let store else { pendingActions.append((id, action)); return }
-        // Tapping an ask-back reminder opens the thing it's about.
-        guard action == UNNotificationDefaultActionIdentifier, let item = store.deadlines.first(where: { $0.id == id })?.item else { return }
+        // Tapping an ask-back reminder opens the thing it's about. "Text them" opens it with the note in Messages over it.
+        guard action == UNNotificationDefaultActionIdentifier || action == Self.textAction,
+              let item = store.deadlines.first(where: { $0.id == id })?.item else { return }
         store.openedItem = item.id
+        if action == Self.textAction { store.textRequest = item.id }
     }
 
     private func replayPendingActions() {
