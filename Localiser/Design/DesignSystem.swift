@@ -306,13 +306,14 @@ struct SoftButtonStyle: ButtonStyle {
 /// "Garage › Back wall › Rack 2", with the final container emphasised as on the canvas.
 struct PlaceBreadcrumb: View {
     let path: String?
+    var font = Font.wbCaption
     var body: some View {
         if let path, !path.isEmpty {
             let parts = path.components(separatedBy: " › ")
             let containers = Text(parts.dropLast().map { $0 + " › " }.joined()).foregroundStyle(Theme.secondary)
             let last = Text(parts.last ?? "").foregroundStyle(Theme.ink).fontWeight(.semibold)
             Text("\(containers)\(last)")
-                .font(.wbCaption)
+                .font(font)
                 .accessibilityLabel(path)
         } else {
             Text("No place yet").font(.wbCaption).foregroundStyle(Theme.secondary)

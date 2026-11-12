@@ -250,8 +250,10 @@ struct ProComparison: View {
             Row(name: String(localized: "Homes"), free: .text(CreationKind.home.freeLimit.formatted()), pro: .text(noLimit)),
             Row(name: String(localized: "Weekly automatic backups"), free: .notIncluded, pro: .included),
             Row(name: String(localized: "Share Pro with your family"), free: .notIncluded, pro: .included),
+            // Its own row, so it's plain that lending is free (beta feedback, 12 Nov).
+            Row(name: String(localized: "Lending"), caption: String(localized: "Who has it, and a reminder to ask for it back"), free: .included, pro: .included),
             Row(name: String(localized: "Everything else"),
-                caption: String(localized: "Voice memos, lending, trips, reminders, Siri, Spotlight, the widget, manual backups and export"),
+                caption: String(localized: "Voice memos, trips, reminders, Siri, Spotlight, the widgets, manual backups and export"),
                 free: .included, pro: .included),
         ]
     }

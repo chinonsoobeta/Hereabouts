@@ -33,7 +33,8 @@ import SwiftUI
     }
 }
 
-/// A form row that opens the place chooser. Shows the chosen place as a breadcrumb.
+/// A form row that opens the place chooser. It reads like the Name field above it: the chosen place leads, and
+/// until one is chosen the row says "Place" in grey, as a placeholder would (beta feedback, 12 Nov).
 struct PlacePicker: View {
     @Environment(LocaliserStore.self) private var store
     @Binding var selection: UUID?
@@ -45,21 +46,32 @@ struct PlacePicker: View {
     var recent: [Place] = []
     /// Whose places to offer. The current home when nil.
     var home: HomeRecord? = nil
+    /// Keeps the title on the left and the place small on the right, for a row whose "None" alone wouldn't say what it's for.
+    var labelled = false
     var body: some View {
         let _ = store.revision
+        let place = store.places.first { $0.id == selection }
         NavigationLink {
             PlaceChooser(selection: $selection, excluded: excluded, noneTitle: noneTitle, suggested: recent, suggestedTitle: String(localized: "Recent"), home: home)
         } label: {
-            HStack(spacing: 12) {
-                Text(title).foregroundStyle(Theme.ink)
-                Spacer(minLength: 8)
-                if let place = store.places.first(where: { $0.id == selection }) {
-                    PlaceBreadcrumb(path: place.path).multilineTextAlignment(.trailing)
-                } else {
-                    Text(noneTitle).font(.wbCaption).foregroundStyle(Theme.secondary)
+            if labelled {
+                HStack(spacing: 12) {
+                    Text(title).foregroundStyle(Theme.ink)
+                    Spacer(minLength: 8)
+                    if let place {
+                        PlaceBreadcrumb(path: place.path).multilineTextAlignment(.trailing)
+                    } else {
+                        Text(noneTitle).font(.wbCaption).foregroundStyle(Theme.secondary)
+                    }
                 }
+            } else if let place {
+                PlaceBreadcrumb(path: place.path, font: .body).frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Text(title).foregroundStyle(Theme.secondary).frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .accessibilityLabel(title)
+        .accessibilityValue(place?.path ?? noneTitle)
         .accessibilityIdentifier("place.picker")
     }
 }

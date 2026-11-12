@@ -567,7 +567,7 @@ struct TripEntryDetailView: View {
                     } else {
                         Button(entry.item == nil ? "Confirm unpacked" : "Put back: \(entry.homePlace?.path ?? String(localized: "no place yet"))") { attempt { try store.resolveHome(entry, resolution: .putBack) } }
                         if entry.item != nil {
-                            PlacePicker(selection: $placeID, home: entry.item?.home)
+                            PlacePicker(selection: $placeID, home: entry.item?.home, labelled: true)
                             Button("Confirm new place") { attempt { try store.resolveHome(entry, resolution: .newPlace, newPlace: store.places.first { $0.id == placeID }) } }.disabled(placeID == nil)
                         }
                     }

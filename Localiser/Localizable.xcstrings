@@ -7331,6 +7331,34 @@
         }
       }
     },
+    "Find a thing" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find a thing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar un objeto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chercher un objet"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar um objeto"
+          }
+        }
+      }
+    },
     "Find options" : {
       "localizations" : {
         "en-GB" : {
@@ -9795,6 +9823,62 @@
         }
       }
     },
+    "Lend something" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lend something"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prestar algo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêter un objet"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emprestar algo"
+          }
+        }
+      }
+    },
+    "Lending" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préstamos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêts"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empréstimos"
+          }
+        }
+      }
+    },
     "Lent" : {
       "localizations" : {
         "en-GB" : {
@@ -11973,6 +12057,34 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Nothing lent out" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing lent out"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada prestado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien de prêté"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada emprestado"
           }
         }
       }
@@ -19279,30 +19391,30 @@
         }
       }
     },
-    "Voice memos, lending, trips, reminders, Siri, Spotlight, the widget, manual backups and export" : {
+    "Voice memos, trips, reminders, Siri, Spotlight, the widgets, manual backups and export" : {
       "localizations" : {
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voice memos, lending, trips, reminders, Siri, Spotlight, the widget, manual backups and export"
+            "value" : "Voice memos, trips, reminders, Siri, Spotlight, the widgets, manual backups and export"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notas de voz, préstamos, viajes, recordatorios, Siri, Spotlight, el widget, las copias manuales y la exportación"
+            "value" : "Notas de voz, viajes, recordatorios, Siri, Spotlight, los widgets, las copias manuales y la exportación"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notes vocales, prêts, voyages, rappels, Siri, Spotlight, le widget, les sauvegardes manuelles et l’export"
+            "value" : "Notes vocales, voyages, rappels, Siri, Spotlight, les widgets, les sauvegardes manuelles et l’export"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notas de voz, empréstimos, viagens, lembretes, Siri, Spotlight, o widget, backups manuais e exportação"
+            "value" : "Notas de voz, viagens, lembretes, Siri, Spotlight, os widgets, backups manuais e exportação"
           }
         }
       }
@@ -19671,6 +19783,34 @@
         }
       }
     },
+    "When you lend something, it shows here with who has it and when to ask for it back." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you lend something, it shows here with who has it and when to ask for it back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando prestes algo, aparecerá aquí con quién lo tiene y cuándo pedir que lo devuelvan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand vous prêtez un objet, il apparaît ici avec la personne qui l’a et le moment de le réclamer."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando você emprestar algo, ele aparece aqui com quem está e quando pedir de volta."
+          }
+        }
+      }
+    },
     "Where do you keep it?" : {
       "localizations" : {
         "en-GB" : {
@@ -19947,6 +20087,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qual objeto?"
+          }
+        }
+      }
+    },
+    "Who has it, and a reminder to ask for it back" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who has it, and a reminder to ask for it back"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quién lo tiene y un recordatorio para pedir que lo devuelvan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui l’a, et un rappel pour le réclamer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com quem está e um lembrete para pedir de volta"
           }
         }
       }

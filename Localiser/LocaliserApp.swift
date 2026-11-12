@@ -89,7 +89,7 @@ extension FocusedValues {
     @Entry var windowShortcuts: WindowShortcuts?
 }
 
-/// New thing (⌘N), search (⌘F) and the four sections (⌘1 to ⌘4), in the iPadOS menu bar and the ⌘-hold overlay.
+/// New thing (⌘N), search (⌘F) and the five sections (⌘1 to ⌘5), in the iPadOS menu bar and the ⌘-hold overlay.
 struct HereaboutsCommands: Commands {
     @FocusedValue(\.windowShortcuts) private var shortcuts
 
@@ -103,16 +103,18 @@ struct HereaboutsCommands: Commands {
             Button("Find") { shortcuts?.show(.find) }.keyboardShortcut("1")
             Button("Places") { shortcuts?.show(.places) }.keyboardShortcut("2")
             Button("Trips") { shortcuts?.show(.packing) }.keyboardShortcut("3")
-            Button("Settings") { shortcuts?.show(.settings) }.keyboardShortcut("4")
+            Button("Lent out") { shortcuts?.show(.lent) }.keyboardShortcut("4")
+            Button("Settings") { shortcuts?.show(.settings) }.keyboardShortcut("5")
         }
     }
 }
 
-enum AppTab: Hashable { case find, places, packing, settings }
+/// The compact layout's tabs, in their order. Settings stays the rightmost (owner, 12 Nov).
+enum AppTab: Hashable, CaseIterable { case find, places, packing, lent, settings }
 
-/// Where the window is. The compact layout shows four tabs; the wide layout also lists each place, trip and kit.
+/// Where the window is. The compact layout shows five tabs; the wide layout also lists each place, trip and kit.
 enum Destination: Hashable {
-    case find, search, places, place(UUID), trips, trip(UUID), kit(UUID), settings
+    case find, search, places, place(UUID), trips, trip(UUID), kit(UUID), lent, settings
 
     /// The tab this destination belongs to, which is all the compact layout can show.
     var tab: AppTab {
@@ -120,6 +122,7 @@ enum Destination: Hashable {
         case .find, .search: .find
         case .places, .place: .places
         case .trips, .trip, .kit: .packing
+        case .lent: .lent
         case .settings: .settings
         }
     }
@@ -131,6 +134,7 @@ enum Destination: Hashable {
         case .find: self = .find
         case .places: self = .places
         case .packing: self = .trips
+        case .lent: self = .lent
         case .settings: self = .settings
         }
     }
@@ -150,6 +154,9 @@ enum ItemSheet: Hashable, Identifiable {
         switch self { case .edit(let id), .move(let id), .moveHome(let id), .lend(let id), .found(let id): id }
     }
 }
+
+/// A thing opened from Lent out. Both layouts show the same Lent out stack, so a fold carries it as it is.
+enum LentRoute: Hashable { case item(UUID) }
 
 /// A trip or kit pushed on the Trips tab. The window keeps the path, so a fold can carry it to the wide layout and back.
 enum TripRoute: Hashable { case trip(UUID), kit(UUID) }
@@ -179,6 +186,7 @@ enum PackingSheet: Hashable, Identifiable {
             // (The pages stay open across a fold or a resize: neither changes the destination.)
             if oldValue == .settings { settingsPath = [] }
             if oldValue == .trips { tripsPath = [] }
+            if oldValue == .lent { lentPath = [] }
             if case .place(let id) = oldValue { roomPaths[id] = nil }
             forgetLabel()
         }
@@ -201,6 +209,12 @@ enum PackingSheet: Hashable, Identifiable {
     var settingsPath: [SettingsPage] = []
     /// The trips and kits pushed on the Trips tab, or on the wide Trips list.
     var tripsPath: [TripRoute] = []
+    /// The thing open on Lent out.
+    var lentPath: [LentRoute] = []
+    /// Lent out's "Lend something", which picks the thing before Lend it opens for it.
+    var choosingLend = false
+    /// The thing picked there, held until the chooser has gone and Lend it can open.
+    var lendPick: UUID?
     /// The places pushed inside each room on the wide layout.
     var roomPaths: [UUID: [PlaceRoute]] = [:]
     /// The place a box label opened, which leads with putting things in.
@@ -215,7 +229,7 @@ enum PackingSheet: Hashable, Identifiable {
     var sidebar = NavigationSplitViewVisibility.all
 
     /// Whether a sheet that the window itself presents is open.
-    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || ritual != nil || itemSheet != nil || placeSheet != nil || packingSheet != nil || upgrading }
+    var sheetOpen: Bool { newThing != nil || speaking || addingPlace || choosingLend || ritual != nil || itemSheet != nil || placeSheet != nil || packingSheet != nil || upgrading }
 
     var tab: AppTab {
         get { destination.tab }
@@ -292,10 +306,6 @@ enum PackingSheet: Hashable, Identifiable {
             reveal(inside: deepest, fromLabel: false)
             labelled = kept
             selectedItem = thing
-        } else if let thing, let item = store.items.first(where: { $0.id == thing }) {
-            // A thing opened on its own, from Lent out: beside its place if this home has it, otherwise in Find.
-            if let place = item.place, store.placesHere.contains(place) { reveal(place, item: thing) }
-            else { destination = .find; findItem = thing }
         } else if destination.tab == .places {
             destination = .places; selectedItem = nil
         }
@@ -348,7 +358,7 @@ enum PackingSheet: Hashable, Identifiable {
             } else { selectedItem = nil }
         }
         if let id = findItem, !store.items.contains(where: { $0.id == id }) { findItem = nil }
-        // A place stays only while it is in the current home. A thing on its own (from Lent out) may be from any home.
+        // A place stays only while it is in the current home.
         let gone = placesPath.firstIndex { route in
             switch route {
             case .place(let id): !here.contains(id)
@@ -356,6 +366,10 @@ enum PackingSheet: Hashable, Identifiable {
             }
         }
         if let gone { placesPath.removeSubrange(gone...) }
+        // Lent out lists things from every home, so only a deleted thing goes.
+        if let gone = lentPath.firstIndex(where: { route in
+            switch route { case .item(let id): !store.items.contains { $0.id == id && !$0.isDeleted } }
+        }) { lentPath.removeSubrange(gone...) }
         for (room, path) in roomPaths {
             if !here.contains(room) { roomPaths[room] = nil; continue }
             if let index = path.firstIndex(where: { if case .place(let id) = $0 { !here.contains(id) } else { true } }) { roomPaths[room] = index == 0 ? nil : Array(path[..<index]) }
@@ -408,6 +422,9 @@ struct RootView: View {
         .sheet(item: $ui.newThing) { new in NavigationStack { ItemEditor(place: store.places.first { $0.id == new.placeID }, name: new.name, photoFirst: new.photoFirst, spokenPlace: new.spokenPlace) } }
         .sheet(isPresented: $ui.speaking, onDismiss: { if let spoken = ui.spoken { ui.newThing = spoken; ui.spoken = nil } }) { NavigationStack { VoiceSheet { ui.spoken = $0 } } }
         .sheet(isPresented: $ui.addingPlace) { NavigationStack { PlaceEditor() } }
+        .sheet(isPresented: $ui.choosingLend, onDismiss: { if let id = ui.lendPick { ui.itemSheet = .lend(id); ui.lendPick = nil } }) {
+            NavigationStack { LendChooser { ui.lendPick = $0; ui.choosingLend = false } }
+        }
         .sheet(item: $ui.itemSheet) { sheet in
             NavigationStack { ItemSheetView(sheet: sheet) }
         }
@@ -504,13 +521,14 @@ struct RootView: View {
         return scene?.keyWindow?.rootViewController.map(presenting) ?? false
     }
 
-    /// Four tabs: every iPhone, and the Duo's outer screen.
+    /// Five tabs: every iPhone, and the Duo's outer screen.
     private var compactTabs: some View {
         @Bindable var ui = ui
         return TabView(selection: $ui.tab) {
             Tab(value: AppTab.find) { NavigationStack { FindView() } } label: { Label("Find", systemImage: "magnifyingglass").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.places) { placesStack } label: { Label("Places", systemImage: "shippingbox").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.packing) { tripsStack } label: { Label("Trips", systemImage: "suitcase").environment(\.symbolVariants, .none) }
+            Tab(value: AppTab.lent) { lentStack } label: { Label("Lent out", systemImage: "arrow.uturn.right").environment(\.symbolVariants, .none) }
             Tab(value: AppTab.settings) { NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() } } label: { Label("Settings", systemImage: "gear").environment(\.symbolVariants, .none) }
                 .badge(reminders.coverageGap || store.isStale ? Text("!") : nil)
         }
@@ -525,6 +543,19 @@ struct RootView: View {
                     switch route {
                     case .trip(let id): if let trip = store.trips.first(where: { $0.id == id }) { TripDetailView(trip: trip) }
                     case .kit(let id): if let kit = store.kits.first(where: { $0.id == id }) { KitDetailView(kit: kit) }
+                    }
+                }
+        }
+    }
+
+    /// Lent out with the thing it opens, with its path kept in the window state. Both layouts use it.
+    private var lentStack: some View {
+        @Bindable var ui = ui
+        return NavigationStack(path: $ui.lentPath) {
+            LentOutView()
+                .navigationDestination(for: LentRoute.self) { route in
+                    switch route {
+                    case .item(let id): if let item = store.items.first(where: { $0.id == id }) { ItemDetailView(item: item) }
                     }
                 }
         }
@@ -611,6 +642,7 @@ struct RootView: View {
             row(.search, String(localized: "Search"), "magnifyingglass")
             row(.find, String(localized: "Find"), "house")
             row(.trips, String(localized: "Trips"), "suitcase")
+            row(.lent, String(localized: "Lent out"), "arrow.uturn.right", count: store.lentItems.isEmpty ? nil : store.lentItems.count)
             row(.settings, String(localized: "Settings"), "gear")
             Section("Places") {
                 row(.places, String(localized: "All places"), "shippingbox")
@@ -659,6 +691,7 @@ struct RootView: View {
         case .kit(let id):
             if let kit = store.kitsHere.first(where: { $0.id == id }) { NavigationStack { KitDetailView(kit: kit) }.id(id) }
             else { NavigationStack { PackingView() } }
+        case .lent: lentStack
         case .settings: NavigationStack(path: $ui.settingsPath) { LibrarySettingsView() }
         }
     }
@@ -728,6 +761,7 @@ extension RootView {
         case .item(let id): store.openedItem = id
         case .place(let id):
             ui.openPlace(id, wide: wide, in: store)
+        case .lent: ui.tab = .lent; ui.lentPath = []
         case .find, .new, .putAway, .say: ui.tab = .find; store.findRequest = link
         }
     }

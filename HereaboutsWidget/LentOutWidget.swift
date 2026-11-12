@@ -30,7 +30,7 @@ struct LentOutWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: LentOutRows.widgetKind, provider: LentOutProvider()) { entry in
             LentOutView(entry: entry)
-                .widgetURL(WidgetButtons.find)
+                .widgetURL(WidgetButtons.lent)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Lent out")

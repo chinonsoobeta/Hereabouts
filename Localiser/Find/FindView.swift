@@ -292,6 +292,8 @@ struct ItemRow: View {
     @Environment(LocaliserStore.self) private var store
     let item: Belonging
     var query = ""
+    /// Lent out adds when to ask for it back, in the warning colour once that day has passed.
+    var showsAskBack = false
     var body: some View {
         let _ = store.revision
         HStack(spacing: 14) {
@@ -299,6 +301,9 @@ struct ItemRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 NotebookLine(name: item.name, detail: item.lentLine ?? item.place.map { String(localized: "is in \($0.path)") } ?? String(localized: "No place yet"), query: query)
                 if item.isLent, let home = item.place { Text("Usually in \(home.path)").font(.wbCaption).foregroundStyle(Theme.secondary) }
+                if showsAskBack, let day = item.openAskBack?.day {
+                    Text("Ask for it back · \(day.formatted)").font(.wbCaption).foregroundStyle((DueLabel.days(until: day) ?? 0) < 0 ? Theme.warning : Theme.ink)
+                }
                 if store.hasSeveralHomes, let home = item.home, home != store.currentHome { Text("At \(home.name)").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 if let since = item.missingSince { Text("Missing since \(since.dayAndMonth)").font(.wbCaption).foregroundStyle(Theme.warning) }
                 if !item.packedTrips.isEmpty { Text("Packed for \(item.packedTrips.map(\.name).joined(separator: ", "))").font(.wbCaption).foregroundStyle(Theme.purpleInk) }

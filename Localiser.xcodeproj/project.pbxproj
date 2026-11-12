@@ -42,6 +42,7 @@
 		4CE43637FF6AECC7A71C3306 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9129D1892BAA558D32EE09BC /* OnboardingView.swift */; };
 		4D53B4532C288AF74D923CBE /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = EFE72C59BE477B9747AE92EA /* AppShortcuts.xcstrings */; };
 		55C935975E9D1D407719D130 /* LocaliserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A961609BF5723FD7F58316C /* LocaliserUITests.swift */; };
+		57AC615A4FDF0DD1B8E96FDA /* LentOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B89412B09CFCBE46808FEB /* LentOutView.swift */; };
 		5B00B5B06E222F1D8BC821EA /* IntentHomeAnswerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7E352782C883558D949F1F /* IntentHomeAnswerTests.swift */; };
 		5B718B50AD711FC7E185188F /* AuditClaudeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D63B74DC84D59B96A0723F /* AuditClaudeTests.swift */; };
 		5DBF36E0D58A15AB7C8382CE /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4437E05350A4892C18DA9522 /* ReminderService.swift */; };
@@ -233,6 +234,7 @@
 		746454CD0E1CC4EBEBE9395B /* SubscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTests.swift; sourceTree = "<group>"; };
 		75DDE3C8E7DC3DA0FC2DCD97 /* voice-practice.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "voice-practice.json"; sourceTree = "<group>"; };
 		76A21167AF6F6CAEF79448DE /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
+		77B89412B09CFCBE46808FEB /* LentOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LentOutView.swift; sourceTree = "<group>"; };
 		785940DE809D3794AA488637 /* Homes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homes.swift; sourceTree = "<group>"; };
 		796960A07F97C020E62944E3 /* IntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentsTests.swift; sourceTree = "<group>"; };
 		838F56782E6BDD1EE0A75006 /* AtkinsonHyperlegible-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Bold.ttf"; sourceTree = "<group>"; };
@@ -377,6 +379,7 @@
 				60A697438CB089D0830D4DC2 /* FindView.swift */,
 				024256BC9684B9B0C8066558 /* Lending.swift */,
 				0E29FE6FB9A6F892A2BEE1EE /* LendSheet.swift */,
+				77B89412B09CFCBE46808FEB /* LentOutView.swift */,
 				DFFAD989528D4021251CA3D9 /* PhotoText.swift */,
 				B5125DB3495BBECED9AFA8D3 /* PutAway.swift */,
 				153312694358421F11F17E69 /* Search.swift */,
@@ -877,6 +880,7 @@
 				7AADE78CF09E1DA8A1CE9449 /* LendSheet.swift in Sources */,
 				6420857F484D25F7378A0505 /* Lending.swift in Sources */,
 				F943B731222EA5E91EEF0507 /* LentOutRows.swift in Sources */,
+				57AC615A4FDF0DD1B8E96FDA /* LentOutView.swift in Sources */,
 				B2F32EF65AF696E94B37952B /* LibraryBackup.swift in Sources */,
 				2A50FFFFB8829E8AE690F13F /* LibrarySettingsView.swift in Sources */,
 				F2963885C11D31BCCBFFBE05 /* Localiser.xcdatamodeld in Sources */,
