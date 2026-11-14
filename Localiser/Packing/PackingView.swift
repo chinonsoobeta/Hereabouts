@@ -1,5 +1,4 @@
 import SwiftUI
-import TipKit
 
 struct PackingView: View {
     @Environment(LocaliserStore.self) private var store
@@ -348,6 +347,7 @@ struct TripDetailView: View {
     let trip: TripRecord
     @Environment(WindowState.self) private var ui
     @State private var deleting = false
+    @AppStorage(Hint.leaving.key) private var leavingHintDone = false
     @State private var canceling = false
     @State private var taskTitle = ""
     @State private var notReady: String?
@@ -381,7 +381,9 @@ struct TripDetailView: View {
                     TripStageStrip(state: trip.state ?? .packing)
                     if trip.state == .canceled { Text("You called off this trip.").font(.wbCaption).foregroundStyle(Theme.secondary) }
                 }.plainRow()
-                if trip.state == .packing { TipView(LeavingTip()).plainRow() }
+                if trip.state == .packing, !leavingHintDone, Hint.leaving.isShown() {
+                    HintCard(hint: .leaving, title: "Check off things as you pack", message: "Tap I'm leaving to check if you still need to pack anything.") { leavingHintDone = true }.plainRow()
+                }
                 stageButton
             }
             // A card of its own. As the only ordinary row under the plain header, it had square top corners.

@@ -5449,34 +5449,6 @@
         }
       }
     },
-    "Close tip" : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close tip"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cerrar consejo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fermer l’astuce"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fechar dica"
-          }
-        }
-      }
-    },
     "Come home" : {
       "localizations" : {
         "en-GB" : {
@@ -19069,34 +19041,6 @@
         }
       }
     },
-    "Turn on Put-away mode here to move several things to one place." : {
-      "localizations" : {
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn on Put-away mode here to move several things to one place."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activa el modo guardar aquí para mover varias cosas a un mismo lugar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activez le mode rangement ici pour déplacer plusieurs objets au même endroit."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ative o modo guardar aqui para mover várias coisas para um só lugar."
-          }
-        }
-      }
-    },
     "Turn on reminders" : {
       "localizations" : {
         "en-GB" : {
@@ -24341,6 +24285,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opções do lugar"
+          }
+        }
+      }
+    },
+    "Put-away mode helps you move several things to one place. You can turn it off in Find options." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put-away mode helps you move several things to one place. You can turn it off in Find options."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El modo guardar te ayuda a mover varias cosas a un mismo lugar. Puedes desactivarlo en Opciones de búsqueda."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mode rangement vous aide à déplacer plusieurs objets au même endroit. Vous pouvez le désactiver dans Options de recherche."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O modo guardar ajuda você a mover várias coisas para um só lugar. Você pode desativá-lo em Opções de busca."
+          }
+        }
+      }
+    },
+    "Turn on" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativar"
+          }
+        }
+      }
+    },
+    "Dismiss" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
           }
         }
       }

@@ -42,7 +42,7 @@ struct LocaliserApp: App {
         }
         catch { loadFailure = (error.supportDetail, error.systemDescription) }
         Appearance.apply()
-        HereaboutsTips.configure()
+        Hint.configureForTesting()
     }
 
     var body: some Scene {
@@ -419,8 +419,6 @@ struct RootView: View {
             if wide { wideLayout } else { compactTabs }
         }
         .tint(Theme.purpleInk)
-        .tipViewStyle(NotebookTipStyle())
-        .tipBackground(Theme.lilacPaper)
         .overlay(alignment: .bottom) { UndoDeletionToast() }
         .fullScreenCover(isPresented: Binding(get: { !seenOnboarding }, set: { if !$0 { seenOnboarding = true } })) {
             OnboardingView { seenOnboarding = true }.environment(pro)

@@ -1,6 +1,5 @@
 import SwiftUI
 import PhotosUI
-import TipKit
 import AppIntents
 import UniformTypeIdentifiers
 
@@ -14,6 +13,7 @@ struct FindView: View {
     @Environment(ReminderService.self) private var reminders
     @AppStorage(SiriTip.whereIs.key) private var whereIsTipDismissed = false
     @AppStorage(SiriTip.writeDown.key) private var writeDownTipDismissed = false
+    @AppStorage(Hint.putAway.key) private var putAwayHintDone = false
 
     private var query: String { ui.query }
     private var showArchived: Bool { ui.showArchived }
@@ -97,13 +97,11 @@ struct FindView: View {
                     Toggle("Put-away mode", systemImage: "tray.and.arrow.down", isOn: $ui.putAway)
                 } label: { Image(systemName: "line.3.horizontal.decrease") }
                 .accessibilityLabel("Find options")
-                .popoverTip(PutAwayTip())
             }
             if VoiceCapture.isAvailable() {
                 ToolbarItem(placement: .topBarTrailing) { Button("Say where", systemImage: "mic") { ui.speaking = true }.accessibilityIdentifier("find.say") }
             }
         }
-        .onChange(of: store.items.count, initial: true) { _, count in PutAwayTip.itemCount = count }
         .onChange(of: reminders.openedRitual, initial: true) { _, value in
             guard let value, let opened = Ritual(rawValue: value) else { return }
             ui.ritual = opened
@@ -155,6 +153,10 @@ struct FindView: View {
         } else {
             RitualBanners { ui.ritual = $0 }
         }
+        if !putAwayHintDone, Hint.suggestsPutAway(itemCount: store.items.count, putAwayOn: putAway) {
+            HintCard(hint: .putAway, title: "Putting things away?", message: "Put-away mode helps you move several things to one place. You can turn it off in Find options.",
+                     actionTitle: "Turn on", action: { ui.putAway = true }) { putAwayHintDone = true }
+        }
         if !store.missingItems.isEmpty {
             SectionHeading(title: String(localized: "Looking for")).padding(.top, 4)
             ForEach(store.missingItems) { item in itemCard(item) }
@@ -162,7 +164,7 @@ struct FindView: View {
         HStack {
             SectionHeading(title: String(localized: "Places"))
             Spacer()
-            if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink { PlacesView() } label: { Text("All places").frame(minHeight: regular ? 44 : nil).contentShape(Rectangle()) }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
+            if store.placesHere.contains(where: { $0.parent == nil }) { NavigationLink { PlacesView() } label: { Text("All places").frame(minHeight: 44).contentShape(Rectangle()) }.font(.wbLabel).foregroundStyle(Theme.purpleInk) }
         }.padding(.top, 8)
         VStack(spacing: 0) {
             ForEach(store.placesHere.filter { $0.parent == nil }.prefix(3)) { place in
@@ -195,8 +197,11 @@ struct SiriTipRow: View {
             Image(systemName: "siri").font(.title2).foregroundStyle(Theme.ink).accessibilityHidden(true)
             Text(phrase).font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
-            Button { withAnimation { dismiss() } } label: { Image(systemName: "xmark").font(.body.weight(.semibold)).foregroundStyle(Theme.pencil) }
-                .frame(minWidth: 44, minHeight: 44).accessibilityLabel("Hide this tip")
+            Button { withAnimation { dismiss() } } label: {
+                Image(systemName: "xmark").font(.body.weight(.semibold)).foregroundStyle(Theme.pencil)
+                    .frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
+            }
+            .buttonStyle(.plain).accessibilityLabel("Hide this tip")
         }
         .padding(.leading, 14).padding(.trailing, 4).padding(.vertical, 4)
         .background(Theme.noteBox, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -552,6 +557,7 @@ struct ItemDetailView: View {
     /// The sheets live in the window state and are presented from the root, so a fold doesn't close them.
     @Environment(WindowState.self) private var ui
     @State private var confirmedPutAway = false
+    @AppStorage(Hint.move.key) private var moveHintDone = false
     @State private var error: String?
     @State private var deleting = false
     @Environment(ProAccess.self) private var pro
@@ -598,12 +604,14 @@ struct ItemDetailView: View {
                                 Button(item.place == nil ? "Choose a place…" : "Move…") { ui.itemSheet = .move(item.id) }
                                     .buttonStyle(SoftButtonStyle(compact: true))
                                     .accessibilityIdentifier("item.move")
-                                    .popoverTip(MoveTip())
                                 if putAway {
                                     Button("Put away here") {
                                         do { try store.move(item, to: item.place); confirmedPutAway = true } catch { self.error = error.plainMessage() }
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
+                            }
+                            if !moveHintDone, !putAway, !item.archived, Hint.move.isShown() {
+                                HintCard(hint: .move, title: "Moved it?", message: "Tap Move when you put it somewhere new. You'll know where to look next time.") { moveHintDone = true }
                             }
                             if item.isLent, !item.archived {
                                 if let line = item.lentLine { Text(line).font(.wbCaption).foregroundStyle(Theme.ink) }

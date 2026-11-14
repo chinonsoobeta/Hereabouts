@@ -1,33 +1,65 @@
 import SwiftUI
-import TipKit
 
-/// One-time hints shown where a feature lives. Each appears once and then stays dismissed.
-enum HereaboutsTips {
-    static func configure() {
-        #if DEBUG
-        let arguments = ProcessInfo.processInfo.arguments
-        if arguments.contains("--show-tips") { Tips.showAllTipsForTesting() }
-        else if arguments.contains("--ui-test-library") { Tips.hideAllTipsForTesting() }
-        #endif
-        try? Tips.configure([.displayFrequency(.daily)])
+/// One-time hints, each a card in the list where its feature lives: a button that does it, and Dismiss.
+/// Never a bubble hanging from the top of the screen, which reads like a notification (owner, 14 November).
+/// Either button puts the card away for good.
+enum Hint: String, CaseIterable {
+    case putAway, move, leaving
+
+    var key: String { "hintDismissed." + rawValue }
+    func isShown(in defaults: UserDefaults = .standard) -> Bool { !Self.hiddenForTesting && !defaults.bool(forKey: key) }
+    func dismiss(in defaults: UserDefaults = .standard) { defaults.set(true, forKey: key) }
+
+    /// Put-away mode is worth a mention once there are a few things to put away, and not while it's on.
+    static func suggestsPutAway(itemCount: Int, putAwayOn: Bool, in defaults: UserDefaults = .standard) -> Bool {
+        itemCount >= 5 && !putAwayOn && putAway.isShown(in: defaults)
     }
+
+    /// UI tests of other screens run without hints, so their layouts stay put. `--show-tips` brings them back, fresh.
+    static func configureForTesting() {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--show-tips") { allCases.forEach { UserDefaults.standard.removeObject(forKey: $0.key) } }
+        #endif
+    }
+
+    static var hiddenForTesting: Bool { SiriTip.hiddenForTesting }
 }
 
-struct PutAwayTip: Tip {
-    @Parameter static var itemCount: Int = 0
-    var title: Text { Text("Putting things away?") }
-    var message: Text? { Text("Turn on Put-away mode here to move several things to one place.") }
-    var rules: [Rule] { #Rule(Self.$itemCount) { $0 >= 5 } }
-}
+/// A hint as a note in the list: a serif title, a line of ink, then its buttons.
+struct HintCard: View {
+    let hint: Hint
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
+    var actionTitle: LocalizedStringKey?
+    var action: (() -> Void)?
+    let dismiss: () -> Void
+    @Environment(\.dynamicTypeSize) private var textSize
 
-struct MoveTip: Tip {
-    var title: Text { Text("Moved it?") }
-    var message: Text? { Text("Tap Move when you put it somewhere new. You'll know where to look next time.") }
-}
+    var body: some View {
+        let buttons = textSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0)) : AnyLayout(HStackLayout(spacing: 20))
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.wbItem).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
+            Text(message).font(.wbBody).foregroundStyle(Theme.ink).fixedSize(horizontal: false, vertical: true)
+            buttons {
+                if let actionTitle, let action {
+                    Button { withAnimation { hint.dismiss(); action() } } label: { tappable(Text(actionTitle).font(.wbBody.weight(.bold)).foregroundStyle(Theme.purpleInk)) }
+                        .buttonStyle(.plain).accessibilityIdentifier("hint.\(hint.rawValue).action")
+                }
+                Button { withAnimation { hint.dismiss(); dismiss() } } label: { tappable(Text("Dismiss").font(.wbBody).foregroundStyle(Theme.ink)) }
+                    .buttonStyle(.plain).accessibilityIdentifier("hint.\(hint.rawValue).dismiss")
+            }
+        }
+        .padding(.horizontal, 14).padding(.top, 12).padding(.bottom, 2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.noteBox, in: RoundedRectangle(cornerRadius: 6))
+        .overlay { RoundedRectangle(cornerRadius: 6).stroke(Theme.ink, lineWidth: 1.5) }
+        .accessibilityElement(children: .contain)
+    }
 
-struct LeavingTip: Tip {
-    var title: Text { Text("Check off things as you pack") }
-    var message: Text? { Text("Tap I'm leaving to check if you still need to pack anything.") }
+    /// The whole 44-point row is the button, not just its word.
+    private func tappable(_ label: some View) -> some View {
+        label.frame(minWidth: 44, minHeight: 44, alignment: .leading).contentShape(Rectangle())
+    }
 }
 
 /// The Siri tips on the Find tab, one per phrase. Each is shown until it is dismissed, then stays gone.
@@ -36,7 +68,7 @@ enum SiriTip: String, CaseIterable {
     var key: String { "siriTipDismissed." + rawValue }
     func isShown(in defaults: UserDefaults = .standard) -> Bool { !defaults.bool(forKey: key) }
     func dismiss(in defaults: UserDefaults = .standard) { defaults.set(true, forKey: key) }
-    /// UI tests of the screens themselves run without the system's tip view, whose own controls fail the accessibility audits.
+    /// UI tests of the screens themselves run without tips, whose extra rows would move what the tests tap.
     static var hiddenForTesting: Bool {
         #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
@@ -44,28 +76,5 @@ enum SiriTip: String, CaseIterable {
         #else
         return false
         #endif
-    }
-}
-
-/// Tips read like a note stuck in the margin: lilac paper, a serif title, ink text and a plain close.
-struct NotebookTipStyle: TipViewStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                configuration.title.font(.wbItem).foregroundStyle(Theme.ink)
-                configuration.message?.font(.wbBody).foregroundStyle(Theme.ink)
-                ForEach(configuration.actions) { action in
-                    Button(action: action.handler) { action.label().font(.wbBody.weight(.bold)).foregroundStyle(Theme.purpleInk) }
-                        .frame(minHeight: 44)
-                }
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-            Button { configuration.tip.invalidate(reason: .tipClosed) } label: {
-                Image(systemName: "xmark").font(.footnote.weight(.bold)).foregroundStyle(Theme.pencil).frame(width: 44, height: 44)
-            }
-            .accessibilityLabel("Close tip")
-        }
-        .padding(.leading, 16).padding(.vertical, 8)
     }
 }
