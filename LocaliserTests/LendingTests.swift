@@ -18,7 +18,7 @@ final class LendingTests: XCTestCase {
         XCTAssertTrue(deadline.active)
         XCTAssertNotNil(deadline.reminderInput)
         XCTAssertTrue(drill.lentLine?.hasPrefix("With Sam · since ") == true)
-        XCTAssertTrue(FindThingIntent.answer(for: drill).hasPrefix("Drill is with Sam, since "))
+        XCTAssertTrue(FindThingIntent.answer(for: drill).hasPrefix("You lent your Drill to Sam on "))
         XCTAssertEqual(ItemSearch.results(query: "sam", entries: store.searchIndex, archived: false).map(\.id), [drill.id])
 
         try store.askAgainNextWeek(deadline)
@@ -30,6 +30,28 @@ final class LendingTests: XCTestCase {
         XCTAssertNil(deadline.reminderInput, "No reminder once it's back")
         XCTAssertEqual(drill.movements.first { $0.kind == .back }?.summary, "Back from Sam")
         XCTAssertTrue(store.lentItems.isEmpty)
+    }
+
+    /// Beta feedback (13 Nov): asked where a lent thing is, Siri says who has it, since when, and that it isn't back.
+    func testSiriSaysALentThingIsWithTheBorrower() throws {
+        let store = try LocaliserStore(inMemory: true)
+        let shed = try store.addPlace(name: "Shed")
+        let drill = try store.addItem(name: "Cordless drill", place: shed)
+        let lentOn = try XCTUnwrap(Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 18)))
+        try store.lend(drill, to: "Sam", askBackOn: nil, on: lentOn)
+        let day = lentOn.formatted(.dateTime.day().month(.wide))
+        XCTAssertEqual(FindThingIntent.answer(for: drill), "You lent your Cordless drill to Sam on \(day) and haven't received it back yet.")
+        XCTAssertFalse(FindThingIntent.answer(for: drill).contains("Shed"), "Not where it usually lives: it's with Sam")
+
+        drill.lentAt = nil
+        XCTAssertEqual(FindThingIntent.answer(for: drill), "You lent your Cordless drill to Sam and haven't received it back yet.", "No lend date saved")
+
+        drill.isPrivate = true
+        XCTAssertEqual(FindThingIntent.answer(for: drill), "That one's private. Open Hereabouts to see it.", "A private thing never says who has it")
+
+        drill.isPrivate = false
+        try store.gotBack(drill)
+        XCTAssertEqual(FindThingIntent.answer(for: drill), "Cordless drill is in Shed.", "Back home, Siri gives its place again")
     }
 
     func testSettingRemindingAndClearingAnAskBackDate() throws {
