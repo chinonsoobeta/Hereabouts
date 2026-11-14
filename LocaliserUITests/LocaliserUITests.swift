@@ -341,6 +341,38 @@ import StoreKitTest
         #endif
     }
 
+    /// Hints are cards in the list with a button that does the thing and Dismiss (owner, 14 November).
+    func testHintsAreCardsInTheList() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--demo-library", "--show-tips"]
+        app.launch()
+        app.tabBars.buttons["Find"].tap()
+        let putAway = app.staticTexts["Putting things away?"]
+        XCTAssertTrue(putAway.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertTrue(app.buttons["hint.putAway.dismiss"].exists)
+        try audit(app, [.contrast, .elementDetection, .hitRegion, .sufficientElementDescription, .textClipped, .trait])
+        app.buttons["hint.putAway.action"].tap()
+        XCTAssertTrue(app.staticTexts["Choose a thing. Say where you put it."].waitForExistence(timeout: 5), "Turn on turns put-away mode on")
+        XCTAssertFalse(putAway.exists)
+        app.buttons["Find options"].tap()
+        app.buttons["Put-away mode"].tap()
+        XCTAssertTrue(app.staticTexts["Choose a thing. Say where you put it."].waitForNonExistence(timeout: 5))
+        XCTAssertFalse(putAway.exists, "Once used, it doesn't come back")
+
+        let search = app.searchFields.firstMatch
+        search.tap(); search.typeText("Winter")
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        let moved = app.staticTexts["Moved it?"]
+        XCTAssertTrue(moved.waitForExistence(timeout: 5), app.debugDescription)
+        app.buttons["hint.move.dismiss"].tap()
+        XCTAssertTrue(moved.waitForNonExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        app.staticTexts["Winter tires"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["item.move"].waitForExistence(timeout: 5))
+        XCTAssertFalse(moved.exists, "Dismissed, it stays gone")
+    }
+
     func testAddingAndSwitchingHomes() throws {
         continueAfterFailure = false
         let app = XCUIApplication()
