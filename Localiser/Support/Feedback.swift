@@ -20,6 +20,15 @@ enum Feedback {
         var language: String
     }
 
+    /// What's on the page, kept by the window so a fold or an iPad resize doesn't lose it (`WindowState.feedback`).
+    struct Draft: Equatable {
+        var name = ""
+        var message = ""
+        var email = ""
+        /// Showing the thanks. Leaving the page then starts the next note empty.
+        var sent = false
+    }
+
     enum Problem: Error, CaseIterable, Equatable, PlainSpoken {
         case noName, empty, tooLong, badEmail, offline, notSent
         var errorDescription: String? {

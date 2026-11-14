@@ -206,7 +206,12 @@ enum PackingSheet: Hashable, Identifiable {
     var ritual: Ritual?
     /// The places and things pushed on the compact Places tab.
     var placesPath: [PlaceRoute] = []
-    var settingsPath: [SettingsPage] = []
+    var settingsPath: [SettingsPage] = [] {
+        // Once a note is sent, leaving Send feedback starts the next one empty. An unsent one waits.
+        didSet { if feedback.sent, !settingsPath.contains(.feedback) { feedback = Feedback.Draft() } }
+    }
+    /// What's typed in Settings › Send feedback.
+    var feedback = Feedback.Draft()
     /// The trips and kits pushed on the Trips tab, or on the wide Trips list.
     var tripsPath: [TripRoute] = []
     /// The thing open on Lent out.

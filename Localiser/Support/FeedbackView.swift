@@ -1,37 +1,37 @@
 import SwiftUI
 
 /// Settings › Send feedback (owner, 13 Nov): written here and sent to support, with no email to write. The name comes
-/// first and the page lists exactly what's sent (Apple's rule for optional feedback forms). A failed send keeps the text.
+/// first and the page lists exactly what's sent (Apple's rule for optional feedback forms). A failed send keeps the text,
+/// and so does a fold or an iPad resize: what's typed is kept by the window, not by this page.
 struct FeedbackView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var name = ""
-    @State private var message = ""
-    @State private var email = ""
+    @Environment(WindowState.self) private var ui
     @State private var sending = false
-    @State private var sent = false
     @State private var problem: String?
 
     private var ready: Bool {
-        !sending && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !sending && !ui.feedback.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !ui.feedback.message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
-        Group { if sent { thanks } else { form } }
+        Group { if ui.feedback.sent { thanks } else { form } }
             .navigationTitle("Send feedback").navigationBarTitleDisplayMode(.inline)
     }
 
     private var form: some View {
-        SheetForm {
+        @Bindable var ui = ui
+        return SheetForm {
             Section {
-                TextField(text: $name, prompt: Text("First name is fine")) { Text("Your name") }
+                TextField(text: $ui.feedback.name, prompt: Text("First name is fine")) { Text("Your name") }
                     .textContentType(.name).accessibilityIdentifier("feedback.name")
             } header: { Text("Your name") }
             Section {
-                TextField(text: $message, prompt: Text("What's working, what isn't, or what you'd like to see"), axis: .vertical) { Text("Your feedback") }
+                TextField(text: $ui.feedback.message, prompt: Text("What's working, what isn't, or what you'd like to see"), axis: .vertical) { Text("Your feedback") }
                     .lineLimit(5...12).accessibilityIdentifier("feedback.message")
             } header: { Text("Your feedback") }
             Section {
-                TextField(text: $email, prompt: Text(verbatim: "you@example.com")) { Text("Your email (optional)") }
+                TextField(text: $ui.feedback.email, prompt: Text(verbatim: "you@example.com")) { Text("Your email (optional)") }
                     .keyboardType(.emailAddress).textContentType(.emailAddress)
                     .textInputAutocapitalization(.never).autocorrectionDisabled()
                     .accessibilityIdentifier("feedback.email")
@@ -41,12 +41,12 @@ struct FeedbackView: View {
                 Text("Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts \(Support.version) on iOS \(UIDevice.current.systemVersion). Nothing from your notebook is sent.")
                     .font(.wbCaption).foregroundStyle(Theme.secondary)
                 if let problem { Text(problem).font(.wbBody).foregroundStyle(Theme.amber) }
-                Link(destination: Support.mail(subject: "Hereabouts feedback", body: message)) { Text("Prefer email? Write to \(Support.email)") }
+                Link(destination: Support.mail(subject: "Hereabouts feedback", body: ui.feedback.message)) { Text("Prefer email? Write to \(Support.email)") }
             }
         }
         .groundBackground()
-        .onChange(of: name) { _, value in
-            if value.count > Feedback.maximumNameLength { name = String(value.prefix(Feedback.maximumNameLength)) }
+        .onChange(of: ui.feedback.name) { _, value in
+            if value.count > Feedback.maximumNameLength { ui.feedback.name = String(value.prefix(Feedback.maximumNameLength)) }
         }
         .safeAreaInset(edge: .bottom) {
             Button { Task { await send() } } label: {
@@ -70,11 +70,11 @@ struct FeedbackView: View {
     private func send() async {
         problem = nil
         do {
-            let note = try Feedback.note(name: name, message: message, email: email)
+            let note = try Feedback.note(name: ui.feedback.name, message: ui.feedback.message, email: ui.feedback.email)
             sending = true
             defer { sending = false }
             try await Feedback.send(note)
-            sent = true
+            ui.feedback.sent = true
             AccessibilityNotification.Announcement(String(localized: "Thanks. Your feedback was sent.")).post()
         } catch {
             let text = error.plainMessage()
