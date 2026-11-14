@@ -795,6 +795,46 @@ import StoreKitTest
         try audit(app, [.contrast, .dynamicType, .textClipped])
     }
 
+    /// Send feedback is a page in the app with a Send button, not an email to write (owner, 13 Nov). The stand-in for
+    /// the site fails the first send, as if offline, and takes the next. The message stays after a failure.
+    func testFeedbackIsWrittenAndSentInTheApp() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--ui-test-library", UUID().uuidString, "--feedback-stand-in"]
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Settings"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Settings"].tap()
+        let row = app.buttons["settings.feedback"]
+        reveal(row, in: app); row.tap()
+        XCTAssertTrue(app.navigationBars["Send feedback"].waitForExistence(timeout: 5), app.debugDescription)
+        let message = app.descendants(matching: .any).matching(identifier: "feedback.message").firstMatch
+        XCTAssertTrue(message.waitForExistence(timeout: 5), app.debugDescription)
+        let send = app.buttons["feedback.send"]
+        XCTAssertFalse(send.isEnabled, "Nothing to send yet")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Nothing from your notebook is sent.'")).firstMatch.exists, "The page says what's sent")
+        let page = XCTAttachment(screenshot: app.screenshot()); page.name = "Send feedback"; page.lifetime = .keepAlways; add(page)
+        try audit(app, [.elementDetection, .hitRegion, .sufficientElementDescription, .trait])
+
+        message.tap(); message.typeText("Lent out is my favourite tab.")
+        XCTAssertFalse(send.isEnabled, "A name is needed too (Apple's rule for feedback forms, owner 13 Nov)")
+        let name = app.textFields["feedback.name"]
+        name.tap(); name.typeText("Sam")
+        let email = app.textFields["feedback.email"]
+        email.tap(); email.typeText("sam@")
+        XCTAssertTrue(send.isEnabled)
+        send.tap()
+        XCTAssertTrue(app.staticTexts["Check the email address, or leave it blank."].waitForExistence(timeout: 5), app.debugDescription)
+        email.tap(); email.typeText("example.com")
+        send.tap()
+        XCTAssertTrue(app.staticTexts["Couldn't send. Check your connection and try again."].waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertEqual(message.value as? String, "Lent out is my favourite tab.", "A failed send keeps the message")
+        send.tap()
+        XCTAssertTrue(app.staticTexts["Thanks. Your feedback was sent."].waitForExistence(timeout: 10), app.debugDescription)
+        let thanks = XCTAttachment(screenshot: app.screenshot()); thanks.name = "Feedback sent"; thanks.lifetime = .keepAlways; add(thanks)
+        app.buttons["feedback.done"].tap()
+        XCTAssertTrue(app.buttons["settings.feedback"].waitForExistence(timeout: 5), "Done goes back to Settings")
+    }
+
     /// Runs an audit, ignoring Dynamic Type reports for navigation bar buttons. Those use the system's
     /// large content viewer rather than growing with the text size, which the audit flags anyway.
     /// `unresolvedContrast`: accept a contrast issue that comes with no element. Only for a screen whose
