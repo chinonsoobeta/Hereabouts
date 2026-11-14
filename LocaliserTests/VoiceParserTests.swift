@@ -49,6 +49,16 @@ final class VoiceParserTests: XCTestCase {
 
     func testEnglishOnlyForNow() {
         XCTAssertTrue(VoiceCapture.isAvailable(for: Locale(identifier: "en_US")))
+        // Cancel while the phone is still getting ready (the microphone question, a speech download) means the start that was
+        // waiting never turns the microphone on afterwards (M64 audit).
+        var attempts = VoiceCapture.Attempts()
+        let first = attempts.begin()
+        XCTAssertTrue(attempts.isCurrent(first))
+        attempts.cancel()
+        XCTAssertFalse(attempts.isCurrent(first), "A start cancelled while it waited doesn't carry on")
+        let second = attempts.begin()
+        XCTAssertTrue(attempts.isCurrent(second))
+        XCTAssertFalse(attempts.isCurrent(first))
         XCTAssertTrue(VoiceCapture.isAvailable(for: Locale(identifier: "en_GB")))
         XCTAssertFalse(VoiceCapture.isAvailable(for: Locale(identifier: "fr_FR")))
         XCTAssertFalse(VoiceCapture.isAvailable(for: Locale(identifier: "es_ES")))

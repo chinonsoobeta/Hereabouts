@@ -18,6 +18,23 @@ final class FeedbackTests: XCTestCase {
         XCTAssertNil(try Feedback.note(name: "Sam", message: "Hi", email: "  ").email, "The email is optional")
     }
 
+    /// The page lists everything the note carries, the language too, so nothing is sent that isn't shown (M64 audit).
+    func testThePageShowsEverythingThatIsSent() throws {
+        let note = try Feedback.note(name: "Sam", message: "Hi", email: "")
+        let shown = Feedback.whatIsSent(for: note)
+        XCTAssertTrue(shown.contains(Feedback.languageName(note.language)), shown)
+        XCTAssertTrue(shown.contains(note.version), shown)
+        XCTAssertTrue(shown.contains(UIDevice.current.systemVersion), shown)
+        XCTAssertEqual(Feedback.languageName("fr-CA", in: Locale(identifier: "en_US")), "French (Canada)")
+        XCTAssertEqual(Feedback.languageName("xx-nonsense", in: Locale(identifier: "en_US")), "xx-nonsense", "An unknown tag is shown as it is")
+    }
+
+    func testThePrivacyPolicyListsTheLanguageToo() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let policy = try String(contentsOf: root.appendingPathComponent("Site/privacy.html"), encoding: .utf8)
+        XCTAssertTrue(policy.contains("your language"), "privacy.html lists every field Send feedback sends")
+    }
+
     func testNoNameABlankMessageALongOneOrABadEmailIsNotSent() {
         XCTAssertThrowsError(try Feedback.note(name: "  ", message: "Hi", email: "")) { XCTAssertEqual($0 as? Feedback.Problem, .noName) }
         XCTAssertThrowsError(try Feedback.note(name: String(repeating: "a", count: Feedback.maximumNameLength + 1), message: "Hi", email: "")) { XCTAssertEqual($0 as? Feedback.Problem, .noName) }

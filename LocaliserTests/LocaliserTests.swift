@@ -902,6 +902,23 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(maker.lastBackup, clock.now)
     }
 
+    /// A weekly backup that couldn't be saved (iCloud Drive full, say) is shown in Settings until one works (M64 audit).
+    func testAFailedAutomaticBackupIsRememberedUntilOneWorks() async throws {
+        let store = try LocaliserStore(inMemory: true)
+        _ = try store.addItem(name: "Passport", place: nil)
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        let (maker, clock, _) = try backupMaker(at: start)
+        var full = maker
+        full.write = { _, _ in throw CocoaError(.fileWriteOutOfSpace) }
+        guard case .failed = await full.runIfDue(store: store) else { return XCTFail("The write fails") }
+        XCTAssertEqual(maker.lastFailure, start, "Settings can say the backup didn't save")
+        XCTAssertNil(maker.lastBackup, "No backup date is made up")
+        clock.now = start.addingTimeInterval(AutomaticBackups.retryGap)
+        guard case .wrote = await maker.runIfDue(store: store) else { return XCTFail("It tries again the next day") }
+        XCTAssertNil(maker.lastFailure, "A backup that works clears it")
+        XCTAssertEqual(maker.lastBackup, clock.now)
+    }
+
     func testAutomaticBackupsKeepTheNewestFive() async throws {
         let store = try LocaliserStore(inMemory: true)
         _ = try store.addItem(name: "Passport", place: nil)
