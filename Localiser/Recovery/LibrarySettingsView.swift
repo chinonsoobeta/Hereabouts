@@ -142,7 +142,7 @@ struct LeavingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Take your notebook with you.").font(.wbDisplay).foregroundStyle(Theme.ink).accessibilityAddTraits(.isHeader)
-                Text("Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
+                Text("Your notebook stays on this iPhone, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere.").font(.wbBody).foregroundStyle(Theme.ink)
                 SectionHeading(title: String(localized: "Keep a copy"))
                 VStack(spacing: 0) {
                     Button { prepareBackup() } label: {

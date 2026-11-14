@@ -12135,100 +12135,6 @@
         }
       }
     },
-    "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere." : {
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nothing leaves this iPad except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
-                }
-              }
-            }
-          }
-        },
-        "en-GB" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nothing leaves this iPad except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nothing leaves this iPhone except copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nada sale de este iPad salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nada sale de este iPhone salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
-                }
-              }
-            }
-          }
-        },
-        "fr" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Rien ne quitte cet iPad, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Rien ne quitte cet iPhone, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
-                }
-              }
-            }
-          }
-        },
-        "pt-BR" : {
-          "variations" : {
-            "device" : {
-              "ipad" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nada sai deste iPad, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nada sai deste iPhone, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "Nothing lent out" : {
       "localizations" : {
         "en-GB" : {
@@ -22799,6 +22705,100 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seu nome"
+          }
+        }
+      }
+    },
+    "Your notebook stays on this iPhone, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook stays on this iPad, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook stays on this iPhone, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              }
+            }
+          }
+        },
+        "en-GB" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook stays on this iPad, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your notebook stays on this iPhone, apart from copies you save and, with Pro, weekly backups to your own iCloud Drive. You can keep a copy in a format you can open anywhere."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu libreta se queda en este iPad, salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu libreta se queda en este iPhone, salvo las copias que guardes y, con Pro, las copias semanales en tu propio iCloud Drive. Puedes guardar una copia en un formato que se abre en cualquier sitio."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre carnet reste sur cet iPad, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre carnet reste sur cet iPhone, sauf les copies que vous enregistrez et, avec Pro, les sauvegardes hebdomadaires dans votre iCloud Drive. Vous pouvez garder une copie dans un format lisible partout."
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu caderno fica neste iPad, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu caderno fica neste iPhone, exceto os backups que você salva e, com o Pro, os backups semanais no seu próprio iCloud Drive. Você pode salvar uma cópia em um formato que abre em qualquer lugar."
+                }
+              }
+            }
           }
         }
       }
