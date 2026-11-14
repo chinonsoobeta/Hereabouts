@@ -587,40 +587,6 @@
         }
       }
     },
-    "%@ is with %@, since %@." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ is with %2$@, since %3$@."
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ is with %@, since %@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ lo tiene %2$@ desde el %3$@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ est chez %2$@ depuis le %3$@."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ está com %2$@ desde %3$@."
-          }
-        }
-      }
-    },
     "%@ is with %@." : {
       "localizations" : {
         "en" : {
@@ -21853,6 +21819,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "As quantidades na mala e as que você definiu ficam mantidas. Confira a lista depois de salvar."
+          }
+        }
+      }
+    },
+    "You lent your %@ to %@ and haven't received it back yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You lent your %1$@ to %2$@ and haven't received it back yet."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You lent your %@ to %@ and haven't had it back yet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prestaste tu %1$@ a %2$@ y aún no ha vuelto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez prêté votre %1$@ à %2$@ et vous attendez toujours son retour."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você emprestou %1$@ para %2$@ e ainda não recebeu de volta."
+          }
+        }
+      }
+    },
+    "You lent your %@ to %@ on %@ and haven't received it back yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You lent your %1$@ to %2$@ on %3$@ and haven't received it back yet."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You lent your %@ to %@ on %@ and haven't had it back yet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prestaste tu %1$@ a %2$@ el %3$@ y aún no ha vuelto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez prêté votre %1$@ à %2$@ le %3$@ et vous attendez toujours son retour."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você emprestou %1$@ para %2$@ em %3$@ e ainda não recebeu de volta."
           }
         }
       }

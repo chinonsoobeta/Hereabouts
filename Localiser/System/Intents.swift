@@ -145,7 +145,8 @@ struct FindThingIntent: AppIntent {
         let path = item.place.map { place in severalHomes ? place.home.map { "\($0.name) · \(place.path)" } ?? place.path : place.path }
         if item.archived { return path.map { String(localized: "\(item.name) is archived. It was last in \($0).") } ?? String(localized: "\(item.name) is archived.") }
         if item.isMissing { return path.map { String(localized: "\(item.name) is marked missing. It was last in \($0).") } ?? String(localized: "\(item.name) is marked missing.") }
-        if item.isLent { return item.lentAt.map { String(localized: "\(item.name) is with \(item.lentTo), since \($0.formatted(.dateTime.day().month(.wide))).") } ?? String(localized: "\(item.name) is with \(item.lentTo).") }
+        // Lent: who has it and since when, not the shelf it usually lives on (owner's wording, 13 Nov).
+        if item.isLent { return item.lentAt.map { String(localized: "You lent your \(item.name) to \(item.lentTo) on \($0.formatted(.dateTime.day().month(.wide))) and haven't received it back yet.") } ?? String(localized: "You lent your \(item.name) to \(item.lentTo) and haven't received it back yet.") }
         if let trip = item.packedTrips.first { return path.map { String(localized: "\(item.name) is packed for \(trip.name). You keep it in \($0).") } ?? String(localized: "\(item.name) is packed for \(trip.name).") }
         guard let path else { return String(localized: "You've saved \(item.name), but haven't added a place yet.") }
         return String(localized: "\(item.name) is in \(path).")
