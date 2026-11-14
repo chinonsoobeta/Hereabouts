@@ -26,6 +26,16 @@ final class HintTests: XCTestCase {
         XCTAssertFalse(Hint.suggestsPutAway(itemCount: 50, putAwayOn: false, in: defaults))
     }
 
+    func testMovedItOnlyShowsBesideAMoveButton() throws {
+        let defaults = try freshDefaults()
+        XCTAssertTrue(Hint.suggestsMove(hasPlace: true, archived: false, putAwayOn: false, in: defaults))
+        XCTAssertFalse(Hint.suggestsMove(hasPlace: false, archived: false, putAwayOn: false, in: defaults), "Without a place the button says Choose a place, not Move")
+        XCTAssertFalse(Hint.suggestsMove(hasPlace: true, archived: true, putAwayOn: false, in: defaults))
+        XCTAssertFalse(Hint.suggestsMove(hasPlace: true, archived: false, putAwayOn: true, in: defaults), "Put-away mode has its own line")
+        Hint.move.dismiss(in: defaults)
+        XCTAssertFalse(Hint.suggestsMove(hasPlace: true, archived: false, putAwayOn: false, in: defaults))
+    }
+
     func testNoHintIsABubbleFromTheTopOfTheScreen() throws {
         let app = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Localiser")
         let files = try XCTUnwrap(FileManager.default.enumerator(at: app, includingPropertiesForKeys: nil)).compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" }
