@@ -155,7 +155,7 @@ Ten steps from a fresh install to the paywall and back, for the review notes' re
 
 ## App Privacy label
 
-- **Data collection:** "Data Not Collected". Hereabouts has no server, analytics, advertising or tracking SDK.
+- **Data collection:** "Data Not Collected". Hereabouts has no analytics, advertising or tracking SDK. Send feedback (Settings) sends the name, message, optional email and versions only when someone taps Send, to a Cloudflare Worker that emails support and stores nothing. The name is required and shown on the form, so it meets Apple's optional-disclosure rule for feedback forms (M69).
 - **Privacy manifest:** `Localiser/PrivacyInfo.xcprivacy` declares app-private UserDefaults use, reason `CA92.1`. Check the final archive's privacy report before submitting.
 - **Policy text:** `Site/privacy.html`. It covers on-device storage, homes, lending and the contact picker, private things, shelf-photo names, box labels, voice memos, automatic backups to the person's iCloud Drive, the widget, notifications, StoreKit, deleting data and support emails.
 
