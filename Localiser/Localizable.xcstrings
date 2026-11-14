@@ -3455,6 +3455,34 @@
         }
       }
     },
+    "Add your name." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add your name."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade tu nombre."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez votre nom."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicione seu nome."
+          }
+        }
+      }
+    },
     "All checked. Your notebook's up to date." : {
       "localizations" : {
         "en-GB" : {
@@ -4833,6 +4861,34 @@
         }
       }
     },
+    "Check the email address, or leave it blank." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the email address, or leave it blank."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el correo o déjalo en blanco."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez l’adresse e-mail ou laissez-la vide."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira o endereço de e-mail ou deixe em branco."
+          }
+        }
+      }
+    },
     "Check the thing, quantity and trip before changing this list." : {
       "localizations" : {
         "en-GB" : {
@@ -6145,6 +6201,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nada para nomear aqui. Tente uma foto mais de perto."
+          }
+        }
+      }
+    },
+    "Couldn't send right now. Try again later, or email %@." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't send right now. Try again later, or email %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo enviar ahora. Inténtalo más tarde o escribe a %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi impossible pour le moment. Réessayez plus tard ou écrivez à %@."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível enviar agora. Tente mais tarde ou escreva para %@."
+          }
+        }
+      }
+    },
+    "Couldn't send. Check your connection and try again." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't send. Check your connection and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo enviar. Revisa tu conexión e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi impossible. Vérifiez votre connexion et réessayez."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível enviar. Verifique sua conexão e tente de novo."
           }
         }
       }
@@ -7489,6 +7601,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Concluída"
+          }
+        }
+      }
+    },
+    "First name is fine" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name is fine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basta con tu nombre de pila"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre prénom suffit"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só o primeiro nome já basta"
           }
         }
       }
@@ -9287,6 +9427,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Manter uma cópia"
+          }
+        }
+      }
+    },
+    "Keep it to %@ characters or fewer." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it to %@ characters or fewer."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa %@ caracteres como máximo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ caractères au maximum."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use no máximo %@ caracteres."
           }
         }
       }
@@ -12257,6 +12425,34 @@
         }
       }
     },
+    "Only if you'd like a reply." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only if you'd like a reply."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo si quieres una respuesta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seulement si vous souhaitez une réponse."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só se você quiser uma resposta."
+          }
+        }
+      }
+    },
     "Open %@" : {
       "localizations" : {
         "en-GB" : {
@@ -13261,6 +13457,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planejar uma viagem com este kit"
+          }
+        }
+      }
+    },
+    "Prefer email? Write to %@" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prefer email? Write to %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Prefieres el correo? Escribe a %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous préférez l’e-mail ? Écrivez à %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prefere e-mail? Escreva para %@"
           }
         }
       }
@@ -15719,6 +15943,34 @@
         }
       }
     },
+    "Send" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        }
+      }
+    },
     "Send feedback" : {
       "localizations" : {
         "en-GB" : {
@@ -15743,6 +15995,68 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enviar comentários"
+          }
+        }
+      }
+    },
+    "Sending" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi en cours"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando"
+          }
+        }
+      }
+    },
+    "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %@ on iOS %@. Nothing from your notebook is sent." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %1$@ on iOS %2$@. Nothing from your notebook is sent."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %@ on iOS %@. Nothing from your notebook is sent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se envía al soporte de Hereabouts: tu nombre, tus comentarios, tu correo si lo añades y Hereabouts %1$@ en iOS %2$@. No se envía nada de tu libreta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé à l’assistance Hereabouts : votre nom, votre commentaire, votre e-mail si vous l’ajoutez, et Hereabouts %1$@ sur iOS %2$@. Rien de votre carnet n’est envoyé."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado ao suporte do Hereabouts: seu nome, seus comentários, seu e-mail se você adicionar um e Hereabouts %1$@ no iOS %2$@. Nada do seu caderno é enviado."
           }
         }
       }
@@ -17295,6 +17609,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mandar mensagem"
+          }
+        }
+      }
+    },
+    "Thanks. Your feedback was sent." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thanks. Your feedback was sent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gracias. Tus comentarios se enviaron."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merci. Votre commentaire a été envoyé."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obrigado. Seus comentários foram enviados."
           }
         }
       }
@@ -19839,6 +20181,34 @@
         }
       }
     },
+    "What's working, what isn't, or what you'd like to see" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's working, what isn't, or what you'd like to see"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué funciona, qué no o qué te gustaría ver"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce qui fonctionne, ce qui ne fonctionne pas, ou ce que vous aimeriez voir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que funciona, o que não funciona ou o que você gostaria de ver"
+          }
+        }
+      }
+    },
     "When you lend something, it shows here with who has it and when to ask for it back." : {
       "localizations" : {
         "en-GB" : {
@@ -20663,6 +21033,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anotar todos"
+          }
+        }
+      }
+    },
+    "Write your feedback first." : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write your feedback first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe primero tus comentarios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrivez d’abord votre commentaire."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escreva seus comentários primeiro."
           }
         }
       }
@@ -22265,6 +22663,34 @@
         }
       }
     },
+    "Your email (optional)" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your email (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu correo (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre e-mail (facultatif)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu e-mail (opcional)"
+          }
+        }
+      }
+    },
     "Your family" : {
       "localizations" : {
         "en-GB" : {
@@ -22293,6 +22719,34 @@
         }
       }
     },
+    "Your feedback" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your feedback"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus comentarios"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre commentaire"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seus comentários"
+          }
+        }
+      }
+    },
     "Your first %lld things are free. You can change your plan anytime in Settings." : {
       "localizations" : {
         "en-GB" : {
@@ -22317,6 +22771,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seus primeiros %lld objetos são grátis. Você pode mudar de plano quando quiser nos Ajustes."
+          }
+        }
+      }
+    },
+    "Your name" : {
+      "localizations" : {
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu nombre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre nom"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu nome"
           }
         }
       }

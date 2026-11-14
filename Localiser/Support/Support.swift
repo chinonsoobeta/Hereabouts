@@ -13,6 +13,8 @@ enum Support {
     static var terms: URL { URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")! }
     static var supportPage: URL { site.appendingPathComponent("support") }
     static var email: String { value("HereaboutsSupportEmail", "support@hereaboutsapp.com") }
+    /// Where Send feedback posts a note; the site emails it to support (Server/feedback).
+    static var feedbackURL: URL { URL(string: value("HereaboutsFeedbackURL", "https://feedback.hereaboutsapp.com/"))! }
 
     static var version: String {
         let info = Bundle.main.infoDictionary

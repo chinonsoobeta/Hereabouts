@@ -31,6 +31,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>HereaboutsAppGroup</key>
 	<string>$(HEREABOUTS_APP_GROUP)</string>
+	<key>HereaboutsFeedbackURL</key>
+	<string>$(HEREABOUTS_FEEDBACK_URL)</string>
 	<key>HereaboutsFreeThings</key>
 	<string>$(HEREABOUTS_FREE_THINGS)</string>
 	<key>HereaboutsSiteURL</key>

@@ -144,7 +144,7 @@ enum Destination: Hashable {
 enum PlaceRoute: Hashable { case place(UUID), item(UUID) }
 
 /// A page pushed in Settings, kept in the window state so a fold doesn't send you back to the list.
-enum SettingsPage: Hashable { case pro, homes, leaving, acknowledgements }
+enum SettingsPage: Hashable { case pro, homes, leaving, feedback, acknowledgements }
 
 /// The sheets a thing opens. They are presented from the root, so they stay open when the layout changes.
 enum ItemSheet: Hashable, Identifiable {

@@ -1,4 +1,4 @@
-// node --test Server/feedback/test
+// cd Server/feedback && npm test
 // What the feedback Worker accepts from the app, and the email it writes to support (owner, 13 Nov).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

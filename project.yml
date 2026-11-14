@@ -14,6 +14,8 @@ settings:
     # Public website and support address. hereaboutsapp.com, bought 8 November.
     HEREABOUTS_SITE_URL: https://hereaboutsapp.com
     HEREABOUTS_SUPPORT_EMAIL: support@hereaboutsapp.com
+    # Send feedback posts here; a Cloudflare Worker (Server/feedback) emails each note to support (owner, 13 Nov).
+    HEREABOUTS_FEEDBACK_URL: https://feedback.hereaboutsapp.com/
     HEREABOUTS_FREE_THINGS: '15'
     # The App Group shared with the widget. The notebook moves into it on the first launch (NotebookFile).
     HEREABOUTS_APP_GROUP: group.dev.hereabouts.app
@@ -32,6 +34,8 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         HereaboutsSiteURL: $(HEREABOUTS_SITE_URL)
         HereaboutsSupportEmail: $(HEREABOUTS_SUPPORT_EMAIL)
+        HereaboutsFeedbackURL: $(HEREABOUTS_FEEDBACK_URL)
+        # Send feedback uses HTTPS through the system only, which is exempt.
         ITSAppUsesNonExemptEncryption: false
         UIAppFonts:
           - "AtkinsonHyperlegible-Bold.ttf"

@@ -1,0 +1,20 @@
+# The app's Send feedback page posts here; the Worker emails each note to support (owner, 13 Nov).
+# Deploy (owner's go-ahead each time):  cd Server/feedback && wrangler deploy
+# Once, before the first deploy, the owner sets where notes go (the Gmail address support@ forwards to, already a
+# verified Email Routing destination). It stays a secret, out of this public repo:
+#   wrangler secret put FEEDBACK_TO
+name = "hereabouts-feedback"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+workers_dev = false
+routes = [{ pattern = "feedback.hereaboutsapp.com", custom_domain = true }]
+
+# Any verified destination address on the account; which one comes from FEEDBACK_TO.
+[[send_email]]
+name = "EMAIL"
+
+# Five notes a minute from one address.
+[[ratelimits]]
+name = "LIMIT"
+namespace_id = "1301"
+simple = { limit = 5, period = 60 }

@@ -92,7 +92,7 @@ struct LibrarySettingsView: View {
             } header: { Text("Privacy") }
             Section {
                 Button("Show the introduction again", systemImage: "play.rectangle") { seenOnboarding = false }
-                Link(destination: Support.mail(subject: "Hereabouts feedback")) { Label("Send feedback", systemImage: "envelope") }
+                NavigationLink(value: SettingsPage.feedback) { Label("Send feedback", systemImage: "text.bubble") }.accessibilityIdentifier("settings.feedback")
                 Link(destination: Support.supportPage) { Label("Help and support", systemImage: "questionmark.circle") }
                 Link(destination: Support.privacy) { Label("Privacy Policy", systemImage: "hand.raised") }
                 Link(destination: Support.terms) { Label("Terms of Use", systemImage: "doc.plaintext") }
@@ -111,6 +111,7 @@ struct LibrarySettingsView: View {
             case .pro: ProView(showsClose: false).toolbarVisibility(.hidden, for: .tabBar)
             case .homes: HomesView().toolbarVisibility(.hidden, for: .tabBar)
             case .leaving: LeavingView().toolbarVisibility(.hidden, for: .tabBar)
+            case .feedback: FeedbackView().toolbarVisibility(.hidden, for: .tabBar)
             case .acknowledgements: AcknowledgementsView().toolbarVisibility(.hidden, for: .tabBar)
             }
         }
