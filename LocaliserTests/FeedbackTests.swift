@@ -75,6 +75,15 @@ final class FeedbackTests: XCTestCase {
     }
 
     /// Each failure is said in the app's own words, and a failed send says how else to reach support.
+    /// Feedback can leave the phone now, so no wording in any language may promise that nothing does (M65, 13 Nov).
+    func testNoWordingSaysNothingLeavesThePhone() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let catalog = try String(contentsOf: root.appendingPathComponent("Localiser/Localizable.xcstrings"), encoding: .utf8)
+        for promise in ["Nothing leaves", "Nada sale de", "Rien ne quitte", "Nada sai de"] {
+            XCTAssertFalse(catalog.contains(promise), promise)
+        }
+    }
+
     func testEveryProblemIsInTheAppsOwnWords() {
         for problem in Feedback.Problem.allCases {
             let text = problem.plainMessage()
