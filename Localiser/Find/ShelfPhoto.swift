@@ -26,12 +26,20 @@ enum ShelfReading {
         var seen = Set<String>()
         var kept: [String] = []
         for raw in names {
-            let name = String(raw.components(separatedBy: .newlines).joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines.union(.punctuationCharacters)).prefix(TextLimit.name))
+            let name = capitalized(String(raw.components(separatedBy: .newlines).joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines.union(.punctuationCharacters)).prefix(TextLimit.name)))
             guard !name.isEmpty, seen.insert(name.lowercased()).inserted else { continue }
             kept.append(name)
             if kept.count == maximumNames { break }
         }
         return kept
+    }
+
+    /// "laptop" becomes "Laptop", as someone would write it. A first word with its own capitals ("iPad", "USB") stays as it is.
+    static func capitalized(_ name: String) -> String {
+        guard let first = name.first, first.isLowercase else { return name }
+        let firstWord = name.prefix { !$0.isWhitespace }
+        if firstWord.dropFirst().contains(where: \.isUppercase) { return name }
+        return first.uppercased() + name.dropFirst()
     }
 
     /// How many of `wanted` fit: all with Pro, otherwise what's left on the free plan.
