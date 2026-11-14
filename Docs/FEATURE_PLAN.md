@@ -407,4 +407,5 @@ In order:
 - NFC tags for boxes.
 - An insurance-value report.
 - Importing from web pages, which would need the app to go online.
+- **Smart speakers** (someone's suggestion, 13 November; the owner: a later maybe). An Alexa skill runs on a server, so answering "where's my drill?" would need a copy of the notebook in the cloud, accounts to link Alexa to it, and the App Store label changed from Data Not Collected. That goes against the privacy policy's "Nothing from your notebook is ever sent to us" and the listing's "Your notebook stays on your iPhone". A shared speaker also answers anyone in the room, which private things (the spare key, passports) can't allow; on the phone, Siri refuses them and the phone is locked to its owner. Google closed this kind of third-party voice app in 2023, so in practice it would mean Alexa. Look again only if household sharing (B6) brings a server anyway. A HomePod may already answer "Where are my keys in Hereabouts?" by passing it to the owner's iPhone (Personal Requests, in the Home app); try it on a HomePod before telling anyone it works.
 - Android: the backup format in `LibraryBackup.swift` is the thing to write down first.
