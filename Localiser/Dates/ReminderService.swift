@@ -104,17 +104,40 @@ final class ReminderService: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions { [.banner, .sound] }
-
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        if let ritual = response.notification.request.content.userInfo["ritual"] as? String {
-            await MainActor.run { openedRitual = ritual }
-            return
+    /// What a tapped notification says, read out before it leaves the system's thread.
+    struct Tap: Sendable {
+        var ritual: String?
+        var deadlineID: String?
+        var action: String
+        init(userInfo: [AnyHashable: Any], action: String) {
+            ritual = userInfo["ritual"] as? String
+            deadlineID = userInfo["deadlineID"] as? String
+            self.action = action
         }
-        guard let raw = response.notification.request.content.userInfo["deadlineID"] as? String,
-              let id = UUID(uuidString: raw) else { return }
-        let action = response.actionIdentifier
-        await handle(id: id, action: action)
+    }
+
+    // Completion handlers, not the async versions: those hand control back to iOS on a background thread, and UIKit
+    // aborts when it then updates the app's snapshot (the build 4 beta crash, 12 November). Both finish on the main actor.
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                            withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        nonisolated(unsafe) let finish = completionHandler
+        Task { @MainActor in finish([.banner, .sound]) }
+    }
+
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping () -> Void) {
+        let tap = Tap(userInfo: response.notification.request.content.userInfo, action: response.actionIdentifier)
+        nonisolated(unsafe) let finish = completionHandler
+        Task { @MainActor in
+            self.receive(tap)
+            finish()
+        }
+    }
+
+    func receive(_ tap: Tap) {
+        if let ritual = tap.ritual { openedRitual = ritual; return }
+        guard let raw = tap.deadlineID, let id = UUID(uuidString: raw) else { return }
+        handle(id: id, action: tap.action)
     }
 
     /// Sunday recap, the monthly stocktake and the evening before a trip. Recomputed whenever the library changes.

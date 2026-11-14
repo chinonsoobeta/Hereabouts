@@ -2,7 +2,7 @@
 
 The owner asked for two adversarial audits of the build that will be submitted, once the hint cards were in (14 November): one by Claude, one by Codex (GPT 6.1 Sol, medium reasoning, read-only). They worked separately. Codex's scope was the diff since `7c07cd6` (hint cards, shelf-photo capitals, strings), the Send feedback path end to end against the privacy claims, and a sweep for App Review risks (2.1, 3.1, 5.1) and data loss.
 
-Each finding got a failing test first (`ac325c6`, `b167966`), then the fix (`5cf4d26`).
+Each finding got a failing test first (`ac325c6`, `b167966`, `5f1fa45`), then the fix (`5cf4d26`, and the crash fix after it). The owner then OK'd reading the beta crash report, which added finding 5.
 
 ## Found and fixed
 
@@ -11,6 +11,7 @@ Each finding got a failing test first (`ac325c6`, `b167966`), then the fix (`5cf
 | 1 | Codex | Should fix | Voice: tapping Cancel while the speech model was still downloading closed the sheet, but the suspended start carried on and turned the microphone on afterwards, with nothing left to stop it. | `VoiceCapture.Attempts`: each start gets a number, and Cancel retires it. A start checks after every wait and stops quietly once it is no longer the current one. |
 | 2 | Codex | Should fix | Send feedback sent the phone's language, but the form, `Site/privacy.html` and `BETA_AND_RELEASE.md` didn't list it. Apple's optional-disclosure rule for feedback forms needs the page to show everything that is sent. | The form now names the language (for example "French (Canada)") along with the versions, in every language. The policy and the release notes list it too. The privacy page needs redeploying, which needs the owner's yes. |
 | 3 | Codex | Should fix | An automatic backup that failed to save (iCloud Drive full, for example) was silently dropped. Settings kept showing the last good date. | `AutomaticBackups.lastFailure` is set when a backup fails and cleared by the next one that works. Settings › Backups shows a warning line until then, with iPad wording. |
+| 5 | Beta crash report | Should fix | The one beta crash (build 4, 12 November, iPhone 17 Pro Max, iOS 27.2.1): tapping a reminder opened Hereabouts, and half a second later it aborted. The async `didReceive` delegate method finished on a background thread, and UIKit asserts on the main thread when it updates the app's snapshot after a notification. | Both notification delegate methods take completion handlers instead, called from the main actor. What a tap says is read into a `Sendable` value first (`ReminderService.Tap`). Test `5f1fa45`, fix in the next commit. |
 | 4 | Both | Minor | The "Moved it?" card said "Tap Move" on a thing with no place, where the button reads "Choose a place…". | `Hint.suggestsMove` needs a place, an active thing, and put-away mode off. |
 
 ## Checked and fine
@@ -47,5 +48,4 @@ Each finding got a failing test first (`ac325c6`, `b167966`), then the fix (`5cf
 
 ## Open
 
-- **Build 4 crash report.** One crash came in from a tester on 12 November (iPhone 17 Pro Max, iOS 27.2.1), and it doesn't match a known cause. It was on build 4, and builds 5 to 7 changed the code since. Reading it means downloading the report, which waits for the owner's OK.
 - **What neither audit covered.** Device behaviour, live StoreKit, Cloudflare settings and the packaged resources of the submission archive. Those are checked by `scripts/check-release.sh` and the owner's check of the build on the phone.
