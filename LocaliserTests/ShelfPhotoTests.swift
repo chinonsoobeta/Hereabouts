@@ -8,6 +8,12 @@ import XCTest
         XCTAssertEqual(ShelfReading.clean((1...20).map { "Box \($0)" }).count, 12)
     }
 
+    func testNamesStartWithACapitalLikeTheyWouldInANotebook() {
+        XCTAssertEqual(ShelfReading.clean(["laptop", "blue suitcase", "écharpe"]), ["Laptop", "Blue suitcase", "Écharpe"], "Only the first letter changes")
+        XCTAssertEqual(ShelfReading.clean(["iPad", "eBook reader", "USB cable", "Tape measure"]), ["iPad", "eBook reader", "USB cable", "Tape measure"], "Names with their own capitals stay as they are")
+        XCTAssertEqual(ShelfReading.clean(["drill", "Drill"]), ["Drill"], "Still one of each")
+    }
+
     func testFreePlanFitting() {
         XCTAssertEqual(ShelfReading.fitting(5, unlocked: false, activeItems: 17, freeLimit: 20), 3)
         XCTAssertEqual(ShelfReading.fitting(5, unlocked: false, activeItems: 25, freeLimit: 20), 0)
