@@ -38,7 +38,7 @@ struct FeedbackView: View {
             } header: { Text("Your email (optional)") }
               footer: { Text("Only if you'd like a reply.").foregroundStyle(Theme.secondary) }
             Section {
-                Text("Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts \(Support.version) on iOS \(UIDevice.current.systemVersion). Nothing from your notebook is sent.")
+                Text(Feedback.whatIsSent(language: Feedback.currentLanguage, version: Support.version, system: Feedback.currentSystem))
                     .font(.wbCaption).foregroundStyle(Theme.secondary)
                 if let problem { Text(problem).font(.wbBody).foregroundStyle(Theme.amber) }
                 Link(destination: Support.mail(subject: "Hereabouts feedback", body: ui.feedback.message)) { Text("Prefer email? Write to \(Support.email)") }

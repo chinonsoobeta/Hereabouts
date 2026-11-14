@@ -189,7 +189,7 @@ final class LocalizationTests: XCTestCase {
                 if locs.values.contains(where: { Self.variesByDevice($0) }) { varied += 1 }
             }
         }
-        XCTAssertEqual(varied, 15, "13 strings that name the iPhone and 2 that say phone; the camera prompt says device, because the system reads it without device variations")
+        XCTAssertEqual(varied, 16, "14 strings that name the iPhone and 2 that say phone; the camera prompt says device, because the system reads it without device variations")
     }
 
     func testRoomIconsMatchEveryLanguage() {

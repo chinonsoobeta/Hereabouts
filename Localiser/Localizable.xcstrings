@@ -15905,36 +15905,36 @@
         }
       }
     },
-    "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %@ on iOS %@. Nothing from your notebook is sent." : {
+    "Sent to Hereabouts support: your name, your feedback, your email if you add one, your language (%@), and Hereabouts %@ on %@. Nothing from your notebook is sent." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %1$@ on iOS %2$@. Nothing from your notebook is sent."
+            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, your language (%1$@), and Hereabouts %2$@ on %3$@. Nothing from your notebook is sent."
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, and Hereabouts %@ on iOS %@. Nothing from your notebook is sent."
+            "value" : "Sent to Hereabouts support: your name, your feedback, your email if you add one, your language (%1$@), and Hereabouts %2$@ on %3$@. Nothing from your notebook is sent."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se envía al soporte de Hereabouts: tu nombre, tus comentarios, tu correo si lo añades y Hereabouts %1$@ en iOS %2$@. No se envía nada de tu libreta."
+            "value" : "Se envía al soporte de Hereabouts: tu nombre, tus comentarios, tu correo si lo añades, tu idioma (%1$@) y Hereabouts %2$@ en %3$@. No se envía nada de tu libreta."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoyé à l’assistance Hereabouts : votre nom, votre commentaire, votre e-mail si vous l’ajoutez, et Hereabouts %1$@ sur iOS %2$@. Rien de votre carnet n’est envoyé."
+            "value" : "Envoyé à l’assistance Hereabouts : votre nom, votre commentaire, votre e-mail si vous l’ajoutez, votre langue (%1$@), et Hereabouts %2$@ sur %3$@. Rien de votre carnet n’est envoyé."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enviado ao suporte do Hereabouts: seu nome, seus comentários, seu e-mail se você adicionar um e Hereabouts %1$@ no iOS %2$@. Nada do seu caderno é enviado."
+            "value" : "Enviado ao suporte do Hereabouts: seu nome, seus comentários, seu e-mail se você adicionar um, seu idioma (%1$@) e Hereabouts %2$@ no %3$@. Nada do seu caderno é enviado."
           }
         }
       }
@@ -22949,6 +22949,100 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seu primeiro backup é salvo logo depois de abrir o app."
+          }
+        }
+      }
+    },
+    "Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPhone." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPhone."
+                }
+              }
+            }
+          }
+        },
+        "en-GB" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPhone."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu última copia automática no se guardó. Hereabouts lo intentará de nuevo mañana. Comprueba que haya espacio en iCloud Drive o en este iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tu última copia automática no se guardó. Hereabouts lo intentará de nuevo mañana. Comprueba que haya espacio en iCloud Drive o en este iPhone."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre dernière sauvegarde automatique n’a pas été enregistrée. Hereabouts réessaiera demain. Vérifiez qu’il reste de l’espace dans iCloud Drive ou sur cet iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre dernière sauvegarde automatique n’a pas été enregistrée. Hereabouts réessaiera demain. Vérifiez qu’il reste de l’espace dans iCloud Drive ou sur cet iPhone."
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "device" : {
+              "ipad" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu último backup automático não foi salvo. O Hereabouts tenta de novo amanhã. Veja se há espaço no iCloud Drive ou neste iPad."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Seu último backup automático não foi salvo. O Hereabouts tenta de novo amanhã. Veja se há espaço no iCloud Drive ou neste iPhone."
+                }
+              }
+            }
           }
         }
       }

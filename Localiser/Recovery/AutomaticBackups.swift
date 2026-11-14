@@ -20,6 +20,8 @@ struct AutomaticBackups: @unchecked Sendable {
     static let enabledKey = "automaticBackupsOn"
     static let lastKey = "automaticBackupLast"
     static let attemptKey = "automaticBackupAttempt"
+    /// When the last automatic backup failed to save; cleared by the next one that works. Settings shows it (M64 audit).
+    static let failedKey = "automaticBackupFailed"
     /// The photos chosen under "Photos and documents to include", which the automatic backups carry too.
     static let filesKey = "backupFileIDs"
     static let keep = 5
@@ -42,6 +44,7 @@ struct AutomaticBackups: @unchecked Sendable {
         nonmutating set { defaults.set(newValue, forKey: Self.enabledKey) }
     }
     var lastBackup: Date? { date(forKey: Self.lastKey) }
+    var lastFailure: Date? { date(forKey: Self.failedKey) }
     private func date(forKey key: String) -> Date? {
         let time = defaults.double(forKey: key)
         return time > 0 ? Date(timeIntervalSince1970: time) : nil
@@ -64,7 +67,10 @@ struct AutomaticBackups: @unchecked Sendable {
         let current = now()
         defaults.set(current.timeIntervalSince1970, forKey: Self.attemptKey)
         let backup: LibraryBackup
-        do { backup = try store.backup(attachmentIDs: Self.savedSelection(in: defaults)) } catch { return .failed(error) }
+        do { backup = try store.backup(attachmentIDs: Self.savedSelection(in: defaults)) } catch {
+            defaults.set(current.timeIntervalSince1970, forKey: Self.failedKey)
+            return .failed(error)
+        }
         let maker = self
         return await Task.detached { maker.save(backup, at: current) }.value
     }
@@ -76,9 +82,13 @@ struct AutomaticBackups: @unchecked Sendable {
             let url = folder.appendingPathComponent(Self.fileName(for: current))
             try Self.coordinate(writing: url, .forReplacing) { try write(data, $0) }
             defaults.set(current.timeIntervalSince1970, forKey: Self.lastKey)
+            defaults.removeObject(forKey: Self.failedKey)
             prune()
             return .wrote(url)
-        } catch { return .failed(error) }
+        } catch {
+            defaults.set(current.timeIntervalSince1970, forKey: Self.failedKey)
+            return .failed(error)
+        }
     }
 
     private func prune() {

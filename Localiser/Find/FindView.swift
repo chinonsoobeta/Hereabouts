@@ -610,7 +610,7 @@ struct ItemDetailView: View {
                                     }.buttonStyle(SoftButtonStyle(compact: true))
                                 }
                             }
-                            if !moveHintDone, !putAway, !item.archived, Hint.move.isShown() {
+                            if !moveHintDone, Hint.suggestsMove(hasPlace: item.place != nil, archived: item.archived, putAwayOn: putAway) {
                                 HintCard(hint: .move, title: "Moved it?", message: "Tap Move when you put it somewhere new. You'll know where to look next time.") { moveHintDone = true }
                             }
                             if item.isLent, !item.archived {

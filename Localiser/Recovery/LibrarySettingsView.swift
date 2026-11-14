@@ -23,6 +23,7 @@ struct LibrarySettingsView: View {
     @AppStorage(Rituals.stocktakeKey) private var stocktakeOn = true
     @AppStorage(AutomaticBackups.enabledKey) private var automaticBackups = true
     @AppStorage(AutomaticBackups.lastKey) private var lastBackupTime = 0.0
+    @AppStorage(AutomaticBackups.failedKey) private var backupFailedTime = 0.0
 
     private var coverageSummary: String {
         switch reminders.permission {
@@ -77,6 +78,10 @@ struct LibrarySettingsView: View {
                     Toggle("Automatic backups", isOn: $automaticBackups)
                     Text(lastBackupTime > 0 ? "Last backup \(Date(timeIntervalSince1970: lastBackupTime).formatted(.relative(presentation: .named)))" : "Your first backup is saved soon after you open the app.")
                         .font(.wbCaption).foregroundStyle(Theme.pencil)
+                    if automaticBackups, backupFailedTime > 0 {
+                        Text("Your last automatic backup didn't save. Hereabouts tries again tomorrow. Check there's space in iCloud Drive or on this iPhone.")
+                            .font(.wbCaption).foregroundStyle(Theme.warning).fixedSize(horizontal: false, vertical: true)
+                    }
                 } else {
                     NavigationLink(value: SettingsPage.pro) {
                         NotebookLine(name: String(localized: "Automatic backups"), detail: String(localized: "Pro saves a copy of your notebook every week."))

@@ -54,7 +54,23 @@ enum Feedback {
         // One @, a dot after it, no spaces: the same check the site makes.
         if !address.isEmpty, address.count > 254 || address.wholeMatch(of: /[^\s@]+@[^\s@]+\.[^\s@]+/) == nil { throw Problem.badEmail }
         return Note(name: who, message: text, email: address.isEmpty ? nil : address, version: Support.version,
-                    system: "iOS \(UIDevice.current.systemVersion)", language: Locale.preferredLanguages.first ?? Locale.current.identifier)
+                    system: currentSystem, language: currentLanguage)
+    }
+
+    @MainActor static var currentSystem: String { "iOS \(UIDevice.current.systemVersion)" }
+    static var currentLanguage: String { Locale.preferredLanguages.first ?? Locale.current.identifier }
+
+    /// The language tag as a person reads it ("French (Canada)"); a tag the system doesn't know is shown as it is.
+    static func languageName(_ tag: String, in locale: Locale = .current) -> String {
+        locale.localizedString(forIdentifier: tag) ?? tag
+    }
+
+    /// The line under the form listing every field the note carries, so the page shows all of what is sent (M64 audit).
+    static func whatIsSent(for note: Note) -> String {
+        whatIsSent(language: note.language, version: note.version, system: note.system)
+    }
+    static func whatIsSent(language: String, version: String, system: String) -> String {
+        String(localized: "Sent to Hereabouts support: your name, your feedback, your email if you add one, your language (\(languageName(language))), and Hereabouts \(version) on \(system). Nothing from your notebook is sent.")
     }
 
     static func request(for note: Note) throws -> URLRequest {

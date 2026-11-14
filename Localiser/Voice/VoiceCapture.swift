@@ -9,6 +9,17 @@ import Speech
     enum Phase: Equatable { case idle, preparing, listening, finishing }
 
     private(set) var phase: Phase = .idle
+
+    /// Which start is still wanted. Getting ready waits (the microphone question, a speech download), and Cancel can come
+    /// in the meantime; a start that was cancelled while it waited must never turn the microphone on afterwards.
+    struct Attempts {
+        private var count = 0
+        private var live: Int?
+        mutating func begin() -> Int { count += 1; live = count; return count }
+        mutating func cancel() { live = nil }
+        func isCurrent(_ attempt: Int) -> Bool { live == attempt }
+    }
+    private var attempts = Attempts()
     /// What has been heard so far. Final once `stop()` returns.
     private(set) var transcript = ""
     var message: String?
@@ -38,14 +49,20 @@ import Speech
         message = nil; transcript = ""; finalText = ""
         if let standIn = Self.standInTranscript { transcript = standIn; return }
         phase = .preparing
+        let mine = attempts.begin()
+        func stillWanted() throws { guard attempts.isCurrent(mine) else { throw CancellationError() } }
         do {
             guard await AVAudioApplication.requestRecordPermission() else {
                 throw VoiceError.noMicrophone
             }
+            try stillWanted()
             let locale = await SpeechTranscriber.supportedLocale(equivalentTo: Locale(identifier: "en-US")) ?? Locale(identifier: "en-US")
+            try stillWanted()
             let transcriber = SpeechTranscriber(locale: locale, transcriptionOptions: [], reportingOptions: [.volatileResults], attributeOptions: [])
             try await install(transcriber)
+            try stillWanted()
             let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber])
+            try stillWanted()
             let analyzer = SpeechAnalyzer(modules: [transcriber])
             self.analyzer = analyzer
 
@@ -75,8 +92,12 @@ import Speech
             engine.prepare()
             try engine.start()
             try await analyzer.start(inputSequence: stream)
+            // Cancelled while the analyzer started: stop() has already turned everything off.
+            guard attempts.isCurrent(mine) else { return }
             phase = .listening
         } catch {
+            // Cancelled while getting ready: stop() has already put things back, and a newer start may be under way.
+            guard attempts.isCurrent(mine) else { return }
             message = (error as? VoiceError)?.text ?? PlainWords.notListening.text
             teardown()
             phase = .idle
@@ -85,6 +106,7 @@ import Speech
 
     /// Stops listening and returns everything heard.
     @discardableResult func stop() async -> String {
+        attempts.cancel()
         if Self.standInTranscript != nil { phase = .idle; return transcript }
         guard phase == .listening else { teardown(); phase = .idle; return transcript }
         phase = .finishing

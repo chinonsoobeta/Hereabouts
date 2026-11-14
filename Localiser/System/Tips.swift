@@ -15,6 +15,11 @@ enum Hint: String, CaseIterable {
         itemCount >= 5 && !putAwayOn && putAway.isShown(in: defaults)
     }
 
+    /// "Tap Move" only makes sense beside a Move button: a thing with a place, not archived, outside put-away mode.
+    static func suggestsMove(hasPlace: Bool, archived: Bool, putAwayOn: Bool, in defaults: UserDefaults = .standard) -> Bool {
+        hasPlace && !archived && !putAwayOn && move.isShown(in: defaults)
+    }
+
     /// UI tests of other screens run without hints, so their layouts stay put. `--show-tips` brings them back, fresh.
     static func configureForTesting() {
         #if DEBUG
