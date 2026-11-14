@@ -12,7 +12,7 @@ enum AskBackNote {
     static func text(for item: Belonging) -> String { text(person: item.lentTo, thing: item.name) }
 
     /// Whether this device can send a text. Without Messages, the thing page shares the note instead, and reminders have no button.
-    static var canText: Bool { MFMessageComposeViewController.canSendText() }
+    @MainActor static var canText: Bool { MFMessageComposeViewController.canSendText() }
 }
 
 /// A note waiting to open in Messages.
