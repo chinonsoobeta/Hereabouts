@@ -226,6 +226,32 @@ final class LocaliserTests: XCTestCase {
         XCTAssertEqual(store.openedItem, item.id, "Tapping an ask-back reminder opens the thing")
     }
 
+    /// The one beta crash (build 4, 12 November): tapping a reminder opened Hereabouts, and the async delegate method
+    /// told iOS it was done from a background thread, so UIKit aborted. The delegate takes completion handlers and
+    /// calls them from the main actor, and what a tap says is read into a value before it crosses over.
+    func testATappedNotificationIsHandledAndFinishedOnTheMainThread() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let source = try String(contentsOf: root.appendingPathComponent("Localiser/Dates/ReminderService.swift"), encoding: .utf8)
+        XCTAssertFalse(source.contains("didReceive response: UNNotificationResponse) async"), "No async didReceive")
+        XCTAssertFalse(source.contains("willPresent notification: UNNotification) async"), "No async willPresent")
+        XCTAssertEqual(source.components(separatedBy: "withCompletionHandler completionHandler").count - 1, 2)
+
+        let store = try LocaliserStore(inMemory: true)
+        let item = try store.addItem(name: "Cordless drill")
+        let deadline = try XCTUnwrap(store.lend(item, to: "Sam", askBackOn: XCTUnwrap(CalendarDay(.now).adding(days: 5))))
+        let previous = UNUserNotificationCenter.current().delegate
+        defer { UNUserNotificationCenter.current().delegate = previous }
+        let service = ReminderService()
+        service.store = store
+        service.receive(ReminderService.Tap(userInfo: ["deadlineID": deadline.id.uuidString], action: UNNotificationDefaultActionIdentifier))
+        XCTAssertEqual(store.openedItem, item.id)
+        service.receive(ReminderService.Tap(userInfo: ["ritual": "recap"], action: UNNotificationDefaultActionIdentifier))
+        XCTAssertEqual(service.openedRitual, "recap")
+        store.openedItem = nil
+        service.receive(ReminderService.Tap(userInfo: ["deadlineID": "not a uuid"], action: UNNotificationDefaultActionIdentifier))
+        XCTAssertNil(store.openedItem)
+    }
+
     /// "Text them" on the reminder opens the thing and the note to send (owner, 12 Nov). Tapping the reminder itself opens only the thing.
     func testTextThemOnAReminderOpensTheThingAndTheNote() throws {
         let store = try LocaliserStore(inMemory: true)
