@@ -75,6 +75,24 @@ final class FeedbackTests: XCTestCase {
     }
 
     /// Each failure is said in the app's own words, and a failed send says how else to reach support.
+    /// What's typed is kept by the window, above the part a fold or an iPad resize rebuilds, as every other editor's is
+    /// (M65, 13 Nov). Leaving the page keeps an unsent note; once one is sent, the next starts empty.
+    @MainActor func testTheWindowKeepsTheNoteUntilItIsSent() {
+        let ui = WindowState()
+        ui.settingsPath = [.feedback]
+        ui.feedback.name = "Sam"; ui.feedback.message = "Lent out is my favorite tab."; ui.feedback.email = "sam@example.com"
+        ui.wide = true
+        XCTAssertEqual(ui.feedback, Feedback.Draft(name: "Sam", message: "Lent out is my favorite tab.", email: "sam@example.com"), "A fold keeps it")
+        ui.settingsPath = []
+        XCTAssertEqual(ui.feedback.message, "Lent out is my favorite tab.", "An unsent note waits for the person to come back")
+        ui.settingsPath = [.feedback]
+        ui.feedback.sent = true
+        ui.wide = false
+        XCTAssertTrue(ui.feedback.sent, "The thanks stays through a fold too")
+        ui.settingsPath = []
+        XCTAssertEqual(ui.feedback, Feedback.Draft(), "After sending, the next note starts empty")
+    }
+
     /// Feedback can leave the phone now, so no wording in any language may promise that nothing does (M65, 13 Nov).
     func testNoWordingSaysNothingLeavesThePhone() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
